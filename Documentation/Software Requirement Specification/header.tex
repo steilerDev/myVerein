@@ -1,0 +1,150 @@
+%
+% Change settings and packages of the Latex document here.
+%
+
+\documentclass[%
+	pdftex,
+	oneside,        % One-sided print
+	11pt,           % Font size
+	parskip=half,   % The half of a line margin after line feeds
+	headsepline,    % Line after header
+	footsepline,    % Line after footer
+	abstracton,     % Abstract headings
+	USenglish,        % Written in English
+	a4paper,        % Written on Din A4 paper
+]{report}
+
+% Line feeds and more
+\usepackage[activate]{microtype}
+
+% Coding of document
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+
+% Custom header
+\usepackage{fancyhdr}
+
+% Appendix and inclusion of PDF pages within appendix
+\usepackage[toc,page]{appendix}
+\usepackage{pdfpages}
+
+% Margin between lines (1 1/2)
+\usepackage[onehalfspacing]{setspace}
+
+% Index-creation
+\usepackage{makeidx}
+
+% English localization
+\usepackage[USenglish]{babel}
+
+% Correct quotes for the document
+\usepackage[english=american]{csquotes}
+
+% Tables for first page
+\usepackage{longtable}
+\setlength{\tabcolsep}{10pt} %Abstand zwischen Spalten
+\renewcommand{\arraystretch}{1.5} %Zeilenabstand
+
+% Graphics
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{subcaption}
+
+% Bibliography
+\usepackage[style=alphabetic,backend=biber,natbib=true]{biblatex}
+\addbibresource{SRS.bib}
+
+% Colors
+\usepackage{color}
+\definecolor{LinkColor}{rgb}{0,0,0.2}
+\definecolor{ListingBackground}{rgb}{0.92,0.92,0.92}
+
+% PDF Settings
+\usepackage[%
+	pdftitle={\pdftitel},
+	pdfauthor={\autor},
+	pdfsubject={\arbeit},
+	pdfcreator={pdflatex, LaTeX},
+	pdfpagemode=UseOutlines, % Start at TOC after opening PDF
+	pdfdisplaydoctitle=true, % Show title instead of file name
+	pdflang=eng % Language of the document
+]{hyperref}
+
+% (Color) settings for links within the PDF
+\hypersetup{%
+	colorlinks=false, % Deactivation of colors within PDF
+	linkcolor=LinkColor, % Color used
+	citecolor=LinkColor,
+	filecolor=LinkColor,
+	menucolor=LinkColor,
+	urlcolor=LinkColor,
+	bookmarksnumbered=true % Enumerate headings within PDF overview
+}
+
+\usepackage{varioref}
+
+% Hurenkinder und Schusterjungen verhindern
+% http://projekte.dante.de/DanteFAQ/Silbentrennung
+\clubpenalty=10000
+\widowpenalty=10000
+\displaywidowpenalty=10000
+
+% Sourcecode
+\usepackage{listings}
+\lstloadlanguages{Java}
+\lstset{%
+	%language=PHP,            % Sprache des Quellcodes
+	%numbers=left,           % Zeilennummern links
+	frame=single,            % Frame around the listing
+	keepspaces=true,         
+	stepnumber=1,            % Jede Zeile nummerieren.
+	numbersep=5pt,           % 5pt Abstand zum Quellcode
+	numberstyle=\tiny,       % Zeichengrösse 'tiny' für die Nummern.
+	breaklines=true,         % Zeilen umbrechen wenn notwendig.
+	breakautoindent=true,    % Nach dem Zeilenumbruch Zeile einrücken.
+	postbreak=\space,        % Bei Leerzeichen umbrechen.
+	tabsize=2,               % Tabulatorgrösse 2
+	basicstyle=\ttfamily\footnotesize, % Nichtproportionale Schrift, klein für den Quellcode
+	showspaces=false,        % Leerzeichen nicht anzeigen.
+	showstringspaces=false,  % Leerzeichen auch in Strings ('') nicht anzeigen.
+	extendedchars=true,      % Alle Zeichen vom Latin1 Zeichensatz anzeigen.
+	captionpos=b,            % sets the caption-position to bottom
+	backgroundcolor=\color{ListingBackground} % Hintergrundfarbe des Quellcodes setzen.
+}
+\lstset{
+    extendedchars=true,
+    literate={->}{{\ding{213}}}1,
+    moredelim=[is][\underbar]{@}{@}
+}
+
+% Glossary
+\usepackage[
+	nonumberlist, % Do not show page numbers
+	acronym,      % Seperate table of acronyms
+	%section,     % Show glossary as section within TOC
+	%toc,          % Show entries within TOC
+]{glossaries}
+
+% Counter for pictures and tables are not reseted after a new chapter
+\usepackage{chngcntr}
+\counterwithout{figure}{chapter}
+\counterwithout{table}{chapter}
+\counterwithout{equation}{chapter}
+
+% Footnotes
+\usepackage[perpage, hang, multiple, stable]{footmisc}
+
+% Chemical and mathematical formulas
+\usepackage[version=3]{mhchem}
+\usepackage{amsmath}
+
+% Watermark
+%\usepackage[draft]{draftwatermark}
+%\SetWatermarkText{Highly C o n f i d e n t i a l -- Approved only}
+%\SetWatermarkLightness{0.65}
+%\SetWatermarkAngle{60}
+
+% Title, Author and Date
+\title{\titel}
+\author{\autor}
+\date{\datum}

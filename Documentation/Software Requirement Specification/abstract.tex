@@ -1,0 +1,9 @@
+\pagestyle{empty}
+
+\renewcommand{\abstractname}{Abstract}
+\begin{abstract}
+\gls{TheMachine} exploits a wide range of new technologies and introduces a new, powerful architecture. It realizes an entire datacenter within a single chassis, containing tens of thousands of cores. It is inevitable that some of these cores will fail over time. If non-fault tolerant distributed software is run on such a system, the failure of a single node (e.g., a \gls{SoCGlos}) could potentially lead to a complete termination of the service. \acrfull{OSAF} addresses this problem, deploying applications as highly available mission critical services on fault tolerant clusters. This means that applications running as \acrshort{OSAF} services are protected against node failures, giving up to a \enquote{five nines} availability. We port \acrshort{OSAF} to \gls{TheMachine}, then port the \gls{Metabox} database to run on \gls{TheMachine} using \acrshort{OSAF}.
+
+\gls{Metabox} itself is the newly released, complex database system produced by \gls{HPLabs}. A comprehensive high-availability support tailored for such system has not been provided and is highly demanded. This is due to the need to process a huge amount of data, since \gls{Metabox} is a candidate to become a finder for the \gls{TheMachine}-file system. Therefore it needs to scan all memory regions of the datacenter to provide a fast access of data used by a specific application, becoming the largest ingest metadata system in the world, growing constantly.
+
+\end{abstract}

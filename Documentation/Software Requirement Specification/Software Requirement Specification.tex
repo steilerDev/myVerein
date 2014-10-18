@@ -1,0 +1,99 @@
+\newcommand{\pdftitel}{myVerein - Software Requirement Specification}
+\newcommand{\autor}{Frank Steiler}
+\newcommand{\arbeit}{Student Research Project}
+
+\input{header}
+
+\newcommand{\titel}{myVerein}
+\newcommand{\subtitel}{Software Requirement Specification}
+\newcommand{\matrikelnr}{8216767}
+\newcommand{\kurs}{TINF12A}
+\newcommand{\datumAbgabe}{September 2014}
+\newcommand{\firma}{Hewlett-Packard GmbH}
+\newcommand{\firmenort}{Böblingen}
+\newcommand{\abgabeort}{Stuttgart}
+\newcommand{\abschluss}{Bachelor of Science}
+\newcommand{\studiengang}{Applied Computer Science}
+\newcommand{\dhbw}{Stuttgart}
+\newcommand{\betreuer}{Alfred Becker}
+\newcommand{\zeitraum}{13 Weeks}
+
+\makeglossaries
+\input{glossary}
+
+\begin{document}
+    % Set counter of listings global (Only possible within document)
+    \counterwithout{lstlisting}{chapter}
+
+	% Deckblatt
+	\begin{spacing}{1}
+		\input{frontpage}
+	\end{spacing}
+	\newpage
+	
+	\renewcommand{\thepage}{\Roman{page}}
+	\setcounter{page}{1}
+	
+	% Erklärung
+	\input{declaration}
+	\newpage
+
+	\pagestyle{plain}
+
+	% Inhaltsverzeichnis
+	\begin{spacing}{1.1}
+	    \setcounter{secnumdepth}{2}
+		\setcounter{tocdepth}{2}
+		\tableofcontents
+	\end{spacing}
+	\newpage
+
+    
+
+	\renewcommand{\thepage}{\arabic{page}}
+	\setcounter{page}{1}
+
+	% Inhalt
+	\input{content/chapters}
+
+	% Anhang
+	\clearpage
+	\pagenumbering{roman}
+
+	% Abbildungsverzeichnis
+	\cleardoublepage
+	\phantomsection \label{listoffig}
+	\addcontentsline{toc}{chapter}{List of figures}
+	\listoffigures
+
+	%Tabellenverzeichnis
+	%\cleardoublepage
+	%\phantomsection \label{listoftab}
+	%\addcontentsline{toc}{chapter}{List of tables}
+	%\listoftables
+
+	% Quellcodeverzeichnis
+	\cleardoublepage
+	\phantomsection \label{listoflist}
+	\addcontentsline{toc}{chapter}{Listings}
+	\lstlistoflistings
+
+	% Literaturverzeichnis
+	\cleardoublepage
+	\phantomsection \label{listoflit}
+	\addcontentsline{toc}{chapter}{Bibliography}
+	\printbibliography
+	
+	%	makeglossaries makeglossaries dokumentation.acn && makeglossaries dokumentation.glo
+	\cleardoublepage
+	\phantomsection \label{listofacr}
+	\addcontentsline{toc}{chapter}{Acronyms}
+	\printglossary[type=\acronymtype]
+
+	% Glossar
+	\cleardoublepage
+	\phantomsection \label{glos}
+	\addcontentsline{toc}{chapter}{Glossary}
+	\printglossary[style=altlist,title=Glossary]
+
+\end{document}
