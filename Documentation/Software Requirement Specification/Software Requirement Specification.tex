@@ -35,8 +35,8 @@
 	\setcounter{page}{1}
 	
 	% Erklärung
-	\input{declaration}
-	\newpage
+	%\input{declaration}
+	%\newpage
 
 	\pagestyle{plain}
 
@@ -67,33 +67,33 @@
 	\listoffigures
 
 	%Tabellenverzeichnis
-	%\cleardoublepage
-	%\phantomsection \label{listoftab}
-	%\addcontentsline{toc}{chapter}{List of tables}
-	%\listoftables
+	\cleardoublepage
+	\phantomsection \label{listoftab}
+	\addcontentsline{toc}{chapter}{List of tables}
+	\listoftables
 
 	% Quellcodeverzeichnis
-	\cleardoublepage
-	\phantomsection \label{listoflist}
-	\addcontentsline{toc}{chapter}{Listings}
-	\lstlistoflistings
+	%\cleardoublepage
+	%\phantomsection \label{listoflist}
+	%\addcontentsline{toc}{chapter}{Listings}
+	%\lstlistoflistings
 
 	% Literaturverzeichnis
-	\cleardoublepage
-	\phantomsection \label{listoflit}
-	\addcontentsline{toc}{chapter}{Bibliography}
-	\printbibliography
+	%\cleardoublepage
+	%\phantomsection \label{listoflit}
+	%\addcontentsline{toc}{chapter}{Bibliography}
+	%\printbibliography
 	
 	%	makeglossaries makeglossaries dokumentation.acn && makeglossaries dokumentation.glo
-	\cleardoublepage
-	\phantomsection \label{listofacr}
-	\addcontentsline{toc}{chapter}{Acronyms}
-	\printglossary[type=\acronymtype]
+	%\cleardoublepage
+	%\phantomsection \label{listofacr}
+	%\addcontentsline{toc}{chapter}{Acronyms}
+	%\printglossary[type=\acronymtype]
 
 	% Glossar
-	\cleardoublepage
-	\phantomsection \label{glos}
-	\addcontentsline{toc}{chapter}{Glossary}
-	\printglossary[style=altlist,title=Glossary]
+	%\cleardoublepage
+	%\phantomsection \label{glos}
+	%\addcontentsline{toc}{chapter}{Glossary}
+	%\printglossary[style=altlist,title=Glossary]
 
 \end{document}

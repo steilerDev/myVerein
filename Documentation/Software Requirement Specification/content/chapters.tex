@@ -5,7 +5,7 @@
 
 \chapter{Product purpose}
 
-The system is intended to simplify the management of a club by unifying the communication channel between the representatives of the organisation and the members. This goal is going to be achieved by using modern technology. The product should be implemented as a server client architecture, where the client is an iOS running smartphone or tablet. 
+The system is intended to simplify the management of a club by unifying the communication channel between the representatives of the organisation and the members. This goal is going to be achieved by using modern technology. The product should be implemented as a server client architecture, where the client is an iOS running smartphone or tablet.
 
 \section{Obligatory requirements} % must-have
 The fulfilment of the following criteria is mandatory:
@@ -14,7 +14,7 @@ The fulfilment of the following criteria is mandatory:
 \begin{itemize}
 \item The user needs to be able to log himself into the server provided by his club at the start of the application
 \item The user needs to be able to check the upcoming schedule of the club
-\item The user needs to be able to send and receive messages of all members of the club
+\item The user needs to be able to send and receive messages
 \end{itemize}
 
 \textbf{Administrator}
@@ -39,12 +39,12 @@ The fulfilment of the following criteria is mandatory:
 \item The system needs to provide a secure user authentication
 \item The system needs to handle the login of multiple users at the same time
 \item The system needs to handle several messages at the same time
-\item The system should be configurable through a web interface, that enables the administrator to manage user and publish relevant information.
-\item The system needs to be developed in Java 8
+\item The system should be configurable through a web interface, that enables the administrator to manage user
 \item The system needs to operate according to the data privacy act
 \item The system needs to be designed in a way that a user can only access a minimum amount of private data of the other users
 \item The system needs to be designed to be easily extensible
 \item The system needs to gather the data from a relational database
+\item The system needs to be developed in Java 8
 \end{itemize}
 
 \section{Optional requirements} % nice-to-have
@@ -54,27 +54,32 @@ The following requirements are optional, but their implementation is nice to hav
 \item The administrator should be able to create divisions
 \item Each user should be able to be part of one or more divisions, to only receive relevant information.
 \item The system should support private chats for each division
+\item Invitations to events should be send to divisions
 \item The user should be able to request access to a division, this access is granted by a higher level user
 \item The user should be able to share photos that are relevant to the club
 \item The application should use push notifications to effectively alert the user about incoming messages, news or upcoming events
-\item The system should be designed to ensure extensibility 
+\item The system should be designed to ensure extensibility
 \item The application should be developed using Swift
 \item The user should be able to optional create a public profile containing contact information
-\item The application should be created according to the Apple Developer Guidlines
+\item The application should be created according to the Apple Developer Guidelines
 \end{itemize}
 
 \section{Additional requirements}
 The following requirements would improve the overall user experience, but their implementation is not business critical.
 \begin{itemize}
-\item The application could have a central news feed, which contains the latest information provided by the administrator.
-\item The application could be implemented multilingual. 
-\item The system could have a second member type, that is allowed to publish news and events.
+\item The application could have a central news feed, which contains the latest information provided by the administrator
+\item The administrator could be able to publish relevant information through the web interface
+\item The application could be implemented multilingual
+\item The system could have a second member type, that is allowed to publish news and events
 \item The application could be able to send and receive attachments in messages, like photos or audio messages
 \item The application could handle multiple accounts on different or on the same server
-\item The application could support the native resolution of different devices, like the iPad or the iPad mini.
+\item The application could support the native resolution of different devices, like the iPad or the iPad mini
 \item The system could send an Email newsletter for members that are not owning a smartphone running iOS
-\item The events could support assignment of supporting roles needed during the event 
+\item The events could support assignment of supporting roles needed during the event
 \item The events could support voting buttons to find the ideal date for the meeting
+\item The system could support the download of shared pictures
+\item The system could support the use of shared pictures within the news of the club
+\item The application could support user management for administrating users within the application
 \end{itemize}
 
 \section{Non-requirements} %need-not-to-have
@@ -96,8 +101,283 @@ The application can be used by every registered member of an organisation, ownin
 The setup and administration of the server environment should be done by a person that is a skilled IT administrator.
 
 \section{Operation condition}
+The application is intended to run on a iPhone 6 in upright orientation, operated by one user at a time. The server application needs to run on a web server with any operating system.
+
+\chapter{Technical requirements}
+\section{Software}
+The users device needs to run at least iOS 8. The server is recommended to run a current version of Linux, for example Debian Whezzy or Ubuntu 14.04 LTS.
+
+\section{Hardware}
+To use the application the user needs an iPhone or iPad of an independent revision. The server needs to be scaled according to the amount of registered members and requests.
+
+\chapter{Product functions}
+<PF\_A\_0000> Launch application \\
+<PF\_A\_0010> Show splash screen \\
+<PF\_A\_0011> Show login form \\ 
+<PF\_A\_0020> Log into the system using user credentials and server address \\
+<PF\_A\_0021> Request access to a server \\
+<PF\_A\_0030> View schedule of the club \\
+<PF\_A\_0040> View detailed information about upcoming events \\
+<PF\_A\_0050> View list of all conversations the user is a part of \\
+<PF\_A\_0060> Select and view a conversation the user is a part of \\
+<PF\_A\_0070> Send a message to a conversation the user is a part of \\
+<PF\_A\_0080> Receive a message within a conversation the user is a part of \\
+<PF\_A\_0090> Request access to additional divisions \\
+<PF\_A\_0100> Share photos by uploading them to the server \\
+<PF\_A\_0101> Change private information (Email address, Password, etc.) \\
+<PF\_A\_0102> Reset password using provided email \\
+<PF\_A\_0110> Create public profile \\
+<PF\_A\_0120> Edit public profile \\
+<PF\_A\_0130> View public profile of other user \\
+<PF\_A\_0140> Receive push notifications \\
+<PF\_A\_0150> Log out of the system \\
+<PF\_A\_0160> Quit application \\
+<PF\_A\_0170> Pause application \\
+\\
+<PF\_S\_0010> Launch server application \\
+<PF\_S\_0020> Login of administrating users only \\
+<PF\_S\_0030> Initial setup of application through user interface \\
+<PF\_S\_0040> Create new user \\
+<PF\_S\_0050> Delete existing user \\
+<PF\_S\_0060> Change membership of user within divisions \\
+<PF\_S\_0070> Create new event \\
+<PF\_S\_0080> Add division to event \\
+<PF\_S\_0090> Change event \\
+<PF\_S\_0100> Authenticate user \\
+<PF\_S\_0110> Receive, process and relay messages of authenticated users \\
+<PF\_S\_0120> Change administrator credentials \\
+<PF\_S\_0130> Edit administrating user \\
+<PF\_S\_0140> Securely connect to database and gather relevant information \\
+<PF\_S\_0150> Log out of system  \\
+
+\chapter{Product data}
+\section{Non-persistent data}
+<PD\_A\_0000> Viewed user profiles \\
+\\
+<PD\_S\_0000> Currently logged in administration user \\
 
 
+\section{Persistent data}
+<PD\_A\_0010> Login credentials (Until log out) \\
+<PD\_A\_0020> User settings \\
+<PD\_A\_0030> Received messages for a user specific amount of time (Default 1 month) \\
+<PD\_A\_0040> Scheduled events for a user specific amount of time after the event occurred (Default 1 month) \\
+<PD\_A\_0050> User information \\
+\\
+<PD\_S\_0010> User information, encrypted credentials and their affiliations within the club \\
+<PD\_S\_0020> Non delivered messages \\
+<PD\_S\_0030> All upcoming events and their invited divisions \\
+<PD\_S\_0040> All uploaded user photos \\
 
+\chapter{Quality requirements}
+\section{User application}
 
+\begin{table}[h]
+  \begin{tabular}{| l || c | c | c | c |}
+      \hline
+      & Very important & Important & Normal & Un-important \\ \hline \hline
+      Reliability & x & & & \\ \hline
+      User friendly & x & & & \\ \hline
+      Efficiently & & x & & \\ \hline
+      Functionality & & x & & \\ \hline
+      Portability & & & x &  \\ \hline
+      Adjustability & & & x &  \\ \hline
+  \end{tabular}
+  \caption{Quality requirements for the user application}
+\end{table}
+
+\paragraph{Reliability (Correctness \& fault tolerance):}
+
+It is very important for the user application to run seamlessly and does not crash unexpectedly.
+
+\paragraph{User friendly:}
+
+It is very important to create a user friendly application, whose interface is intuitively usable. A user should not need a special training to be able to operate the application.
+
+\paragraph{Efficiently:}
+
+It is important to establish an efficient workflow to ensure a frustration free operation. 
+
+\paragraph{Functionality:}
+
+It is important, that the application is meeting all obligatory and optional requirements.
+
+\paragraph{Portability:}
+
+The app should primary run on Apple smartphones and the porting to an Apple tablet or Android device is optional.
+
+\paragraph{Adjustability:}
+
+The core of the application is not intended to be massively altered after the initial implementation.  
+
+\section{Server application}
+\begin{table}[h]
+  \begin{tabular}{| l || c | c | c | c |}
+      \hline
+      & Very important & Important & Normal & Un-important \\ \hline \hline
+      Reliability & x & & & \\ \hline
+      User friendly & & & x & \\ \hline
+      Efficiently & & x & & \\ \hline
+      Functionality & & x & & \\ \hline
+      Portability & x & & & \\ \hline
+      Adjustability & & & x & \\ \hline
+  \end{tabular}
+  \caption{Quality requirements for the server application}
+\end{table}
+
+\paragraph{Reliability (Correctness \& fault tolerance):}
+
+It is very important for the server application to run seamlessly and does not crash unexpectedly.
+
+\paragraph{User friendly:}
+
+A user friendly interface is not very important since the system application should only be operated by skilled administrators.
+
+\paragraph{Efficiently:}
+
+It is important to establish an efficient workflow to ensure a frustration free operation. 
+
+\paragraph{Functionality:}
+
+It is important, that the application is meeting all obligatory and optional requirements.
+
+\paragraph{Portability:}
+
+The application needs to support a wide array of operating systems and thereby it is very important to have a high portability.
+
+\paragraph{Adjustability:}
+
+The core of the application is not intended to be massively altered after the initial implementation.  
+
+\chapter{Test cases}
+
+\section{User application}
+
+\begin{longtable} {| p{.21\textwidth} | p{.39\textwidth} | p{.39\textwidth} |}
+    \caption{User application test cases}
+    \label{tab:testCasesUser} \\ \hline
+    Identifier & Description & Expected result \\ \hline \hline
+    \endfirsthead
+        \multicolumn{3}{c}
+        {{\bfseries \tablename\ \thetable{} -- continued from previous page}} \\
+        \hline
+        Identifier & Description & Expected result \\ \hline \hline
+    \endhead
+        \multicolumn{3}{c}{{Continued on next page}} \\
+    \endfoot
+    \endlastfoot
+
+    <PT\_A\_0000> & 
+    Launch application 
+        \begin{itemize} 
+            \item <PF\_A\_0000>
+            \item <PF\_A\_0010>
+            \item <PF\_A\_0011>
+        \end{itemize} & 
+    The Application launches without any error \\ \hline
+    
+    <PT\_A\_0010> & 
+    Planned stop of the application 
+        \begin{itemize}
+            \item <PF\_A\_0160>
+        \end{itemize} & 
+    The application is stopped without the loss of data \\ \hline
+    
+    <PT\_A\_0020> & 
+    Unplanned stop of the application, e.g. empty battery 
+        \begin{itemize}
+            \item <PF\_A\_0160>
+        \end{itemize} & 
+    The application is stopped without the loss of data \\ \hline
+    
+\end{longtable}
+
+\section{Server application}
+
+\begin{longtable} {| p{.21\textwidth} | p{.39\textwidth} | p{.39\textwidth} |}
+    \caption{Server application test cases}
+    \label{tab:testCasesServer} \\ \hline
+    Identifier & Description & Expected result \\ \hline \hline
+    \endfirsthead
+        \multicolumn{3}{c}
+        {{\bfseries \tablename\ \thetable{} -- continued from previous page}} \\
+        \hline
+        Identifier & Description & Expected result \\ \hline \hline
+    \endhead
+        \multicolumn{3}{c}{{Continued on next page}} \\
+    \endfoot
+    \endlastfoot
+
+    <PT\_S\_0000> & 
+    Launch application
+        \begin{itemize} 
+            \item <PF\_S\_0010>
+        \end{itemize} & 
+    The Application launches without any error \\ \hline
+
+    
+    <PT\_S\_0010> & 
+    Unplanned stop of the application, e.g. server reboot &
+    The application does not loose any data\\ \hline
+    
+\end{longtable}
+
+\chapter{Non-functional requirements}
+
+Since the Software uses sensible user information, it has to fulfil the requirements of the corresponding laws in the country where it should be used. In this special case, it has to fulfil the Bundesdatenschutzgesetz. Therefore it is not allowed to store any data, which is not directly needed for the system. If there are additional Information stored, the user has to be informed and needs to agree to that usage.
+The system should consume as less CPU – Power as possible, to make the complete server as efficient as possible, while still ensuring a reliable operation. This can be achieved by efficient programming and a good initial design.
+
+The complete source code is licensed using a GNU GPL version 2 license.
+
+\chapter{User interface}
+
+The user interface is going to use a common color scheme: \url{http://paletton.com/#uid=73i0u0kllll97A-ferBrsf4-F8P}
+
+\section{User application}
+The application should have a tabbed layout (Like the Facebook app). There would be 4-5 entries, depending on the features that are going to be implemented within the system: Calendar, Chats, Photos, News, Settings.
+
+\section{Server application}
+
+For the design of the web interface the Twitter Bootstrap engine is going to be used.
+
+\chapter{Development environment}
+
+\section{Software}
+
+For the development of the iPhone application the xCode IDE is going to be used, while the Java based server application is developed using Netbeans IDE.
+
+\section{Hardware}
+
+The software is going to be developed on a MacBook Pro Mid 2010, 15", while the client application is tested on an iPhone 6. The server application is going to be tested on \textbf{???}.
+
+\chapter{Key milestones}
+
+The milestones given in this document are just rough estimators.
+
+\begin{longtable} {| p{.04\textwidth} | p{.65\textwidth} | p{.15\textwidth} | p{.15\textwidth} |}
+    \caption{Key milestones and their scheduling}
+    \label{tab:milestones} \\ \hline
+    \# & Milestone & Target start date & Target completion date \\ \hline \hline
+    \endfirsthead
+        \multicolumn{4}{c}
+        {{\bfseries \tablename\ \thetable{} -- continued from previous page}} \\
+        \hline
+        \# & Milestone & Target start date & Target completion date \\ \hline \hline
+    \endhead
+        \multicolumn{4}{c}{{Continued on next page}} \\
+    \endfoot
+    \endlastfoot
+        
+        1 & Software Requirement Specification & 17.10.2014 & 20.10.2014 \\ \hline
+        2 & Server Specification & 20.10.2014 & 3.11.2014 \\ \hline
+        3 & Basic Server implementation (Obligatory requirements) & 03.11.2014 & 24.11.2014 \\ \hline
+        4 & User Application Specification & 20.10.2014 & 05.01.2015 \\ \hline
+        5 & Basic User Application Implementation & 05.01.2015 & 02.02.2015 \\ \hline
+        6 & Bug fixing and implementation of interaction between client and server & 02.02.2015 & 23.02.2015 \\ \hline
+        7 & Implementation of Optional requirements & 23.02.2015 & 13.04.2015 \\ \hline
+        8 & Writing of project paper & 17.10.2014 & 20.04.2015 \\ \hline
+        9 & Revision of paper and further bug fixing & 20.04.2015 & 18.05.2015 \\ \hline
+        10 & Implementation of additional requirements & 13.04.2014 & ... \\ \hline
+    
+\end{longtable}
 
