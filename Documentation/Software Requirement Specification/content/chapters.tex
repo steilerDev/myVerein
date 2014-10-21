@@ -10,21 +10,21 @@ The system is intended to simplify the management of a club by unifying the comm
 \section{Obligatory requirements} % must-have
 The fulfilment of the following criteria is mandatory:
 
-\textbf{User}
+\paragraph{User}
 \begin{itemize}
 \item The user needs to be able to log himself into the server provided by his club at the start of the application
 \item The user needs to be able to check the upcoming schedule of the club
 \item The user needs to be able to send and receive messages
 \end{itemize}
 
-\textbf{Administrator}
+\paragraph{Administrator}
 \begin{itemize}
 \item The administrator needs to be able to modify the server according to the clubs name etc.
 \item The administrator needs to be able to modify the access rights of all members of the club
 \item The administrator needs to be able to schedule an event
 \end{itemize}
 
-\textbf{Application (Client)}
+\paragraph{Application (Client)}
 \begin{itemize}
 \item The application needs to be optimised for the operation with an iPhone 6
 \item The application needs to ensure an intuitive operation
@@ -32,7 +32,7 @@ The fulfilment of the following criteria is mandatory:
 \item The application needs a basic graphical user interface
 \end{itemize}
 
-\textbf{System (Server)}
+\paragraph{System (Server)}
 \begin{itemize}
 \item The system needs to ensure a fault tolerant, consistent operation.
 \item The system needs to be configurable
@@ -93,7 +93,7 @@ The following requirements are not in the scope of this product.
 
 \chapter{Product environment}
 \section{Application area}
-The system combining a messaging app, as well as event organisation and news publishing service. These functionalities are intended to be used in the context of a single club or organisation.
+The system is combining a messaging app, as well as event organisation and news publishing service. These functionalities are intended to be used in the context of a single club or organisation.
 
 \section{User group}
 The application can be used by every registered member of an organisation, owning a smartphone with internet connection. Concluding the application is going to be used by a wide age group, including people that are not very familiar with the technology they are operating.
@@ -135,9 +135,13 @@ To use the application the user needs an iPhone or iPad of an independent revisi
 <PF\_A\_0170> Pause application \\
 \\
 <PF\_S\_0010> Launch server application \\
+<PF\_S\_0011> Access server user interface through web browser \\
+<PF\_S\_0012> Show login form \\
 <PF\_S\_0020> Login of administrating users only \\
 <PF\_S\_0030> Initial setup of application through user interface \\
 <PF\_S\_0040> Create new user \\
+<PF\_S\_0041> Accept user request \\
+<PF\_S\_0042> Decline user request \\
 <PF\_S\_0050> Delete existing user \\
 <PF\_S\_0060> Change membership of user within divisions \\
 <PF\_S\_0070> Create new event \\
@@ -145,10 +149,10 @@ To use the application the user needs an iPhone or iPad of an independent revisi
 <PF\_S\_0090> Change event \\
 <PF\_S\_0100> Authenticate user \\
 <PF\_S\_0110> Receive, process and relay messages of authenticated users \\
+<PF\_S\_0111> Receive and process uploaded pictures of authenticated users \\
 <PF\_S\_0120> Change administrator credentials \\
-<PF\_S\_0130> Edit administrating user \\
-<PF\_S\_0140> Securely connect to database and gather relevant information \\
-<PF\_S\_0150> Log out of system  \\
+<PF\_S\_0130> Securely connect to database and gather relevant information \\
+<PF\_S\_0140> Log out of system  \\
 
 \chapter{Product data}
 \section{Non-persistent data}
@@ -290,6 +294,158 @@ The core of the application is not intended to be massively altered after the in
         \end{itemize} & 
     The application is stopped without the loss of data \\ \hline
     
+    <PT\_A\_0030> & 
+    Interruption through system events (e.g. phone call) & 
+    The application  pauses without the loss of data and relaunches at the last view \\ \hline
+    
+    <PT\_A\_0040> & 
+    Log into the application
+        \begin{itemize}
+            \item <PD\_A\_0011>
+            \item <PF\_A\_0020>
+        \end{itemize} & 
+    The application loads all information provided by the server \\ \hline
+    
+    <PT\_A\_0050> & 
+    The user requests access to the server, providing his name and email address 
+        \begin{itemize}
+            \item <PF\_A\_0021>
+        \end{itemize} & 
+    The application reports a successfull request and the user receives an email notification \\ \hline
+    
+    <PT\_A\_0060> & 
+    The user receives access to the server
+        \begin{itemize}
+            \item <PF\_S\_0041>
+            \item <PD\_A\_0011>
+            \item <PF\_A\_0020>
+        \end{itemize} & 
+    The user receives an email notification and is able to log into the application \\ \hline
+    
+    <PT\_A\_0070> & 
+    The user has forgotten his credentials and needs to reset his password from the login screen
+        \begin{itemize}
+            \item <PD\_A\_0011>
+            \item <PF\_A\_0102>
+        \end{itemize} & 
+    The user receives an email notification with his new credentials \\ \hline
+    
+    <PT\_A\_0080> & 
+    The application syncs the data from the server
+        \begin{itemize}
+            \item <PF\_S\_0140>
+            \item <PF\_A\_0080>
+        \end{itemize} & 
+    The application connects to the server and receives only relevant and changed information (E.g. new/changed events or new messages) \\ \hline
+
+    <PT\_A\_0090> & 
+    Select calendar menu entry
+        \begin{itemize}
+            \item <PF\_A\_0030>
+        \end{itemize} & 
+    The application shows a calendar view with all upcoming events, published by the club and relevant to the user \\ \hline
+
+    <PT\_A\_0100> & 
+    Select calendar event
+        \begin{itemize}
+            \item <PF\_A\_0040>
+        \end{itemize} & 
+    The application shows detailed information about the selected event \\ \hline
+    
+    <PT\_A\_0110> & 
+    Select messages menu entry
+        \begin{itemize}
+            \item <PF\_A\_0050>
+        \end{itemize} & 
+    The application shows list of all user relevant conversations \\ \hline
+    
+    <PT\_A\_0120> & 
+    Select a message
+        \begin{itemize}
+            \item <PF\_A\_0060>
+        \end{itemize} & 
+    The application shows list of all user relevant conversations \\ \hline
+    
+    <PT\_A\_0130> & 
+    Send a message
+        \begin{itemize}
+            \item <PF\_A\_0070>
+            \item <PF\_S\_0110>
+        \end{itemize} & 
+    The application successfully sends the message to the server and then relays it to the correct receipients \\ \hline
+    
+    <PT\_A\_0140> & 
+    Select divisions menu entry
+        \begin{itemize}
+            \item <PF\_A\_0090>
+        \end{itemize} & 
+    Present a list of all divisions of the club \\ \hline
+    
+    <PT\_A\_0150> & 
+    Press on the request access to division button
+        \begin{itemize}
+            \item <PF\_A\_0090>
+        \end{itemize} & 
+    The application requests access to a certain division, the responsible administrator gets notified and the user is informed about the successful request\\ \hline
+    
+    <PT\_A\_0160> & 
+    Select photo menu entry
+        \begin{itemize}
+            \item <PF\_A\_0100>
+        \end{itemize} & 
+    The application shows a camera view, with the option to choose an existing photo \\ \hline
+    
+    <PT\_A\_0170> & 
+    Upload a selected photo
+        \begin{itemize}
+            \item <PF\_A\_0100>
+            \item <PF\_S\_0111>
+        \end{itemize} & 
+    The application uploads the photo, the server stores the photo and the application notifies the user about the successful upload\\ \hline
+    
+    <PT\_A\_0180> & 
+    Select the settings menu entry & 
+    The application presents a list of available settings options \\ \hline
+    
+    <PT\_A\_0190> & 
+    Select the public profile menu entry
+        \begin{itemize}
+            \item <PF\_A\_0110>
+            \item <PF\_A\_0120>
+        \end{itemize} & 
+    The application shows the current public profile of the user and the user is able to edit the entries \\ \hline
+    
+    <PT\_A\_0200> & 
+    Save the public profile
+        \begin{itemize}
+            \item <PF\_A\_0110>
+            \item <PF\_A\_0120>
+        \end{itemize} & 
+    The application uploads the updated public profile of the user to the server \\ \hline
+    
+    <PT\_A\_0210> & 
+    Select a contact within a conversation
+        \begin{itemize}
+            \item <PF\_A\_0060>
+            \item <PF\_A\_0130>
+        \end{itemize} & 
+    A detailed view of all private information shared by the contact is displayed \\ \hline
+    
+    <PT\_A\_0220> & 
+    The application receives push notifications
+        \begin{itemize}
+            \item <PF\_A\_0140>
+        \end{itemize} & 
+    Depending on the users settings he receives a push notification for an event, e.g. an incoming message or upcoming event \\ \hline
+    
+    <PT\_A\_0230> & 
+    Select the logout menu entry
+        \begin{itemize}
+            \item <PF\_A\_0150>
+            \item <PF\_A\_0011>
+        \end{itemize} & 
+    The application logs out of the system and presents the login screen \\ \hline
+    
 \end{longtable}
 
 \section{Server application}
@@ -313,32 +469,155 @@ The core of the application is not intended to be massively altered after the in
         \begin{itemize} 
             \item <PF\_S\_0010>
         \end{itemize} & 
-    The Application launches without any error \\ \hline
-
+    The application launches without any error \\ \hline
     
     <PT\_S\_0010> & 
     Unplanned stop of the application, e.g. server reboot &
     The application does not loose any data\\ \hline
+    
+    <PT\_S\_0020> & 
+    Access admin web page for the first time
+        \begin{itemize} 
+            \item <PF\_S\_0030>
+        \end{itemize} & 
+    The server presents the process of the initial setup \\ \hline
+    
+    <PT\_S\_0030> & 
+    Access admin web page
+        \begin{itemize} 
+            \item <PF\_S\_0011>
+            \item <PF\_S\_0012>
+        \end{itemize} & 
+    The server presents a login window \\ \hline
+    
+    <PT\_S\_0040> & 
+    Log into the system using credentials
+        \begin{itemize} 
+            \item <PF\_S\_0020>
+        \end{itemize} & 
+    The server proceeds to the administrator view if the credentials match to an administrator account \\ \hline
+    
+    <PT\_S\_0050> & 
+    Create new user
+        \begin{itemize} 
+            \item <PF\_S\_0040>
+        \end{itemize} & 
+    The provided name and email address is stored and the user receives an email containing his credentials \\ \hline
+    
+    <PT\_S\_0060> & 
+    Select \enquote{access requests} menu item &
+    The server provides a list of users that requested access to the server \\ \hline
+    
+    <PT\_S\_0070> & 
+    Process access request
+        \begin{itemize} 
+            \item <PF\_S\_0041>
+            \item <PF\_S\_0042>
+        \end{itemize} & 
+    The provided name and email address is stored and the user receives an email containing his credentials \\ \hline
+    
+    <PT\_S\_0080> & 
+    Select \enquote{user list} menu item &
+    The server provides a list of all registered users \\ \hline
+    
+    <PT\_S\_0090> & 
+    Delete user
+        \begin{itemize} 
+            \item <PF\_S\_0050>
+        \end{itemize} & 
+    Selected user is deleted and is not able to log himself into the system anymore \\ \hline
+    
+    <PT\_S\_0100> & 
+    Reset user password & 
+    The user is notified about his new password through email \\ \hline
+    
+    <PT\_S\_0110> & 
+    Change membership within divisions
+        \begin{itemize} 
+            \item <PF\_S\_0060>
+        \end{itemize} & 
+    The user is added or removed from the division, this change is respected in the following updates of the user \\ \hline
+    
+    <PT\_S\_0120> & 
+    Select events menu item &
+    A calendar view with all upcoming events is presented \\ \hline
+    
+    <PT\_S\_0130> & 
+    Select event
+        \begin{itemize} 
+            \item <PF\_S\_0080>
+            \item <PF\_S\_0090>
+        \end{itemize} & 
+    The user is seeing all details of the event and is able to change the invited groups as well as change the event itself \\ \hline
+    
+    <PT\_S\_0140> & 
+    Saving selected element
+        \begin{itemize} 
+            \item <PF\_S\_0080>
+            \item <PF\_S\_0090>
+        \end{itemize} & 
+    The event is changed and the changes are pushed to the user \\ \hline
+    
+    <PT\_S\_0150> & 
+    A users try to log into the system
+        \begin{itemize} 
+            \item <PF\_S\_0100>
+            \item <PF\_A\_0020>
+        \end{itemize} & 
+    The server checks if the user is allowed to log in and sends back the response \\ \hline
+    
+    <PT\_S\_0160> & 
+    A message is sent to the server
+        \begin{itemize} 
+            \item <PF\_S\_0110>
+        \end{itemize} & 
+    The sender's authentication is checked and the messages are queued until the recipient are online \\ \hline
+    
+    <PT\_S\_0170> & 
+    A photo is uploaded to the server
+        \begin{itemize} 
+            \item <PF\_S\_0111>
+        \end{itemize} & 
+    The photo is stored on the server \\ \hline
+    
+    <PT\_S\_0180> & 
+    Select settings menu item & 
+    The administrator is presented a list of adjustable settings \\ \hline
+    
+    <PT\_S\_0190> & 
+    Change administrator password
+        \begin{itemize} 
+            \item <PF\_S\_0120>
+        \end{itemize} & 
+    The new password is stored within the system and the administrator is only able to log into the system using his new password \\ \hline
+    
+    <PT\_S\_0190> & 
+    Select log out menu item
+        \begin{itemize} 
+            \item <PF\_S\_0140>
+        \end{itemize} & 
+    The user is logged out of the system and the server shows the log in page \\ \hline
     
 \end{longtable}
 
 \chapter{Non-functional requirements}
 
 Since the Software uses sensible user information, it has to fulfil the requirements of the corresponding laws in the country where it should be used. In this special case, it has to fulfil the Bundesdatenschutzgesetz. Therefore it is not allowed to store any data, which is not directly needed for the system. If there are additional Information stored, the user has to be informed and needs to agree to that usage.
-The system should consume as less CPU – Power as possible, to make the complete server as efficient as possible, while still ensuring a reliable operation. This can be achieved by efficient programming and a good initial design.
 
-The complete source code is licensed using a GNU GPL version 2 license.
+The system should consume as less CPU Power as possible, to make the complete server as efficient as possible, while still ensuring a reliable operation. This can be achieved by efficient programming and a good initial design.
+
+The complete source code and the documentation is going to be licensed using a GNU GPL version 2 license. If the content is not applicable to the GNU GPL version 2 license a Creative Commons - Attribution - Non Commercial - Share Alike - 4.0 International License will be used.
 
 \chapter{User interface}
 
-The user interface is going to use a common color scheme: \url{http://paletton.com/#uid=73i0u0kllll97A-ferBrsf4-F8P}
+For the user interface a common color scheme needs to be evaluated. This scheme would help the user to associate a logo, web page or user interface to an application or brand.
 
 \section{User application}
-The application should have a tabbed layout (Like the Facebook app). There would be 4-5 entries, depending on the features that are going to be implemented within the system: Calendar, Chats, Photos, News, Settings.
+The application should have a tabbed layout (Like the Facebook app). This view would have up to 5 entries: Calendar, Chats, Photos, News, Settings.
 
 \section{Server application}
 
-For the design of the web interface the Twitter Bootstrap engine is going to be used.
+The responsive Twitter bootstrap engine would be used to design the user interface for the web application administrating the server application.
 
 \chapter{Development environment}
 
@@ -348,7 +627,7 @@ For the development of the iPhone application the xCode IDE is going to be used,
 
 \section{Hardware}
 
-The software is going to be developed on a MacBook Pro Mid 2010, 15", while the client application is tested on an iPhone 6. The server application is going to be tested on \textbf{???}.
+The software is going to be developed on a MacBook Pro Mid 2010, 15". The client application is tested on an iPhone 6, while the server application is going to be tested on a root server provided by the university running a common Linux distribution.
 
 \chapter{Key milestones}
 
@@ -370,14 +649,14 @@ The milestones given in this document are just rough estimators.
         
         1 & Software Requirement Specification & 17.10.2014 & 20.10.2014 \\ \hline
         2 & Server Specification & 20.10.2014 & 3.11.2014 \\ \hline
-        3 & Basic Server implementation (Obligatory requirements) & 03.11.2014 & 24.11.2014 \\ \hline
+        3 & Basic Server Implementation (Obligatory requirements) & 03.11.2014 & 24.11.2014 \\ \hline
         4 & User Application Specification & 20.10.2014 & 05.01.2015 \\ \hline
         5 & Basic User Application Implementation & 05.01.2015 & 02.02.2015 \\ \hline
-        6 & Bug fixing and implementation of interaction between client and server & 02.02.2015 & 23.02.2015 \\ \hline
-        7 & Implementation of Optional requirements & 23.02.2015 & 13.04.2015 \\ \hline
-        8 & Writing of project paper & 17.10.2014 & 20.04.2015 \\ \hline
-        9 & Revision of paper and further bug fixing & 20.04.2015 & 18.05.2015 \\ \hline
-        10 & Implementation of additional requirements & 13.04.2014 & ... \\ \hline
+        6 & Interaction between client and server implemented \& system bug free & 02.02.2015 & 23.02.2015 \\ \hline
+        7 & Optional Requirements Implementation & 23.02.2015 & 13.04.2015 \\ \hline
+        8 & Project Paper & 17.10.2014 & 20.04.2015 \\ \hline
+        9 & Revised project paper, applications bug free & 20.04.2015 & 18.05.2015 \\ \hline
+        10 & Additional Requirements Implementation & 13.04.2014 & 08.06.2015 \\ \hline
     
 \end{longtable}
 
