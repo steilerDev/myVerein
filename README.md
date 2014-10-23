@@ -3,9 +3,11 @@ myVerein
 
 The system aims to leverage clubs and societies to the 21st century by offering them a simple, secure and unified way to share information and exchange thoughts between their members.
 
-The open source project aims to create an easy to use and intuitive server application that can be self hosted and administrated by the local IT administrator of the society. The information then can be accessed by every registered member through a mobile application that is going to be distributed through the AppStore. By using a self hosting approach the information are only shared with registered users, respecting the privacy of the society.
+## The Vision
+The open source project intends to create an easy to use and intuitive server application that can be self hosted and administrated by the local IT administrator of the society. The information then can be accessed by every registered member through a mobile application that is going to be distributed through the AppStore. By using a self hosting approach the information are only shared with registered users, respecting the privacy of the society.
 
-The project is initially created within a student research project on the [DHBW Stuttgart](http://www.dhbw-stuttgart.de) by [Frank Steiler](mailto:frank@steilerdev.de). All documents created within this project are shared through this repository and are licensed using a [Creative Commons - Attribution - Non Commercial - Share Alike - 4.0 International License](http://creativecommons.org/licenses/by-nc-sa/4.0/), if not marked differently. The source code is licensed using a (GNU General Public License version 2)[http://www.gnu.org/licenses/gpl-2.0.html].
+## Background
+The project is initially created within a student research project on the [DHBW Stuttgart](http://www.dhbw-stuttgart.de) by [Frank Steiler](mailto:frank@steilerdev.de). All documents created within this project are shared through this repository and are licensed using a [Creative Commons - Attribution - Non Commercial - Share Alike - 4.0 International License](http://creativecommons.org/licenses/by-nc-sa/4.0/), if not marked differently. The source code is licensed using a [GNU General Public License version 2][(ttp://www.gnu.org/licenses/gpl-2.0.html).
 
 The project's timeline is aiming to release a final version of the product by mid 2015.
 
