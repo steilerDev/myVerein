@@ -12,7 +12,7 @@ The server application is intended to manage all required information of the sys
 A user friendly interface is needed to enable an intuitive usage of the system through a web interface.
 
 \chapter{Product requirements}
-The following chapter is addressing the requirements specified in the Software Requirements Specification. The requirements listed within this document are only related to the server application. Some optional and additional requirements are added. These specification include some improvement suggestion that have been suggested by IT administrators of several clubs.
+The following chapter is addressing the requirements specified in the Software Requirements Specification. The requirements listed within this document are only related to the server application. Some optional and additional requirements are added. These specification include some improvement that have been suggested by IT administrators of several clubs, that I have talked to.
 
 \section{Obligatory requirements}
 \begin{itemize}
@@ -67,7 +67,7 @@ The following requirements would improve the overall user experience, but their 
 The following requirements are not in the scope of this product.
 \begin{itemize}
 \item The system is not designed to create a homepage for the club
-\item The application is not designed to provide access to non-members of a club6
+\item The application is not designed to provide access to non-members of a club
 \item The system should not be used to collect statistics about the users
 \end{itemize}
 
@@ -85,7 +85,7 @@ The server is going to use a database to store the persistent data, defined in t
 
 The use of an industry standard noSQL database would ensure an efficient operation of the application. As a reliant and free database application, the open-source project \emph{MongoDB} is chosen. This document orientated, state of the art, persistent data store will ensure an efficient a reliant storage of all user information.
 
-\section{Database tables}
+\section{Database model}
 Even though \emph{MongoDB} is a database application that uses a dynamic schema, it is important to model the organisation of the data, to later ensure a reliant and consistent operation. The dynamic schema is very helpful within agile development.
 
 \subsection{User}
@@ -127,7 +127,7 @@ To create a durable database it is important to have a precise plan of the desig
 The diagram shows the standardised representation of all document stores described in the previous section.
 
 \section{Schema design}
-Since MongoDB is based on JSON-like objects (it acually stores the binary representation of serialized JSON files), the database schema in this section is modelled using JSON like syntax. This section is going to describe all relevant document stores needed for the server application.
+Since MongoDB is based on JSON-like objects (it actually stores the binary representation of serialised JSON files), the database schema in this section is modelled using JSON like syntax. This section is going to describe all relevant document stores needed for the server application.
 
 \subsection{User}
 \begin{lstlisting}[language=json, caption=\emph{User}-document store]
@@ -226,11 +226,52 @@ Picture: {
 \end{lstlisting}
 
 \chapter{Initialisation}
-Which steps are needed at the first setup of the application
+After the initial installation, the application needs to perform some initial configuration. These steps should be performed through the web interface. The following list includes all steps that need to be performed.
 
-\chapter{Functionalities}
+\begin{enumerate}
+    \item Super admin account creation
+    \item MongoDB database connection
+    \item General club settings including:
+    \begin{itemize}
+        \item Name
+        \item Logo
+    \end{itemize}
+    \item Initial definition of club organisation
+    \item Creation/Import of member information
+\end{enumerate}
 
-\chapter{Front End Design}
+\chapter{Back end design}
+The main work of the server needs to be done within the back end. This part is managing all requests, gathering the data and handling over the appropriate information to the view. Concluding the system is going to be based on a model-view-controller design pattern. 
 
-\chapter{Apple Push Notifications}
-\url{http://relayrides.github.io/pushy/}
+The frameworks, that are going to be used within this project in the backend and the design principles they are based on, are going to be discussed in this chapter.
+
+\section{\acrfull{MVC}}
+A \acrshort{MVC} separates business logic from the data model and graphical representation (view). On top of that it enables the developer to generate an effective access control. It is part of software engineering best practices, defined as an architectural design pattern.
+
+The server application needs to be designed according to this pattern, since it is a de-facto standard requirement for enterprise grade applications.
+
+\section{\acrfull{AOP}}
+The development paradigm describes a way that enhances current development by increasing the modularity of applications. \acrshort{AOP} is not replacing, but extending object-orientated programming. Since the modularity of \acrshort{AOP} is on source-code level, it describes an engineering discipline.
+
+An example where \acrlong{AOP} is a perfect fit, is logging. This aspect should be able to hook into every written function, to enable a useful logging mechanism. On top of that it is important to meet different requirements by enabling the developer to easily exchange the logging framework.
+
+The server application is intended to use \acrlong{AOP}, to create a state of the art application.
+
+\section{Back end framework: Java Spring}
+To easily implement the above described techniques the Java Spring framework is going to be used within this project. This open source project is a powerful tool to develop enterprise grade applications. On top of that it tries to enforce good practice within these application.
+
+The framework itself includes several sub-frameworks, that allow the developer to easily implement a \acrlong{MVC} or use \acrlong{AOP} among several other modules.
+
+\section{Back end framework: Pushy}
+Since push notification are an essential part of the application, the system needs to support \acrfull{APNS}. A well documented and maintained Java library, implementing this service is \href{http://relayrides.github.io/pushy/}{Pushy}. 
+
+Unfortunately recent research revealed that it seems that there can be only one Server per application that implements the \acrshort{APNS}. Concluding a work around or extension for the notification needs to be found. 
+
+\chapter{Front end design}
+In the case of the server application, the front end design describes the layout of the administrator panel within the web interface. The used framework, as well as an initial design is presented in this chapter.
+
+\section{Front end framework: Twitter Bootstrap}
+The Bootstrap framework is one of the most used projects within Github and evolved into being the standard when it comes down to effective, responsive and simple web design. Concluding this fully customisable front end framework is a perfect fit for this project.
+
+\section{Wireframes}
+Within this section an initial design for the web interface is presented.

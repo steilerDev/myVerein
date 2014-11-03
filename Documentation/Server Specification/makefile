@@ -1,4 +1,4 @@
-DOCUMENT_NAME = Internship\ report
+DOCUMENT_NAME = Server\ Specification
 OUTPUT_DIR    = output
 ABGABE_DIR    = ./
 
