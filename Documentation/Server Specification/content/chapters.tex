@@ -7,59 +7,230 @@
 This document is extending the general Software Requirement Specification for the whole system, specifying details about the server application. This document therefore tracks the complete design of the backend of the system, like the admin panel, the database and every other component needed to run the application.
 
 \chapter{Product purpose}
+The server application is intended to manage all required information of the system. These include the member management as well as the handling of push notification and chat messages.
+
+A user friendly interface is needed to enable an intuitive usage of the system through a web interface.
 
 \chapter{Product requirements}
+The following chapter is addressing the requirements specified in the Software Requirements Specification. The requirements listed within this document are only related to the server application. Some optional and additional requirements are added. These specification include some improvement suggestion that have been suggested by IT administrators of several clubs.
+
+\section{Obligatory requirements}
+\begin{itemize}
+\item The administrator needs to be able to modify the server according to the clubs name etc. during the initial setup
+\item The administrator needs to be able to modify the access rights of all members of the club
+\item The administrator needs to be able to schedule an event
+\item The system needs to ensure a fault tolerant, consistent operation.
+\item The system needs to be configurable
+\item The system needs to provide a secure user authentication
+\item The system needs to handle the login of multiple users at the same time
+\item The system needs to handle several messages at the same time
+\item The system should be configurable through a web interface, that enables the administrator to manage user
+\item The system needs to operate according to the data privacy act
+\item The system needs to be designed in a way that a user can only access a minimum amount of private data of the other users
+\item The system needs to be designed to be easily extensible
+\item The system needs to save and gather the data from a persistent data storage system
+\item The system needs to be developed in Java 8
+\end{itemize}
+
+\section{Optional requirements}
+The following requirements are optional, but their implementation is nice to have.
+\begin{itemize}
+\item The application should have a sophisticated graphical user interface through a web interface
+\item The administrator should be able to create divisions
+\item Each user should be able to be part of one or more divisions, to only receive relevant information.
+\item The system should support private chats for each division
+\item Invitations to events should be send to divisions
+\item The user should be able to request access to a division, this access is granted by a higher level user
+\item The user should be able to share photos that are relevant to the club
+\item The application should use push notifications to effectively alert the user about incoming messages, news or upcoming events
+\item The system should be designed to ensure extensibility
+\item The user should be able to optional create a public profile containing contact information
+\item The system should be designed to allow a multi-lingual implementation
+\item The administrator should be able to manage the divisional arrangement via the web interface
+\end{itemize}
+
+\section{Additional requirements}
+The following requirements would improve the overall user experience, but their implementation is not business critical.
+\begin{itemize}
+\item The application could have a central news feed, which contains the latest information provided by the administrator
+\item The administrator could be able to publish relevant information through the web interface
+\item Approved user besides the administrator could be able to manage user or publish news and events
+\item The system could send an Email newsletter for members that are not owning a smartphone running iOS, or allow the print out of the newsletter for a non-digital distribution
+\item The events could support assignment of supporting roles needed during the event
+\item The events could support voting buttons to find the ideal date for the meeting
+\item The system could support the download of shared pictures
+\item The system could support the use of shared pictures within the news of the club
+\item The system could allow the administrator to share news through the clubs homepage using plugins within Joomla, Wordpress, Facebook or other systems.
+\end{itemize}
+
+\section{Non-requirements} %need-not-to-have
+The following requirements are not in the scope of this product.
+\begin{itemize}
+\item The system is not designed to create a homepage for the club
+\item The application is not designed to provide access to non-members of a club6
+\item The system should not be used to collect statistics about the users
+\end{itemize}
 
 \chapter{License}
+Since the system is handling personal data and billing information it is very important to create a secure and transparent application, that is trusted by the user and administrators. Therefore an open source release is the best way to gain the trust of user and ensure a quick and effective exposure and fix of critical bugs. 
+
+On top of that the project is created within a research project, so the results of the application development should also be used to educate other people by publishing the research effort, the software planing phase as well as the final implementation of the system.
+
+The chosen license for the source code is therefore a GNU General Public License version 2. That license is ensuring the development of free software and allows third parties to use the system, only if they acknowledge the initial author as well as license their product using the same license or a later version. This implies that if the software is used in future projects, these projects are going to be free software as well, increasing the amount of open sourced work.
+
+The documentation of the the project is licensed using a Creative Commons - Attribution - Non Commercial - Share Alike - 4.0 International License, which is allowing everyone to use and quote the work, as long as they mark their changes, attribute the initial author, do not use the documents for commercial purpose and license the related work using the same license.
 
 \chapter{Database}
 The server is going to use a database to store the persistent data, defined in the Software Requirement Specification. By choosing this common approach to store data, it is ensured that all information are stored consistent and persistent, even after a crash of the application.
 
-The use of an industry standard relational database would ensure an efficient operation of the application. As a reliant and free database application, the open-source project \emph{MySQL} is chosen.
+The use of an industry standard noSQL database would ensure an efficient operation of the application. As a reliant and free database application, the open-source project \emph{MongoDB} is chosen. This document orientated, state of the art, persistent data store will ensure an efficient a reliant storage of all user information.
 
 \section{Database tables}
-The following section is describing the design of the tables of the database. This is done by providing a detailed description about the functionality of each table.
+Even though \emph{MongoDB} is a database application that uses a dynamic schema, it is important to model the organisation of the data, to later ensure a reliant and consistent operation. The dynamic schema is very helpful within agile development.
 
 \subsection{User}
-All user information are stored within two tables, to ensure an extensible way to store information about the person. The \emph{User} table is storing all required information, like the user's email or his hashed password. The \emph{Additional Information} table is storing an indefinite amount of additional properties for each user as a key value pair attached to the user's ID.
+The user information are stored within the \emph{User} document store. The data is organised according to the \emph{One-to-Many Relationships with Embedded Documents} model \cite[p. 141]{Mongo:2014aa}.
 
-On top of that each user is part of one ore more division. This relation is handled in a \emph{UserDivision} table.
+On the lowest level all required information about the user, like the user's email or his hashed password, are stored. Within the \emph{PrivateInformation} array all given private information about the user are stored. These information can only be viewed by the administrator and might include billing information. The \emph{PublicInformation} array is holding all optional information stated by the user. These information can be accessed by every member of the club.
+
+On top of that each user is part of one ore more divisions. The membership within the divisions is stored as nested arrays. These data structures hold the foreign key to the division as well as the date when the user joined the division.
 
 \subsection{Division}
-Each division is an entry within the division's table. It is defined by its name and short description.
+Each division is an entry within the division's document store. It is defined by its name and short description.
 
-Divisions are organised hierarchical within a club, so this structure has to be represented within the database. An efficient and easy to implemented solution is needed. Since the implementation is not relying solely on SQL, the solution is not limited to \emph{Nested Sets} or the \emph{Materialised Path}. An \emph{Adjacency list} seems to be a prefect fit, because its implementation is very efficient and easy to realise, but needs application side logic performing certain tasks. \cite{Hillyer:2014aa}
+Divisions are organised hierarchical within a club, so this structure has to be represented within the database. This data structure is going to be represented within MongoDB using the \emph{Model Tree Structures with an Array of Ancestors} \cite[p. 149]{Mongo:2014aa}. This structure is storing the direct parent of the node, as well as an array of all ancestors, to easily query all ancestors. Within the use case of this application this behaviour is needed, since the system needs to subscribe the user to all chats of the user's division as well as all chats above his division.
 
-Every user can be part of one or more divisions. This relation is defined within the \emph{is part of} table, containing the User ID of the members and the Division ID of the divisions, as well as the date, when the user joined this division. This attribute is needed to ensure, that the application is loading all information about a new division after the user joined.
-
-On top of that each division is administrated by a single user, who gains access to the administrator panel through this position. If there is no administrator specified, the super admin takes his role. This user is defined outside of the database, to ensure access to the panel, even if the database connection is not working.
-
-\url{http://explainextended.com/2009/03/17/hierarchical-queries-in-mysql/}
-\url{http://stackoverflow.com/questions/4048151/what-are-the-options-for-storing-hierarchical-data-in-a-relational-database}
+Each division is administrated by a single user, who gains access to the administrator panel through this position. If there is no administrator specified, the super admin takes his role. This super user is defined outside of the database, to ensure access to the panel, even if the database connection is not working.
 
 \subsection{Messages}
-Each member of a division automatically joins a group chat between all members of this division. To ensure privacy for each chat, messages are only saved on the server as long as necessary. Therefore a \emph{Message stack} table is created. Every sent message is stored within this table until the recipient access it, or the system deletes the message after its expiration. 
+Each member of a division automatically joins a group chat between all members of this division. To ensure privacy for each chat, messages are only saved on the server as long as necessary. Therefore a \emph{Message stack} document store is created. Every sent message is stored there until the recipient accesses it, or the system deletes the message after its expiration. The expiration of the message is handled by MongoDB through the functionality to set a Time-To-Life for collections \cite[p. 198]{Mongo:2014aa}.
 
 Each entry contains the message to one member of the group chat. When the user syncs his application with the server, the server returns all messages from the stack for the user. The rows are deleted as soon as the user receives the message. 
 
 \subsection{Events}
-A core feature of the application is creation and management of events for each division. The events are managed within the \emph{Event} table. A event invites whole divisions, and every member can send a response to the invitation. The invited divisions are stored within the \emph{invited} table and the responses of the users are stored within the \emph{answered} table, which is also storing the type of answer (accepted, declined or tentative).
+A core feature of the application is creation and management of events for each division. The events are managed within the \emph{Event} data store. An event invites whole divisions, and every member can send a response to the invitation. 
+
+The invited divisions are stored as embedded documents according to the \emph{One-to-Many Relationships with Embedded Documents} model \cite[p. 141]{Mongo:2014aa}, because it is unlikely that the user is going to add values to that field. If the amount of data added to these fields extends the reserved space for the document, the database has to reallocate the space, which leads to fragmentation and a slow write performance. Concluding the responses of the users is stored according to the \emph{One-to-Many Relationships with Document References} model \cite[p. 143]{Mongo:2014aa}, since these fields are constantly extended.
+
+The database is trying to keep the used storage low and therefore tries to delete all events that are 
 
 Besides that the event has several properties, e.g. a short description, a location, the date of the event and its last change.
 
 \subsection{Pictures}
-Since the user is able to upload pictures that are relevant to the club, a table is created to manage these pictures. The picture's metadata is handled through that table, as well as the URL pointing to the file.
+Since the user is able to upload pictures that are relevant to the club, a document store is created to manage these pictures. The picture's metadata is handled through that store, as well as the URL pointing to the file and an array with tags for the picture.
 
 Each picture is uploaded by a specific user and the user can associate up to one division to the picture.
  
 \section{Conceptual schema: Entity Relationship Diagram}
-To create a durable database it is important to have a precise plan of the design. The first step --the conceptual schema of a relational database-- can be expressed as an entity-relationship model (ER-model). The specific ER-diagram for \emph{myVerein} can be found in appendix \vref{app:ER-Diagram}. 
+To create a durable database it is important to have a precise plan of the design. The first step --the conceptual schema of a database-- can be expressed as an entity-relationship model (ER-model). Even though this schema is originated from relational databases this project is trying to use it for a document based database, since relationships between the documents exist. The specific ER-diagram for \emph{myVerein} can be found in appendix \vref{app:ER-Diagram}.
 
-The diagram shows the standardised representation of all tables described in the previous section.
+The diagram shows the standardised representation of all document stores described in the previous section.
 
-\section{Relational schema according to Kemper/Eichler}
+\section{Schema design}
+Since MongoDB is based on JSON-like objects (it acually stores the binary representation of serialized JSON files), the database schema in this section is modelled using JSON like syntax. This section is going to describe all relevant document stores needed for the server application.
+
+\subsection{User}
+\begin{lstlisting}[language=json, caption=\emph{User}-document store]
+User: {
+    _id: int,  
+    FirstName: String, 
+    LastName: String, 
+    Email: String,
+    Password: String,
+    Salt: String,
+    PrivateInformation: {
+        IBAN: String,
+        ...
+    },
+    PublicInformation: {
+        Mobile: String,
+        ...
+    },
+    Divisions: [
+        div1: {
+            div_id: <division_id>,
+            joined: Date
+        },
+        ...
+    ]
+}
+\end{lstlisting}
+
+\subsection{Division}
+\begin{lstlisting}[language=json, caption=\emph{Division}-document store]
+Division: {
+    _id: int,  
+    DivisionName: String,
+    DivisionDescription: String,
+    Parent: <division_is>,
+    Ancestors: [
+        <division_id>,
+        ...
+    ]
+    Administrator: <user_id>
+}
+\end{lstlisting}
+
+\subsection{Messages}
+\begin{lstlisting}[language=json, caption=\emph{Message}-document store]
+Message: {
+    _id: int,  
+    Content: String,
+    Timestamp: Date,
+    Sender: <user_id>,
+    Receiver: <user_id>,
+    Group: <division_id>
+}
+\end{lstlisting}
+
+\subsection{Events}
+\begin{lstlisting}[language=json, caption=\emph{Event}-document store]
+Event: {
+    _id: int,  
+    Name: String,
+    Description: String,
+    Location: String,
+    LastChange: Date,
+    EventTime: Date,
+    InvitedDivisions:[
+        <division_id>,
+        ...
+    ]
+}
+\end{lstlisting}
+
+\begin{lstlisting}[language=json, caption=\emph{InvitationAnswers}-document store]
+InvitationAnswers: {
+    _id: int,  
+    Event: <event_id>,
+    User: <user_is>,
+    answer: int
+}
+\end{lstlisting}
+
+\subsection{Picture}
+
+\begin{lstlisting}[language=json, caption=\emph{Picture}-document store]
+Picture: {
+    _id: int,  
+    Name: String,
+    URL: String,
+    Description: String,
+    Tags: [
+        String,
+        ...
+    ],
+    Uploader: <user_id>,
+    Division: <division_id>
+}
+\end{lstlisting}
 
 \chapter{Initialisation}
 Which steps are needed at the first setup of the application
 
 \chapter{Functionalities}
+
+\chapter{Front End Design}
+
+\chapter{Apple Push Notifications}
+\url{http://relayrides.github.io/pushy/}

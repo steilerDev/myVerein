@@ -91,31 +91,75 @@
 
 % Sourcecode
 \usepackage{listings}
-\lstloadlanguages{Java}
-\lstset{%
-	%language=PHP,            % Sprache des Quellcodes
-	%numbers=left,           % Zeilennummern links
-	frame=single,            % Frame around the listing
-	keepspaces=true,
-	stepnumber=1,            % Jede Zeile nummerieren.
-	numbersep=5pt,           % 5pt Abstand zum Quellcode
-	numberstyle=\tiny,       % Zeichengrösse 'tiny' für die Nummern.
-	breaklines=true,         % Zeilen umbrechen wenn notwendig.
-	breakautoindent=true,    % Nach dem Zeilenumbruch Zeile einrücken.
-	postbreak=\space,        % Bei Leerzeichen umbrechen.
-	tabsize=2,               % Tabulatorgrösse 2
-	basicstyle=\ttfamily\footnotesize, % Nichtproportionale Schrift, klein für den Quellcode
-	showspaces=false,        % Leerzeichen nicht anzeigen.
-	showstringspaces=false,  % Leerzeichen auch in Strings ('') nicht anzeigen.
-	extendedchars=true,      % Alle Zeichen vom Latin1 Zeichensatz anzeigen.
-	captionpos=b,            % sets the caption-position to bottom
-	backgroundcolor=\color{ListingBackground} % Hintergrundfarbe des Quellcodes setzen.
-}
 \lstset{
+    basicstyle=\normalfont\ttfamily,
     extendedchars=true,
-    literate={->}{{\ding{213}}}1,
-    moredelim=[is][\underbar]{@}{@}
+    backgroundcolor=\color{ListingBackground},
+    frame=single,
+    numbers=left,
+    numberstyle=\scriptsize,
+    stepnumber=1,
+    numbersep=8pt,
+    keepspaces=true, 
+    breaklines=true
 }
+
+\usepackage{xcolor}
+
+\colorlet{punct}{red!60!black}
+\definecolor{background}{HTML}{EEEEEE}
+\definecolor{delim}{RGB}{20,105,176}
+\colorlet{numb}{magenta!60!black}
+
+\lstdefinelanguage{relationalSchema}{
+    %literate={->}{{\ding{213}}},
+    %moredelim=[is][\underbar]{_}{_},
+}
+
+\lstdefinelanguage{json}{
+    showstringspaces=false,
+    literate=
+     *{0}{{{\color{numb}0}}}{1}
+      {1}{{{\color{numb}1}}}{1}
+      {2}{{{\color{numb}2}}}{1}
+      {3}{{{\color{numb}3}}}{1}
+      {4}{{{\color{numb}4}}}{1}
+      {5}{{{\color{numb}5}}}{1}
+      {6}{{{\color{numb}6}}}{1}
+      {7}{{{\color{numb}7}}}{1}
+      {8}{{{\color{numb}8}}}{1}
+      {9}{{{\color{numb}9}}}{1}
+      {:}{{{\color{punct}{:}}}}{1}
+      {,}{{{\color{punct}{,}}}}{1}
+      {\{}{{{\color{delim}{\{}}}}{1}
+      {\}}{{{\color{delim}{\}}}}}{1}
+      {[}{{{\color{delim}{[}}}}{1}
+      {]}{{{\color{delim}{]}}}}{1},
+}
+
+
+%\lstloadlanguages{Java}
+%\lstset{%
+%	language=SQL,            % Sprache des Quellcodes
+%	numbers=left,           % Zeilennummern links
+%	frame=single,            % Frame around the listing
+%	keepspaces=true,
+%	stepnumber=1,            % Jede Zeile nummerieren.
+%	numbersep=5pt,           % 5pt Abstand zum Quellcode
+%	numberstyle=\tiny,       % Zeichengrösse 'tiny' für die Nummern.
+%	breaklines=true,         % Zeilen umbrechen wenn notwendig.
+%	breakautoindent=true,    % Nach dem Zeilenumbruch Zeile einrücken.
+%	postbreak=\space,        % Bei Leerzeichen umbrechen.
+%	tabsize=2,               % Tabulatorgrösse 2
+%	basicstyle=\ttfamily\footnotesize, % Nichtproportionale Schrift, klein für den Quellcode
+%	showspaces=false,        % Leerzeichen nicht anzeigen.
+%	showstringspaces=false,  % Leerzeichen auch in Strings ('') nicht anzeigen.
+%	extendedchars=true,      % Alle Zeichen vom Latin1 Zeichensatz anzeigen.
+%	captionpos=b,            % sets the caption-position to bottom
+%	backgroundcolor=\color{ListingBackground}, % Hintergrundfarbe des Quellcodes setzen.
+%    literate={->}{{\ding{213}}},
+%    moredelim=[is][\underbar]{@}{@}
+%}
 
 % Glossary
 \usepackage[
