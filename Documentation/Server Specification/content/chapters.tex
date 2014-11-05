@@ -80,6 +80,90 @@ The chosen license for the source code is therefore a GNU General Public License
 
 The documentation of the the project is licensed using a Creative Commons - Attribution - Non Commercial - Share Alike - 4.0 International License, which is allowing everyone to use and quote the work, as long as they mark their changes, attribute the initial author, do not use the documents for commercial purpose and license the related work using the same license.
 
+\chapter{Use-cases}
+This chapter is going to describe the use-cases that the rest of the document is focusing on.
+
+\section{Administrative use cases}
+This section is referring to use cases, that are performed by an administrator through the web interface of the system.
+\paragraph{User management}
+\begin{itemize}
+\item Create a new user
+\item Accept/Decline user request to join system
+\item Accept/Decline user request to join division
+\item Alter information about user
+\item Assign user to divisions
+\item Reset user password
+\item Retrieve user information
+\item Find user
+\item Get notifications about upcoming payments/honours
+\item De-/Activate user accounts for the system
+\end{itemize}
+
+\paragraph{Division management}
+\begin{itemize}
+\item Create new division
+\item Change division hierarchy
+\item Assign division administrator
+\item Enable/Disable division's group chat
+\item Change division's details
+\end{itemize}
+
+\paragraph{Event management}
+\begin{itemize}
+\item Create new event
+\item Invite divisions to event
+\item Alter event
+\item Check answers of user of an event
+\end{itemize}
+
+\paragraph{Photo management}
+\begin{itemize}
+\item View all uploaded pictures
+\item Change the metadata stored with the picture
+\item Download the picture
+\item Change the picture management
+\item Find pictures through tags
+\item Delete picture
+\end{itemize}
+
+\section{Client use cases}
+This section is referring to use cases, that are performed by the client's application on the server.
+
+\paragraph{User authentication}
+\begin{itemize}
+\item Allow the user to log into the system, if his account is account is approved by the administrator
+\item Allow user to send a member request for the system/club
+\end{itemize}
+
+\paragraph{User management}
+\begin{itemize}
+\item Let the user change his information
+\item The user can declare stored information as public (readable by everyone in the club) or private (only readable by the administrators)
+\item The user can request access to a certain division
+\item The user can search through all members within his divisions
+\end{itemize}
+
+\paragraph{Messaging}
+\begin{itemize}
+\item Allow authenticated user to send messages
+\item Allow authenticated user to pull all unread messages from the server
+\item Send push notifications to receiver of messages
+\end{itemize}
+
+\paragraph{Events}
+\begin{itemize}
+\item Synchronise events with users as soon as they connect to the server
+\item Let the user send responses about their attendance of an event
+\item Send push notifications to remind a user about the beginning of an event
+\end{itemize}
+
+\paragraph{Picture}
+\begin{itemize}
+\item Authenticated user can upload pictures
+\item During upload the user can state information about the picture and assign several tags
+\item The user can choose one of the divisions he is part of to be associated with the picture
+\end{itemize}
+
 \chapter{Database}
 The server is going to use a database to store the persistent data, defined in the Software Requirement Specification. By choosing this common approach to store data, it is ensured that all information are stored consistent and persistent, even after a crash of the application.
 
@@ -202,7 +286,7 @@ Event: {
 \begin{lstlisting}[language=json, caption=\emph{InvitationAnswers}-document store]
 InvitationAnswers: {
     _id: int,  
-    Event: <event_id>,
+    Event: <event_id>,`
     User: <user_is>,
     answer: int
 }
@@ -265,7 +349,7 @@ The framework itself includes several sub-frameworks, that allow the developer t
 \section{Back end framework: Pushy}
 Since push notification are an essential part of the application, the system needs to support \acrfull{APNS}. A well documented and maintained Java library, implementing this service is \href{http://relayrides.github.io/pushy/}{Pushy}. 
 
-Unfortunately recent research revealed that it seems that there can be only one Server per application that implements the \acrshort{APNS}. Concluding a work around or extension for the notification needs to be found. 
+Unfortunately recent research revealed that it seems that Apple is restricting one Server per application that is able to use \acrshort{APNS}. Concluding a self hosted version of the myVerein server application is not going to be able to send out push notifications. Therefore the project is considering to focus on a \acrfull{SaaS} model, which means that the project is going to host an instance of the server application for the club. Therefore the provider is reducing the amount of work for the IT administrator by getting rid of technical details. On top of that the application is going to be able to send out push notifications to the user's devices. Of course every club is still able to self-host the application, with a reduced range of functions.
 
 \chapter{Front end design}
 In the case of the server application, the front end design describes the layout of the administrator panel within the web interface. The used framework, as well as an initial design is presented in this chapter.
@@ -274,4 +358,4 @@ In the case of the server application, the front end design describes the layout
 The Bootstrap framework is one of the most used projects within Github and evolved into being the standard when it comes down to effective, responsive and simple web design. Concluding this fully customisable front end framework is a perfect fit for this project.
 
 \section{Wireframes}
-Within this section an initial design for the web interface is presented.
+Within this section an initial design for the web interface is presented. This design needs to be as intuitive as possible. An initial draft for the design can be found in appendix \vref{app:Wireframes}.
