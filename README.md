@@ -23,7 +23,11 @@ The project's timeline is aiming to release a final version of the product by mi
 
 ## Used technologies
 This project is going to use several frameworks and third-party products. The development is currently considering the use of the following products:
-* [mongoDB](http://www.mongodb.org) licensed under a [GNU AGPL v3.0](http://www.gnu.org/licenses/agpl-3.0.html) and a [Apache License v2.0](http://www.apache.org/licenses/LICENSE-2.0)
-* [spring](http://spring.io) licensed under a [Apache License v2.0](http://www.apache.org/licenses/LICENSE-2.0)
+* Datastore: [mongoDB](http://www.mongodb.org) licensed under a [GNU AGPL v3.0](http://www.gnu.org/licenses/agpl-3.0.html) and an [Apache License v2.0](http://www.apache.org/licenses/LICENSE-2.0)
+* MVC Framework: [spring](http://spring.io) licensed under an [Apache License v2.0](http://www.apache.org/licenses/LICENSE-2.0)
+* Template Engine: [thymeleaf](http://www.thymeleaf.org) licensed under an [Apache License v2.0](http://www.thymeleaf.org/license.html) 
+* Logging Framework: [Log4j](http://logging.apache.org/log4j/2.x/) licensed under an [Apache License v2.0](http://logging.apache.org/log4j/2.x/license.html) and [slf4j](http://www.slf4j.org) licensed under a [MIT license](http://www.slf4j.org/license.html)
+* Dependency management: [Maven](http://maven.apache.org) licensed under an [Apache License v2.0](http://www.apache.org/licenses/)
+* Testing: [jUnit](http://junit.org) licensed under an [Eclipse Public License v1.0](http://opensource.org/licenses/eclipse-1.0.html)
 
 If you have any feedback, feature request, or you are a society's IT administrator and want your club to be among the first one to use this product, feel free to [contact me](mailto:frank@steilerdev.de).
