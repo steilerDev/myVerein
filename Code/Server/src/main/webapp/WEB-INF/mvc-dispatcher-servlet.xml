@@ -3,15 +3,19 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:mvc="http://www.springframework.org/schema/mvc"
        xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mongo="http://www.springframework.org/schema/data/mongo"
        xsi:schemaLocation=" http://www.springframework.org/schema/mvc
                             http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd
                             http://www.springframework.org/schema/beans
                             http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
                             http://www.springframework.org/schema/context
-                            http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+                            http://www.springframework.org/schema/context/spring-context-3.0.xsd
+                            http://www.springframework.org/schema/data/mongo
+                            http://www.springframework.org/schema/data/mongo/spring-mongo.xsd">
 
     <!-- Spring annotation processing -->
     <context:component-scan base-package="de.steilerdev.myVerein.server.controller"/>
+    <context:component-scan base-package="de.steilerdev.myVerein.server.model"/>
     <mvc:annotation-driven />
 
     <!-- Message externalization/internationalization, Standard Spring MessageSource implementation -->
@@ -39,4 +43,15 @@
     <mvc:resources location="/images/" mapping="/images/**" />
     <mvc:resources location="/css/" mapping="/css/**" />
 
+    <!-- Database configuration -->
+    <bean id="mongo" class="org.springframework.data.mongodb.core.MongoFactoryBean">
+        <property name="host" value="localhost" />
+    </bean>
+
+    <bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
+        <constructor-arg name="mongo" ref="mongo" />
+        <constructor-arg name="databaseName" value="myVerein" />
+    </bean>
+
+    <mongo:repositories base-package="de.steilerdev.myVerein.server.model" />
 </beans>
