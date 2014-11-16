@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+
+       <!-- MVC configuration (Enabling of annotations and static content serving) -->
+       <import resource="configuration/mvc-configuration.xml" />
+
+       <!-- Database configuration -->
+       <import resource="configuration/database-config.xml" />
+
+       <!-- Thymeleaf (Template engine, JSP replacement) configuration -->
+       <import resource="configuration/thymeleaf-config.xml" />
+
+       <!-- Java Spring Security configuration -->
+       <import resource="configuration/security-config.xml" />
+
+</beans>

@@ -1,22 +1,42 @@
 <web-app version="2.4"
-	xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://java.sun.com/xml/ns/j2ee"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee 
-	http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
+						http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
 
 	<display-name>myVerein - Web Console</display-name>
-	<context-param>
-		<param-name/>
-		<param-value/>
-	</context-param>
+
+	<!-- Defining Spring managed servlets and context listener (Needed to be able to run spring security) -->
 
 	<servlet>
-		<servlet-name>mvc-dispatcher</servlet-name>
+		<servlet-name>myVerein</servlet-name>
 		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
         <load-on-startup>1</load-on-startup>
 	</servlet>
 
 	<servlet-mapping>
-		<servlet-name>mvc-dispatcher</servlet-name>
+		<servlet-name>myVerein</servlet-name>
 		<url-pattern>/</url-pattern>
 	</servlet-mapping>
+
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>/WEB-INF/myVerein-servlet.xml</param-value>
+	</context-param>
+
+	<listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
+
+	<!-- Spring Security filter to enforce user authentication -->
+	<filter>
+		<filter-name>springSecurityFilterChain</filter-name>
+		<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+	</filter>
+
+	<filter-mapping>
+		<filter-name>springSecurityFilterChain</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
 </web-app>

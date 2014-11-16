@@ -33,4 +33,10 @@ public class HelloController {
 		model.addAttribute("user", user1);
 		return "hello";
 	}
+
+	@RequestMapping(value = "login", method = RequestMethod.GET)
+	public String login()
+	{
+		return "login";
+	}
 }

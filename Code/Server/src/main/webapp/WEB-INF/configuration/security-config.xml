@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/security"
+             xmlns:beans="http://www.springframework.org/schema/beans"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:context="http://www.springframework.org/schema/context"
+             xsi:schemaLocation="  http://www.springframework.org/schema/beans
+                                   http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+                                   http://www.springframework.org/schema/context
+                                   http://www.springframework.org/schema/context/spring-context.xsd
+                                   http://www.springframework.org/schema/security
+                                   http://www.springframework.org/schema/security/spring-security.xsd">
+
+       <!-- Including super user configuration files -->
+       <context:property-placeholder location="classpath:admin.properties"/>
+
+       <!-- Excluding patterns -->
+       <http pattern="/login*" security="none"/>
+
+       <!-- Defining pages that are secured through Spring security -->
+       <http>
+              <intercept-url pattern="/**" access="ROLE_USER" />
+              <form-login login-page="/login"/>
+              <logout logout-url="/logout" />
+       </http>
+
+       <authentication-manager>
+              <authentication-provider>
+                     <!-- Loading super user from properties file instead of database application -->
+                     <user-service properties="classpath:admin.properties" />
+              </authentication-provider>
+              <authentication-provider user-service-ref="UserAuthenticationService" />
+       </authentication-manager>
+
+       <beans:bean id="UserAuthenticationService" class="de.steilerdev.myVerein.server.security.UserAuthenticationService" />
+
+</beans:beans>
