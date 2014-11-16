@@ -19,21 +19,29 @@ package de.steilerdev.myVerein.server.model;
 
 import org.springframework.data.annotation.Id;
 
+import javax.validation.constraints.NotNull;
 import java.util.HashMap;
+import java.util.List;
 
 public class User
 {
     @Id
     private String id;
 
+    @NotNull
     private String firstName;
+    @NotNull
     private String lastName;
 
+    @NotNull
     private String email;
+    @NotNull
     private String password;
 
     private HashMap<String,String> privateInformation;
     private HashMap<String,String> publicInformation;
+
+    private List<HashMap<String,Object>> divisions;
 
     public User() {}
 
@@ -121,5 +129,15 @@ public class User
     public void setPublicInformation(HashMap<String, String> publicInformation)
     {
         this.publicInformation = publicInformation;
+    }
+
+    public List<HashMap<String, Object>> getDivisions()
+    {
+        return divisions;
+    }
+
+    public void setDivisions(List<HashMap<String, Object>> divisions)
+    {
+        this.divisions = divisions;
     }
 }

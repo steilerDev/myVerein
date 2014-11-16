@@ -13,6 +13,9 @@
                             http://www.springframework.org/schema/data/mongo
                             http://www.springframework.org/schema/data/mongo/spring-mongo.xsd">
 
+    <!-- Including configuration files -->
+    <context:property-placeholder location="classpath:mongo.properties"/>
+
     <!-- Spring annotation processing -->
     <context:component-scan base-package="de.steilerdev.myVerein.server.controller"/>
     <context:component-scan base-package="de.steilerdev.myVerein.server.model"/>
@@ -44,14 +47,16 @@
     <mvc:resources location="/css/" mapping="/css/**" />
 
     <!-- Database configuration -->
-    <bean id="mongo" class="org.springframework.data.mongodb.core.MongoFactoryBean">
-        <property name="host" value="localhost" />
-    </bean>
+    <!--mongo:mongo host="${dbHost}" port="${dbPort}" />
+    <mongo:db-factory dbname="${dbName}" mongo-ref="mongo"/-->
+    <mongo:repositories base-package="de.steilerdev.myVerein.server.model" />
+    <mongo:db-factory host="${dbHost}"
+                      port="${dbPort}"
+                      dbname="${dbName}"
+                      username="${dbUsername}"
+                      password="${dbPassword}"/>
 
     <bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
-        <constructor-arg name="mongo" ref="mongo" />
-        <constructor-arg name="databaseName" value="myVerein" />
+        <constructor-arg name="mongoDbFactory" ref="mongoDbFactory"/>
     </bean>
-
-    <mongo:repositories base-package="de.steilerdev.myVerein.server.model" />
 </beans>
