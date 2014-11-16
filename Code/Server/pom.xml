@@ -9,12 +9,23 @@
 
     <properties>
         <java.version>1.8</java.version>
+
+        <!-- Spring Framework -->
         <spring.version>4.1.2.RELEASE</spring.version>
         <spring.data.version>1.6.1.RELEASE</spring.data.version>
+        <spring.security.version>3.2.5.RELEASE</spring.security.version>
+
+        <!-- Testing -->
         <junit.version>4.11</junit.version>
+
+        <!-- Template Engine -->
         <thymeleaf.version>2.1.3.RELEASE</thymeleaf.version>
+
+        <!-- Logging -->
         <slf4j.version>1.7.7</slf4j.version>
         <log4j.version>2.1</log4j.version>
+
+        <!-- Validator -->
         <javax.validation.version>1.0.0.GA</javax.validation.version>
         <hibernate.validator.version>4.3.2.Final</hibernate.validator.version>
     </properties>
@@ -67,16 +78,31 @@
             <version>${spring.data.version}</version>
         </dependency>
 
-        <!-- JSR 303 with Hibernate Validator -->
+        <!-- JSR 303 with Hibernate Validator (Validating objects inserted into the database) -->
         <dependency>
             <groupId>javax.validation</groupId>
             <artifactId>validation-api</artifactId>
             <version>${javax.validation.version}</version>
         </dependency>
+
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-validator</artifactId>
             <version>${hibernate.validator.version}</version>
+        </dependency>
+
+        <!-- Spring Security Framework for user authentication -->
+
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-web</artifactId>
+            <version>${spring.security.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-config</artifactId>
+            <version>${spring.security.version}</version>
         </dependency>
 
         <!-- Testing -->

@@ -28,7 +28,7 @@ public class HelloController {
 	@RequestMapping(method = RequestMethod.GET)
 	public String printWelcome(ModelMap model) {
 		User user1 = userRepository.findByFirstName("Frank");
-		user1.setEmail(null);
+		user1.setEmail("frank1@steilerdev.de");
 		userRepository.save(user1);
 		model.addAttribute("user", user1);
 		return "hello";
