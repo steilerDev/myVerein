@@ -17,9 +17,11 @@
 
 package de.steilerdev.myVerein.server.model;
 
+import org.hibernate.validator.constraints.Email;
+import org.hibernate.validator.constraints.NotBlank;
+import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.data.annotation.Id;
 
-import javax.validation.constraints.NotNull;
 import java.util.HashMap;
 import java.util.List;
 
@@ -28,19 +30,22 @@ public class User
     @Id
     private String id;
 
-    @NotNull
+    @NotBlank
     private String firstName;
-    @NotNull
+    @NotBlank
     private String lastName;
 
-    @NotNull
+    @NotBlank
+    @Email
     private String email;
-    @NotNull
+
+    @NotBlank
     private String password;
 
     private HashMap<String,String> privateInformation;
     private HashMap<String,String> publicInformation;
 
+    @NotEmpty
     private List<HashMap<String,Object>> divisions;
 
     public User() {}

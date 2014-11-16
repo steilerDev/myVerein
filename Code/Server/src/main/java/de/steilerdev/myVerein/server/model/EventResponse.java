@@ -41,6 +41,7 @@ public class EventResponse
     @NotNull
     private User user;
 
+    @NotNull
     private Answer answer;
 
     public EventResponse() {}

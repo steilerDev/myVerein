@@ -47,14 +47,18 @@
     <mvc:resources location="/css/" mapping="/css/**" />
 
     <!-- Database configuration -->
-    <!--mongo:mongo host="${dbHost}" port="${dbPort}" />
-    <mongo:db-factory dbname="${dbName}" mongo-ref="mongo"/-->
     <mongo:repositories base-package="de.steilerdev.myVerein.server.model" />
     <mongo:db-factory host="${dbHost}"
                       port="${dbPort}"
                       dbname="${dbName}"
                       username="${dbUsername}"
                       password="${dbPassword}"/>
+
+    <bean id="dataValidator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean"/>
+
+    <bean id="mongoValidator" class="org.springframework.data.mongodb.core.mapping.event.ValidatingMongoEventListener">
+        <constructor-arg name="validator" ref="dataValidator"/>
+    </bean>
 
     <bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
         <constructor-arg name="mongoDbFactory" ref="mongoDbFactory"/>

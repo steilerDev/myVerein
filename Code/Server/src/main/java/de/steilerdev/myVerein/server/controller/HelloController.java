@@ -27,12 +27,10 @@ public class HelloController {
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String printWelcome(ModelMap model) {
-		//User user1 = userRepository.findByFirstName("Frank");
-
-		model.addAttribute("message", "Hello world!");
-		model.addAttribute("user", divisionRepository.findByName("Division1").getAdminUser());
-		Calendar.getInstance().getTime();
-		model.addAttribute("division", divisionRepository.findByName("Division1"));
+		User user1 = userRepository.findByFirstName("Frank");
+		user1.setEmail(null);
+		userRepository.save(user1);
+		model.addAttribute("user", user1);
 		return "hello";
 	}
 }
