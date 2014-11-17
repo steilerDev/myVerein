@@ -29,6 +29,7 @@ public class Division
 
     @NotBlank
     private String name;
+
     private String desc;
 
     @DBRef

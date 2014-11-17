@@ -19,13 +19,9 @@ package de.steilerdev.myVerein.server.security;
 import de.steilerdev.myVerein.server.model.User;
 import de.steilerdev.myVerein.server.model.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-
-import java.util.ArrayList;
 
 public class UserAuthenticationService implements UserDetailsService
 {
@@ -41,9 +37,7 @@ public class UserAuthenticationService implements UserDetailsService
             throw new UsernameNotFoundException("Could not find user " + s);
         } else
         {
-            ArrayList<GrantedAuthority> grantedAuthorities = new ArrayList<>();
-            grantedAuthorities.add(new SimpleGrantedAuthority("ROLE_USER"));
-            return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), grantedAuthorities);
+            return user;
         }
     }
 }

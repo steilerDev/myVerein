@@ -13,7 +13,13 @@
        <!-- Spring annotation processing -->
        <context:component-scan base-package="de.steilerdev.myVerein.server.controller"/>
        <context:component-scan base-package="de.steilerdev.myVerein.server.model"/>
-       <annotation-driven />
+
+       <annotation-driven>
+           <argument-resolvers>
+               <!-- Allowing the use of @AuthenticationPrincipal, respectively @CurrentUser -->
+               <beans:bean class="org.springframework.security.web.bind.support.AuthenticationPrincipalArgumentResolver"/>
+           </argument-resolvers>
+       </annotation-driven>
 
        <!-- Resource folder, for static content serving -->
        <resources location="/images/" mapping="/images/**" />

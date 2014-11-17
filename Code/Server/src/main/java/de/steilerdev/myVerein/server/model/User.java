@@ -20,12 +20,19 @@ package de.steilerdev.myVerein.server.model;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.NotEmpty;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.keygen.KeyGenerators;
 
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
-public class User
+public class User implements UserDetails
 {
     @Id
     private String id;
@@ -41,12 +48,19 @@ public class User
 
     @NotBlank
     private String password;
+    @NotBlank
+    private String salt;
 
     private HashMap<String,String> privateInformation;
     private HashMap<String,String> publicInformation;
 
+    @DBRef
     @NotEmpty
-    private List<HashMap<String,Object>> divisions;
+    private List<Division> divisions;
+
+    @Transient
+    @Autowired
+    private ShaPasswordEncoder passwordEncoder;
 
     public User() {}
 
@@ -55,15 +69,57 @@ public class User
         this.email = email;
         this.firstName = firstName;
         this.lastName = lastName;
-        this.password = password;
         this.privateInformation = privateInformation;
         this.publicInformation = publicInformation;
+        setPassword(password);
     }
 
     @Override
     public String toString()
     {
         return String.format("User[id=%s, firstName=%s, lastName=%s", id, firstName, lastName);
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities()
+    {
+        ArrayList<GrantedAuthority> grantedAuthorities = new ArrayList<>();
+        grantedAuthorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+        return grantedAuthorities;
+    }
+
+    /**
+     * Returns the username (Email address) of the selected user.
+     * @return The username (Email address) of the user.
+     */
+    @Override
+    public String getUsername()
+    {
+        return email;
+    }
+
+    @Override
+    public boolean isAccountNonExpired()
+    {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked()
+    {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired()
+    {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled()
+    {
+        return true;
     }
 
     public String getId()
@@ -111,9 +167,20 @@ public class User
         return password;
     }
 
+    /**
+     * Setting the password. The password is automatically hashed and the salt is randomly generated.
+     * @param password The new plain text password.
+     */
     public void setPassword(String password)
     {
-        this.password = password;
+        salt = KeyGenerators.string().generateKey();
+        if(passwordEncoder == null)
+        {
+            System.err.println("Encoder is null!");
+            passwordEncoder = new ShaPasswordEncoder(512);
+            passwordEncoder.setIterations(1000);
+        }
+        this.password = passwordEncoder.encodePassword(password, salt);
     }
 
     public HashMap<String, String> getPrivateInformation()
@@ -136,13 +203,32 @@ public class User
         this.publicInformation = publicInformation;
     }
 
-    public List<HashMap<String, Object>> getDivisions()
+    public List<Division> getDivisions()
     {
         return divisions;
     }
 
-    public void setDivisions(List<HashMap<String, Object>> divisions)
+    public void setDivisions(List<Division> divisions)
     {
         this.divisions = divisions;
+    }
+
+    public void addDivision(Division division)
+    {
+        if(divisions == null)
+        {
+            divisions = new ArrayList<>();
+        }
+        divisions.add(division);
+    }
+
+    public String getSalt()
+    {
+        return salt;
+    }
+
+    public void setSalt(String salt)
+    {
+        this.salt = salt;
     }
 }

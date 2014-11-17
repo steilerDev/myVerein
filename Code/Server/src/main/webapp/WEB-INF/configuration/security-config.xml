@@ -24,12 +24,22 @@
        </http>
 
        <authentication-manager>
-              <authentication-provider>
-                     <!-- Loading super user from properties file instead of database application -->
+              <!--  Plain text authentication without database -->
+              <!-- authentication-provider>
                      <user-service properties="classpath:admin.properties" />
+              </authentication-provider-->
+              <authentication-provider user-service-ref="UserAuthenticationService">
+                     <password-encoder ref="passwordEncoder">
+                            <salt-source user-property="salt" />
+                     </password-encoder>
               </authentication-provider>
-              <authentication-provider user-service-ref="UserAuthenticationService" />
        </authentication-manager>
+
+        <!-- Password encoder with SHA-512 hashing method and 1000 iterations using 8byte salting -->
+       <beans:bean id="passwordEncoder" class="org.springframework.security.authentication.encoding.ShaPasswordEncoder">
+              <beans:constructor-arg value="512"/>
+              <beans:property name="iterations" value="1000" />
+       </beans:bean>
 
        <beans:bean id="UserAuthenticationService" class="de.steilerdev.myVerein.server.security.UserAuthenticationService" />
 
