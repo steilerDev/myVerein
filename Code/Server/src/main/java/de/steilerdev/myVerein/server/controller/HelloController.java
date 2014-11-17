@@ -26,6 +26,8 @@ public class HelloController {
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String printWelcome(ModelMap model, @CurrentUser User user) {
+		user.setPassword("asdf");
+		userRepository.save(user);
 		model.addAttribute("user", user);
 		return "hello";
 	}

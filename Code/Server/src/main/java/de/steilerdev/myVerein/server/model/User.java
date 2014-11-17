@@ -17,14 +17,13 @@
 
 package de.steilerdev.myVerein.server.model;
 
+import de.steilerdev.myVerein.server.security.PasswordEncoder;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.NotEmpty;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.DBRef;
-import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -32,6 +31,7 @@ import org.springframework.security.crypto.keygen.KeyGenerators;
 
 import java.util.*;
 
+@Configurable
 public class User implements UserDetails
 {
     @Id
@@ -57,10 +57,6 @@ public class User implements UserDetails
     @DBRef
     @NotEmpty
     private List<Division> divisions;
-
-    @Transient
-    @Autowired
-    private ShaPasswordEncoder passwordEncoder;
 
     public User() {}
 
@@ -174,12 +170,7 @@ public class User implements UserDetails
     public void setPassword(String password)
     {
         salt = KeyGenerators.string().generateKey();
-        if(passwordEncoder == null)
-        {
-            System.err.println("Encoder is null!");
-            passwordEncoder = new ShaPasswordEncoder(512);
-            passwordEncoder.setIterations(1000);
-        }
+        PasswordEncoder passwordEncoder = new PasswordEncoder();
         this.password = passwordEncoder.encodePassword(password, salt);
     }
 

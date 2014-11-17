@@ -2,16 +2,10 @@
 <beans:beans xmlns="http://www.springframework.org/schema/security"
              xmlns:beans="http://www.springframework.org/schema/beans"
              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-             xmlns:context="http://www.springframework.org/schema/context"
              xsi:schemaLocation="  http://www.springframework.org/schema/beans
                                    http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-                                   http://www.springframework.org/schema/context
-                                   http://www.springframework.org/schema/context/spring-context.xsd
                                    http://www.springframework.org/schema/security
                                    http://www.springframework.org/schema/security/spring-security.xsd">
-
-       <!-- Including super user configuration files -->
-       <context:property-placeholder location="classpath:admin.properties"/>
 
        <!-- Excluding patterns -->
        <http pattern="/login*" security="none"/>
@@ -36,10 +30,7 @@
        </authentication-manager>
 
         <!-- Password encoder with SHA-512 hashing method and 1000 iterations using 8byte salting -->
-       <beans:bean id="passwordEncoder" class="org.springframework.security.authentication.encoding.ShaPasswordEncoder">
-              <beans:constructor-arg value="512"/>
-              <beans:property name="iterations" value="1000" />
-       </beans:bean>
+       <beans:bean id="passwordEncoder" class="de.steilerdev.myVerein.server.security.PasswordEncoder" />
 
        <beans:bean id="UserAuthenticationService" class="de.steilerdev.myVerein.server.security.UserAuthenticationService" />
 

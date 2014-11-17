@@ -92,7 +92,6 @@
         </dependency>
 
         <!-- Spring Security Framework for user authentication -->
-
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-web</artifactId>
