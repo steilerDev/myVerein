@@ -21,17 +21,15 @@ import de.steilerdev.myVerein.server.security.PasswordEncoder;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.NotEmpty;
-import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.keygen.KeyGenerators;
 
 import java.util.*;
 
-@Configurable
 public class User implements UserDetails
 {
     @Id
@@ -55,8 +53,10 @@ public class User implements UserDetails
     private HashMap<String,String> publicInformation;
 
     @DBRef
-    @NotEmpty
     private List<Division> divisions;
+
+    @Transient
+    Collection<? extends GrantedAuthority> authorities;
 
     public User() {}
 
@@ -79,9 +79,12 @@ public class User implements UserDetails
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities()
     {
-        ArrayList<GrantedAuthority> grantedAuthorities = new ArrayList<>();
-        grantedAuthorities.add(new SimpleGrantedAuthority("ROLE_USER"));
-        return grantedAuthorities;
+        return authorities;
+    }
+
+    public void setAuthorities(Collection<? extends GrantedAuthority> authorities)
+    {
+        this.authorities = authorities;
     }
 
     /**

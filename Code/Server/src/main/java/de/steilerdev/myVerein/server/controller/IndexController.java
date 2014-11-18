@@ -16,7 +16,8 @@ import java.util.ArrayList;
 
 @Controller
 @RequestMapping("/")
-public class HelloController {
+public class IndexController
+{
 
 	@Autowired
 	private UserRepository userRepository;
@@ -26,10 +27,8 @@ public class HelloController {
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String printWelcome(ModelMap model, @CurrentUser User user) {
-		user.setPassword("asdf");
-		userRepository.save(user);
 		model.addAttribute("user", user);
-		return "hello";
+		return "index";
 	}
 
 	@RequestMapping(value = "login", method = RequestMethod.GET)

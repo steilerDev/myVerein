@@ -24,6 +24,6 @@ import java.util.List;
 @Repository
 public interface DivisionRepository extends MongoRepository<Division, String> {
 
-    public Division findByName(String firstName);
-
+    public Division findByName(String name);
+    public List<Division> findByAdminUser(User adminUser);
 }

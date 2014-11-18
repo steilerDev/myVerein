@@ -20,6 +20,7 @@ import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Division
@@ -105,6 +106,15 @@ public class Division
     public List<Division> getAncestors()
     {
         return ancestors;
+    }
+
+    public void addAncestor(Division ancestor)
+    {
+        if(ancestors == null)
+        {
+            ancestors = new ArrayList<Division>();
+        }
+        ancestors.add(ancestor);
     }
 
     public void setAncestors(List<Division> ancestors)

@@ -7,15 +7,19 @@
                                    http://www.springframework.org/schema/security
                                    http://www.springframework.org/schema/security/spring-security.xsd">
 
-       <!-- Excluding patterns -->
-       <http pattern="/login*" security="none"/>
-
        <!-- Defining pages that are secured through Spring security -->
-       <http>
-              <intercept-url pattern="/**" access="ROLE_USER" />
-              <form-login login-page="/login"/>
-              <logout logout-url="/logout" />
+       <http auto-config="false"  use-expressions="true" access-denied-page="/accessdenied">
+            <intercept-url pattern="/login" access="permitAll" />
+            <intercept-url pattern="/logout" access="permitAll" />
+            <intercept-url pattern="/signup" access="permitAll" />
+            <intercept-url pattern="/accessdenied" access="permitAll" />
+            <intercept-url pattern="/settings" access="hasRole('ROLE_SUPERADMIN')" />
+            <intercept-url pattern="/**" access="hasRole('ROLE_ADMIN')" />
+
+            <form-login login-page="/login"/>
+            <logout logout-url="/logout" />
        </http>
+
 
        <authentication-manager>
               <!--  Plain text authentication without database -->
