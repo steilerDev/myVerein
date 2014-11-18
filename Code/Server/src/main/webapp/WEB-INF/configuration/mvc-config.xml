@@ -24,4 +24,5 @@
        <!-- Resource folder, for static content serving -->
        <resources location="/images/" mapping="/images/**" />
        <resources location="/css/" mapping="/css/**" />
+
 </beans:beans>

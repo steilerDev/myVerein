@@ -5,7 +5,7 @@
 
 
        <!-- MVC configuration (Enabling of annotations and static content serving) -->
-       <import resource="configuration/mvc-configuration.xml" />
+       <import resource="configuration/mvc-config.xml" />
 
        <!-- Database configuration -->
        <import resource="configuration/database-config.xml" />
@@ -16,4 +16,6 @@
        <!-- Java Spring Security configuration -->
        <import resource="configuration/security-config.xml" />
 
+       <!-- Internationalization configuration, defining MessageSource etc. -->
+       <import resource="configuration/internationalization-config.xml" />
 </beans>
