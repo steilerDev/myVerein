@@ -9,9 +9,9 @@
 	</head>
 
 	<body>
-		<h1>Hello world</h1>
-		<p>User: <span th:text="${user.getFirstName()}">No user specified</span></p>
-		<p>User roles: <span th:text="${user.getAuthorities()}">No authorities</span></p>
-		<a th:href="@{/logout}">Logout</a>
+		<h1>Hello!</h1>
+		<div th:include="fragments/fragments :: links"></div>
+		<p>You are logged in as user: <span th:text="${user.getFirstName()}">No user specified</span></p>
+		<p>Your roles: <span th:text="${user.getAuthorities()}">No authorities</span></p>
 	</body>
 </html>

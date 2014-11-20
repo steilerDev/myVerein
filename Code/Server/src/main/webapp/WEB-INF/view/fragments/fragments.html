@@ -1,0 +1,22 @@
+<!--
+    Document   : Thymeleaf Fragments
+    Description: This document manages fragments needed by all view pages, e.g. header and footers imports, etc.
+    Copyright  : (c) 2014 Frank Steiler <frank@steilerdev.de>
+    License    : GNU General Public License v2.0
+-->
+
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <title>Thymeleaf Fragments</title>
+</head>
+
+<p th:fragment="links"><a th:href="@{/}">Homepage</a> | <a th:href="@{/user}">User mangement</a> | <a th:href="@{/logout}">Logout</a></p>
+
+<body>
+</body>
+</html>

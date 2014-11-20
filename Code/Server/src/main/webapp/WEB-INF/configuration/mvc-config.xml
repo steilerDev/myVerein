@@ -22,7 +22,6 @@
        </annotation-driven>
 
        <!-- Resource folder, for static content serving -->
-       <resources location="/images/" mapping="/images/**" />
-       <resources location="/css/" mapping="/css/**" />
+       <resources location="/WEB-INF/resources/" mapping="/resources/**" />
 
 </beans:beans>

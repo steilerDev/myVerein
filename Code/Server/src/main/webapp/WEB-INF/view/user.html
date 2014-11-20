@@ -1,0 +1,38 @@
+<!--/*
+    Document   : User Management
+    Description: This view is presenting the user management for an administrating user.
+    Copyright  : (c) 2014 Frank Steiler <frank@steilerdev.de>
+    License    : GNU General Public License v2.0
+*/-->
+
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <title>User Management</title>
+    <script th:href="@{/resources/list.min.js}" src="../resources/list.min.js"></script>
+    <script th:href="@{/resources/list.fuzzysearch.min.js}" src="../resources/list.fuzzysearch.min.js"></script>
+</head>
+<body>
+<div th:include="fragments/fragments :: links"></div>
+<div id="user-list">
+    <input type="text" class="fuzzy-search" />
+    <ul class="list">
+        <li th:each="user: ${users}">
+            <h3 class="name" th:text="${user.getFirstName()} + ' ' + ${user.getLastName()}">Guybrush Threepwood</h3>
+            <p class="email" th:text="${user.getEmail()}">guybrush@threepwood.com</p>
+        </li>
+    </ul>
+</div>
+
+<script>
+    var monkeyList = new List('user-list', {
+        valueNames: ['name', 'email'],
+        plugins: [ ListFuzzySearch() ]
+    });
+</script>
+</body>
+</html>

@@ -17,17 +17,21 @@
 package de.steilerdev.myVerein.server.model;
 
 import org.hibernate.validator.constraints.NotBlank;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Division
 {
     @Id
-    private String id;
-
+    @Indexed
     @NotBlank
     private String name;
 
@@ -42,6 +46,9 @@ public class Division
     @DBRef
     private List<Division> ancestors;
 
+    @Transient
+    private static Logger logger = LoggerFactory.getLogger(Division.class);
+
     public Division(){}
 
     public Division(String name, String desc, User adminUser, Division parent, List<Division> ancestors)
@@ -53,14 +60,28 @@ public class Division
         this.ancestors = ancestors;
     }
 
-    public String getId()
+    public Division(String name, String desc, User adminUser, Division parent)
     {
-        return id;
-    }
+        this.name = name;
+        this.desc = desc;
+        this.adminUser = adminUser;
+        this.parent = parent;
 
-    public void setId(String id)
-    {
-        this.id = id;
+        if(parent != null)
+        {
+            List<Division> ancestor;
+            if (parent.getAncestors() == null)
+            {
+                ancestor = new ArrayList<>();
+            } else
+            {
+                //Need to create a new ArrayList, assigning would lead to fill and use BOTH lists
+                ancestor = new ArrayList<>(parent.getAncestors());
+            }
+            ancestor.add(parent);
+            logger.debug("Ancestors " + ancestor.stream().map(div -> div.getName()).collect(Collectors.joining(", ")) + " for division " + this.name);
+            this.ancestors = ancestor;
+        }
     }
 
     public String getName()
@@ -110,6 +131,7 @@ public class Division
 
     public void addAncestor(Division ancestor)
     {
+        logger.debug("Adding ancestor " + ancestor.getName() + " to " + this.name);
         if(ancestors == null)
         {
             ancestors = new ArrayList<Division>();
@@ -120,5 +142,23 @@ public class Division
     public void setAncestors(List<Division> ancestors)
     {
         this.ancestors = ancestors;
+    }
+
+    /**
+     * Comparing two objects of the division class according to their name. Overwritten to be able to use the contains() method of java.util.List
+     * @param object
+     * @return
+     */
+    @Override
+    public boolean equals(Object object)
+    {
+        boolean sameSame = false;
+
+        if (object != null && object instanceof Division)
+        {
+            sameSame = ((Division) object).name.equals(this.name);
+        }
+
+        return sameSame;
     }
 }

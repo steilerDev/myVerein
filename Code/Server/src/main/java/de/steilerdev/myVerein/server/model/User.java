@@ -20,9 +20,9 @@ package de.steilerdev.myVerein.server.model;
 import de.steilerdev.myVerein.server.security.PasswordEncoder;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotBlank;
-import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -32,14 +32,16 @@ import java.util.*;
 
 public class User implements UserDetails
 {
-    @Id
-    private String id;
+//    @Id
+//    private String id;
 
     @NotBlank
     private String firstName;
     @NotBlank
     private String lastName;
 
+    @Id
+    @Indexed
     @NotBlank
     @Email
     private String email;
@@ -60,6 +62,11 @@ public class User implements UserDetails
 
     public User() {}
 
+    public User(String firstName, String lastName, String email, String password)
+    {
+        this(firstName, lastName, email, password, null, null);
+    }
+
     public User(String firstName, String lastName, String email, String password, HashMap<String,String> privateInformation, HashMap<String,String> publicInformation)
     {
         this.email = email;
@@ -73,7 +80,7 @@ public class User implements UserDetails
     @Override
     public String toString()
     {
-        return String.format("User[id=%s, firstName=%s, lastName=%s", id, firstName, lastName);
+        return String.format("User[Email=%s, firstName=%s, lastName=%s]", email, firstName, lastName);
     }
 
     @Override
@@ -119,16 +126,6 @@ public class User implements UserDetails
     public boolean isEnabled()
     {
         return true;
-    }
-
-    public String getId()
-    {
-        return id;
-    }
-
-    public void setId(String id)
-    {
-        this.id = id;
     }
 
     public String getFirstName()

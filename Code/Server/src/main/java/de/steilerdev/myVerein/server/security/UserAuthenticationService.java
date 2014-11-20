@@ -20,6 +20,8 @@ import de.steilerdev.myVerein.server.model.Division;
 import de.steilerdev.myVerein.server.model.DivisionRepository;
 import de.steilerdev.myVerein.server.model.User;
 import de.steilerdev.myVerein.server.model.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -38,13 +40,16 @@ public class UserAuthenticationService implements UserDetailsService
     @Autowired
     DivisionRepository divisionRepository;
 
+    private static Logger logger = LoggerFactory.getLogger(UserAuthenticationService.class);
+
     @Override
-    public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException
     {
-        User user = userRepository.findByEmail(s);
+        User user = userRepository.findByEmail(username);
         if(user == null)
         {
-            throw new UsernameNotFoundException("Could not find user " + s);
+            logger.warn("Unable to find user with username " + username);
+            throw new UsernameNotFoundException("Could not find user " + username);
         } else
         {
             user.setAuthorities(getUserAuthorities(user));
@@ -60,16 +65,20 @@ public class UserAuthenticationService implements UserDetailsService
      */
     private ArrayList<GrantedAuthority> getUserAuthorities(User user)
     {
+        logger.debug("Checking user role");
         ArrayList<GrantedAuthority> authorities = new ArrayList<>();
         List<Division> administratedDiv = divisionRepository.findByAdminUser(user);
         if(administratedDiv.isEmpty())
         {
+            logger.debug("Authenticated user is ROLE_USER");
             authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
         } else
         {
+            logger.debug("Authenticated user is ROLE_ADMIN");
             authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
             if(administratedDiv.stream().anyMatch(div -> div.getParent() == null))
             {
+                logger.debug("Authenticated user is ROLE_SUPERADMIN");
                 authorities.add(new SimpleGrantedAuthority("ROLE_SUPERADMIN"));
             }
         }

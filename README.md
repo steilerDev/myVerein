@@ -27,6 +27,7 @@ This project is going to use several frameworks and third-party products. The de
 * MVC Framework: [spring](http://spring.io) licensed under an [Apache License v2.0](http://www.apache.org/licenses/LICENSE-2.0)
 * Template Engine: [thymeleaf](http://www.thymeleaf.org) licensed under an [Apache License v2.0](http://www.thymeleaf.org/license.html) 
 * Validation: [Hibernate Validator](http://hibernate.org/validator/) licensed under an [Apache License v2.0](https://raw.githubusercontent.com/hibernate/hibernate-validator/master/license.txt) and [JavaX Bean Validation](http://mvnrepository.com/artifact/javax.validation/validation-api/1.0.0.GA) licensed under an [Apache License v.2.0](http://www.apache.org/licenses/LICENSE-2.0)
+* Front-end JS libraries: [ListJS](http://www.listjs.com) licensed under a [MIT license](https://raw.githubusercontent.com/javve/list.js/master/LICENSE) and an [Apache License v2.0](http://www.apache.org/licenses/LICENSE-2.0) (Fuzzy search plugin)
 * Logging Framework: [Log4j](http://logging.apache.org/log4j/2.x/) licensed under an [Apache License v2.0](http://logging.apache.org/log4j/2.x/license.html) and [slf4j](http://www.slf4j.org) licensed under a [MIT license](http://www.slf4j.org/license.html)
 * Dependency management: [Maven](http://maven.apache.org) licensed under an [Apache License v2.0](http://www.apache.org/licenses/)
 * Testing: [jUnit](http://junit.org) licensed under an [Eclipse Public License v1.0](http://opensource.org/licenses/eclipse-1.0.html)

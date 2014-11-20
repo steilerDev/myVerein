@@ -9,6 +9,10 @@
 			<param name="ConversionPattern" value="%d{HH:mm:ss} [%t] %c{1} - %m%n" />
 		</layout>
 	</appender>
+
+	<logger name="de.steilerdev.myVerein">
+		<level value="debug" />
+	</logger>
 	
 	<logger name="org.springframework.core">
 		<level value="info" />

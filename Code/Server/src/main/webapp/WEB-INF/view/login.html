@@ -9,7 +9,7 @@
     <body onload='document.f.j_username.focus();'>
         <h1 th:text="#{login.heading}">My custom login page</h1>
         <h3 th:text="#{login.message}">Login with Username and Password</h3>
-        <form name='f' action='/j_spring_security_check' method='POST'>
+        <form name='f' action='/j_spring_security_check' method='POST' accept-charset="UTF-8">
             <table>
                 <tr>
                     <td th:text="#{login.user}">User:</td>

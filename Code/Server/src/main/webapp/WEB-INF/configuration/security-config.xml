@@ -23,9 +23,9 @@
 
        <authentication-manager>
               <!--  Plain text authentication without database -->
-              <!-- authentication-provider>
+              <authentication-provider>
                      <user-service properties="classpath:admin.properties" />
-              </authentication-provider-->
+              </authentication-provider>
               <authentication-provider user-service-ref="UserAuthenticationService">
                      <password-encoder ref="passwordEncoder">
                             <salt-source user-property="salt" />
