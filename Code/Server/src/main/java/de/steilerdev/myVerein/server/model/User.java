@@ -17,6 +17,8 @@
 
 package de.steilerdev.myVerein.server.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import de.steilerdev.myVerein.server.security.PasswordEncoder;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotBlank;
@@ -32,9 +34,6 @@ import java.util.*;
 
 public class User implements UserDetails
 {
-//    @Id
-//    private String id;
-
     @NotBlank
     private String firstName;
     @NotBlank
@@ -46,18 +45,24 @@ public class User implements UserDetails
     @Email
     private String email;
 
+    @JsonIgnore
     @NotBlank
     private String password;
+    @JsonIgnore
     @NotBlank
     private String salt;
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private HashMap<String,String> privateInformation;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private HashMap<String,String> publicInformation;
 
     @DBRef
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<Division> divisions;
 
     @Transient
+    @JsonIgnore
     Collection<? extends GrantedAuthority> authorities;
 
     public User() {}
@@ -98,30 +103,35 @@ public class User implements UserDetails
      * Returns the username (Email address) of the selected user.
      * @return The username (Email address) of the user.
      */
+    @JsonIgnore
     @Override
     public String getUsername()
     {
         return email;
     }
 
+    @JsonIgnore
     @Override
     public boolean isAccountNonExpired()
     {
         return true;
     }
 
+    @JsonIgnore
     @Override
     public boolean isAccountNonLocked()
     {
         return true;
     }
 
+    @JsonIgnore
     @Override
     public boolean isCredentialsNonExpired()
     {
         return true;
     }
 
+    @JsonIgnore
     @Override
     public boolean isEnabled()
     {

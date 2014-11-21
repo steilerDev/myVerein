@@ -20,16 +20,15 @@ import de.steilerdev.myVerein.server.model.Division;
 import de.steilerdev.myVerein.server.model.DivisionRepository;
 import de.steilerdev.myVerein.server.model.User;
 import de.steilerdev.myVerein.server.model.UserRepository;
-import de.steilerdev.myVerein.server.security.CurrentUser;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 /**
@@ -46,18 +45,48 @@ public class UserManagementController
     UserRepository userRepository;
 
     /**
-     * This request mapping is processing the request to view the user management page. It gathers all users displayed within this view.
-     * @param model The model handed over to the view.
-     * @param currentUser The currently logged in user.
+     * This request mapping is processing the request to view the user management page.
      * @return The path to the view for the user management page.
      */
     @RequestMapping(method = RequestMethod.GET)
-    public String showUserManagement(ModelMap model, @CurrentUser User currentUser)
+    public String showUserManagement()
     {
-        List<User> allUser = userRepository.findAllEmailAndName();
-        model.addAttribute("users", allUser);
         return "user";
     }
+
+    /**
+     * This function gathers the names of all available divisions and returns them.
+     * @return A list of all names of the available divisions. The response is converted to json using a Jackson converter.
+     */
+    @RequestMapping(value = "getDivision", produces = "application/json")
+    public @ResponseBody List<String> getDivision(@RequestParam(required = false) String term)
+    {
+        if(term == null || term.isEmpty())
+        {
+            return divisionRepository.findAllNames().parallelStream().map(div -> div.getName()).collect(Collectors.toList());
+        } else
+        {
+            return divisionRepository.findAllNamesContainingString(term).parallelStream().map(div -> div.getName()).collect(Collectors.toList());
+        }
+    }
+
+    /**
+     * This function gathers all user and returns them. Only the first name, last name and emails are returned.
+     * @return A list of all user. The response is converted to json using Jackson converter.
+     */
+    @RequestMapping(value = "getUser", produces = "application/json")
+    public @ResponseBody List<User> getUser()
+    {
+        return userRepository.findAllEmailAndName();
+    }
+
+    @RequestMapping(value = "getUser", produces = "application/json", params = "email")
+    public @ResponseBody User getUser(@RequestParam String email)
+    {
+        //Todo: Check if current user is allowed to view all information
+        return userRepository.findByEmail(email);
+    }
+
 
     /**
      * This function is collecting all divisions administrated by the user and only returns the divisions that are closest to the root node on their respective paths.

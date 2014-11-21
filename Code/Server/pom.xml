@@ -28,6 +28,9 @@
         <!-- Validator -->
         <javax.validation.version>1.0.0.GA</javax.validation.version>
         <hibernate.validator.version>4.3.2.Final</hibernate.validator.version>
+
+        <!-- JSON conversion -->
+        <jackson.version>2.4.3</jackson.version>
     </properties>
 
     <dependencies>
@@ -139,6 +142,25 @@
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-api</artifactId>
             <version>${log4j.version}</version>
+        </dependency>
+
+        <!-- JSON for Java -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>${jackson.version}</version>
         </dependency>
 
     </dependencies>

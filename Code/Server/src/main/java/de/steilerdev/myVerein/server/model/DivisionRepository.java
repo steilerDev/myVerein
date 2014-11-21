@@ -17,6 +17,7 @@
 package de.steilerdev.myVerein.server.model;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -26,4 +27,19 @@ public interface DivisionRepository extends MongoRepository<Division, String> {
 
     public Division findByName(String name);
     public List<Division> findByAdminUser(User adminUser);
+
+    /**
+     * Gathers all division names available.
+     * @return All divisions, but only their name field is populated.
+     */
+    @Query(value="{}", fields="{ 'name' : 1}")
+    public List<Division> findAllNames();
+
+    /**
+     * Gathers all division names available, that contain the String.
+     * @param contains The returned division needs to contain the specified String.
+     * @return All divisions, containing the specified String, but only their name field is populated.
+     */
+    @Query(value="{'_id': { $regex: '.*?0.*', $options: 'i' }}", fields="{ 'name' : 1}")
+    public List<Division> findAllNamesContainingString(String contains);
 }

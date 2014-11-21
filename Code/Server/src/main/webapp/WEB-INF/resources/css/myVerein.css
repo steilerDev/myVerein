@@ -1,0 +1,28 @@
+@-webkit-keyframes heartbeat{
+    0%     { -webkit-transform:scale(1,1); }
+    49%    { -webkit-transform:scale(.5,.5); }
+    50%    { background-color:rgba(200,0,0,.2); }
+    100%   { -webkit-transform:scale(1,1); }
+}
+@-moz-keyframes heartbeat{
+    0%     { -moz-transform:scale(1,1); }
+    49%    { -moz-transform:scale(.5,.5); }
+    50%    { background-color:rgba(200,0,0,.2); }
+    100%   { -moz-transform:scale(1,1); }
+}
+@keyframes heartbeat{
+    0%     { transform:scale(1,1); }
+    49%    { transform:scale(.5,.5); }
+    50%    { background-color:rgba(200,0,0,.2); }
+    100%   { transform:scale(1,1); }
+}
+.heartbeat{
+    width:30px;
+    height:30px;
+    -webkit-border-radius:30px;
+    -moz-border-radius:30px;
+    border-radius:30px;
+    background-color:rgba(200,0,0,.5);
+    -webkit-animation:heartbeat .6s infinite;
+    animation:heartbeat .6s infinite;
+}

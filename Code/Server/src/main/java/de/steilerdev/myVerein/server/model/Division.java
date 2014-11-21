@@ -16,6 +16,7 @@
  */
 package de.steilerdev.myVerein.server.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.validator.constraints.NotBlank;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+
 public class Division
 {
     @Id
@@ -37,15 +39,19 @@ public class Division
 
     private String desc;
 
+    @JsonIgnore
     @DBRef
     private User adminUser;
 
+    @JsonIgnore
     @DBRef
     private Division parent;
 
+    @JsonIgnore
     @DBRef
     private List<Division> ancestors;
 
+    @JsonIgnore
     @Transient
     private static Logger logger = LoggerFactory.getLogger(Division.class);
 
@@ -83,6 +89,7 @@ public class Division
             this.ancestors = ancestor;
         }
     }
+
 
     public String getName()
     {
