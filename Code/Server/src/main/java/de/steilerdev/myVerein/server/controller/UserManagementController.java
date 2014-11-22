@@ -20,6 +20,9 @@ import de.steilerdev.myVerein.server.model.Division;
 import de.steilerdev.myVerein.server.model.DivisionRepository;
 import de.steilerdev.myVerein.server.model.User;
 import de.steilerdev.myVerein.server.model.UserRepository;
+import de.steilerdev.myVerein.server.security.CurrentUser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,6 +32,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -38,6 +42,8 @@ import java.util.stream.Collectors;
 @RequestMapping("/user")
 public class UserManagementController
 {
+    private static Logger logger = LoggerFactory.getLogger(UserManagementController.class);
+
     @Autowired
     DivisionRepository divisionRepository;
 
@@ -51,6 +57,15 @@ public class UserManagementController
     @RequestMapping(method = RequestMethod.GET)
     public String showUserManagement()
     {
+        return "user";
+    }
+
+    @RequestMapping(method = RequestMethod.POST)
+    public String saveUser(@RequestParam Map<String, String> parameters)
+    {
+        parameters.keySet().stream().forEach(key -> {
+            System.err.println("Key: " + key + " Value: " + parameters.get(key));
+        });
         return "user";
     }
 
@@ -81,10 +96,35 @@ public class UserManagementController
     }
 
     @RequestMapping(value = "getUser", produces = "application/json", params = "email")
-    public @ResponseBody User getUser(@RequestParam String email)
+    public @ResponseBody User getUser(@RequestParam String email, @CurrentUser User currentUser)
     {
-        //Todo: Check if current user is allowed to view all information
-        return userRepository.findByEmail(email);
+        User searchedUser = userRepository.findByEmail(email);
+        //Getting the list of administrated divisions
+        List<Division> administratedDivisions = divisionRepository.findByAdminUser(currentUser);
+
+        boolean allowedToAdministrate;
+
+        //Is the user does not have any divisions at the moment, the admin is allowed to administrate the user.
+        if(searchedUser.getDivisions() == null || searchedUser.getDivisions().isEmpty())
+        {
+            allowedToAdministrate = true;
+        } else
+        {
+            //Checking if the current administrator is administrating any of the divisions the user is part of
+            allowedToAdministrate = searchedUser.getDivisions().parallelStream() //Streaming all divisions the user is part of
+                    .anyMatch(div -> //If there is any match the admin is allowed to view the user
+                            div.getAncestors().parallelStream() //Streaming all ancestors of the user's divisions
+                                    .anyMatch(anc -> administratedDivisions.contains(anc))); //If there is any match between administrated divisions and ancestors of one of the users divisions
+        }
+
+        if(!allowedToAdministrate)
+        {
+            logger.debug("Currently logged in user is not administrating selected user. Hiding private information");
+            searchedUser.setPrivateInformation(null);
+        }
+        searchedUser.setAdministrationAllowed(allowedToAdministrate);
+
+        return searchedUser;
     }
 
 

@@ -26,6 +26,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.keygen.KeyGenerators;
@@ -61,9 +62,22 @@ public class User implements UserDetails
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<Division> divisions;
 
+
+    @DateTimeFormat(iso= DateTimeFormat.ISO.DATE)
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Date memberSince;
+
+    @DateTimeFormat(iso= DateTimeFormat.ISO.DATE)
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Date birthday;
+
     @Transient
     @JsonIgnore
     Collection<? extends GrantedAuthority> authorities;
+
+    @Transient
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    boolean administrationAllowed;
 
     public User() {}
 
@@ -184,6 +198,15 @@ public class User implements UserDetails
         this.password = passwordEncoder.encodePassword(password, salt);
     }
 
+    public void addPrivateInformation(String key, String value)
+    {
+        if (privateInformation == null)
+        {
+            privateInformation = new HashMap<>();
+        }
+        privateInformation.put(key, value);
+    }
+
     public HashMap<String, String> getPrivateInformation()
     {
         return privateInformation;
@@ -192,6 +215,15 @@ public class User implements UserDetails
     public void setPrivateInformation(HashMap<String, String> privateInformation)
     {
         this.privateInformation = privateInformation;
+    }
+
+    public void addPublicInformation(String key, String value)
+    {
+        if (publicInformation == null)
+        {
+            publicInformation = new HashMap<>();
+        }
+        publicInformation.put(key, value);
     }
 
     public HashMap<String, String> getPublicInformation()
@@ -231,5 +263,35 @@ public class User implements UserDetails
     public void setSalt(String salt)
     {
         this.salt = salt;
+    }
+
+    public boolean isAdministrationAllowed()
+    {
+        return administrationAllowed;
+    }
+
+    public void setAdministrationAllowed(boolean administrationAllowed)
+    {
+        this.administrationAllowed = administrationAllowed;
+    }
+
+    public Date getMemberSince()
+    {
+        return memberSince;
+    }
+
+    public void setMemberSince(Date memberSince)
+    {
+        this.memberSince = memberSince;
+    }
+
+    public Date getBirthday()
+    {
+        return birthday;
+    }
+
+    public void setBirthday(Date birthday)
+    {
+        this.birthday = birthday;
     }
 }

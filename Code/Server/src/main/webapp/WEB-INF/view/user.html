@@ -16,11 +16,14 @@
 
         <link th:href="@{/resources/css/jquery.tagsinput.css}" href="../resources/css/jquery.tagsinput.css" rel="stylesheet" type="text/css" />
         <link th:href="@{/resources/css/jquery-ui.min.css}" href="../resources/css/jquery-ui.min.css" rel="stylesheet" type="text/css" />
+        <link th:href="@{/resources/css/bootstrap-validator.css}" href="../resources/css/bootstrap-validator.css" rel="stylesheet" type="text/css" />
+        <link th:href="@{/resources/css/magic-bootstrap.css}" href="../resources/css/magic-bootstrap.css" rel="stylesheet" type="text/css" />
         <link th:href="@{/resources/css/myVerein.css}" href="../resources/css/myVerein.css" rel="stylesheet" type="text/css" />
+        <link th:href="@{/resources/css/datepicker3.css}" href="../resources/css/datepicker3.css" rel="stylesheet" type="text/css" />
 
-        <script th:src="@{/resources/js/jquery-2.1.1.min.js}" src="../resources/js/jquery-2.1.1.min.js" type="application/javascript" />
-        <script th:src="@{/resources/js/jquery-ui.min.js}" src="../resources/js/jquery-ui.min.js" type="application/javascript" />
+        <script th:src="@{/resources/js/myVerein.base.js}" src="../resources/js/myVerein.base.js" type="application/javascript" />
         <script th:src="@{/resources/js/myVerein.user.js}" src="../resources/js/myVerein.user.js" type="application/javascript" />
+        <script th:src="@{/resources/js/bootstrap-datepicker.js}" src="../resources/js/bootstrap-datepicker.js" type="application/javascript" />
     </head>
 
     <body>
@@ -31,12 +34,89 @@
             <div id="user-list-loading" class="heartbeat" />
         </div>
 
-        <form id="myForm" action="/user" method="post">
-            Name: <input type="text" name="name" />
-            <br/>
-            Divisions: <input name="divisions" id="divisions" value="" type="text"/>
-            <br/>
-            <input type="submit" value="Save user" />
+        <form id="userForm" method="post" class="form-horizontal"
+              data-bv-feedbackicons-valid="glyphicon glyphicon-ok"
+              data-bv-feedbackicons-invalid="glyphicon glyphicon-remove"
+              data-bv-feedbackicons-validating="glyphicon glyphicon-refresh">
+
+            <div class="form-group">
+                <label class="col-sm-3 control-label">First Name</label>
+                <div class="col-sm-5">
+                    <input id="firstName" type="text" class="form-control" name="firstName"
+                           data-bv-notempty="true"
+                           data-bv-notempty-message="The first name is required and cannot be empty"
+
+                           data-bv-regexp="true"
+                           data-bv-regexp-regexp="^[a-zA-Z0-9]+$"
+                           data-bv-regexp-message="The first name can only consist of alphabetical and number"
+
+                           data-bv-different="true"
+                           data-bv-different-field="password"
+                           data-bv-different-message="The first name and password cannot be the same as each other" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">Last Name</label>
+                <div class="col-sm-5">
+                    <input id="lastName" type="text" class="form-control" name="lastName"
+                           data-bv-notempty="true"
+                           data-bv-notempty-message="The last name is required and cannot be empty"
+
+                           data-bv-regexp="true"
+                           data-bv-regexp-regexp="^[a-zA-Z0-9]+$"
+                           data-bv-regexp-message="The last name can only consist of alphabetical and number"
+
+                           data-bv-different="true"
+                           data-bv-different-field="password"
+                           data-bv-different-message="The last name and password cannot be the same as each other" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">Email address</label>
+                <div class="col-sm-5">
+                    <input id="email" type="text" class="form-control" name="email"
+                           data-bv-notempty="true"
+                           data-bv-notempty-message="The email address is required and cannot be empty"
+
+                           data-bv-emailaddress="true"
+                           data-bv-emailaddress-message="The email address is not a valid" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">Birthday</label>
+                <div class="col-sm-5">
+                    <input id="birthday" type="text" class="form-control" name="birthday"
+                           data-bv-date="true"
+                           data-bv-date-format="DD/MM/YYYY"
+                           data-bv-date-message="The date needs to be formated according to this pattern DD/MM/YYYY"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">Member since</label>
+                <div class="col-sm-5">
+                    <input id="memberSince" type="text" class="form-control" name="memberSince"
+                           data-bv-date="true"
+                           data-bv-date-format="DD/MM/YYYY"
+                           data-bv-date-message="The date needs to be formated according to this pattern DD/MM/YYYY" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">Divisions</label>
+                <div class="col-sm-5">
+                    <input name="divisions" id="divisions" type="text"/>
+                </div>
+            </div>
+            <div class="privateInformation" />
+            <div class="addPrivateInformation col-sm-9 col-sm-offset-3" />
+            <div class="publicInformation" />
+            <div class="addPublicInformation col-sm-9 col-sm-offset-3" />
+
+            <hr/>
+            <div class="form-group">
+                <div class="col-sm-9 col-sm-offset-3">
+                    <button id="userButton" type="submit" class="btn btn-default">Save user</button>
+                </div>
+            </div>
         </form>
     </body>
 </html>

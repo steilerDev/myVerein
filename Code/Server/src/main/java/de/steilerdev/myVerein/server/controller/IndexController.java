@@ -13,6 +13,12 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import java.sql.Time;
+import java.text.DateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.TimeZone;
+
 /**
  * This controller is processing all general requests.
  */
@@ -61,9 +67,17 @@ public class IndexController
 		divisionRepository.deleteAll();
 
 		User user1 = new User("Frank", "Steiler", "frank@steiler.eu", "asdf");
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTimeZone(TimeZone.getTimeZone("UTC"));
+		calendar.set(1994, Calendar.JUNE, 28, 12, 0, 0);
+		user1.setBirthday(calendar.getTime());
+		calendar.set(2000, Calendar.JANUARY, 1, 12, 0, 0);
+		user1.setMemberSince(calendar.getTime());
 		User user2 = new User("John", "Doe", "john@doe.com", "asdf");
 		User user3 = new User("Peter", "Enis", "peter@enis.com", "asdf");
 		User user4 = new User("Luke", "Skywalker", "luke@skywalker.com", "asdf");
+		user4.addPrivateInformation("IBAN", "ABCDEFG");
+		user4.addPublicInformation("Gender", "Male");
 		User user5 = new User("Marty", "McFly", "marty@mcfly.com", "asdf");
 
 		userRepository.save(user1);
