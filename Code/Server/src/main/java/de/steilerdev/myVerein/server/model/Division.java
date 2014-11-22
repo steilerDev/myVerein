@@ -17,6 +17,7 @@
 package de.steilerdev.myVerein.server.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.hibernate.validator.constraints.NotBlank;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +38,7 @@ public class Division
     @NotBlank
     private String name;
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String desc;
 
     @JsonIgnore

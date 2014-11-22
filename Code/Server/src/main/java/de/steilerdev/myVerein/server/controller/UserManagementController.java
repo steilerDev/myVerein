@@ -74,14 +74,14 @@ public class UserManagementController
      * @return A list of all names of the available divisions. The response is converted to json using a Jackson converter.
      */
     @RequestMapping(value = "getDivision", produces = "application/json")
-    public @ResponseBody List<String> getDivision(@RequestParam(required = false) String term)
+    public @ResponseBody List<Division> getDivision(@RequestParam(required = false) String term)
     {
         if(term == null || term.isEmpty())
         {
-            return divisionRepository.findAllNames().parallelStream().map(div -> div.getName()).collect(Collectors.toList());
+            return divisionRepository.findAllNames();
         } else
         {
-            return divisionRepository.findAllNamesContainingString(term).parallelStream().map(div -> div.getName()).collect(Collectors.toList());
+            return divisionRepository.findAllNamesContainingString(term);
         }
     }
 
