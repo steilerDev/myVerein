@@ -94,13 +94,13 @@ function loadUser(email) {
             $('#memberSince').val('');
         }
 
-        //Reset tag list
-        $('#divisions').importTags('');
+        //Reset division list
+        $('#divisions')[0].selectize.clear();
 
-        //Fill tag list
+        //Fill division list
         if (user.divisions) {
             $.each(user.divisions, function (index, division) {
-                $('#divisions').addTag(division.name);
+                $('#divisions')[0].selectize.addItem(division.name);
             });
         }
 
@@ -162,7 +162,6 @@ $(document).ready(function() {
         labelField: 'name',
         searchField: 'name',
         load: function(query, callback) {
-            if (!query.length) return callback();
             $.ajax({
                 url: '/user/getDivision',
                 type: 'GET',
@@ -203,11 +202,18 @@ $(document).ready(function() {
         .on('success.form.bv', function(e) { //The submition function
             // Prevent form submission
             e.preventDefault();
-
-            // Use Ajax to submit form data
-            $.post('/user', $(e.target).serialize(), function(result) {
-                // ... Process the result ...
-            }, 'json');
+            //Send the serialized form
+            $.ajax({
+                url: '/user',
+                type: 'POST',
+                data: $(e.target).serialize(),
+                error: function() {
+                    console.log('Error');
+                },
+                success: function() {
+                    console.log('Success');
+                }
+            });
         });
 
     //Enable Datepicker

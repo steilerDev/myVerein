@@ -10,7 +10,7 @@
 
 	<body>
 		<h1>Hello!</h1>
-		<div th:include="fragments/fragments :: links"></div>
+		<div th:include="fragments/fragments :: navbar"></div>
 		<p>You are logged in as user: <span th:text="${user.getFirstName()}">No user specified</span></p>
 		<p>Your roles: <span th:text="${user.getAuthorities()}">No authorities</span></p>
 	</body>

@@ -29,96 +29,101 @@
     </head>
 
     <body>
-        <div th:include="fragments/fragments :: links"></div>
-        <div id="user-list">
-            <input type="text" class="fuzzy-search" />
-            <ul class="list" />
-            <div id="user-list-loading" class="heartbeat" />
+        <div th:include="fragments/fragments :: navbar"/>
+        <div class="container">
+            <div class="col-sm-6">
+                <div id="user-list">
+                    <input type="text" class="fuzzy-search" />
+                    <ul class="list" />
+                    <div id="user-list-loading" class="heartbeat" />
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <form id="userForm" method="post" class="form-horizontal"
+                      data-bv-feedbackicons-valid="glyphicon glyphicon-ok"
+                      data-bv-feedbackicons-invalid="glyphicon glyphicon-remove"
+                      data-bv-feedbackicons-validating="glyphicon glyphicon-refresh">
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">First Name</label>
+                        <div class="col-sm-5">
+                            <input id="firstName" type="text" class="form-control" name="firstName"
+                                   data-bv-notempty="true"
+                                   data-bv-notempty-message="The first name is required and cannot be empty"
+
+                                   data-bv-regexp="true"
+                                   data-bv-regexp-regexp="^[a-zA-Z0-9]+$"
+                                   data-bv-regexp-message="The first name can only consist of alphabetical and number"
+
+                                   data-bv-different="true"
+                                   data-bv-different-field="password"
+                                   data-bv-different-message="The first name and password cannot be the same as each other" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Last Name</label>
+                        <div class="col-sm-5">
+                            <input id="lastName" type="text" class="form-control" name="lastName"
+                                   data-bv-notempty="true"
+                                   data-bv-notempty-message="The last name is required and cannot be empty"
+
+                                   data-bv-regexp="true"
+                                   data-bv-regexp-regexp="^[a-zA-Z0-9]+$"
+                                   data-bv-regexp-message="The last name can only consist of alphabetical and number"
+
+                                   data-bv-different="true"
+                                   data-bv-different-field="password"
+                                   data-bv-different-message="The last name and password cannot be the same as each other" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Email address</label>
+                        <div class="col-sm-5">
+                            <input id="email" type="text" class="form-control" name="email"
+                                   data-bv-notempty="true"
+                                   data-bv-notempty-message="The email address is required and cannot be empty"
+
+                                   data-bv-emailaddress="true"
+                                   data-bv-emailaddress-message="The email address is not a valid" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Birthday</label>
+                        <div class="col-sm-5">
+                            <input id="birthday" type="text" class="form-control" name="birthday"
+                                   data-bv-date="true"
+                                   data-bv-date-format="DD/MM/YYYY"
+                                   data-bv-date-message="The date needs to be formated according to this pattern DD/MM/YYYY"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Member since</label>
+                        <div class="col-sm-5">
+                            <input id="memberSince" type="text" class="form-control" name="memberSince"
+                                   data-bv-date="true"
+                                   data-bv-date-format="DD/MM/YYYY"
+                                   data-bv-date-message="The date needs to be formated according to this pattern DD/MM/YYYY" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Divisions</label>
+                        <div class="col-sm-5">
+                            <input name="divisions" id="divisions" type="text" />
+                        </div>
+                    </div>
+                    <div class="privateInformation" />
+                    <div class="addPrivateInformation col-sm-9 col-sm-offset-3" />
+                    <div class="publicInformation" />
+                    <div class="addPublicInformation col-sm-9 col-sm-offset-3" />
+
+                    <hr/>
+                    <div class="form-group">
+                        <div class="col-sm-9 col-sm-offset-3">
+                            <button id="userButton" type="submit" class="btn btn-default">Save user</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
         </div>
-
-        <form id="userForm" method="post" class="form-horizontal"
-              data-bv-feedbackicons-valid="glyphicon glyphicon-ok"
-              data-bv-feedbackicons-invalid="glyphicon glyphicon-remove"
-              data-bv-feedbackicons-validating="glyphicon glyphicon-refresh">
-
-            <div class="form-group">
-                <label class="col-sm-3 control-label">First Name</label>
-                <div class="col-sm-5">
-                    <input id="firstName" type="text" class="form-control" name="firstName"
-                           data-bv-notempty="true"
-                           data-bv-notempty-message="The first name is required and cannot be empty"
-
-                           data-bv-regexp="true"
-                           data-bv-regexp-regexp="^[a-zA-Z0-9]+$"
-                           data-bv-regexp-message="The first name can only consist of alphabetical and number"
-
-                           data-bv-different="true"
-                           data-bv-different-field="password"
-                           data-bv-different-message="The first name and password cannot be the same as each other" />
-                </div>
-            </div>
-            <div class="form-group">
-                <label class="col-sm-3 control-label">Last Name</label>
-                <div class="col-sm-5">
-                    <input id="lastName" type="text" class="form-control" name="lastName"
-                           data-bv-notempty="true"
-                           data-bv-notempty-message="The last name is required and cannot be empty"
-
-                           data-bv-regexp="true"
-                           data-bv-regexp-regexp="^[a-zA-Z0-9]+$"
-                           data-bv-regexp-message="The last name can only consist of alphabetical and number"
-
-                           data-bv-different="true"
-                           data-bv-different-field="password"
-                           data-bv-different-message="The last name and password cannot be the same as each other" />
-                </div>
-            </div>
-            <div class="form-group">
-                <label class="col-sm-3 control-label">Email address</label>
-                <div class="col-sm-5">
-                    <input id="email" type="text" class="form-control" name="email"
-                           data-bv-notempty="true"
-                           data-bv-notempty-message="The email address is required and cannot be empty"
-
-                           data-bv-emailaddress="true"
-                           data-bv-emailaddress-message="The email address is not a valid" />
-                </div>
-            </div>
-            <div class="form-group">
-                <label class="col-sm-3 control-label">Birthday</label>
-                <div class="col-sm-5">
-                    <input id="birthday" type="text" class="form-control" name="birthday"
-                           data-bv-date="true"
-                           data-bv-date-format="DD/MM/YYYY"
-                           data-bv-date-message="The date needs to be formated according to this pattern DD/MM/YYYY"/>
-                </div>
-            </div>
-            <div class="form-group">
-                <label class="col-sm-3 control-label">Member since</label>
-                <div class="col-sm-5">
-                    <input id="memberSince" type="text" class="form-control" name="memberSince"
-                           data-bv-date="true"
-                           data-bv-date-format="DD/MM/YYYY"
-                           data-bv-date-message="The date needs to be formated according to this pattern DD/MM/YYYY" />
-                </div>
-            </div>
-            <div class="form-group">
-                <label class="col-sm-3 control-label">Divisions</label>
-                <div class="col-sm-5">
-                    <input name="divisions" id="divisions" type="text"/>
-                </div>
-            </div>
-            <div class="privateInformation" />
-            <div class="addPrivateInformation col-sm-9 col-sm-offset-3" />
-            <div class="publicInformation" />
-            <div class="addPublicInformation col-sm-9 col-sm-offset-3" />
-
-            <hr/>
-            <div class="form-group">
-                <div class="col-sm-9 col-sm-offset-3">
-                    <button id="userButton" type="submit" class="btn btn-default">Save user</button>
-                </div>
-            </div>
-        </form>
     </body>
 </html>

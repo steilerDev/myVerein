@@ -24,6 +24,8 @@ import de.steilerdev.myVerein.server.security.CurrentUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -61,12 +63,12 @@ public class UserManagementController
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public String saveUser(@RequestParam Map<String, String> parameters)
+    public @ResponseBody ResponseEntity saveUser(@RequestParam Map<String, String> parameters)
     {
         parameters.keySet().stream().forEach(key -> {
             System.err.println("Key: " + key + " Value: " + parameters.get(key));
         });
-        return "user";
+        return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
     }
 
     /**
