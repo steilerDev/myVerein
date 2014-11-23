@@ -31,4 +31,12 @@ public interface UserRepository extends MongoRepository<User, String> {
 
     @Query(value="{}", fields="{ 'firstName' : 1, 'lastName' : 1, 'email' : 1 }")
     public List<User> findAllEmailAndName();
+
+    /**
+     * Gathers all user whose firstName, lastName or email contains the String.
+     * @param contains The returned user contains this string on one of the following fields: firstName, lastName, email.
+     * @return All user, containing the specified String, but only their firstName, lastName and email field is populated.
+     */
+    @Query(value="{$or : [{'_id': { $regex: '.*?0.*', $options: 'i' }}, {'firstName': { $regex: '.*?0.*', $options: 'i' }}, {'lastName': { $regex: '.*?0.*', $options: 'i' }}]}", fields="{ 'firstName' : 1, 'lastName' : 1, 'email' : 1}")
+    public List<User> findAllEmailAndNameContainingString(String contains);
 }

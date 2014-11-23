@@ -24,7 +24,6 @@
 
         <script th:src="@{/resources/js/myVerein.base.js}" src="../resources/js/myVerein.base.js" type="application/javascript" />
         <script th:src="@{/resources/js/myVerein.user.js}" src="../resources/js/myVerein.user.js" type="application/javascript" />
-        <script th:src="@{/resources/js/bootstrap-datepicker.js}" src="../resources/js/bootstrap-datepicker.js" type="application/javascript" />
     </head>
 
     <body>
@@ -32,18 +31,20 @@
         <div class="container">
             <div class="col-sm-6">
                 <div id="user-list">
-                    <div class="col-sm-6">
-                        <input type="text" class="form-control fuzzy-search" placeholder="Search..." />
-                    </div>
-                    <div class="col-sm-3">
-                        <button class="sort btn btn-default" data-sort="firstName">
-                            Sort by name
-                        </button>
-                    </div>
-                    <div class="col-sm-3">
-                        <button id="addUser" class="btn btn-default">
-                            Create new user
-                        </button>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <input type="text" class="form-control fuzzy-search" placeholder="Search..." />
+                        </div>
+                        <div class="col-sm-3">
+                            <button class="sort btn btn-default" data-sort="firstName">
+                                Sort by name
+                            </button>
+                        </div>
+                        <div class="col-sm-3">
+                            <button id="addUser" class="btn btn-default">
+                                Create new user
+                            </button>
+                        </div>
                     </div>
                     <div class="col-sm-12">
                         <ul class="list" />

@@ -1,0 +1,75 @@
+<!--/*
+    Document   : Division Management
+    Description: 
+    Copyright  : (c) 2014 Frank Steiler <frank@steilerdev.de>
+    License    : GNU General Public License v2.0
+*/-->
+
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <title>Division Management</title>
+
+    <link th:href="@{/resources/css/jquery-ui.min.css}" href="../resources/css/jquery-ui.min.css" rel="stylesheet" type="text/css" />
+    <link th:href="@{/resources/css/magic-bootstrap.css}" href="../resources/css/magic-bootstrap.css" rel="stylesheet" type="text/css" />
+    <link th:href="@{/resources/css/myVerein.css}" href="../resources/css/myVerein.css" rel="stylesheet" type="text/css" />
+    <link th:href="@{/resources/css/jqtree.css}" href="../resources/css/jqtree.css" rel="stylesheet" type="text/css" />
+    <link th:href="@{/resources/css/selectize-core.css}" href="../resources/css/selectize-core.css" rel="stylesheet" type="text/css" />
+    <link th:href="@{/resources/css/selectize-bootstrap.css}" href="../resources/css/selectize-bootstrap.css" rel="stylesheet" type="text/css" />
+
+    <script th:src="@{/resources/js/myVerein.base.js}" src="../resources/js/myVerein.base.js" type="application/javascript" />
+    <script th:src="@{/resources/js/myVerein.division.js}" src="../resources/js/myVerein.division.js" type="application/javascript" />
+</head>
+<body>
+    <div th:include="fragments/fragments :: navbar"/>
+    <div class="container">
+        <div class="col-sm-6">
+            <div id="division-tree"></div>
+            <div id="division-tree-loading" class="center-block heartbeat" />
+        </div>
+        <div class="col-sm-6">
+            <div id="message" />
+            <form id="divisionForm" method="post" class="form-horizontal"
+                  data-bv-feedbackicons-valid="glyphicon glyphicon-ok"
+                  data-bv-feedbackicons-invalid="glyphicon glyphicon-remove"
+                  data-bv-feedbackicons-validating="glyphicon glyphicon-refresh">
+
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">Division Name</label>
+                    <div class="col-sm-9">
+                        <input id="name" type="text" class="form-control" name="name"
+                               data-bv-notempty="true"
+                               data-bv-notempty-message="The division name is required and cannot be empty"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">Description</label>
+                    <div class="col-sm-9">
+                        <input id="description" type="text" class="form-control" name="description" />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">Division Administrator</label>
+                    <div class="col-sm-9">
+                        <input name="admin" id="admin" type="text" />
+                    </div>
+                </div>
+
+                <hr/>
+                <div id="submitGroup" class="form-group">
+                    <div id="form-loading"/>
+                    <div class="col-sm-9 col-sm-offset-3">
+                        <button id="divisionButton" type="submit" class="btn btn-default">Save division</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</body>
+</html>

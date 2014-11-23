@@ -68,7 +68,7 @@ public class UserManagementController
     @RequestMapping(method = RequestMethod.POST)
     public @ResponseBody ResponseEntity saveUser(@RequestParam Map<String, String> parameters, @CurrentUser User currentUser, Locale locale)
     {
-        System.err.println(locale);
+        //System.err.println(locale);
         User newUser;
         if(parameters.get("newUser") != null && !parameters.get("newUser").isEmpty())
         {
@@ -199,29 +199,19 @@ public class UserManagementController
     }
 
     /**
-     * This function gathers the names of all available divisions and returns them.
-     * @return A list of all names of the available divisions. The response is converted to json using a Jackson converter.
-     */
-    @RequestMapping(value = "getDivision", produces = "application/json")
-    public @ResponseBody List<Division> getDivision(@RequestParam(required = false) String term)
-    {
-        if(term == null || term.isEmpty())
-        {
-            return divisionRepository.findAllNames();
-        } else
-        {
-            return divisionRepository.findAllNamesContainingString(term);
-        }
-    }
-
-    /**
      * This function gathers all user and returns them. Only the first name, last name and emails are returned.
      * @return A list of all user. The response is converted to json using Jackson converter.
      */
     @RequestMapping(value = "getUser", produces = "application/json")
-    public @ResponseBody List<User> getUser()
+    public @ResponseBody List<User> getUser(@RequestParam(required = false) String term)
     {
-        return userRepository.findAllEmailAndName();
+        if(term == null || term.isEmpty())
+        {
+            return userRepository.findAllEmailAndName();
+        } else
+        {
+            return userRepository.findAllEmailAndNameContainingString(term);
+        }
     }
 
     @RequestMapping(value = "getUser", produces = "application/json", params = "email")
@@ -267,32 +257,5 @@ public class UserManagementController
                                     .anyMatch(anc -> administratedDivisions.contains(anc))); //If there is any match between administrated divisions and ancestors of one of the users divisions
         }
         return allowedToAdministrate;
-    }
-
-
-    /**
-     * This function is collecting all divisions administrated by the user and only returns the divisions that are closest to the root node on their respective paths.
-     * @param currentUser The currently logged in user.
-     * @return The optimized set of administrated divisions.
-     */
-    private List<Division> getOptimizedSetOfAdministratedDivisions(User currentUser)
-    {
-        List<Division> administratedDivisions = divisionRepository.findByAdminUser(currentUser);
-        List<Division> reducedDivisions;
-
-        // Checking if user is superadmin, which concludes he would administrate every division.
-        if(currentUser.getAuthorities().stream().anyMatch(auth -> auth.getAuthority().equals("ROLE_SUPERADMIN")))
-        {
-            //Finding and returning root node.
-            reducedDivisions = administratedDivisions.parallelStream().filter(div -> div.getParent() == null).collect(Collectors.toList());
-        } else
-        {
-            //Reducing the list to the divisions that are on the top of the tree, removing all unnecessary divisions.
-            reducedDivisions = administratedDivisions.stream() //Creating a stream of all divisions
-                    .filter(division -> administratedDivisions.stream() //filtering all divisions that are already defined in a divisions that is closer to the root of the tree
-                            .noneMatch(allDivisions -> division.getAncestors().contains(allDivisions))) //Checking, if there is any division in the list, that is an ancestor of the current division. If there is a match there exists a closer division.
-                    .collect(Collectors.toList()); // Converting the stream to a list
-        }
-        return reducedDivisions;
     }
 }

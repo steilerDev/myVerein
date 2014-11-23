@@ -42,4 +42,6 @@ public interface DivisionRepository extends MongoRepository<Division, String> {
      */
     @Query(value="{'_id': { $regex: '.*?0.*', $options: 'i' }}", fields="{ 'name' : 1}")
     public List<Division> findAllNamesContainingString(String contains);
+
+    public List<Division> findByParent(Division parent);
 }
