@@ -41,7 +41,7 @@ public class Division
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String desc;
 
-    @JsonIgnore
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     @DBRef
     private User adminUser;
 
@@ -73,23 +73,7 @@ public class Division
         this.name = name;
         this.desc = desc;
         this.adminUser = adminUser;
-        this.parent = parent;
-
-        if(parent != null)
-        {
-            List<Division> ancestor;
-            if (parent.getAncestors() == null)
-            {
-                ancestor = new ArrayList<>();
-            } else
-            {
-                //Need to create a new ArrayList, assigning would lead to fill and use BOTH lists
-                ancestor = new ArrayList<>(parent.getAncestors());
-            }
-            ancestor.add(parent);
-            logger.debug("Ancestors " + ancestor.stream().map(div -> div.getName()).collect(Collectors.joining(", ")) + " for division " + this.name);
-            this.ancestors = ancestor;
-        }
+        this.setParent(parent);
     }
 
 
@@ -128,8 +112,27 @@ public class Division
         return parent;
     }
 
+    /**
+     * This function updates the parent and the ancestors.
+     * @param parent The new parent.
+     */
     public void setParent(Division parent)
     {
+        if(parent != null)
+        {
+            List<Division> ancestor;
+            if (parent.getAncestors() == null)
+            {
+                ancestor = new ArrayList<>();
+            } else
+            {
+                //Need to create a new ArrayList, assigning would lead to fill and use BOTH lists
+                ancestor = new ArrayList<>(parent.getAncestors());
+            }
+            ancestor.add(parent);
+            logger.debug("Ancestors " + ancestor.stream().map(div -> div.getName()).collect(Collectors.joining(", ")) + " for division " + this.name);
+            this.ancestors = ancestor;
+        }
         this.parent = parent;
     }
 

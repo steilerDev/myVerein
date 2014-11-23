@@ -14,21 +14,53 @@ function clearForm() {
     $('#description').val('');
     $('#admin')[0].selectize.clear();
     //Reseting previous validation annotation
-    $('#division').data('bootstrapValidator').resetForm();
+    $('#divisionForm').data('bootstrapValidator').resetForm();
 }
 
 //Loading division information into the form
 function loadDivision(name) {
-    //Sending JSON request with the email as parameter to get the user details
+    //Sending JSON request with the division name as parameter to get the division details
     $.getJSON("/division/getDivision", {name: name}, function (division) {
         clearForm();
 
         $('#name').val(division.name);
-        $('#description').val(division.description);
+        $('#description').val(division.desc);
 
+        if (division.adminUser) {
+            $('#admin')[0].selectize.addItem(division.adminUser.email);
+        }
         $('#form-loading').removeClass('heartbeat');
     })
 }
+
+function loadTree() {
+    //Loading tree through ajax
+    $('#division-tree').tree(
+        'loadDataFromUrl',
+        '/division/getDivisionTree', //URL
+        null, //Replace existing tree
+        function() {
+            $('#division-tree-loading').removeClass('heartbeat'); //Stop loading animation when successful
+        }
+    );
+}
+
+$.fn.serializeObject = function()
+{
+    var o = {};
+    var a = this.serializeArray();
+    $.each(a, function() {
+        if (o[this.name] !== undefined) {
+            if (!o[this.name].push) {
+                o[this.name] = [o[this.name]];
+            }
+            o[this.name].push(this.value || '');
+        } else {
+            o[this.name] = this.value || '';
+        }
+    });
+    return o;
+};
 
 //Running init scripts as soon as the DOM is fully loaded.
 $(document).ready(function() {
@@ -46,19 +78,12 @@ $(document).ready(function() {
             }
         },
         onLoadFailed: function(response) {
-            //
+            showMessage('danger', 'Unable to load division tree. Try again');
+            $(division-tree-loading).removeClass('heartbeat');
         }
     });
 
-    //Loading tree through ajax
-    $('#division-tree').tree(
-        'loadDataFromUrl',
-        '/division/getDivisionTree', //URL
-        null, //Replace existing tree
-        function() {
-            $('#division-tree-loading').removeClass('heartbeat'); //Stop loading animation when successful
-        }
-    );
+    loadTree();
 
     //Clicking on a tree node needs to fill the form
     $('#division-tree').bind(
@@ -75,8 +100,9 @@ $(document).ready(function() {
         createOnBlur: true,
         create: false, //Not allowing the creation of user specific items
         hideSelected: true, //If an option is allready in the list it is hidden
-        preload: 'focus', //Loading data as soon as the control gains focus
+        preload: true, //Loading data immidiately (if division is loaded without loading the available user, the added user gets removed because selectize thinks he is not valid)
         valueField: 'email',
+        labelField: 'email',
         searchField: 'email',
         maxItems: 1,
         render: {
@@ -109,24 +135,29 @@ $(document).ready(function() {
         .on('success.form.bv', function(e) { //The submition function
             // Prevent form submission
             e.preventDefault();
-            //$('#form-loading').addClass('heartbeat');
-            ////Send the serialized form
-            //$.ajax({
-            //    url: '/user',
-            //    type: 'POST',
-            //    data: $(e.target).serialize(),
-            //    error: function(msg) {
-            //        $('#form-loading').removeClass('heartbeat');
-            //        showMessage(msg, 'danger');
-            //    },
-            //    success: function() {
-            //        $('#form-loading').removeClass('heartbeat');
-            //        showMessage('Successfully saved user.', 'success');
-            //        clearForm();
-            //        userList.clear();
-            //        $("#user-list-loading").addClass('heartbeat');
-            //        loadUserList();
-            //    }
-            //});
+            $('#form-loading').addClass('heartbeat');
+            //Send the serialized form
+
+            //var json = jQuery.parseJSON($('#division-tree').tree('toJson'));
+            //console.log($(e.target).serializeObject());
+            //console.log(json);
+            //$.extend(json,  $(e.target).serializeObject());
+            //console.log(json);
+            $.ajax({
+                url: '/division',
+                type: 'POST',
+                data: $(e.target).serialize(),
+                error: function(msg) {
+                    $('#form-loading').removeClass('heartbeat');
+                    showMessage(msg, 'danger');
+                },
+               success: function() {
+                    $('#form-loading').removeClass('heartbeat');
+                    showMessage('Successfully saved division.', 'success');
+                    clearForm();
+                    $("#division-tree-loading").addClass('heartbeat');
+                   loadTree();
+                }
+            });
         });
 })

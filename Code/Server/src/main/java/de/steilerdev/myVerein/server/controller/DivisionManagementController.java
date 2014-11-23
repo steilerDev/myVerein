@@ -17,19 +17,28 @@
 package de.steilerdev.myVerein.server.controller;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.sun.org.apache.xpath.internal.operations.Div;
 import de.steilerdev.myVerein.server.model.Division;
 import de.steilerdev.myVerein.server.model.DivisionRepository;
 import de.steilerdev.myVerein.server.model.User;
+import de.steilerdev.myVerein.server.model.UserRepository;
 import de.steilerdev.myVerein.server.security.CurrentUser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.validation.ConstraintViolationException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -42,6 +51,11 @@ public class DivisionManagementController
     @Autowired
     DivisionRepository divisionRepository;
 
+    @Autowired
+    UserRepository userRepository;
+
+    private static Logger logger = LoggerFactory.getLogger(DivisionManagementController.class);
+
     /**
      * This request mapping is processing the request to view the division management page.
      * @return The path to the view for the division management page.
@@ -50,6 +64,59 @@ public class DivisionManagementController
     public String showDivisionManagement()
     {
         return "division";
+    }
+
+    @RequestMapping(method = RequestMethod.POST)
+    public @ResponseBody ResponseEntity<String> saveDivision(@RequestParam Map<String, String> parameters, @CurrentUser User currentUser)
+    {
+        List<Division> administratedDivisions = getOptimizedSetOfAdministratedDivisions(currentUser);
+        if(administratedDivisions.size() > 0)
+        {
+            if(parameters.get("name") == null || parameters.get("name").isEmpty())
+            {
+                logger.warn("Required parameter missing.");
+                return new ResponseEntity<>("Required parameter missing.", HttpStatus.BAD_REQUEST);
+            }
+
+            Division division;
+            if(divisionRepository.findByName(parameters.get("name")) == null)
+            {
+                division = new Division();
+                //If there is a new division the parent is one of the administrated divisions. The correct layout is updated through a different request.
+                division.setParent(administratedDivisions.get(0));
+            } else
+            {
+                division = divisionRepository.findByName(parameters.get("name"));
+                if(!administratedDivisions.parallelStream().anyMatch(div -> division.getAncestors().contains(div))) //Check if user is allowed to change the division (if he administrates one of the parent divisions)
+                {
+                    logger.warn("User is not allowed to change declared division.");
+                    return new ResponseEntity<>("You are not allowed to change this division.", HttpStatus.FORBIDDEN);
+                }
+            }
+
+            User adminUser = null;
+            if(parameters.get("admin") != null && !parameters.get("admin").isEmpty())
+            {
+                adminUser = userRepository.findByEmail(parameters.get("admin"));
+            }
+            division.setAdminUser(adminUser);
+            division.setName(parameters.get("name"));
+            division.setDesc(parameters.get("description"));
+
+            try
+            {
+                divisionRepository.save(division);
+            } catch (ConstraintViolationException e)
+            {
+                logger.warn("A database constraint was violated while saving the division.");
+                return new ResponseEntity<>("A database constraint was violated while saving the division.", HttpStatus.BAD_REQUEST);
+            }
+            return new ResponseEntity<>(HttpStatus.OK);
+        } else
+        {
+            logger.warn("User is not allowed to create a new division.");
+            return new ResponseEntity<>("You are not allowed to create a new division", HttpStatus.FORBIDDEN);
+        }
     }
 
     /**
@@ -72,11 +139,14 @@ public class DivisionManagementController
     public @ResponseBody Division getSingleDivision (@RequestParam String name)
     {
         Division searchedDivision = divisionRepository.findByName(name);
-        searchedDivision.getAdminUser().setPrivateInformation(null);
-        searchedDivision.getAdminUser().setPublicInformation(null);
-        searchedDivision.getAdminUser().setDivisions(null);
-        searchedDivision.getAdminUser().setBirthday(null);
-        searchedDivision.getAdminUser().setMemberSince(null);
+        if(searchedDivision.getAdminUser() != null)
+        {
+            searchedDivision.getAdminUser().setPrivateInformation(null);
+            searchedDivision.getAdminUser().setPublicInformation(null);
+            searchedDivision.getAdminUser().setDivisions(null);
+            searchedDivision.getAdminUser().setBirthday(null);
+            searchedDivision.getAdminUser().setMemberSince(null);
+        }
         return searchedDivision;
     }
 

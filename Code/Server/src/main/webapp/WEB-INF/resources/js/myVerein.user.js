@@ -151,7 +151,7 @@ $(document).ready(function() {
         createOnBlur: true,
         create: false, //Not allowing the creation of user specific items
         hideSelected: true, //If an option is allready in the list it is hidden
-        preload: 'focus', //Loading data as soon as the control gains focus
+        preload: true, //Loading data immidiately (if user is loaded without loading the available divisions, the added divisions get removed because selectize thinks they are not valid)
         valueField: 'name',
         labelField: 'name',
         searchField: 'name',

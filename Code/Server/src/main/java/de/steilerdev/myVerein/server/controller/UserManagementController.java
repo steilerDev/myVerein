@@ -68,6 +68,7 @@ public class UserManagementController
     @RequestMapping(method = RequestMethod.POST)
     public @ResponseBody ResponseEntity saveUser(@RequestParam Map<String, String> parameters, @CurrentUser User currentUser, Locale locale)
     {
+        //Todo: Check if user is administrating the new assigned division
         //System.err.println(locale);
         User newUser;
         if(parameters.get("newUser") != null && !parameters.get("newUser").isEmpty())
@@ -228,6 +229,8 @@ public class UserManagementController
         {
             searchedUser.setAdministrationAllowed(true);
         }
+        //Not setting admin user null could lead to an infinite loop when creating the JSON
+        searchedUser.getDivisions().parallelStream().forEach(div -> div.setAdminUser(null));
         return searchedUser;
     }
 
