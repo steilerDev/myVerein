@@ -32,7 +32,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.security.spec.ECField;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -65,10 +70,73 @@ public class UserManagementController
     @RequestMapping(method = RequestMethod.POST)
     public @ResponseBody ResponseEntity saveUser(@RequestParam Map<String, String> parameters)
     {
+        User newUser = userRepository.findByEmail(parameters.get("email"));
+        if(newUser == null
+                || parameters.get("firstName") == null
+                || parameters.get("firstName").isEmpty()
+                || parameters.get("lastName") == null
+                || parameters.get("lastName").isEmpty()
+                || parameters.get("email") == null
+                || parameters.get("email").isEmpty()
+                || parameters.get("birthday") == null
+                || parameters.get("memberSince") == null
+                || parameters.get("divisions") == null)
+        {
+            return new ResponseEntity<>("Required parameter missing", HttpStatus.BAD_REQUEST);
+        }
+        newUser.setFirstName(parameters.get("firstName"));
+        newUser.setLastName(parameters.get("lastName"));
+        newUser.setEmail(parameters.get("email"));
+
+        if(!parameters.get("birthday").isEmpty())
+        {
+            try
+            {
+                SimpleDateFormat dateFormat = new SimpleDateFormat("DD/MM/YYYY");
+                newUser.setBirthday(dateFormat.parse(parameters.get("birthday")));
+            } catch (ParseException e)
+            {
+                return new ResponseEntity<>("Wrong date format", HttpStatus.BAD_REQUEST);
+            }
+        } else
+        {
+            newUser.setBirthday(null);
+        }
+
+        if(!parameters.get("memberSince").isEmpty())
+        {
+            try
+            {
+                SimpleDateFormat dateFormat = new SimpleDateFormat("DD/MM/YYYY");
+                newUser.setMemberSince(dateFormat.parse(parameters.get("memberSince")));
+            } catch (ParseException e)
+            {
+                return new ResponseEntity<>("Wrong date format", HttpStatus.BAD_REQUEST);
+            }
+        } else
+        {
+            newUser.setBirthday(null);
+        }
+
+        if(!parameters.get("divisions").isEmpty())
+        {
+            String[] divisions = parameters.get("divisions").split(",");
+            for(String division: divisions)
+            {
+                Division div = divisionRepository.findByName(division);
+                if(div == null)
+                {
+                    return new ResponseEntity<>("Division does not exist", HttpStatus.BAD_REQUEST);
+                }
+                newUser.addDivision(div);
+            }
+        }
+        //Todo: Parse variable fields (_old, _new)
+
         parameters.keySet().stream().forEach(key -> {
             System.err.println("Key: " + key + " Value: " + parameters.get(key));
         });
-        return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<String>(HttpStatus.OK);
     }
 
     /**

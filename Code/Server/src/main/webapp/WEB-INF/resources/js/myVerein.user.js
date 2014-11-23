@@ -24,6 +24,7 @@ if("undefined"==typeof jQuery)throw new Error("BootstrapValidator requires jQuer
 
 //Add form fields from existing key and value to target
 function addInformation(target, key, value, edit) {
+    key = '_old' + target + key;
     var removeButton = '';
     if(edit)
     {
@@ -32,7 +33,7 @@ function addInformation(target, key, value, edit) {
     $(target).append('' +
         '<div id="' + key + '_field" class="form-group">' +
             '<label class="col-sm-3 control-label">' + key + '</label>' +
-            '<div class="col-sm-5">' +
+            '<div class="col-sm-9">' +
                 '<input name="' + key + '" class="form-control" value="' + value + '" type="text"/>' +
                 removeButton +
             '</div>' +
@@ -48,14 +49,14 @@ function addInformation(target, key, value, edit) {
 var newInformationCounter = 0; //Counter used to create unique identifiers for new input fields
 //Create new form fields without existing key or value
 function addNewInformation(target) {
-    var key = 'newValue' + newInformationCounter;
+    var key = '_new' + target + newInformationCounter;
     newInformationCounter++;
     removeButton = '<a id="remove_' + key + '">Remove field</a>';
 
     $(target).append('' +
     '<div id="' + key + '_field" class="form-group">' +
         '<label class="col-sm-3 control-label">New custom field</label>' +
-        '<div class="col-sm-5">' +
+        '<div class="col-sm-9">' +
             '<input name="'+ key + '_key" class="form-control" placeholder="Key" type="text"/>' +
             '<input name="'+ key + '_value" class="form-control" placeholder="Value" type="text"/>' +
             removeButton +
@@ -67,70 +68,69 @@ function addNewInformation(target) {
     });
 }
 
-//Loading a user's information into the form
-function loadUser(email) {
-    email = 'email=' + email;
+function clearForm() {
+    $('#firstName').val('');
+    $('#lastName').val('');
+    $('#email').val('');
+    $('#birthday').val('');
+    $('#memberSince').val('');
+    $('#divisions')[0].selectize.clear();
+    $('.privateInformation').empty();
+    $('.publicInformation').empty();
+    $('.addPrivateInformation').empty();
+    $('.addPublicInformation').empty();
     //Reseting previous validation annotation
     $('#userForm').data('bootstrapValidator').resetForm();
-    //Sending JSON request with the email as parameter to get the user details
-    $.getJSON("/user/getUser", email, function(data) {
-        var user = $.parseJSON(JSON.stringify(data));
+}
 
-        //Fill static form
+//Loading a user's information into the form
+function loadUser(email) {
+    //Sending JSON request with the email as parameter to get the user details
+    $.getJSON("/user/getUser", {email: email}, function(data) {
+        var user = $.parseJSON(JSON.stringify(data));
+        clearForm();
+        //Filling existing fields
         $('#firstName').val(user.firstName);
         $('#lastName').val(user.lastName);
         $('#email').val(user.email);
-
         if(user.birthday)
         {
             $('#birthday').datepicker('update', new Date(user.birthday));
-        } else {
-            $('#birthday').val('');
         }
         if(user.memberSince)
         {
             $('#memberSince').datepicker('update', new Date(user.memberSince));
-        } else {
-            $('#memberSince').val('');
         }
-
-        //Reset division list
-        $('#divisions')[0].selectize.clear();
 
         //Fill division list
         if (user.divisions) {
             $.each(user.divisions, function (index, division) {
+                //Todo: Not working yet :(
                 $('#divisions')[0].selectize.addItem(division.name);
             });
         }
 
-        //Resetting private and public information
-        $('.privateInformation').empty();
-        $('.publicInformation').empty();
-        $('.addPrivateInformation').empty();
-        $('.addPublicInformation').empty();
-
         //Inserting public information if there are any
         if (user.publicInformation) {
-            $('.publicInformation').append('<div class="col-sm-12" >Public Information</div>');
+            $('.publicInformation').append('<div class="row text-center col-sm-12" >Public Information</div>');
             $.each(user.publicInformation, function (key, value) {
                 addInformation('.publicInformation', key, value, user.administrationAllowed);
             });
         } else if (user.administrationAllowed){
-            $('.publicInformation').append('<div class="col-sm-12" >Public Information</div>');
+            $('.publicInformation').append('<div class="row text-center col-sm-12" >Public Information</div>');
         }
 
         //Inserting private information if there are any
         if (user.privateInformation) {
-            $('.privateInformation').append('<div class="col-sm-12" >Private Information</div>');
+            $('.privateInformation').append('<div class="row text-center col-sm-12" >Private Information</div>');
             $.each(user.privateInformation, function (key, value) {
                 addInformation('.privateInformation', key, value, user.administrationAllowed);
             });
         } else if (user.administrationAllowed){
-            $('.privateInformation').append('<div class="col-sm-12" >Private Information</div>');
+            $('.privateInformation').append('<div class="row text-center col-sm-12" >Private Information</div>');
         }
 
-        //Enabling/Disabling save button, depending on the administration allowed flag
+        //Enabling/Disabling save button and adding of custom key value pairs, depending on the administration allowed flag
         if (!user.administrationAllowed) {
             //Todo: Add message that user is not allowed and explain
             $('#userButton').attr('disabled', 'disabled');
@@ -147,6 +147,14 @@ function loadUser(email) {
             });
         }
     });
+}
+
+function showMessage(message, level) {
+    $('#message').append(
+        '<div class="alert alert-' + level + ' alert-dismissible" role="alert">' +
+            '<button type="button" class="close" data-dismiss="alert">&times;</button>' +
+            message +
+        '</div>');
 }
 
 //Running init scripts as soon as the DOM is fully loaded.
@@ -192,8 +200,9 @@ $(document).ready(function() {
     userList.on("updated", function(){
         $("li.list-item").click(function(e){
             //Get the email as identification of the selected user and loading the user into the form
+            $('#form-loading').addClass('heartbeat');
             loadUser($(this).children(".email").text());
-            //Todo: Maybe loading animation
+            $('#form-loading').removeClass('heartbeat');
             });
     });
 
@@ -202,16 +211,23 @@ $(document).ready(function() {
         .on('success.form.bv', function(e) { //The submition function
             // Prevent form submission
             e.preventDefault();
+            $('#form-loading').addClass('heartbeat');
             //Send the serialized form
             $.ajax({
                 url: '/user',
                 type: 'POST',
                 data: $(e.target).serialize(),
                 error: function() {
-                    console.log('Error');
+                    $('#form-loading').removeClass('heartbeat');
+                    showMessage('An unexpected error occurred. Please try again.', 'danger');
                 },
                 success: function() {
-                    console.log('Success');
+                    $('#form-loading').removeClass('heartbeat');
+                    showMessage('Successfully saved user.', 'success');
+                    clearForm();
+                    userList.clear();
+                    $("#user-list-loading").addClass('heartbeat');
+                    loadUserList();
                 }
             });
         });
@@ -224,11 +240,14 @@ $(document).ready(function() {
     };
     $('#birthday').datepicker(datepickerOptions);
     $('#memberSince').datepicker(datepickerOptions);
+    loadUserList();
 
-    //Loading user list through ajax request
-    $.getJSON("/user/getUser", function(data){
-        var user = $.parseJSON(JSON.stringify(data));
-        $("#user-list-loading").remove();
-        userList.add(user);
-    });
+    function loadUserList() {
+        //Loading user list through ajax request
+        $.getJSON("/user/getUser", function(data){
+            var user = $.parseJSON(JSON.stringify(data));
+            $("#user-list-loading").removeClass('heartbeat');
+            userList.add(user);
+        });
+    }
 })

@@ -33,12 +33,22 @@
         <div class="container">
             <div class="col-sm-6">
                 <div id="user-list">
-                    <input type="text" class="fuzzy-search" />
-                    <ul class="list" />
-                    <div id="user-list-loading" class="heartbeat" />
+                    <div class="col-sm-9">
+                        <input type="text" class="form-control fuzzy-search" placeholder="Search..." />
+                    </div>
+                    <div class="col-sm-3">
+                        <button class="sort btn btn-default" data-sort="firstName">
+                            Sort by name
+                        </button>
+                    </div>
+                    <div class="col-sm-12">
+                        <ul class="list" />
+                        <div id="user-list-loading" class="center-block heartbeat" />
+                    </div>
                 </div>
             </div>
             <div class="col-sm-6">
+                <div id="message" />
                 <form id="userForm" method="post" class="form-horizontal"
                       data-bv-feedbackicons-valid="glyphicon glyphicon-ok"
                       data-bv-feedbackicons-invalid="glyphicon glyphicon-remove"
@@ -46,7 +56,7 @@
 
                     <div class="form-group">
                         <label class="col-sm-3 control-label">First Name</label>
-                        <div class="col-sm-5">
+                        <div class="col-sm-9">
                             <input id="firstName" type="text" class="form-control" name="firstName"
                                    data-bv-notempty="true"
                                    data-bv-notempty-message="The first name is required and cannot be empty"
@@ -62,7 +72,7 @@
                     </div>
                     <div class="form-group">
                         <label class="col-sm-3 control-label">Last Name</label>
-                        <div class="col-sm-5">
+                        <div class="col-sm-9">
                             <input id="lastName" type="text" class="form-control" name="lastName"
                                    data-bv-notempty="true"
                                    data-bv-notempty-message="The last name is required and cannot be empty"
@@ -78,7 +88,7 @@
                     </div>
                     <div class="form-group">
                         <label class="col-sm-3 control-label">Email address</label>
-                        <div class="col-sm-5">
+                        <div class="col-sm-9">
                             <input id="email" type="text" class="form-control" name="email"
                                    data-bv-notempty="true"
                                    data-bv-notempty-message="The email address is required and cannot be empty"
@@ -89,7 +99,7 @@
                     </div>
                     <div class="form-group">
                         <label class="col-sm-3 control-label">Birthday</label>
-                        <div class="col-sm-5">
+                        <div class="col-sm-9">
                             <input id="birthday" type="text" class="form-control" name="birthday"
                                    data-bv-date="true"
                                    data-bv-date-format="DD/MM/YYYY"
@@ -98,7 +108,7 @@
                     </div>
                     <div class="form-group">
                         <label class="col-sm-3 control-label">Member since</label>
-                        <div class="col-sm-5">
+                        <div class="col-sm-9">
                             <input id="memberSince" type="text" class="form-control" name="memberSince"
                                    data-bv-date="true"
                                    data-bv-date-format="DD/MM/YYYY"
@@ -107,7 +117,7 @@
                     </div>
                     <div class="form-group">
                         <label class="col-sm-3 control-label">Divisions</label>
-                        <div class="col-sm-5">
+                        <div class="col-sm-9">
                             <input name="divisions" id="divisions" type="text" />
                         </div>
                     </div>
@@ -120,6 +130,7 @@
                     <div class="form-group">
                         <div class="col-sm-9 col-sm-offset-3">
                             <button id="userButton" type="submit" class="btn btn-default">Save user</button>
+                            <div id="form-loading"/>
                         </div>
                     </div>
                 </form>
