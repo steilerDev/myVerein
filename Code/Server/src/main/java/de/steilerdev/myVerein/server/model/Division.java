@@ -135,6 +135,10 @@ public class Division
 
     public List<Division> getAncestors()
     {
+        if(ancestors == null)
+        {
+            return new ArrayList<>();
+        }
         return ancestors;
     }
 

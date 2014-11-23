@@ -251,8 +251,11 @@ public class User implements UserDetails
         if(divisions == null)
         {
             divisions = new ArrayList<>();
+            divisions.add(division);
+        } else if(!divisions.contains(division))
+        {
+            divisions.add(division);
         }
-        divisions.add(division);
     }
 
     public String getSalt()

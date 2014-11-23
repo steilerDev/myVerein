@@ -32,13 +32,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.security.spec.ECField;
-import java.text.DateFormat;
+import javax.validation.ConstraintViolationException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -68,75 +66,136 @@ public class UserManagementController
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public @ResponseBody ResponseEntity saveUser(@RequestParam Map<String, String> parameters)
+    public @ResponseBody ResponseEntity saveUser(@RequestParam Map<String, String> parameters, @CurrentUser User currentUser, Locale locale)
     {
-        User newUser = userRepository.findByEmail(parameters.get("email"));
-        if(newUser == null
-                || parameters.get("firstName") == null
-                || parameters.get("firstName").isEmpty()
-                || parameters.get("lastName") == null
-                || parameters.get("lastName").isEmpty()
-                || parameters.get("email") == null
-                || parameters.get("email").isEmpty()
-                || parameters.get("birthday") == null
-                || parameters.get("memberSince") == null
-                || parameters.get("divisions") == null)
+        System.err.println(locale);
+        User newUser;
+        if(parameters.get("newUser") != null && !parameters.get("newUser").isEmpty())
         {
-            return new ResponseEntity<>("Required parameter missing", HttpStatus.BAD_REQUEST);
-        }
-        newUser.setFirstName(parameters.get("firstName"));
-        newUser.setLastName(parameters.get("lastName"));
-        newUser.setEmail(parameters.get("email"));
-
-        if(!parameters.get("birthday").isEmpty())
-        {
-            try
+            if(userRepository.findByEmail(parameters.get("email")) == null)
             {
-                SimpleDateFormat dateFormat = new SimpleDateFormat("DD/MM/YYYY");
-                newUser.setBirthday(dateFormat.parse(parameters.get("birthday")));
-            } catch (ParseException e)
-            {
-                return new ResponseEntity<>("Wrong date format", HttpStatus.BAD_REQUEST);
-            }
-        } else
-        {
-            newUser.setBirthday(null);
-        }
-
-        if(!parameters.get("memberSince").isEmpty())
-        {
-            try
-            {
-                SimpleDateFormat dateFormat = new SimpleDateFormat("DD/MM/YYYY");
-                newUser.setMemberSince(dateFormat.parse(parameters.get("memberSince")));
-            } catch (ParseException e)
-            {
-                return new ResponseEntity<>("Wrong date format", HttpStatus.BAD_REQUEST);
-            }
-        } else
-        {
-            newUser.setBirthday(null);
-        }
-
-        if(!parameters.get("divisions").isEmpty())
-        {
-            String[] divisions = parameters.get("divisions").split(",");
-            for(String division: divisions)
-            {
-                Division div = divisionRepository.findByName(division);
-                if(div == null)
+                newUser = new User();
+                if(parameters.get("password") == null || parameters.get("password").isEmpty())
                 {
-                    return new ResponseEntity<>("Division does not exist", HttpStatus.BAD_REQUEST);
+                    logger.warn("The password can not be empty");
+                    return new ResponseEntity("The password can not be empty", HttpStatus.BAD_REQUEST);
+                } else
+                {
+                    newUser.setPassword(parameters.get("password"));
                 }
-                newUser.addDivision(div);
+            } else
+            {
+                logger.warn("A user with the given email already exists.");
+                return new ResponseEntity("A user with the given email already exists.", HttpStatus.BAD_REQUEST);
             }
+        } else {
+            newUser = userRepository.findByEmail(parameters.get("email"));
         }
-        //Todo: Parse variable fields (_old, _new)
+        if(isAllowedToAdministrate(currentUser, newUser))
+        {
+            if (newUser == null || parameters.get("firstName") == null || parameters.get("firstName").isEmpty() || parameters.get("lastName") == null || parameters.get("lastName").isEmpty() || parameters.get("email") == null || parameters.get("email").isEmpty() || parameters.get("birthday") == null || parameters.get("memberSince") == null || parameters.get("divisions") == null)
+            {
+                logger.warn("Required parameter missing.");
+                return new ResponseEntity<>("Required parameter missing", HttpStatus.BAD_REQUEST);
+            }
+            newUser.setFirstName(parameters.get("firstName"));
+            newUser.setLastName(parameters.get("lastName"));
+            newUser.setEmail(parameters.get("email"));
 
-        parameters.keySet().stream().forEach(key -> {
-            System.err.println("Key: " + key + " Value: " + parameters.get(key));
-        });
-        return new ResponseEntity<String>(HttpStatus.OK);
+            if (!parameters.get("birthday").isEmpty())
+            {
+                try
+                {
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("DD/MM/YYYY");
+                    newUser.setBirthday(dateFormat.parse(parameters.get("birthday")));
+                } catch (ParseException e)
+                {
+                    logger.warn("Unrecognized date format (" + parameters.get("birthday") + ")");
+                    return new ResponseEntity<>("Wrong date format", HttpStatus.BAD_REQUEST);
+                }
+            } else
+            {
+                newUser.setBirthday(null);
+            }
+
+            if (!parameters.get("memberSince").isEmpty())
+            {
+                try
+                {
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("DD/MM/YYYY");
+                    newUser.setMemberSince(dateFormat.parse(parameters.get("memberSince")));
+                } catch (ParseException e)
+                {
+                    logger.warn("Unrecognized date format (" + parameters.get("memberSince") + ")");
+                    return new ResponseEntity<>("Wrong date format", HttpStatus.BAD_REQUEST);
+                }
+            } else
+            {
+                newUser.setBirthday(null);
+            }
+
+            if (!parameters.get("divisions").isEmpty())
+            {
+                String[] divisions = parameters.get("divisions").split(",");
+                for (String division : divisions)
+                {
+                    Division div = divisionRepository.findByName(division);
+                    if (div == null)
+                    {
+                        logger.warn("Unrecognized division (" + div + ")");
+                        return new ResponseEntity<>("Division does not exist", HttpStatus.BAD_REQUEST);
+                    }
+                    newUser.addDivision(div);
+                }
+            }
+
+            parameters.keySet().parallelStream().forEach(key -> {
+                String normalizedKey;
+                if (key.startsWith("_old."))
+                {
+                    normalizedKey = key.substring(5);
+                    if (normalizedKey.startsWith("privateInformation"))
+                    {
+                        normalizedKey = normalizedKey.substring(18);
+                        newUser.addPrivateInformation(normalizedKey, parameters.get(key));
+                    } else if (normalizedKey.startsWith("publicInformation"))
+                    {
+                        normalizedKey = normalizedKey.substring(17);
+                        newUser.addPublicInformation(normalizedKey, parameters.get(key));
+                    } else
+                    {
+                        logger.warn("Unrecognized custom field (" + key + ").");
+                    }
+                } else if (key.startsWith("_new.") && key.endsWith("_key"))
+                {
+                    normalizedKey = key.substring(5);
+                    if (normalizedKey.startsWith("privateInformation"))
+                    {
+                        String value = key.replace("_key", "_value");
+                        newUser.addPrivateInformation(parameters.get(key), parameters.get(value));
+                    } else if (normalizedKey.startsWith("publicInformation"))
+                    {
+                        String value = key.replace("_key", "_value");
+                        newUser.addPublicInformation(parameters.get(key), parameters.get(value));
+                    } else
+                    {
+                        logger.warn("Unrecognized custom field (" + key + ").");
+                    }
+                }
+            });
+
+            try
+            {
+                userRepository.save(newUser);
+            } catch (ConstraintViolationException e)
+            {
+                logger.warn("A database constraint was violated while saving the user.");
+                return new ResponseEntity<>("A database constraint was violated while saving the user.", HttpStatus.BAD_REQUEST);
+            }
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+        logger.warn("The user is not allowed to perfom these changes.");
+        return new ResponseEntity<>("The user is not allowed to perform these changes.", HttpStatus.FORBIDDEN);
     }
 
     /**
@@ -169,32 +228,45 @@ public class UserManagementController
     public @ResponseBody User getUser(@RequestParam String email, @CurrentUser User currentUser)
     {
         User searchedUser = userRepository.findByEmail(email);
+
+        if(!isAllowedToAdministrate(currentUser, searchedUser))
+        {
+            logger.debug("Currently logged in user is not administrating selected user. Hiding private information");
+            searchedUser.setPrivateInformation(null);
+            searchedUser.setAdministrationAllowed(false);
+        } else
+        {
+            searchedUser.setAdministrationAllowed(true);
+        }
+        return searchedUser;
+    }
+
+    /**
+     * This function checks if the currently logged in user is allowed to administrate (view private information and change user details) the selected user.
+     * @param currentUser The currently logged in user.
+     * @param selectedUser The selected user.
+     * @return True if the user is allowed, false otherwise.
+     */
+    private boolean isAllowedToAdministrate(User currentUser, User selectedUser)
+    {
         //Getting the list of administrated divisions
         List<Division> administratedDivisions = divisionRepository.findByAdminUser(currentUser);
 
         boolean allowedToAdministrate;
 
         //Is the user does not have any divisions at the moment, the admin is allowed to administrate the user.
-        if(searchedUser.getDivisions() == null || searchedUser.getDivisions().isEmpty())
+        if(selectedUser.getDivisions() == null || selectedUser.getDivisions().isEmpty() || selectedUser.getUsername().equals(currentUser.getUsername()))
         {
             allowedToAdministrate = true;
         } else
         {
             //Checking if the current administrator is administrating any of the divisions the user is part of
-            allowedToAdministrate = searchedUser.getDivisions().parallelStream() //Streaming all divisions the user is part of
+            allowedToAdministrate = selectedUser.getDivisions().parallelStream() //Streaming all divisions the user is part of
                     .anyMatch(div -> //If there is any match the admin is allowed to view the user
                             div.getAncestors().parallelStream() //Streaming all ancestors of the user's divisions
                                     .anyMatch(anc -> administratedDivisions.contains(anc))); //If there is any match between administrated divisions and ancestors of one of the users divisions
         }
-
-        if(!allowedToAdministrate)
-        {
-            logger.debug("Currently logged in user is not administrating selected user. Hiding private information");
-            searchedUser.setPrivateInformation(null);
-        }
-        searchedUser.setAdministrationAllowed(allowedToAdministrate);
-
-        return searchedUser;
+        return allowedToAdministrate;
     }
 
 

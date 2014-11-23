@@ -6,7 +6,7 @@
 	<appender name="console" class="org.apache.log4j.ConsoleAppender">
 		<param name="Target" value="System.out" />
 		<layout class="org.apache.log4j.PatternLayout">
-			<param name="ConversionPattern" value="%d{HH:mm:ss} [%t] %c{1} - %m%n" />
+			<param name="ConversionPattern" value="%d{HH:mm:ss} %-5p [%t] %c{1} - %m%n" />
 		</layout>
 	</appender>
 
@@ -31,15 +31,15 @@
 	</logger>
 
 	<logger name="org.springframework.http">
-		<level value="debug" />
+		<level value="info" />
 	</logger>
 
 	<logger name="org.springframework.web">
-		<level value="debug" />
+		<level value="info" />
 	</logger>
 
 	<logger name="org.springframework.security">
-		<level value="debug" />
+		<level value="info" />
 	</logger>
 
 	<logger name="org.thymeleaf.TemplateEngine">

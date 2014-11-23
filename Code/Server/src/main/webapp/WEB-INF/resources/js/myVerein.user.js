@@ -24,15 +24,16 @@ if("undefined"==typeof jQuery)throw new Error("BootstrapValidator requires jQuer
 
 //Add form fields from existing key and value to target
 function addInformation(target, key, value, edit) {
+    name = key;
     key = '_old' + target + key;
     var removeButton = '';
     if(edit)
     {
-        removeButton = '<a id="remove_' + key + '">Remove '+ key + '</a>';
+        removeButton = '<a id="remove_' + key + '">Remove '+ name + '</a>';
     }
     $(target).append('' +
         '<div id="' + key + '_field" class="form-group">' +
-            '<label class="col-sm-3 control-label">' + key + '</label>' +
+            '<label class="col-sm-3 control-label">' + name + '</label>' +
             '<div class="col-sm-9">' +
                 '<input name="' + key + '" class="form-control" value="' + value + '" type="text"/>' +
                 removeButton +
@@ -79,6 +80,7 @@ function clearForm() {
     $('.publicInformation').empty();
     $('.addPrivateInformation').empty();
     $('.addPublicInformation').empty();
+    $('#newUser').empty();
     //Reseting previous validation annotation
     $('#userForm').data('bootstrapValidator').resetForm();
 }
@@ -89,6 +91,7 @@ function loadUser(email) {
     $.getJSON("/user/getUser", {email: email}, function(data) {
         var user = $.parseJSON(JSON.stringify(data));
         clearForm();
+        $('#userButton').text('Update user');
         //Filling existing fields
         $('#firstName').val(user.firstName);
         $('#lastName').val(user.lastName);
@@ -105,7 +108,6 @@ function loadUser(email) {
         //Fill division list
         if (user.divisions) {
             $.each(user.divisions, function (index, division) {
-                //Todo: Not working yet :(
                 $('#divisions')[0].selectize.addItem(division.name);
             });
         }
@@ -132,7 +134,7 @@ function loadUser(email) {
 
         //Enabling/Disabling save button and adding of custom key value pairs, depending on the administration allowed flag
         if (!user.administrationAllowed) {
-            //Todo: Add message that user is not allowed and explain
+            showMessage('You are not allowed to modify this user, because you are not his administrator.', 'warning');
             $('#userButton').attr('disabled', 'disabled');
         } else {
             $('#userButton').removeAttr('disabled');
@@ -150,6 +152,7 @@ function loadUser(email) {
 }
 
 function showMessage(message, level) {
+    $('#message').empty();
     $('#message').append(
         '<div class="alert alert-' + level + ' alert-dismissible" role="alert">' +
             '<button type="button" class="close" data-dismiss="alert">&times;</button>' +
@@ -241,6 +244,20 @@ $(document).ready(function() {
     $('#birthday').datepicker(datepickerOptions);
     $('#memberSince').datepicker(datepickerOptions);
     loadUserList();
+
+    $('#addUser').click(function(e){
+        clearForm();
+        $('#newUser').append('' +
+        '<label class="col-sm-3 control-label">Password</label>' +
+        '<div class="col-sm-9">' +
+            '<input id="password" type="password" class="form-control" name="password"' +
+                'data-bv-notempty="true"' +
+                'data-bv-notempty-message="The last name is required and cannot be empty" />' +
+                '<input type="hidden" name="newUser" value="true"/>' +
+        '</div>');
+        $('#userButton').text('Save new user');
+        $('#firstName').focus();
+    });
 
     function loadUserList() {
         //Loading user list through ajax request

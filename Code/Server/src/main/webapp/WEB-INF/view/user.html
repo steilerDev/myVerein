@@ -14,7 +14,6 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
         <title>User Management</title>
 
-        <link th:href="@{/resources/css/jquery.tagsinput.css}" href="../resources/css/jquery.tagsinput.css" rel="stylesheet" type="text/css" />
         <link th:href="@{/resources/css/jquery-ui.min.css}" href="../resources/css/jquery-ui.min.css" rel="stylesheet" type="text/css" />
         <link th:href="@{/resources/css/bootstrap-validator.css}" href="../resources/css/bootstrap-validator.css" rel="stylesheet" type="text/css" />
         <link th:href="@{/resources/css/magic-bootstrap.css}" href="../resources/css/magic-bootstrap.css" rel="stylesheet" type="text/css" />
@@ -33,12 +32,17 @@
         <div class="container">
             <div class="col-sm-6">
                 <div id="user-list">
-                    <div class="col-sm-9">
+                    <div class="col-sm-6">
                         <input type="text" class="form-control fuzzy-search" placeholder="Search..." />
                     </div>
                     <div class="col-sm-3">
                         <button class="sort btn btn-default" data-sort="firstName">
                             Sort by name
+                        </button>
+                    </div>
+                    <div class="col-sm-3">
+                        <button id="addUser" class="btn btn-default">
+                            Create new user
                         </button>
                     </div>
                     <div class="col-sm-12">
@@ -97,6 +101,15 @@
                                    data-bv-emailaddress-message="The email address is not a valid" />
                         </div>
                     </div>
+                    <div id="newUser" class="form-group">
+                        <label class="col-sm-3 control-label">Password</label>
+                        <div class="col-sm-9">
+                            <input id="password" type="password" class="form-control" name="password"
+                                data-bv-notempty="true"
+                                data-bv-notempty-message="The last name is required and cannot be empty" />
+                            <input type="hidden" name="newUser" value="true" />
+                        </div>
+                    </div>
                     <div class="form-group">
                         <label class="col-sm-3 control-label">Birthday</label>
                         <div class="col-sm-9">
@@ -127,11 +140,11 @@
                     <div class="addPublicInformation col-sm-9 col-sm-offset-3" />
 
                     <hr/>
-                    <div class="form-group">
-                        <div class="col-sm-9 col-sm-offset-3">
-                            <button id="userButton" type="submit" class="btn btn-default">Save user</button>
+                    <div id="submitGroup" class="form-group">
                             <div id="form-loading"/>
-                        </div>
+                            <div class="col-sm-9 col-sm-offset-3">
+                                <button id="userButton" type="submit" class="btn btn-default">Save new user</button>
+                            </div>
                     </div>
                 </form>
             </div>
