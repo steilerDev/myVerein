@@ -68,11 +68,20 @@ public class UserManagementController
     @RequestMapping(method = RequestMethod.POST)
     public @ResponseBody ResponseEntity saveUser(@RequestParam Map<String, String> parameters, @CurrentUser User currentUser, Locale locale)
     {
-        //Todo: Check if user is administrating the new assigned division
         //System.err.println(locale);
         User newUser;
+        User oldUser = null;
+        //The user needs always an email identifier
+        if(parameters.get("email") == null || parameters.get("email").isEmpty())
+        {
+            logger.warn("The email can not be empty");
+            return new ResponseEntity("The email can not be empty", HttpStatus.BAD_REQUEST);
+        }
+
+        //A new user is added
         if(parameters.get("newUser") != null && !parameters.get("newUser").isEmpty())
         {
+            logger.debug("A new user is created");
             if(userRepository.findByEmail(parameters.get("email")) == null)
             {
                 newUser = new User();
@@ -89,8 +98,29 @@ public class UserManagementController
                 logger.warn("A user with the given email already exists.");
                 return new ResponseEntity("A user with the given email already exists.", HttpStatus.BAD_REQUEST);
             }
-        } else {
-            newUser = userRepository.findByEmail(parameters.get("email"));
+        //An existing user is modified
+        } else if (parameters.get("oldUser") != null && !parameters.get("oldUser").isEmpty())
+        {
+            logger.debug("An existing user is modified");
+            //The email did not change
+            if(parameters.get("oldUser").equals(parameters.get("email")) && userRepository.findByEmail(parameters.get("email")) != null)
+            {
+                newUser = userRepository.findByEmail(parameters.get("email"));
+            //Email did change and the new email is unused
+            } else if (userRepository.findByEmail(parameters.get("oldUser")) != null && userRepository.findByEmail(parameters.get("email")) == null)
+            {
+                logger.debug("The user changed his email");
+                oldUser = userRepository.findByEmail(parameters.get("oldUser"));
+                newUser = userRepository.findByEmail(parameters.get("oldUser"));
+            } else
+            {
+                logger.warn("Problem finding existing user, either the existing user could not be located or the new email is already taken");
+                return new ResponseEntity("Problem finding existing user, either the existing user could not be located or the new email is already taken", HttpStatus.BAD_REQUEST);
+            }
+        } else
+        {
+            logger.warn("Neither new nor existing user parameter or identifier existing.");
+            return new ResponseEntity<>("Neither new nor existing user parameter or identifier existing.", HttpStatus.BAD_REQUEST);
         }
         if(isAllowedToAdministrate(currentUser, newUser))
         {
@@ -144,7 +174,7 @@ public class UserManagementController
                     if (div == null)
                     {
                         logger.warn("Unrecognized division (" + div + ")");
-                        return new ResponseEntity<>("Division does not exist", HttpStatus.BAD_REQUEST);
+                        return new ResponseEntity<>("Division " + div + " does not exist", HttpStatus.BAD_REQUEST);
                     }
                     newUser.addDivision(div);
                 }
@@ -188,6 +218,10 @@ public class UserManagementController
             try
             {
                 userRepository.save(newUser);
+                if(oldUser != null)
+                {
+                    userRepository.delete(oldUser);
+                }
             } catch (ConstraintViolationException e)
             {
                 logger.warn("A database constraint was violated while saving the user.");

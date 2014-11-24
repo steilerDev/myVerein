@@ -17,7 +17,7 @@
 
 //Add form fields from existing key and value to target
 function addInformation(target, key, value, edit) {
-    name = key;
+    var name = key;
     key = '_old' + target + key;
     var removeButton = '';
     if(edit)
@@ -74,6 +74,7 @@ function clearForm() {
     $('.addPrivateInformation').empty();
     $('.addPublicInformation').empty();
     $('#newUser').empty();
+    $('#heading').text('');
     //Reseting previous validation annotation
     $('#userForm').data('bootstrapValidator').resetForm();
 }
@@ -140,6 +141,8 @@ function loadUser(email) {
                 addNewInformation('.publicInformation');
             });
         }
+        $('#heading').text('Modify user <' + user.email + '>');
+        $('#newUser').append('<input type="hidden" name="oldUser" value="' + user.email + '"/>');
     });
 }
 
@@ -203,9 +206,9 @@ $(document).ready(function() {
                 url: '/user',
                 type: 'POST',
                 data: $(e.target).serialize(),
-                error: function(msg) {
+                error: function(response) {
                     $('#form-loading').removeClass('heartbeat');
-                    showMessage(msg, 'danger');
+                    showMessage(response.responseText, 'danger');
                 },
                 success: function() {
                     $('#form-loading').removeClass('heartbeat');
@@ -230,6 +233,7 @@ $(document).ready(function() {
 
     $('#addUser').click(function(e){
         clearForm();
+        $('#heading').text('Create new user');
         $('#newUser').append('' +
         '<label class="col-sm-3 control-label">Password</label>' +
         '<div class="col-sm-9">' +
