@@ -64,6 +64,15 @@ public class DivisionManagementController
         return "division";
     }
 
+    /**
+     * If a modification on a division needs to be stored durable this controller is invoked by posting the parameters to the URI /division
+     * @param name The new name of the division.
+     * @param oldName The old name of the division (might be equal to new name)
+     * @param description The description of the division (not required parameter)
+     * @param admin The name of the administrating user (not required parameter)
+     * @param currentUser The currently logged in user.
+     * @return A HTTP response with an status code. If an error occurred an error message is bundled into the response.
+     */
     @RequestMapping(method = RequestMethod.POST)
     public @ResponseBody ResponseEntity<String> saveDivision(@RequestParam String name,
                                                              @RequestParam String oldName,
@@ -144,6 +153,7 @@ public class DivisionManagementController
 
     /**
      * This function gathers the names of all available divisions and returns them.
+     * @param term A term, that is required to be part of the division name.
      * @return A list of all names of the available divisions. The response is converted to json using a Jackson converter.
      */
     @RequestMapping(value = "getDivision", produces = "application/json")
@@ -158,6 +168,11 @@ public class DivisionManagementController
         }
     }
 
+    /**
+     * This function returns a single division as JSON object, where the administrator's fields are reduced to his name and email.
+     * @param name The name of the division.
+     * @return A JSON object of the division.
+     */
     @RequestMapping(value = "getDivision", produces = "application/json", params = "name")
     public @ResponseBody Division getSingleDivision (@RequestParam String name)
     {
@@ -173,12 +188,21 @@ public class DivisionManagementController
         return searchedDivision;
     }
 
+    /**
+     * This controller is invoked as soon as an administrator is changing the layout of the division scheme.
+     * @param moved_node The name of the node that has been moved.
+     * @param target_node The name of the node, where the moved_node got moved to.
+     * @param position The relation the moved_node is positioned to the target_node.
+     * @param previous_parent The previous parent of the node.
+     * @param currentUser The currently logged in user.
+     * @return An HTTP status code and an error message if an error occurred.
+     */
     @RequestMapping(value="updateDivisionTree", method = RequestMethod.POST)
     public @ResponseBody ResponseEntity saveTree(@RequestParam String moved_node,
                                                  @RequestParam String target_node,
                                                  @RequestParam String position,
                                                  @RequestParam String previous_parent,
-                                                 @CurrentUser User currentUser, Locale locale)
+                                                 @CurrentUser User currentUser)
     {
 
         return new ResponseEntity(HttpStatus.OK);
@@ -186,7 +210,8 @@ public class DivisionManagementController
 
     /**
      * This function gathers the complete division tree that the user is administrating.
-     * @return A list of treenodes, that represent the division tree.
+     * @param currentUser The currently logged in user.
+     * @return A list of tree nodes, that represent the division tree.
      */
     @RequestMapping(value = "getDivisionTree", produces = "application/json")
     public @ResponseBody List<TreeNode> getDivisionTree(@CurrentUser User currentUser)
@@ -197,6 +222,11 @@ public class DivisionManagementController
         return divisionTree;
     }
 
+    /**
+     * This recursive function gathers the subtree starting at the selected node.
+     * @param div The root node of the searched sub tree.
+     * @return The sub tree starting at the division node.
+     */
     public TreeNode getSubTree(Division div)
     {
         List<Division> children = divisionRepository.findByParent(div);
