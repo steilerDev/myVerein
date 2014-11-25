@@ -33,15 +33,19 @@
         </div>
         <div class="col-sm-6">
             <div id="message" />
+            <h2 id="heading">Division</h2>
+            <hr />
             <form id="divisionForm" method="post" class="form-horizontal"
                   data-bv-feedbackicons-valid="glyphicon glyphicon-ok"
                   data-bv-feedbackicons-invalid="glyphicon glyphicon-remove"
                   data-bv-feedbackicons-validating="glyphicon glyphicon-refresh">
 
+                <input id="oldName" type="hidden" name="oldName" value="" />
+
                 <div class="form-group">
                     <label class="col-sm-3 control-label">Division Name</label>
                     <div class="col-sm-9">
-                        <input id="name" type="text" class="form-control" name="name"
+                        <input disabled="disabled" id="name" type="text" class="form-control" name="name"
                                data-bv-notempty="true"
                                data-bv-notempty-message="The division name is required and cannot be empty"/>
                     </div>
@@ -49,14 +53,14 @@
                 <div class="form-group">
                     <label class="col-sm-3 control-label">Description</label>
                     <div class="col-sm-9">
-                        <input id="description" type="text" class="form-control" name="description" />
+                        <input disabled="disabled" id="description" type="text" class="form-control" name="description" />
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label class="col-sm-3 control-label">Division Administrator</label>
                     <div class="col-sm-9">
-                        <input name="admin" id="admin" type="text" />
+                        <input disabled="disabled" name="admin" id="admin" type="text" />
                     </div>
                 </div>
 

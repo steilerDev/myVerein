@@ -74,6 +74,7 @@ function clearForm() {
     $('.addPrivateInformation').empty();
     $('.addPublicInformation').empty();
     $('#newUser').empty();
+    $('#message').empty();
     $('#heading').text('');
     //Reseting previous validation annotation
     $('#userForm').data('bootstrapValidator').resetForm();
@@ -212,8 +213,8 @@ $(document).ready(function() {
                 },
                 success: function() {
                     $('#form-loading').removeClass('heartbeat');
-                    showMessage('Successfully saved user.', 'success');
                     clearForm();
+                    showMessage('Successfully saved user.', 'success');
                     userList.clear();
                     $("#user-list-loading").addClass('heartbeat');
                     loadUserList();

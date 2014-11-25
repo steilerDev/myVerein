@@ -282,7 +282,7 @@ public class UserManagementController
         boolean allowedToAdministrate;
 
         //Is the user does not have any divisions at the moment, the admin is allowed to administrate the user.
-        if(selectedUser.getDivisions() == null || selectedUser.getDivisions().isEmpty() || selectedUser.getUsername().equals(currentUser.getUsername()))
+        if(selectedUser.getDivisions() == null || selectedUser.getDivisions().isEmpty() || selectedUser.getEmail().equals(currentUser.getEmail()))
         {
             allowedToAdministrate = true;
         } else

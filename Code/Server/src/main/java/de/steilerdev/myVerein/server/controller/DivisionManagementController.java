@@ -72,46 +72,73 @@ public class DivisionManagementController
         List<Division> administratedDivisions = getOptimizedSetOfAdministratedDivisions(currentUser);
         if(administratedDivisions.size() > 0)
         {
-            if(parameters.get("name") == null || parameters.get("name").isEmpty())
+            if(parameters.get("name") == null || parameters.get("name").isEmpty() || parameters.get("oldName") == null)
             {
                 logger.warn("Required parameter missing.");
                 return new ResponseEntity<>("Required parameter missing.", HttpStatus.BAD_REQUEST);
             }
 
             Division division;
-            if(divisionRepository.findByName(parameters.get("name")) == null)
+            Division oldDivision = null;
+
+            if(parameters.get("oldName").isEmpty())
             {
+                logger.debug("A new division is created");
                 division = new Division();
                 //If there is a new division the parent is one of the administrated divisions. The correct layout is updated through a different request.
                 division.setParent(administratedDivisions.get(0));
+            } else if(parameters.get("oldName").equals(parameters.get("name")) && divisionRepository.findByName(parameters.get("oldName")) != null)
+            {
+                //A division is changed, name stays.
+                logger.debug("An exisiting division is changed. The identificator is unchanged.");
+                division = divisionRepository.findByName(parameters.get("oldName"));
+            } else if(divisionRepository.findByName(parameters.get("oldName")) != null && divisionRepository.findByName(parameters.get("name")) == null)
+            {
+                //An existing divisions name is changed and the name is unique
+                logger.debug("An exisiting division is changed. The identificator is changed as well.");
+                division = divisionRepository.findByName(parameters.get("oldName"));
+                oldDivision = divisionRepository.findByName(parameters.get("oldName"));
             } else
             {
-                division = divisionRepository.findByName(parameters.get("name"));
-                if(!administratedDivisions.parallelStream().anyMatch(div -> division.getAncestors().contains(div))) //Check if user is allowed to change the division (if he administrates one of the parent divisions)
+                return new ResponseEntity<>("Problem finding existing division, either the existing division could not be located or the new name is already taken", HttpStatus.BAD_REQUEST);
+            }
+
+            if(administratedDivisions.parallelStream().anyMatch(div -> division.getAncestors().contains(div))) //Check if user is allowed to change the division (if he administrates one of the parent divisions)
+            {
+
+                User adminUser = null;
+                if (parameters.get("admin") != null && !parameters.get("admin").isEmpty())
                 {
-                    logger.warn("User is not allowed to change declared division.");
-                    return new ResponseEntity<>("You are not allowed to change this division.", HttpStatus.FORBIDDEN);
+                    adminUser = userRepository.findByEmail(parameters.get("admin"));
+                    if (adminUser == null)
+                    {
+                        logger.warn("Unable to find specified admin user.");
+                        return new ResponseEntity<>("Unable to find specified admin user.", HttpStatus.BAD_REQUEST);
+                    }
                 }
-            }
+                division.setAdminUser(adminUser);
+                division.setName(parameters.get("name"));
+                division.setDesc(parameters.get("description"));
 
-            User adminUser = null;
-            if(parameters.get("admin") != null && !parameters.get("admin").isEmpty())
+                try
+                {
+                    if (oldDivision != null)
+                    {
+                        logger.debug("Deleting old division.");
+                        divisionRepository.delete(oldDivision);
+                    }
+                    divisionRepository.save(division);
+                } catch (ConstraintViolationException e)
+                {
+                    logger.warn("A database constraint was violated while saving the division.");
+                    return new ResponseEntity<>("A database constraint was violated while saving the division.", HttpStatus.BAD_REQUEST);
+                }
+                return new ResponseEntity<>(HttpStatus.OK);
+            } else
             {
-                adminUser = userRepository.findByEmail(parameters.get("admin"));
+                logger.warn("User is not allowed to change declared division.");
+                return new ResponseEntity<>("You are not allowed to change this division.", HttpStatus.FORBIDDEN);
             }
-            division.setAdminUser(adminUser);
-            division.setName(parameters.get("name"));
-            division.setDesc(parameters.get("description"));
-
-            try
-            {
-                divisionRepository.save(division);
-            } catch (ConstraintViolationException e)
-            {
-                logger.warn("A database constraint was violated while saving the division.");
-                return new ResponseEntity<>("A database constraint was violated while saving the division.", HttpStatus.BAD_REQUEST);
-            }
-            return new ResponseEntity<>(HttpStatus.OK);
         } else
         {
             logger.warn("User is not allowed to create a new division.");

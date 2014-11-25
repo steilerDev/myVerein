@@ -13,8 +13,11 @@ function clearForm() {
     $('#name').val('');
     $('#description').val('');
     $('#admin')[0].selectize.clear();
+    $('#oldName').val('');
+    $('#heading').text('Division');
     //Reseting previous validation annotation
     $('#divisionForm').data('bootstrapValidator').resetForm();
+    $('#message').empty();
 }
 
 //Loading division information into the form
@@ -24,11 +27,19 @@ function loadDivision(name) {
         clearForm();
 
         $('#name').val(division.name);
+        $('#oldName').val(division.name);
         $('#description').val(division.desc);
+        $('#heading').text('Modify division <' + division.name + '>');
 
         if (division.adminUser) {
             $('#admin')[0].selectize.addItem(division.adminUser.email);
         }
+
+        $('#name').removeAttr('disabled');
+        $('#description').removeAttr('disabled');
+        $('#admin')[0].selectize.enable();
+        $('#divisionButton').removeAttr('disabled');
+
         $('#form-loading').removeClass('heartbeat');
     })
 }
@@ -104,6 +115,7 @@ $(document).ready(function() {
         valueField: 'email',
         labelField: 'email',
         searchField: 'email',
+        disable: true,
         maxItems: 1,
         render: {
             option: function (item, escape) {
@@ -147,14 +159,14 @@ $(document).ready(function() {
                 url: '/division',
                 type: 'POST',
                 data: $(e.target).serialize(),
-                error: function(msg) {
+                error: function(response) {
                     $('#form-loading').removeClass('heartbeat');
-                    showMessage(msg, 'danger');
+                    showMessage(response.responseText, 'danger');
                 },
                success: function() {
                     $('#form-loading').removeClass('heartbeat');
-                    showMessage('Successfully saved division.', 'success');
                     clearForm();
+                    showMessage('Successfully saved division.', 'success');
                     $("#division-tree-loading").addClass('heartbeat');
                    loadTree();
                 }
