@@ -80,13 +80,12 @@ $(document).ready(function() {
         autoOpen: true,
         dragAndDrop: true,
         onCanMove: function(node) {
-            if (! node.parent.parent) {
-                // Cannot move root node
-                return false;
-            }
-            else {
-                return true;
-            }
+            //Not allowed to move a root node
+            return node.parent.parent;
+        },
+        onCanMoveTo: function(moved_node, target_node, position) {
+            //User is not allowed to move a node to a new root position
+            return !(! target_node.parent.parent && (position == 'before' || position == 'after'));
         },
         onLoadFailed: function(response) {
             showMessage('danger', 'Unable to load division tree. Try again');
@@ -102,6 +101,28 @@ $(document).ready(function() {
         function(event) {
             $('#form-loading').addClass('heartbeat');
             loadDivision(event.node.name);
+        }
+    );
+
+    $('#division-tree').bind(
+        'tree.move',
+        function(event) {
+            $.ajax({
+                url: '/division/updateDivisionTree',
+                type: 'POST',
+                data: {
+                    moved_node: event.move_info.moved_node.name,
+                    target_node: event.move_info.target_node.name,
+                    position: event.move_info.position,
+                    previous_parent: event.move_info.previous_parent.name
+                },
+                error: function() {
+                    //callback();
+                },
+                success: function(data) {
+                    //callback(data);
+                }
+            });
         }
     );
 

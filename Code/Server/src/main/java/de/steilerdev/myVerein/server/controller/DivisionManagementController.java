@@ -17,7 +17,6 @@
 package de.steilerdev.myVerein.server.controller;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.sun.org.apache.xpath.internal.operations.Div;
 import de.steilerdev.myVerein.server.model.Division;
 import de.steilerdev.myVerein.server.model.DivisionRepository;
 import de.steilerdev.myVerein.server.model.User;
@@ -38,7 +37,6 @@ import javax.validation.ConstraintViolationException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -67,37 +65,35 @@ public class DivisionManagementController
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public @ResponseBody ResponseEntity<String> saveDivision(@RequestParam Map<String, String> parameters, @CurrentUser User currentUser)
+    public @ResponseBody ResponseEntity<String> saveDivision(@RequestParam String name,
+                                                             @RequestParam String oldName,
+                                                             @RequestParam(required = false) String description,
+                                                             @RequestParam(required = false) String admin,
+                                                             @CurrentUser User currentUser)
     {
         List<Division> administratedDivisions = getOptimizedSetOfAdministratedDivisions(currentUser);
         if(administratedDivisions.size() > 0)
         {
-            if(parameters.get("name") == null || parameters.get("name").isEmpty() || parameters.get("oldName") == null)
-            {
-                logger.warn("Required parameter missing.");
-                return new ResponseEntity<>("Required parameter missing.", HttpStatus.BAD_REQUEST);
-            }
-
             Division division;
             Division oldDivision = null;
 
-            if(parameters.get("oldName").isEmpty())
+            if(oldName.isEmpty())
             {
                 logger.debug("A new division is created");
                 division = new Division();
                 //If there is a new division the parent is one of the administrated divisions. The correct layout is updated through a different request.
                 division.setParent(administratedDivisions.get(0));
-            } else if(parameters.get("oldName").equals(parameters.get("name")) && divisionRepository.findByName(parameters.get("oldName")) != null)
+            } else if(oldName.equals(name) && divisionRepository.findByName(oldName) != null)
             {
                 //A division is changed, name stays.
-                logger.debug("An exisiting division is changed. The identificator is unchanged.");
-                division = divisionRepository.findByName(parameters.get("oldName"));
-            } else if(divisionRepository.findByName(parameters.get("oldName")) != null && divisionRepository.findByName(parameters.get("name")) == null)
+                logger.debug("An existing division is changed. The identification is unchanged.");
+                division = divisionRepository.findByName(oldName);
+            } else if(divisionRepository.findByName(oldName) != null && divisionRepository.findByName(name) == null)
             {
                 //An existing divisions name is changed and the name is unique
-                logger.debug("An exisiting division is changed. The identificator is changed as well.");
-                division = divisionRepository.findByName(parameters.get("oldName"));
-                oldDivision = divisionRepository.findByName(parameters.get("oldName"));
+                logger.debug("An existing division is changed. The identification has changed as well.");
+                division = divisionRepository.findByName(oldName);
+                oldDivision = divisionRepository.findByName(oldName);
             } else
             {
                 return new ResponseEntity<>("Problem finding existing division, either the existing division could not be located or the new name is already taken", HttpStatus.BAD_REQUEST);
@@ -107,9 +103,9 @@ public class DivisionManagementController
             {
 
                 User adminUser = null;
-                if (parameters.get("admin") != null && !parameters.get("admin").isEmpty())
+                if (admin != null && !admin.isEmpty())
                 {
-                    adminUser = userRepository.findByEmail(parameters.get("admin"));
+                    adminUser = userRepository.findByEmail(admin);
                     if (adminUser == null)
                     {
                         logger.warn("Unable to find specified admin user.");
@@ -117,8 +113,8 @@ public class DivisionManagementController
                     }
                 }
                 division.setAdminUser(adminUser);
-                division.setName(parameters.get("name"));
-                division.setDesc(parameters.get("description"));
+                division.setName(name);
+                division.setDesc(description);
 
                 try
                 {
@@ -175,6 +171,17 @@ public class DivisionManagementController
             searchedDivision.getAdminUser().setMemberSince(null);
         }
         return searchedDivision;
+    }
+
+    @RequestMapping(value="updateDivisionTree", method = RequestMethod.POST)
+    public @ResponseBody ResponseEntity saveTree(@RequestParam String moved_node,
+                                                 @RequestParam String target_node,
+                                                 @RequestParam String position,
+                                                 @RequestParam String previous_parent,
+                                                 @CurrentUser User currentUser, Locale locale)
+    {
+
+        return new ResponseEntity(HttpStatus.OK);
     }
 
     /**

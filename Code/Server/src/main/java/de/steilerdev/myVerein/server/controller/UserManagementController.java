@@ -66,32 +66,42 @@ public class UserManagementController
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public @ResponseBody ResponseEntity saveUser(@RequestParam Map<String, String> parameters, @CurrentUser User currentUser, Locale locale)
+    public @ResponseBody ResponseEntity saveUser(@RequestParam String email,
+                                                 @RequestParam String firstName,
+                                                 @RequestParam String lastName,
+                                                 @RequestParam String birthday,
+                                                 @RequestParam String memberSince,
+                                                 @RequestParam String divisions,
+                                                 @RequestParam(required = false) String newUser,
+                                                 @RequestParam(required = false) String oldUser,
+                                                 @RequestParam(required = false) String password,
+                                                 @RequestParam Map<String, String> parameters,
+                                                 @CurrentUser User currentUser, Locale locale)
     {
         //System.err.println(locale);
-        User newUser;
-        User oldUser = null;
+        User newUserObject;
+        User oldUserObject = null;
         //The user needs always an email identifier
-        if(parameters.get("email") == null || parameters.get("email").isEmpty())
+        if(email.isEmpty())
         {
             logger.warn("The email can not be empty");
             return new ResponseEntity("The email can not be empty", HttpStatus.BAD_REQUEST);
         }
 
         //A new user is added
-        if(parameters.get("newUser") != null && !parameters.get("newUser").isEmpty())
+        if(newUser != null && !newUser.isEmpty())
         {
             logger.debug("A new user is created");
             if(userRepository.findByEmail(parameters.get("email")) == null)
             {
-                newUser = new User();
-                if(parameters.get("password") == null || parameters.get("password").isEmpty())
+                newUserObject = new User();
+                if(password == null || password.isEmpty())
                 {
                     logger.warn("The password can not be empty");
                     return new ResponseEntity("The password can not be empty", HttpStatus.BAD_REQUEST);
                 } else
                 {
-                    newUser.setPassword(parameters.get("password"));
+                    newUserObject.setPassword(password);
                 }
             } else
             {
@@ -99,19 +109,19 @@ public class UserManagementController
                 return new ResponseEntity("A user with the given email already exists.", HttpStatus.BAD_REQUEST);
             }
         //An existing user is modified
-        } else if (parameters.get("oldUser") != null && !parameters.get("oldUser").isEmpty())
+        } else if (oldUser != null && !oldUser.isEmpty())
         {
             logger.debug("An existing user is modified");
             //The email did not change
-            if(parameters.get("oldUser").equals(parameters.get("email")) && userRepository.findByEmail(parameters.get("email")) != null)
+            if(oldUser.equals(email) && userRepository.findByEmail(email) != null)
             {
-                newUser = userRepository.findByEmail(parameters.get("email"));
+                newUserObject = userRepository.findByEmail(oldUser);
             //Email did change and the new email is unused
-            } else if (userRepository.findByEmail(parameters.get("oldUser")) != null && userRepository.findByEmail(parameters.get("email")) == null)
+            } else if (userRepository.findByEmail(oldUser) != null && userRepository.findByEmail(email) == null)
             {
                 logger.debug("The user changed his email");
-                oldUser = userRepository.findByEmail(parameters.get("oldUser"));
-                newUser = userRepository.findByEmail(parameters.get("oldUser"));
+                oldUserObject = userRepository.findByEmail(oldUser);
+                newUserObject = userRepository.findByEmail(oldUser);
             } else
             {
                 logger.warn("Problem finding existing user, either the existing user could not be located or the new email is already taken");
@@ -122,39 +132,39 @@ public class UserManagementController
             logger.warn("Neither new nor existing user parameter or identifier existing.");
             return new ResponseEntity<>("Neither new nor existing user parameter or identifier existing.", HttpStatus.BAD_REQUEST);
         }
-        if(isAllowedToAdministrate(currentUser, newUser))
+        if(isAllowedToAdministrate(currentUser, newUserObject))
         {
-            if (newUser == null || parameters.get("firstName") == null || parameters.get("firstName").isEmpty() || parameters.get("lastName") == null || parameters.get("lastName").isEmpty() || parameters.get("email") == null || parameters.get("email").isEmpty() || parameters.get("birthday") == null || parameters.get("memberSince") == null || parameters.get("divisions") == null)
+            if (newUserObject == null || firstName.isEmpty() || lastName.isEmpty())
             {
                 logger.warn("Required parameter missing.");
                 return new ResponseEntity<>("Required parameter missing", HttpStatus.BAD_REQUEST);
             }
-            newUser.setFirstName(parameters.get("firstName"));
-            newUser.setLastName(parameters.get("lastName"));
-            newUser.setEmail(parameters.get("email"));
+            newUserObject.setFirstName(firstName);
+            newUserObject.setLastName(lastName);
+            newUserObject.setEmail(email);
 
-            if (!parameters.get("birthday").isEmpty())
+            if (!birthday.isEmpty())
             {
                 try
                 {
                     SimpleDateFormat dateFormat = new SimpleDateFormat("DD/MM/YYYY");
-                    newUser.setBirthday(dateFormat.parse(parameters.get("birthday")));
+                    newUserObject.setBirthday(dateFormat.parse(birthday));
                 } catch (ParseException e)
                 {
-                    logger.warn("Unrecognized date format (" + parameters.get("birthday") + ")");
+                    logger.warn("Unrecognized date format (" + birthday + ")");
                     return new ResponseEntity<>("Wrong date format", HttpStatus.BAD_REQUEST);
                 }
             } else
             {
-                newUser.setBirthday(null);
+                newUserObject.setBirthday(null);
             }
 
-            if (!parameters.get("memberSince").isEmpty())
+            if (!memberSince.isEmpty())
             {
                 try
                 {
                     SimpleDateFormat dateFormat = new SimpleDateFormat("DD/MM/YYYY");
-                    newUser.setMemberSince(dateFormat.parse(parameters.get("memberSince")));
+                    newUserObject.setMemberSince(dateFormat.parse(memberSince));
                 } catch (ParseException e)
                 {
                     logger.warn("Unrecognized date format (" + parameters.get("memberSince") + ")");
@@ -162,13 +172,13 @@ public class UserManagementController
                 }
             } else
             {
-                newUser.setBirthday(null);
+                newUserObject.setBirthday(null);
             }
 
-            if (!parameters.get("divisions").isEmpty())
+            if (!divisions.isEmpty())
             {
-                String[] divisions = parameters.get("divisions").split(",");
-                for (String division : divisions)
+                String[] divArray = divisions.split(",");
+                for (String division : divArray)
                 {
                     Division div = divisionRepository.findByName(division);
                     if (div == null)
@@ -176,7 +186,7 @@ public class UserManagementController
                         logger.warn("Unrecognized division (" + div + ")");
                         return new ResponseEntity<>("Division " + div + " does not exist", HttpStatus.BAD_REQUEST);
                     }
-                    newUser.addDivision(div);
+                    newUserObject.addDivision(div);
                 }
             }
 
@@ -188,11 +198,11 @@ public class UserManagementController
                     if (normalizedKey.startsWith("privateInformation"))
                     {
                         normalizedKey = normalizedKey.substring(18);
-                        newUser.addPrivateInformation(normalizedKey, parameters.get(key));
+                        newUserObject.addPrivateInformation(normalizedKey, parameters.get(key));
                     } else if (normalizedKey.startsWith("publicInformation"))
                     {
                         normalizedKey = normalizedKey.substring(17);
-                        newUser.addPublicInformation(normalizedKey, parameters.get(key));
+                        newUserObject.addPublicInformation(normalizedKey, parameters.get(key));
                     } else
                     {
                         logger.warn("Unrecognized custom field (" + key + ").");
@@ -203,11 +213,11 @@ public class UserManagementController
                     if (normalizedKey.startsWith("privateInformation"))
                     {
                         String value = key.replace("_key", "_value");
-                        newUser.addPrivateInformation(parameters.get(key), parameters.get(value));
+                        newUserObject.addPrivateInformation(parameters.get(key), parameters.get(value));
                     } else if (normalizedKey.startsWith("publicInformation"))
                     {
                         String value = key.replace("_key", "_value");
-                        newUser.addPublicInformation(parameters.get(key), parameters.get(value));
+                        newUserObject.addPublicInformation(parameters.get(key), parameters.get(value));
                     } else
                     {
                         logger.warn("Unrecognized custom field (" + key + ").");
@@ -217,10 +227,10 @@ public class UserManagementController
 
             try
             {
-                userRepository.save(newUser);
-                if(oldUser != null)
+                userRepository.save(newUserObject);
+                if(oldUserObject != null)
                 {
-                    userRepository.delete(oldUser);
+                    userRepository.delete(oldUserObject);
                 }
             } catch (ConstraintViolationException e)
             {
@@ -229,7 +239,7 @@ public class UserManagementController
             }
             return new ResponseEntity<>(HttpStatus.OK);
         }
-        logger.warn("The user is not allowed to perfom these changes.");
+        logger.warn("The user is not allowed to perform these changes.");
         return new ResponseEntity<>("The user is not allowed to perform these changes.", HttpStatus.FORBIDDEN);
     }
 
