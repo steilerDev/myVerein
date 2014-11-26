@@ -88,6 +88,12 @@ public class DivisionManagementController
 
             if(oldName.isEmpty())
             {
+                if(divisionRepository.findByName(name) != null)
+                {
+                    logger.warn("An unused new division is overwritten.");
+                    return new ResponseEntity<>("An unused new division is overwritten", HttpStatus.OK);
+                }
+
                 logger.debug("A new division is created");
                 division = new Division();
                 //If there is a new division the parent is one of the administrated divisions. The correct layout is updated through a different request.
@@ -138,7 +144,7 @@ public class DivisionManagementController
                     logger.warn("A database constraint was violated while saving the division.");
                     return new ResponseEntity<>("A database constraint was violated while saving the division.", HttpStatus.BAD_REQUEST);
                 }
-                return new ResponseEntity<>(HttpStatus.OK);
+                return new ResponseEntity<>("Successfully saved division", HttpStatus.OK);
             } else
             {
                 logger.warn("User is not allowed to change declared division.");
@@ -223,7 +229,7 @@ public class DivisionManagementController
                 if(targetDivision.getParent().equals(movedDivision.getParent()))
                 {
                     logger.debug("Position 'after', but target_node's parent equals moved_node's parent. Concluding the layout did not change.");
-                    return new ResponseEntity<>(HttpStatus.OK);
+                    return new ResponseEntity<>("Successfully updated division tree", HttpStatus.OK);
                 } else
                 {
                     return changeDivisionParent(movedDivision, targetDivision.getParent(), currentUser);
@@ -233,7 +239,7 @@ public class DivisionManagementController
                 if(previous_parent.equals(target_node))
                 {
                     logger.debug("Previous parent (" + previous_parent + ") is identical to new parent (" + target_node + "). Structure unchanged.");
-                    return new ResponseEntity<>(HttpStatus.OK);
+                    return new ResponseEntity<>("Successfully updated division tree", HttpStatus.OK);
                 } else
                 {
                     return changeDivisionParent(movedDivision, targetDivision, currentUser);
@@ -263,7 +269,7 @@ public class DivisionManagementController
         {
             logger.debug("Changing structure.");
             updateSubtree(selectedDivision, newParent);
-            return new ResponseEntity<>(HttpStatus.OK);
+            return new ResponseEntity<>("Successfully updated division tree", HttpStatus.OK);
         } else
         {
             logger.warn("The user is not allowed to move the node.");

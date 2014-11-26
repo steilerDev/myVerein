@@ -1,6 +1,6 @@
 /**
  * Document   : myVerein.division.js
- * Description:
+ * Description: The JavaScript used by the DivisionManagement page. The file includes jqTree.
  * Copyright  : (c) 2014 Frank Steiler <frank@steilerdev.de>
  * License    : GNU General Public License v2.0
  */
@@ -39,7 +39,7 @@ function loadDivision(name) {
         $('#description').removeAttr('disabled');
         $('#admin')[0].selectize.enable();
         $('#divisionButton').removeAttr('disabled');
-
+        $('#name').focus();
         $('#form-loading').removeClass('heartbeat');
     })
 }
@@ -56,23 +56,6 @@ function loadTree() {
     );
 }
 
-$.fn.serializeObject = function()
-{
-    var o = {};
-    var a = this.serializeArray();
-    $.each(a, function() {
-        if (o[this.name] !== undefined) {
-            if (!o[this.name].push) {
-                o[this.name] = [o[this.name]];
-            }
-            o[this.name].push(this.value || '');
-        } else {
-            o[this.name] = this.value || '';
-        }
-    });
-    return o;
-};
-
 //Running init scripts as soon as the DOM is fully loaded.
 $(document).ready(function() {
     //Configure division tree
@@ -88,7 +71,7 @@ $(document).ready(function() {
             return !(! target_node.parent.parent && (position == 'before' || position == 'after'));
         },
         onLoadFailed: function(response) {
-            showMessage('danger', 'Unable to load division tree. Try again');
+            showMessage(response.responseText, 'danger');
             $(division-tree-loading).removeClass('heartbeat');
         }
     });
@@ -121,8 +104,8 @@ $(document).ready(function() {
                     $('#division-tree-loading').removeClass('heartbeat');
                     loadTree()
                 },
-                success: function() {
-                    console.log("Successfully updated tree.");
+                success: function(response) {
+                    console.log(response.responseText);
                 }
             });
         }
@@ -143,8 +126,8 @@ $(document).ready(function() {
         render: {
             option: function (item, escape) {
                 return '<div>' +
-                            '<span class="name">' + item.firstName + ' ' + item.lastName + ' </span>' +
-                            '<span class="description">(' + item.email + ')</span>' +
+                            '<span class="name">' + escape(item.firstName) + ' ' + escape(item.lastName) + ' </span>' +
+                            '<span class="description">(' + escape(item.email) + ')</span>' +
                         '</div>';
             }
         },
@@ -171,13 +154,6 @@ $(document).ready(function() {
             // Prevent form submission
             e.preventDefault();
             $('#form-loading').addClass('heartbeat');
-            //Send the serialized form
-
-            //var json = jQuery.parseJSON($('#division-tree').tree('toJson'));
-            //console.log($(e.target).serializeObject());
-            //console.log(json);
-            //$.extend(json,  $(e.target).serializeObject());
-            //console.log(json);
             $.ajax({
                 url: '/division',
                 type: 'POST',
@@ -186,13 +162,38 @@ $(document).ready(function() {
                     $('#form-loading').removeClass('heartbeat');
                     showMessage(response.responseText, 'danger');
                 },
-               success: function() {
+               success: function(response) {
                     $('#form-loading').removeClass('heartbeat');
                     clearForm();
-                    showMessage('Successfully saved division.', 'success');
+                    showMessage(response.responseText, 'success');
                     $("#division-tree-loading").addClass('heartbeat');
-                   loadTree();
+                    loadTree();
                 }
             });
         });
+
+    $('#addDivision').click(function(e){
+        $('#form-loading').addClass('heartbeat');
+        var newDivName = 'New Division';
+        $.ajax({
+            url: '/division',
+            type: 'POST',
+            data: {
+                name: newDivName,
+                oldName: ''
+            },
+            error: function(response) {
+                loadTree();
+                clearForm();
+                $('#form-loading').removeClass('heartbeat');
+                showMessage(response.responseText, 'danger');
+            },
+            success: function(response) {
+                loadDivision(newDivName);
+                $("#division-tree-loading").addClass('heartbeat');
+                loadTree();
+                showMessage(response.responseText, 'success');
+            }
+        });
+    });
 })

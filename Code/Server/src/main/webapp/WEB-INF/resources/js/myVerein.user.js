@@ -1,6 +1,6 @@
 /**
  * Document   : myVerein.user
- * Description: The JavaScript used by the UserManagement page. The file includes list.js, list.js fuzzy search plugin and jQuery tags input.
+ * Description: The JavaScript used by the UserManagement page. The file includes list.js, list.js fuzzy search plugin and bootstrap datepicker.
  * Copyright  : (c) 2014 Frank Steiler <frank@steilerdev.de>
  * License    : GNU General Public License v2.0
  */
