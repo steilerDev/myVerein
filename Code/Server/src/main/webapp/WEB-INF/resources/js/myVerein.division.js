@@ -116,11 +116,13 @@ $(document).ready(function() {
                     position: event.move_info.position,
                     previous_parent: event.move_info.previous_parent.name
                 },
-                error: function() {
-                    //callback();
+                error: function(response) {
+                    showMessage(response.responseText, 'danger');
+                    $('#division-tree-loading').removeClass('heartbeat');
+                    loadTree()
                 },
-                success: function(data) {
-                    //callback(data);
+                success: function() {
+                    console.log("Successfully updated tree.");
                 }
             });
         }

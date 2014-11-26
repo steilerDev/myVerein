@@ -198,14 +198,90 @@ public class DivisionManagementController
      * @return An HTTP status code and an error message if an error occurred.
      */
     @RequestMapping(value="updateDivisionTree", method = RequestMethod.POST)
-    public @ResponseBody ResponseEntity saveTree(@RequestParam String moved_node,
+    public @ResponseBody ResponseEntity<String> saveTree(@RequestParam String moved_node,
                                                  @RequestParam String target_node,
                                                  @RequestParam String position,
                                                  @RequestParam String previous_parent,
                                                  @CurrentUser User currentUser)
     {
+        if(moved_node.isEmpty() || target_node.isEmpty() || position.isEmpty() || previous_parent.isEmpty())
+        {
+            logger.warn("Required parameter missing.");
+            return new ResponseEntity<>("Required parameter missing", HttpStatus.BAD_REQUEST);
+        } else
+        {
+            //The parameters are not empty, we will need the two objects.
+            Division targetDivision = divisionRepository.findByName(target_node);
+            Division movedDivision = divisionRepository.findByName(moved_node);
 
-        return new ResponseEntity(HttpStatus.OK);
+            if(movedDivision == null || targetDivision == null)
+            {
+                logger.warn("Unable to find new parent or moved division.");
+                return new ResponseEntity<>("Unable to find new parent or moved division", HttpStatus.BAD_REQUEST);
+            } else if(position.equals("after"))
+            {
+                if(targetDivision.getParent().equals(movedDivision.getParent()))
+                {
+                    logger.debug("Position 'after', but target_node's parent equals moved_node's parent. Concluding the layout did not change.");
+                    return new ResponseEntity<>(HttpStatus.OK);
+                } else
+                {
+                    return changeDivisionParent(movedDivision, targetDivision.getParent(), currentUser);
+                }
+            } else if(position.equals("inside"))
+            {
+                if(previous_parent.equals(target_node))
+                {
+                    logger.debug("Previous parent (" + previous_parent + ") is identical to new parent (" + target_node + "). Structure unchanged.");
+                    return new ResponseEntity<>(HttpStatus.OK);
+                } else
+                {
+                    return changeDivisionParent(movedDivision, targetDivision, currentUser);
+                }
+            } else
+            {
+                logger.warn("Unrecognized position of the node (" + position + ")");
+                return new ResponseEntity<>("Unrecognized position of the nod", HttpStatus.BAD_REQUEST);
+            }
+        }
+    }
+
+    /**
+     * This function moves the selected division (and all subdivisions) to a new parent. The function evaluates if the user is allowed to perform this action.
+     * @param selectedDivision The division that needs to be moved.
+     * @param newParent The new parent for the division.
+     * @param currentUser The currently logged in user.
+     * @return The response entity for the performed action.
+     */
+    private ResponseEntity<String> changeDivisionParent(Division selectedDivision, Division newParent, User currentUser)
+    {
+        logger.debug("Changing layout: " + selectedDivision.getName() + " moved to parent " + newParent.getName());
+        List<Division> adminDivision = getOptimizedSetOfAdministratedDivisions(currentUser);
+
+        //The moved node and the target need to be administrated by the user. The nodes should not be root nodes of the user's administration.
+        if(adminDivision.parallelStream().anyMatch(div -> newParent.equals(div) || newParent.getAncestors().contains(div)) && adminDivision.parallelStream().anyMatch(div -> selectedDivision.getAncestors().contains(div))) //Check if user is allowed to change the division (if he administrates one of the parent divisions)
+        {
+            logger.debug("Changing structure.");
+            updateSubtree(selectedDivision, newParent);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } else
+        {
+            logger.warn("The user is not allowed to move the node.");
+            return new ResponseEntity<>("The user is not allowed to move the node", HttpStatus.FORBIDDEN);
+        }
+    }
+
+    /**
+     * This recursive function updates the complete subtree.
+     * @param newChild The new child.
+     * @param newParent The new parent.
+     */
+    private void updateSubtree(Division newChild, Division newParent)
+    {
+        newChild.setParent(newParent);
+        Division newNode = divisionRepository.save(newChild);
+
+        divisionRepository.findByParent(newNode).parallelStream().forEach(div -> updateSubtree(div, newNode));
     }
 
     /**
