@@ -165,7 +165,7 @@ $(document).ready(function() {
                success: function(response) {
                     $('#form-loading').removeClass('heartbeat');
                     clearForm();
-                    showMessage(response.responseText, 'success');
+                    showMessage(response, 'success');
                     $("#division-tree-loading").addClass('heartbeat');
                     loadTree();
                 }
@@ -192,7 +192,7 @@ $(document).ready(function() {
                 loadDivision(newDivName);
                 $("#division-tree-loading").addClass('heartbeat');
                 loadTree();
-                showMessage(response.responseText, 'success');
+                showMessage(response, 'success');
             }
         });
     });

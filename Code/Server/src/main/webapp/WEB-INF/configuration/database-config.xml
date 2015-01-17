@@ -10,17 +10,35 @@
                                    http://www.springframework.org/schema/data/mongo
                                    http://www.springframework.org/schema/data/mongo/spring-mongo.xsd">
 
-       <!-- Including database configuration files -->
-       <context:property-placeholder location="classpath:mongo.properties"/>
+        <!-- Including database configuration files -->
+        <context:property-placeholder location="classpath:mongo.properties"/>
+
+        <mapping-converter id="javaTimeConverter">
+            <custom-converters>
+                <converter>
+                    <beans:bean class="de.steilerdev.myVerein.server.time.StringToLocalDateConverter" />
+                </converter>
+                <converter>
+                    <beans:bean class="de.steilerdev.myVerein.server.time.StringToLocalDateTimeConverter" />
+                </converter>
+                <converter>
+                    <beans:bean class="de.steilerdev.myVerein.server.time.LocalDateTimeToStringConverter" />
+                </converter>
+                <converter>
+                    <beans:bean class="de.steilerdev.myVerein.server.time.LocalDateToStringConverter" />
+                </converter>
+            </custom-converters>
+        </mapping-converter>
 
        <!-- Database configuration -->
        <repositories base-package="de.steilerdev.myVerein.server.model" />
-       <template db-factory-ref="mongoDbFactory"/>
+       <template db-factory-ref="mongoDbFactory" converter-ref="javaTimeConverter"/>
+
        <db-factory host="${dbHost}"
-                         port="${dbPort}"
-                         dbname="${dbName}"
-                         username="${dbUsername}"
-                         password="${dbPassword}"/>
+                   port="${dbPort}"
+                   dbname="${dbName}"
+                   username="${dbUsername}"
+                   password="${dbPassword}"/>
 
        <!-- Data Validation using Hibernate Validator and JavaX validation interface -->
        <beans:bean id="dataValidator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean"/>
@@ -28,4 +46,5 @@
        <beans:bean id="mongoValidator" class="org.springframework.data.mongodb.core.mapping.event.ValidatingMongoEventListener">
               <beans:constructor-arg name="validator" ref="dataValidator"/>
        </beans:bean>
+
 </beans:beans>

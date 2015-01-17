@@ -15,8 +15,7 @@
        </bean>
 
        <!-- Store the information about the selected language in a cookie (Set the cookie by accessing the localized page ones explicitly "...?locale=de" -->
-       <bean id="localeResolver"
-                   class="org.springframework.web.servlet.i18n.CookieLocaleResolver">
+       <bean id="localeResolver" class="org.springframework.web.servlet.i18n.CookieLocaleResolver">
               <property name="defaultLocale" value="en" />
               <property name="cookieName" value="myVereinLocaleCookie" />
               <property name="cookieMaxAge" value="3600"></property>

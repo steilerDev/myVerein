@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.sql.Time;
 import java.text.DateFormat;
+import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
@@ -43,7 +44,6 @@ public class IndexController
 	@RequestMapping(method = RequestMethod.GET)
 	public String printWelcome(ModelMap model, @CurrentUser User currentUser) {
 		model.addAttribute("user", currentUser);
-		//createDatabaseExample();
 		return "index";
 	}
 
@@ -54,6 +54,7 @@ public class IndexController
 	@RequestMapping(value = "login", method = RequestMethod.GET)
 	public String login()
 	{
+		createDatabaseExample();
 		return "login";
 	}
 
@@ -67,12 +68,8 @@ public class IndexController
 		divisionRepository.deleteAll();
 
 		User user1 = new User("Frank", "Steiler", "frank@steiler.eu", "asdf");
-		Calendar calendar = Calendar.getInstance();
-		calendar.setTimeZone(TimeZone.getTimeZone("UTC"));
-		calendar.set(1994, Calendar.JUNE, 28, 12, 0, 0);
-		user1.setBirthday(calendar.getTime());
-		calendar.set(2000, Calendar.JANUARY, 1, 12, 0, 0);
-		user1.setMemberSince(calendar.getTime());
+		user1.setBirthday(LocalDate.of(1994, 6, 28));
+		user1.setMemberSince(LocalDate.of(2000, 1, 1));
 		User user2 = new User("John", "Doe", "john@doe.com", "asdf");
 		User user3 = new User("Peter", "Enis", "peter@enis.com", "asdf");
 		User user4 = new User("Luke", "Skywalker", "luke@skywalker.com", "asdf");

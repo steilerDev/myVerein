@@ -35,6 +35,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.validation.ConstraintViolationException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -70,6 +73,7 @@ public class UserManagementController
                                                  @RequestParam String lastName,
                                                  @RequestParam String birthday,
                                                  @RequestParam String memberSince,
+                                                 @RequestParam(required = false) String passiveSince,
                                                  @RequestParam String divisions,
                                                  @RequestParam(required = false) String newUser,
                                                  @RequestParam(required = false) String oldUser,
@@ -146,9 +150,8 @@ public class UserManagementController
             {
                 try
                 {
-                    SimpleDateFormat dateFormat = new SimpleDateFormat("DD/MM/YYYY");
-                    newUserObject.setBirthday(dateFormat.parse(birthday));
-                } catch (ParseException e)
+                    newUserObject.setBirthday(LocalDate.parse(birthday, DateTimeFormatter.ofPattern("dd/MM/YYYY")));
+                } catch (DateTimeParseException e)
                 {
                     logger.warn("Unrecognized date format (" + birthday + ")");
                     return new ResponseEntity<>("Wrong date format", HttpStatus.BAD_REQUEST);
@@ -162,9 +165,8 @@ public class UserManagementController
             {
                 try
                 {
-                    SimpleDateFormat dateFormat = new SimpleDateFormat("DD/MM/YYYY");
-                    newUserObject.setMemberSince(dateFormat.parse(memberSince));
-                } catch (ParseException e)
+                    newUserObject.setMemberSince(LocalDate.parse(memberSince, DateTimeFormatter.ofPattern("dd/MM/YYYY")));
+                } catch (DateTimeParseException e)
                 {
                     logger.warn("Unrecognized date format (" + parameters.get("memberSince") + ")");
                     return new ResponseEntity<>("Wrong date format", HttpStatus.BAD_REQUEST);
@@ -236,7 +238,7 @@ public class UserManagementController
                 logger.warn("A database constraint was violated while saving the user.");
                 return new ResponseEntity<>("A database constraint was violated while saving the user.", HttpStatus.BAD_REQUEST);
             }
-            return new ResponseEntity<>(HttpStatus.OK);
+            return new ResponseEntity<>("Successfully saved user", HttpStatus.OK);
         }
         logger.warn("The user is not allowed to perform these changes.");
         return new ResponseEntity<>("The user is not allowed to perform these changes.", HttpStatus.FORBIDDEN);

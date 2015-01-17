@@ -31,7 +31,11 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.keygen.KeyGenerators;
 
-import java.util.*;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
 
 public class User implements UserDetails
 {
@@ -49,6 +53,7 @@ public class User implements UserDetails
     @JsonIgnore
     @NotBlank
     private String password;
+
     @JsonIgnore
     @NotBlank
     private String salt;
@@ -62,14 +67,14 @@ public class User implements UserDetails
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<Division> divisions;
 
-
-    @DateTimeFormat(iso= DateTimeFormat.ISO.DATE)
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Date memberSince;
+    private LocalDate memberSince;
 
-    @DateTimeFormat(iso= DateTimeFormat.ISO.DATE)
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Date birthday;
+    private LocalDate passiveSince;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private LocalDate birthday;
 
     @Transient
     @JsonIgnore
@@ -278,23 +283,33 @@ public class User implements UserDetails
         this.administrationAllowed = administrationAllowed;
     }
 
-    public Date getMemberSince()
+    public LocalDate getMemberSince()
     {
         return memberSince;
     }
 
-    public void setMemberSince(Date memberSince)
+    public void setMemberSince(LocalDate memberSince)
     {
         this.memberSince = memberSince;
     }
 
-    public Date getBirthday()
+    public LocalDate getBirthday()
     {
         return birthday;
     }
 
-    public void setBirthday(Date birthday)
+    public void setBirthday(LocalDate birthday)
     {
         this.birthday = birthday;
+    }
+
+    public LocalDate getPassiveSince()
+    {
+        return passiveSince;
+    }
+
+    public void setPassiveSince(LocalDate passiveSince)
+    {
+        this.passiveSince = passiveSince;
     }
 }

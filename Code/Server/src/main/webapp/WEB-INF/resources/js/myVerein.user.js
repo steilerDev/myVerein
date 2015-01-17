@@ -211,10 +211,10 @@ $(document).ready(function() {
                     $('#form-loading').removeClass('heartbeat');
                     showMessage(response.responseText, 'danger');
                 },
-                success: function() {
+                success: function(response) {
                     $('#form-loading').removeClass('heartbeat');
                     clearForm();
-                    showMessage('Successfully saved user.', 'success');
+                    showMessage(response, 'success');
                     userList.clear();
                     $("#user-list-loading").addClass('heartbeat');
                     loadUserList();

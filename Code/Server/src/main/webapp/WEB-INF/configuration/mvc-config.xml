@@ -12,7 +12,6 @@
 
        <!-- Spring annotation processing -->
        <context:component-scan base-package="de.steilerdev.myVerein.server.controller"/>
-       <context:component-scan base-package="de.steilerdev.myVerein.server.model"/>
 
        <annotation-driven>
            <argument-resolvers>
