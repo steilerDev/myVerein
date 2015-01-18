@@ -13,21 +13,9 @@
         <!-- Including database configuration files -->
         <context:property-placeholder location="classpath:mongo.properties"/>
 
+        <!-- Converter used to enable the use of Java 8 time classes with Spring Data -->
         <mapping-converter id="javaTimeConverter">
-            <custom-converters>
-                <converter>
-                    <beans:bean class="de.steilerdev.myVerein.server.time.StringToLocalDateConverter" />
-                </converter>
-                <converter>
-                    <beans:bean class="de.steilerdev.myVerein.server.time.StringToLocalDateTimeConverter" />
-                </converter>
-                <converter>
-                    <beans:bean class="de.steilerdev.myVerein.server.time.LocalDateTimeToStringConverter" />
-                </converter>
-                <converter>
-                    <beans:bean class="de.steilerdev.myVerein.server.time.LocalDateToStringConverter" />
-                </converter>
-            </custom-converters>
+            <custom-converters base-package="de.steilerdev.myVerein.server.converter"/>
         </mapping-converter>
 
        <!-- Database configuration -->

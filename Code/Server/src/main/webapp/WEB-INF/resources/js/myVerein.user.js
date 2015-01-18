@@ -90,13 +90,25 @@ function loadUser(email) {
         $('#firstName').val(user.firstName);
         $('#lastName').val(user.lastName);
         $('#email').val(user.email);
+        console.log(user.birthday);
         if(user.birthday)
         {
-            $('#birthday').datepicker('update', new Date(user.birthday));
+            //Parsing date from response
+            var date = new Date(0);
+            date.setUTCDate(user.birthday.dayOfMonth);
+            date.setUTCMonth(user.birthday.monthValue - 1); //LocalDate is not a 0 starting index at the month
+            date.setUTCFullYear(user.birthday.year);
+            $('#birthday').datepicker('setUTCDate', date);
         }
+
         if(user.memberSince)
         {
-            $('#memberSince').datepicker('update', new Date(user.memberSince));
+            //Parsing date from response
+            var date = new Date(0);
+            date.setUTCDate(user.memberSince.dayOfMonth);
+            date.setUTCMonth(user.memberSince.monthValue - 1); //LocalDate is not a 0 starting index at the month
+            date.setUTCFullYear(user.memberSince.year);
+            $('#memberSince').datepicker('setUTCDate', date);
         }
 
         //Fill division list

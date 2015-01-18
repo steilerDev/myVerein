@@ -54,7 +54,7 @@ public class IndexController
 	@RequestMapping(value = "login", method = RequestMethod.GET)
 	public String login()
 	{
-		createDatabaseExample();
+		//createDatabaseExample();
 		return "login";
 	}
 

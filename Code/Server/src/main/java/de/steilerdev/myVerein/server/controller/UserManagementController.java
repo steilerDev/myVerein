@@ -150,7 +150,7 @@ public class UserManagementController
             {
                 try
                 {
-                    newUserObject.setBirthday(LocalDate.parse(birthday, DateTimeFormatter.ofPattern("dd/MM/YYYY")));
+                    newUserObject.setBirthday(LocalDate.parse(birthday, DateTimeFormatter.ofPattern("d/MM/y")));
                 } catch (DateTimeParseException e)
                 {
                     logger.warn("Unrecognized date format (" + birthday + ")");
@@ -165,7 +165,7 @@ public class UserManagementController
             {
                 try
                 {
-                    newUserObject.setMemberSince(LocalDate.parse(memberSince, DateTimeFormatter.ofPattern("dd/MM/YYYY")));
+                    newUserObject.setMemberSince(LocalDate.parse(memberSince, DateTimeFormatter.ofPattern("d/MM/y")));
                 } catch (DateTimeParseException e)
                 {
                     logger.warn("Unrecognized date format (" + parameters.get("memberSince") + ")");
@@ -274,8 +274,12 @@ public class UserManagementController
         {
             searchedUser.setAdministrationAllowed(true);
         }
-        //Not setting admin user null could lead to an infinite loop when creating the JSON
-        searchedUser.getDivisions().parallelStream().forEach(div -> div.setAdminUser(null));
+
+        if(searchedUser.getDivisions() != null)
+        {
+            //Not setting admin user null could lead to an infinite loop when creating the JSON
+            searchedUser.getDivisions().parallelStream().forEach(div -> div.setAdminUser(null));
+        }
         return searchedUser;
     }
 

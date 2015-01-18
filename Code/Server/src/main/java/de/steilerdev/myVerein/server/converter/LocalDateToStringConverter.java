@@ -14,24 +14,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.steilerdev.myVerein.server.time;
+package de.steilerdev.myVerein.server.converter;
 
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Date;
 
 /**
- * This class is a converter used by SpringData, to convert a Java 7 Date to a Java 8 LocalDateTime
+ * This class is a converter used by SpringData, to convert a Java 8 LocalDate to a Java 7 Date
  */
 @Component
-public class StringToLocalDateConverter implements Converter<String, LocalDate>
+public class LocalDateToStringConverter implements Converter<LocalDate, String>
 {
     @Override
-    public LocalDate convert(String source) {
-        return source == null ? null : LocalDate.parse(source);
+    public String convert(LocalDate source) {
+        return source == null ? null : source.toString();
     }
 }
