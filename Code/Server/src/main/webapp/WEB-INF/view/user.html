@@ -21,6 +21,9 @@
         <link th:href="@{/resources/css/datepicker3.css}" href="../resources/css/datepicker3.css" rel="stylesheet" type="text/css" />
         <link th:href="@{/resources/css/selectize-core.css}" href="../resources/css/selectize-core.css" rel="stylesheet" type="text/css" />
         <link th:href="@{/resources/css/selectize-bootstrap.css}" href="../resources/css/selectize-bootstrap.css" rel="stylesheet" type="text/css" />
+        <link th:href="@{/resources/css/notification.css}" href="../resources/css/notification.css" rel="stylesheet" type="text/css" />
+        <link th:href="@{/resources/css/icons.css}" href="../resources/css/icons.css" rel="stylesheet" type="text/css" />
+        <link th:href="@{/resources/css/button.css}" href="../resources/css/button.css" rel="stylesheet" type="text/css" />
 
         <script th:src="@{/resources/js/myVerein.base.js}" src="../resources/js/myVerein.base.js" type="application/javascript" />
         <script th:src="@{/resources/js/myVerein.user.js}" src="../resources/js/myVerein.user.js" type="application/javascript" />
@@ -51,7 +54,6 @@
                 </div>
             </div>
             <div class="col-sm-6">
-                <div id="message" />
                 <h2 id="heading">Create new user</h2>
                 <hr />
                 <form id="userForm" method="post" class="form-horizontal"
@@ -142,9 +144,27 @@
 
                     <hr/>
                     <div id="submitGroup" class="form-group">
-                            <div id="form-loading"/>
-                            <div class="col-sm-9 col-sm-offset-3">
-                                <button id="userButton" type="submit" class="btn btn-default">Save new user</button>
+                            <div class="col-sm-9 col-sm-offset-3 progress-button">
+                                <button type="submit"><span id="userButton">Submit</span></button>
+                                <svg class="progress-circle" width="50" height="50">
+                                    <g transform="scale(0.71)">
+                                        <path d="m35,2.5c17.955803,0 32.5,14.544199 32.5,32.5c0,17.955803 -14.544197,32.5 -32.5,32.5c-17.955803,0 -32.5,-14.544197 -32.5,-32.5c0,-17.955801 14.544197,-32.5 32.5,-32.5z"/>
+                                    </g>
+                                </svg>
+                                <svg class="checkmark" width="50" height="50">
+                                    <g transform="scale(0.71)">
+                                        <path d="m31.5,46.5l15.3,-23.2"/>
+                                        <path d="m31.5,46.5l-8.5,-7.1"/>
+                                    </g>
+                                </svg>
+                                <svg class="cross" width="50" height="50">
+                                    <g transform="scale(0.71)">
+                                        <path d="m35,35l-9.3,-9.3"/>
+                                        <path d="m35,35l9.3,9.3"/>
+                                        <path d="m35,35l-9.3,9.3"/>
+                                        <path d="m35,35l9.3,-9.3"/>
+                                    </g>
+                                </svg>
                             </div>
                     </div>
                 </form>
