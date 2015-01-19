@@ -16,7 +16,8 @@
 
 
 var newInformationCounter = 0; //Counter used to create unique identifiers for new input fields
-var submitButton;
+var userSubmitButton;
+var userList;
 
 //Add form fields from existing key and value to target
 function addInformation(target, key, value, edit) {
@@ -65,7 +66,7 @@ function addNewInformation(target) {
     });
 }
 
-function clearForm() {
+function clearUserForm() {
     $('#firstName').val('');
     $('#lastName').val('');
     $('#email').val('');
@@ -142,9 +143,9 @@ function loadUser(email) {
         //Enabling/Disabling save button and adding of custom key value pairs, depending on the administration allowed flag
         if (!user.administrationAllowed) {
             showMessage('You are not allowed to modify this user, because you are not his administrator.', 'warning', 'icon_error-triangle');
-            submitButton.disable();
+            userSubmitButton.disable();
         } else {
-            submitButton.enable();
+            userSubmitButton.enable();
             $('.addPrivateInformation').append('<a id="addPrivateInformationButton">Add private information</a>');
             $('#addPrivateInformationButton').click(function(e){
                 addNewInformation('.privateInformation');
@@ -160,118 +161,132 @@ function loadUser(email) {
     });
 }
 
-//Running init scripts as soon as the DOM is fully loaded.
-$(document).ready(function() {
-    //Configuring division input field
-    $('#divisions').selectize({
-        persist: false,
-        createOnBlur: true,
-        create: false, //Not allowing the creation of user specific items
-        hideSelected: true, //If an option is allready in the list it is hidden
-        preload: true, //Loading data immidiately (if user is loaded without loading the available divisions, the added divisions get removed because selectize thinks they are not valid)
-        valueField: 'name',
-        labelField: 'name',
-        searchField: 'name',
-        load: function(query, callback) {
-            $.ajax({
-                url: '/division/getDivision',
-                type: 'GET',
-                data: {
-                    term: query
-                },
-                error: function() {
-                    callback();
-                },
-                success: function(data) {
-                    callback(data);
-                }
-            });
-        }
+function loadUserList() {
+    //Loading user list through ajax request
+    $.getJSON("/user/getUser", function (data) {
+        $("#user-list-loading").removeClass('heartbeat');
+        userList.add(data);
     });
+}
 
-    //Configuring fuzzy-search on user list.
-    var listOptions = {
-        valueNames: ['firstName', 'lastName', 'email'],
-        item: '<li class="list-item"><h3><span class="firstName"></span> <span class="lastName"></span></h3><p class="email"></p></li>',
-        plugins: [ ListFuzzySearch() ]
+//This function is called as soon as the tab is shown. If necessary it is loading all required resources.
+function loadUserPage() {
+    if(!$('#divisions')[0].selectize) {
+        //Configuring division input field
+        $('#divisions').selectize({
+            persist: false,
+            createOnBlur: true,
+            create: false, //Not allowing the creation of user specific items
+            hideSelected: true, //If an option is allready in the list it is hidden
+            preload: true, //Loading data immidiately (if user is loaded without loading the available divisions, the added divisions get removed because selectize thinks they are not valid)
+            valueField: 'name',
+            labelField: 'name',
+            searchField: 'name',
+            load: function (query, callback) {
+                $.ajax({
+                    url: '/division/getDivision',
+                    type: 'GET',
+                    data: {
+                        term: query
+                    },
+                    error: function () {
+                        callback();
+                    },
+                    success: function (data) {
+                        callback(data);
+                    }
+                });
+            }
+        });
     }
 
-    //Creating user list
-    var userList = new List('user-list', listOptions);
+    if(!userList) {
+        //Configuring fuzzy-search on user list.
+        var listOptions = {
+            valueNames: ['firstName', 'lastName', 'email'],
+            item: '<li class="list-item"><h3><span class="firstName"></span> <span class="lastName"></span></h3><p class="email"></p></li>',
+            plugins: [ListFuzzySearch()]
+        }
 
-    //When items are added to the list the listener for the list items need to be updated.
-    userList.on("updated", function(){
-        $("li.list-item").click(function(e){
-            //Get the email as identification of the selected user and loading the user into the form
-            submitButton.startAnimation();
-            loadUser($(this).children(".email").text());
-            submitButton.stopAnimation(1);
-            });
-    });
+        //Creating user list
+        userList = new List('user-list', listOptions);
 
-    //Enable bootstrap validator
-    $('#userForm').bootstrapValidator() //The constrains are configured within the HTML
-        .on('success.form.bv', function(e) { //The submission function
-            // Prevent form submission
-            e.preventDefault();
-            //Starting button animation
-            submitButton.startAnimation();
-            //Send the serialized form
-            $.ajax({
-                url: '/user',
-                type: 'POST',
-                data: $(e.target).serialize(),
-                error: function(response) {
-                    submitButton.stopAnimation(-1);
-                    showMessage(response.responseText, 'error', 'icon_error-triangle');
-                },
-                success: function(response) {
-                    //clearForm();
-                    submitButton.stopAnimation(0);
-                    showMessage(response, 'success', 'icon_check');
-                    userList.clear();
-                    $("#user-list-loading").addClass('heartbeat');
-                    loadUserList();
-                }
+        //When items are added to the list the listener for the list items need to be updated.
+        userList.on("updated", function () {
+            $("li.list-item").click(function (e) {
+                //Get the email as identification of the selected user and loading the user into the form
+                userSubmitButton.startAnimation();
+                loadUser($(this).children(".email").text());
+                userSubmitButton.stopAnimation(1);
             });
         });
+    } else
+    {
+        userList.clear();
+    }
 
-    //Enabling progress button
-    submitButton = new UIProgressButton(document.querySelector('.progress-button'));
+    if(!$('#userForm').data('bootstrapValidator')) {
+        //Enable bootstrap validator
+        $('#userForm').bootstrapValidator() //The constrains are configured within the HTML
+            .on('success.form.bv', function (e) { //The submission function
+                // Prevent form submission
+                e.preventDefault();
+                //Starting button animation
+                userSubmitButton.startAnimation();
+                //Send the serialized form
+                $.ajax({
+                    url: '/user',
+                    type: 'POST',
+                    data: $(e.target).serialize(),
+                    error: function (response) {
+                        userSubmitButton.stopAnimation(-1);
+                        showMessage(response.responseText, 'error', 'icon_error-triangle');
+                    },
+                    success: function (response) {
+                        //clearForm();
+                        userSubmitButton.stopAnimation(0);
+                        showMessage(response, 'success', 'icon_check');
+                        userList.clear();
+                        $("#user-list-loading").addClass('heartbeat');
+                        loadUserList();
+                    }
+                });
+            });
+    }
 
-    //Enable Datepicker
-    var datepickerOptions = {
-        format: "dd/mm/yyyy",
-        weekStart: 1,
-        todayHighlight: true
-    };
-    $('#birthday').datepicker(datepickerOptions);
-    $('#memberSince').datepicker(datepickerOptions);
-    loadUserList();
+    if(userSubmitButton) {
+        //Enabling progress button
+        userSubmitButton = new UIProgressButton(document.querySelector('.progress-button'));
+    }
 
-    $('#addUser').click(function(e){
+    if(!($('#memberSince').data().datepicker && $('#birthday').data().datepicker)) {
+        //Enable Datepicker
+        var datepickerOptions = {
+            format: "dd/mm/yyyy",
+            weekStart: 1,
+            todayHighlight: true
+        };
+        $('#birthday').datepicker(datepickerOptions);
+        $('#memberSince').datepicker(datepickerOptions);
+    }
+
+
+    $('#addUser').click(function (e) {
         clearForm();
         $('#heading').text('Create new user');
         $('#newUser').append('' +
         '<label class="col-sm-3 control-label">Password</label>' +
         '<div class="col-sm-9">' +
-            '<input id="password" type="password" class="form-control" name="password"' +
-                'data-bv-notempty="true"' +
-                'data-bv-notempty-message="The last name is required and cannot be empty" />' +
-                '<input type="hidden" name="newUser" value="true"/>' +
+        '<input id="password" type="password" class="form-control" name="password"' +
+        'data-bv-notempty="true"' +
+        'data-bv-notempty-message="The last name is required and cannot be empty" />' +
+        '<input type="hidden" name="newUser" value="true"/>' +
         '</div>');
         $('#userButton').text('Save new user');
-        submitButton.enable();
+        userSubmitButton.enable();
         $('#firstName').focus();
     });
 
-    function loadUserList() {
-        //Loading user list through ajax request
-        $.getJSON("/user/getUser", function(data){
-            $("#user-list-loading").removeClass('heartbeat');
-            userList.add(data);
-        });
-    }
-
-
-})
+    loadUserList();
+    clearUserForm();
+}

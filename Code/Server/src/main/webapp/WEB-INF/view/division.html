@@ -15,6 +15,7 @@
     <title>Division Management</title>
 
     <link th:href="@{/resources/css/jquery-ui.min.css}" href="../resources/css/jquery-ui.min.css" rel="stylesheet" type="text/css" />
+    <link th:href="@{/resources/css/bootstrap-validator.css}" href="../resources/css/bootstrap-validator.css" rel="stylesheet" type="text/css" />
     <link th:href="@{/resources/css/magic-bootstrap.css}" href="../resources/css/magic-bootstrap.css" rel="stylesheet" type="text/css" />
     <link th:href="@{/resources/css/myVerein.css}" href="../resources/css/myVerein.css" rel="stylesheet" type="text/css" />
     <link th:href="@{/resources/css/jqtree.css}" href="../resources/css/jqtree.css" rel="stylesheet" type="text/css" />
@@ -26,10 +27,12 @@
 
     <script th:src="@{/resources/js/myVerein.base.js}" src="../resources/js/myVerein.base.js" type="application/javascript" />
     <script th:src="@{/resources/js/myVerein.division.js}" src="../resources/js/myVerein.division.js" type="application/javascript" />
+    <script th:src="@{/resources/js/myVerein.user.js}" src="../resources/js/myVerein.user.js" type="application/javascript" />
+
 </head>
 <body>
     <div th:include="fragments/fragments :: navbar"/>
-    <div class="container">
+    <div th:fragment="content" class="container">
         <div class="col-sm-6">
             <div class="row">
                 <div class="col-sm-4 col-sm-offset-8">

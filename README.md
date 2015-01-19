@@ -32,7 +32,9 @@ This project is going to use several frameworks and third-party products. The de
 * Front-end CSS libraries: [Heartbeat loading animation](http://jimmyamash.com/idealab/loaders/loaders.html)
 * Front-end notifications: [Notification Styles Inspiration](http://tympanus.net/codrops/?p=19415) licensed under a [Codrops license](http://tympanus.net/codrops/licensing/)
 * Front-end progress buttons: [Circular Progress Button with SVG](http://tympanus.net/codrops/?p=18828) licensed under a [Codrops license](http://tympanus.net/codrops/licensing/), adjusted by Frank Steiler
+* Front-end tab style: [Tab Styles Inspiration](http://tympanus.net/codrops/?p=19559) licensed under a [Codrops license](http://tympanus.net/codrops/licensing/)
 * Icons: [The Elegant Icon Font](http://www.elegantthemes.com/blog/resources/elegant-icon-font) dual-licensed under a [GNU GPL v2.0 license](http://www.gnu.org/licenses/gpl-2.0.html) and a [MIT license](http://opensource.org/licenses/MIT)
+* Font: Josefin Sans by Santiago Orozco licensed under a [SLI Open Font License](http://opensource.org/licenses/OFL-1.1)
 * Logging Framework: [Log4j](http://logging.apache.org/log4j/2.x/) licensed under an [Apache License v2.0](http://logging.apache.org/log4j/2.x/license.html) and [slf4j](http://www.slf4j.org) licensed under a [MIT License](http://www.slf4j.org/license.html)
 * Dependency management: [Maven](http://maven.apache.org) licensed under an [Apache License v2.0](http://www.apache.org/licenses/)
 * Testing: [jUnit](http://junit.org) licensed under an [Eclipse Public License v1.0](http://opensource.org/licenses/eclipse-1.0.html)

@@ -40,7 +40,7 @@ you can use the generic selector below, but it's slower:
 }
 
 .icon:before {
-	font-size: 2em;
+	font-size: 1.5em;
 }
 
 .arrow_up:before {

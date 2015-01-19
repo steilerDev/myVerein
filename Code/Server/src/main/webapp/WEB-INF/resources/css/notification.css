@@ -36,6 +36,18 @@
     pointer-events: auto;
 }
 
+.ns-type-error {
+
+}
+
+.ns-type-success span .icon {
+    color: #00BC67;
+}
+
+.ns-type-warning {
+
+}
+
 .ns-close {
     width: 20px;
     height: 20px;
