@@ -24,6 +24,7 @@ import de.steilerdev.myVerein.server.security.CurrentUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -33,8 +34,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.validation.ConstraintViolationException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -58,67 +57,51 @@ public class UserManagementController
     UserRepository userRepository;
 
     /**
-     * This request mapping is processing the request to view the user management page.
-     * @return The path to the view for the user management page.
-     */
-    @RequestMapping(method = RequestMethod.GET)
-    public String showUserManagement()
-    {
-        return "user";
-    }
-
-    /**
      * This function saves the user, according to the parameters posted through this request.
-     * @param email
-     * @param firstName
-     * @param lastName
-     * @param birthday
-     * @param memberSince
-     * @param passiveSince
-     * @param divisions
-     * @param newUser
-     * @param oldUser
-     * @param password
-     * @param parameters
-     * @param currentUser
-     * @param locale
-     * @return
      */
     @RequestMapping(method = RequestMethod.POST)
-    public @ResponseBody ResponseEntity saveUser(@RequestParam String email,
-                                                 @RequestParam String firstName,
+    public @ResponseBody ResponseEntity<String> saveUser(@RequestParam String firstName,
                                                  @RequestParam String lastName,
+                                                 @RequestParam String email,
                                                  @RequestParam String birthday,
-                                                 @RequestParam String memberSince,
-                                                 @RequestParam(required = false) String passiveSince,
+                                                 @RequestParam String password,
+                                                 @RequestParam(required = false) String gender,
+                                                 @RequestParam String street,
+                                                 @RequestParam String streetNumber,
+                                                 @RequestParam String zip,
+                                                 @RequestParam String city,
+                                                 @RequestParam String country,
+                                                 @RequestParam String activeMemberSince,
+                                                 @RequestParam String passiveMemberSince,
+                                                 @RequestParam String resignationDate,
+                                                 @RequestParam String iban,
+                                                 @RequestParam String bic,
                                                  @RequestParam String divisions,
-                                                 @RequestParam(required = false) String newUser,
-                                                 @RequestParam(required = false) String oldUser,
-                                                 @RequestParam(required = false) String password,
+                                                 @RequestParam String userFlag,
                                                  @RequestParam Map<String, String> parameters,
                                                  @CurrentUser User currentUser, Locale locale)
     {
         //System.err.println(locale);
         User newUserObject;
         User oldUserObject = null;
+
         //The user needs always an email identifier
-        if(email.isEmpty())
+        if(email.isEmpty() || userFlag.isEmpty())
         {
-            logger.warn("The email can not be empty");
-            return new ResponseEntity("The email can not be empty", HttpStatus.BAD_REQUEST);
+            logger.warn("The email/user flag can not be empty");
+            return new ResponseEntity<>("The email can not be empty", HttpStatus.BAD_REQUEST);
         }
 
-        //A new user is added
-        if(newUser != null && !newUser.isEmpty())
+        if(userFlag.equals("true")) //A new user is added
         {
             logger.debug("A new user is created");
-            if(userRepository.findByEmail(parameters.get("email")) == null)
+            if(userRepository.findByEmail(email) == null)
             {
                 newUserObject = new User();
-                if(password == null || password.isEmpty())
+                if(password.isEmpty())
                 {
                     logger.warn("The password can not be empty");
-                    return new ResponseEntity("The password can not be empty", HttpStatus.BAD_REQUEST);
+                    return new ResponseEntity<>("The password can not be empty", HttpStatus.BAD_REQUEST);
                 } else
                 {
                     newUserObject.setPassword(password);
@@ -126,31 +109,24 @@ public class UserManagementController
             } else
             {
                 logger.warn("A user with the given email already exists.");
-                return new ResponseEntity("A user with the given email already exists.", HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<>("A user with the given email already exists.", HttpStatus.BAD_REQUEST);
             }
-        //An existing user is modified
-        } else if (oldUser != null && !oldUser.isEmpty())
+        } else //An existing user is modified
         {
             logger.debug("An existing user is modified");
-            //The email did not change
-            if(oldUser.equals(email) && userRepository.findByEmail(email) != null)
+            if(userFlag.equals(email) && userRepository.findByEmail(email) != null) //The email did not change
             {
-                newUserObject = userRepository.findByEmail(oldUser);
-            //Email did change and the new email is unused
-            } else if (userRepository.findByEmail(oldUser) != null && userRepository.findByEmail(email) == null)
+                newUserObject = userRepository.findByEmail(userFlag);
+            } else if (userRepository.findByEmail(userFlag) != null && userRepository.findByEmail(email) == null) //Email did change and the new email is unused
             {
                 logger.debug("The user changed his email");
-                oldUserObject = userRepository.findByEmail(oldUser);
-                newUserObject = userRepository.findByEmail(oldUser);
+                oldUserObject = userRepository.findByEmail(userFlag);
+                newUserObject = userRepository.findByEmail(userFlag);
             } else
             {
-                logger.warn("Problem finding existing user, either the existing user could not be located or the new email is already taken");
-                return new ResponseEntity("Problem finding existing user, either the existing user could not be located or the new email is already taken", HttpStatus.BAD_REQUEST);
+                logger.warn("A problem occurred while retrieving the user, either the existing user could not be located or the new email is already taken");
+                return new ResponseEntity<>("A problem occurred while retrieving the user, either the existing user could not be located or the new email is already taken", HttpStatus.BAD_REQUEST);
             }
-        } else
-        {
-            logger.warn("Neither new nor existing user parameter or identifier existing.");
-            return new ResponseEntity<>("Neither new nor existing user parameter or identifier existing.", HttpStatus.BAD_REQUEST);
         }
         if(isAllowedToAdministrate(currentUser, newUserObject))
         {
@@ -163,7 +139,7 @@ public class UserManagementController
             newUserObject.setLastName(lastName);
             newUserObject.setEmail(email);
 
-            if (!birthday.isEmpty())
+            if(!birthday.isEmpty())
             {
                 try
                 {
@@ -171,27 +147,76 @@ public class UserManagementController
                 } catch (DateTimeParseException e)
                 {
                     logger.warn("Unrecognized date format (" + birthday + ")");
-                    return new ResponseEntity<>("Wrong date format", HttpStatus.BAD_REQUEST);
+                    return new ResponseEntity<>("Wrong date format within birthday field", HttpStatus.BAD_REQUEST);
                 }
             } else
             {
                 newUserObject.setBirthday(null);
             }
 
-            if (!memberSince.isEmpty())
+            if(!gender.isEmpty() && !gender.equals("default"))
+            try
+            {
+                newUserObject.setGender(User.Gender.valueOf(gender));
+            } catch (IllegalArgumentException e)
+            {
+                logger.warn("Unable to parse gender: " + e.getMessage());
+                return new ResponseEntity<>("Unable to parse gender", HttpStatus.BAD_REQUEST);
+            }
+
+            newUserObject.setStreet(street);
+            newUserObject.setStreetNumber(streetNumber);
+            newUserObject.setZipCode(zip);
+            newUserObject.setCity(city);
+            newUserObject.setCountry(country);
+
+            if(!activeMemberSince.isEmpty())
             {
                 try
                 {
-                    newUserObject.setMemberSince(LocalDate.parse(memberSince, DateTimeFormatter.ofPattern("d/MM/y")));
+                    newUserObject.setActiveSince(LocalDate.parse(activeMemberSince, DateTimeFormatter.ofPattern("d/MM/y")));
                 } catch (DateTimeParseException e)
                 {
-                    logger.warn("Unrecognized date format (" + parameters.get("memberSince") + ")");
-                    return new ResponseEntity<>("Wrong date format", HttpStatus.BAD_REQUEST);
+                    logger.warn("Unrecognized date format (" + activeMemberSince + ")");
+                    return new ResponseEntity<>("Wrong date format within active member field", HttpStatus.BAD_REQUEST);
                 }
             } else
             {
-                newUserObject.setBirthday(null);
+                newUserObject.setActiveSince(null);
             }
+
+            if(!passiveMemberSince.isEmpty())
+            {
+                try
+                {
+                    newUserObject.setPassiveSince(LocalDate.parse(passiveMemberSince, DateTimeFormatter.ofPattern("d/MM/y")));
+                } catch (DateTimeParseException e)
+                {
+                    logger.warn("Unrecognized date format (" + passiveMemberSince + ")");
+                    return new ResponseEntity<>("Wrong date format within passive member field", HttpStatus.BAD_REQUEST);
+                }
+            } else
+            {
+                newUserObject.setPassiveSince(null);
+            }
+
+            if(!resignationDate.isEmpty())
+            {
+                try
+                {
+                    newUserObject.setResignationDate(LocalDate.parse(resignationDate, DateTimeFormatter.ofPattern("d/MM/y")));
+                } catch (DateTimeParseException e)
+                {
+                    logger.warn("Unrecognized date format (" + resignationDate + ")");
+                    return new ResponseEntity<>("Wrong date format within resignation date field", HttpStatus.BAD_REQUEST);
+                }
+            } else
+            {
+                newUserObject.setResignationDate(null);
+            }
+
+            newUserObject.setIban(iban);
+            newUserObject.setBic(bic);
 
             if (!divisions.isEmpty())
             {
@@ -286,10 +311,17 @@ public class UserManagementController
         {
             logger.debug("Currently logged in user is not administrating selected user. Hiding private information");
             searchedUser.setPrivateInformation(null);
-            searchedUser.setAdministrationAllowed(false);
+            searchedUser.setBic(null);
+            searchedUser.setIban(null);
+            searchedUser.setBirthday(null);
+            searchedUser.setStreet(null);
+            searchedUser.setStreetNumber(null);
+            searchedUser.setCity(null);
+            searchedUser.setZipCode(null);
+            searchedUser.setAdministrationNotAllowedMessage("You are not allowed to modify this user, since you are not his administrator");
         } else
         {
-            searchedUser.setAdministrationAllowed(true);
+            searchedUser.setAdministrationNotAllowedMessage(null);
         }
 
         if(searchedUser.getDivisions() != null)
@@ -298,6 +330,32 @@ public class UserManagementController
             searchedUser.getDivisions().parallelStream().forEach(div -> div.setAdminUser(null));
         }
         return searchedUser;
+    }
+
+    @RequestMapping(method = RequestMethod.POST, value = "deleteUser")
+    public @ResponseBody ResponseEntity<String> deleteUser(@RequestParam String email, @CurrentUser User currentUser)
+    {
+        User deletedUser = userRepository.findByEmail(email);
+        if(deletedUser == null)
+        {
+            logger.warn("Unable to find stated user " + email);
+            return new ResponseEntity<>("Unable to find the stated user", HttpStatus.BAD_REQUEST);
+        } else if (!isAllowedToAdministrate(currentUser, deletedUser))
+        {
+            logger.warn("Not allowed to delete user.");
+            return new ResponseEntity<>("You are not allowed to delete the selected user", HttpStatus.BAD_REQUEST);
+        } else
+        {
+            try
+            {
+                userRepository.delete(deletedUser);
+                return new ResponseEntity<>("Successfully deleted selected user", HttpStatus.OK);
+            } catch (IllegalArgumentException e)
+            {
+                logger.warn("Unable to delete selected user.");
+                return new ResponseEntity<>("Unable to delete the selected user", HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        }
     }
 
     /**

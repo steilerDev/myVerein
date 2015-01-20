@@ -1,6 +1,6 @@
 <!--/*
     Document   : Division Management
-    Description: 
+    Description: This page contains the fragment included within the application, that is used to manage the divisions.
     Copyright  : (c) 2014 Frank Steiler <frank@steilerdev.de>
     License    : GNU General Public License v2.0
 */-->
@@ -10,100 +10,86 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:th="http://www.thymeleaf.org">
 
-<head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <title>Division Management</title>
+    <head>
+        <title>Division Management</title>
+    </head>
+    <body>
+        <div id="tab" class="tabs tabs-style-underline">
+            <div class="content-wrap">
+                <!-- Only the following container is going to be used within the production page-->
+                <section th:fragment="content">
+                    <div class="col-sm-6">
+                        <div class="row">
+                            <div class="col-sm-4 col-sm-offset-8">
+                                <button id="addDivision" class="btn btn-default">
+                                    Create new division
+                                </button>
+                            </div>
+                        </div>
+                        <div id="division-tree"></div>
+                        <div id="division-tree-loading" class="center-block heartbeat" />
+                    </div>
+                    <div class="col-sm-6">
+                        <h2 id="heading">Division</h2>
+                        <hr />
+                        <form id="divisionForm" method="post" class="form-horizontal"
+                              data-bv-feedbackicons-valid="glyphicon glyphicon-ok"
+                              data-bv-feedbackicons-invalid="glyphicon glyphicon-remove"
+                              data-bv-feedbackicons-validating="glyphicon glyphicon-refresh">
 
-    <link th:href="@{/resources/css/jquery-ui.min.css}" href="../resources/css/jquery-ui.min.css" rel="stylesheet" type="text/css" />
-    <link th:href="@{/resources/css/bootstrap-validator.css}" href="../resources/css/bootstrap-validator.css" rel="stylesheet" type="text/css" />
-    <link th:href="@{/resources/css/magic-bootstrap.css}" href="../resources/css/magic-bootstrap.css" rel="stylesheet" type="text/css" />
-    <link th:href="@{/resources/css/myVerein.css}" href="../resources/css/myVerein.css" rel="stylesheet" type="text/css" />
-    <link th:href="@{/resources/css/jqtree.css}" href="../resources/css/jqtree.css" rel="stylesheet" type="text/css" />
-    <link th:href="@{/resources/css/selectize-core.css}" href="../resources/css/selectize-core.css" rel="stylesheet" type="text/css" />
-    <link th:href="@{/resources/css/selectize-bootstrap.css}" href="../resources/css/selectize-bootstrap.css" rel="stylesheet" type="text/css" />
-    <link th:href="@{/resources/css/notification.css}" href="../resources/css/notification.css" rel="stylesheet" type="text/css" />
-    <link th:href="@{/resources/css/icons.css}" href="../resources/css/icons.css" rel="stylesheet" type="text/css" />
-    <link th:href="@{/resources/css/button.css}" href="../resources/css/button.css" rel="stylesheet" type="text/css" />
+                            <input id="oldName" type="hidden" name="oldName" value="" />
 
-    <script th:src="@{/resources/js/myVerein.base.js}" src="../resources/js/myVerein.base.js" type="application/javascript" />
-    <script th:src="@{/resources/js/myVerein.division.js}" src="../resources/js/myVerein.division.js" type="application/javascript" />
-    <script th:src="@{/resources/js/myVerein.user.js}" src="../resources/js/myVerein.user.js" type="application/javascript" />
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">Division Name</label>
+                                <div class="col-sm-9">
+                                    <input disabled="disabled" id="name" type="text" class="form-control" name="name"
+                                           data-bv-notempty="true"
+                                           data-bv-notempty-message="The division name is required and cannot be empty"/>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">Description</label>
+                                <div class="col-sm-9">
+                                    <input disabled="disabled" id="description" type="text" class="form-control" name="description" />
+                                </div>
+                            </div>
 
-</head>
-<body>
-    <div th:include="fragments/fragments :: navbar"/>
-    <div th:fragment="content" class="container">
-        <div class="col-sm-6">
-            <div class="row">
-                <div class="col-sm-4 col-sm-offset-8">
-                    <button id="addDivision" class="btn btn-default">
-                        Create new division
-                    </button>
-                </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">Division Administrator</label>
+                                <div class="col-sm-9">
+                                    <input disabled="disabled" name="admin" id="admin" type="text" />
+                                </div>
+                            </div>
+
+                            <hr/>
+                            <div id="submitGroup" class="form-group">
+                                <div class="col-sm-offset-3 col-sm-9 progress-button">
+                                    <button type="submit"><span id="divisionButton">Submit</span></button>
+                                    <svg class="progress-circle" width="50" height="50">
+                                        <g transform="scale(0.71)">
+                                            <path d="m35,2.5c17.955803,0 32.5,14.544199 32.5,32.5c0,17.955803 -14.544197,32.5 -32.5,32.5c-17.955803,0 -32.5,-14.544197 -32.5,-32.5c0,-17.955801 14.544197,-32.5 32.5,-32.5z"/>
+                                        </g>
+                                    </svg>
+                                    <svg class="checkmark" width="50" height="50">
+                                        <g transform="scale(0.71)">
+                                            <path d="m31.5,46.5l15.3,-23.2"/>
+                                            <path d="m31.5,46.5l-8.5,-7.1"/>
+                                        </g>
+                                    </svg>
+                                    <svg class="cross" width="50" height="50">
+                                        <g transform="scale(0.71)">
+                                            <path d="m35,35l-9.3,-9.3"/>
+                                            <path d="m35,35l9.3,9.3"/>
+                                            <path d="m35,35l-9.3,9.3"/>
+                                            <path d="m35,35l9.3,-9.3"/>
+                                        </g>
+                                    </svg>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </section>
             </div>
-            <div id="division-tree"></div>
-            <div id="division-tree-loading" class="center-block heartbeat" />
         </div>
-        <div class="col-sm-6">
-            <h2 id="heading">Division</h2>
-            <hr />
-            <form id="divisionForm" method="post" class="form-horizontal"
-                  data-bv-feedbackicons-valid="glyphicon glyphicon-ok"
-                  data-bv-feedbackicons-invalid="glyphicon glyphicon-remove"
-                  data-bv-feedbackicons-validating="glyphicon glyphicon-refresh">
-
-                <input id="oldName" type="hidden" name="oldName" value="" />
-
-                <div class="form-group">
-                    <label class="col-sm-3 control-label">Division Name</label>
-                    <div class="col-sm-9">
-                        <input disabled="disabled" id="name" type="text" class="form-control" name="name"
-                               data-bv-notempty="true"
-                               data-bv-notempty-message="The division name is required and cannot be empty"/>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-3 control-label">Description</label>
-                    <div class="col-sm-9">
-                        <input disabled="disabled" id="description" type="text" class="form-control" name="description" />
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label class="col-sm-3 control-label">Division Administrator</label>
-                    <div class="col-sm-9">
-                        <input disabled="disabled" name="admin" id="admin" type="text" />
-                    </div>
-                </div>
-
-                <hr/>
-                <div id="submitGroup" class="form-group">
-                    <div class="col-sm-offset-3 col-sm-9 progress-button">
-                        <button type="submit"><span id="divisionButton">Submit</span></button>
-                        <svg class="progress-circle" width="50" height="50">
-                            <g transform="scale(0.71)">
-                                <path d="m35,2.5c17.955803,0 32.5,14.544199 32.5,32.5c0,17.955803 -14.544197,32.5 -32.5,32.5c-17.955803,0 -32.5,-14.544197 -32.5,-32.5c0,-17.955801 14.544197,-32.5 32.5,-32.5z"/>
-                            </g>
-                        </svg>
-                        <svg class="checkmark" width="50" height="50">
-                            <g transform="scale(0.71)">
-                                <path d="m31.5,46.5l15.3,-23.2"/>
-                                <path d="m31.5,46.5l-8.5,-7.1"/>
-                            </g>
-                        </svg>
-                        <svg class="cross" width="50" height="50">
-                            <g transform="scale(0.71)">
-                                <path d="m35,35l-9.3,-9.3"/>
-                                <path d="m35,35l9.3,9.3"/>
-                                <path d="m35,35l-9.3,9.3"/>
-                                <path d="m35,35l9.3,-9.3"/>
-                            </g>
-                        </svg>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
-
-</body>
+    </body>
 </html>

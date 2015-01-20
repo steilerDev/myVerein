@@ -32,6 +32,16 @@
 	color: #fff;
 }
 
+.progress-error-button button {
+	border: 2px solid #FF5617;
+	color: #FF5617;
+}
+
+.progress-error-button button:hover {
+	background-color: #FF5617;
+	color: #fff;
+}
+
 .progress-button button:focus {
 	outline: none;
 }

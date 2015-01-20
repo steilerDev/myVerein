@@ -13,12 +13,7 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import java.sql.Time;
-import java.text.DateFormat;
 import java.time.LocalDate;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.TimeZone;
 
 /**
  * This controller is processing all general requests.
@@ -36,14 +31,11 @@ public class IndexController
 	private static Logger logger = LoggerFactory.getLogger(IndexController.class);
 
 	/**
-	 * This request mapping is processing the request to view the index page.
-	 * @param model The model handed over to the view.
-	 * @param currentUser The currently logged in user.
+	 * This request mapping is processing the request to view the application page.
 	 * @return The path to the view for the index page.
 	 */
 	@RequestMapping(method = RequestMethod.GET)
-	public String printWelcome(ModelMap model, @CurrentUser User currentUser) {
-		model.addAttribute("user", currentUser);
+	public String startApplication() {
 		return "index";
 	}
 
@@ -54,7 +46,7 @@ public class IndexController
 	@RequestMapping(value = "login", method = RequestMethod.GET)
 	public String login()
 	{
-		//createDatabaseExample();
+		createDatabaseExample();
 		return "login";
 	}
 
@@ -69,8 +61,18 @@ public class IndexController
 
 		User user1 = new User("Frank", "Steiler", "frank@steiler.eu", "asdf");
 		user1.setBirthday(LocalDate.of(1994, 6, 28));
-		user1.setMemberSince(LocalDate.of(2000, 1, 1));
+		user1.setActiveSince(LocalDate.of(2000, 1, 1));
+		user1.setIban("DE46500700100927353010");
+		user1.setBic("BYLADEM1001");
+		user1.setCity("Stuttgart");
+		user1.setZipCode("70190");
+		user1.setStreetNumber("27");
+		user1.setStreet("Metzstraße");
+		user1.setCountry("Germany");
+		user1.setGender(User.Gender.MALE);
 		User user2 = new User("John", "Doe", "john@doe.com", "asdf");
+		user2.setActiveSince(LocalDate.of(1999,1,1));
+		user2.setPassiveSince(LocalDate.of(2000,6,1));
 		User user3 = new User("Peter", "Enis", "peter@enis.com", "asdf");
 		User user4 = new User("Luke", "Skywalker", "luke@skywalker.com", "asdf");
 		user4.addPrivateInformation("IBAN", "ABCDEFG");

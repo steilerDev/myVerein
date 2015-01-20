@@ -39,20 +39,14 @@ import java.util.List;
 public class User implements UserDetails
 {
     public enum Gender {
-        MALE {
-            @Override
-            public String toString()
-            {
-                return "Male";
-            }
-        },
-        FEMALE {
-            @Override
-            public String toString()
-            {
-                return "Female";
-            }
-        },
+        MALE,
+        FEMALE
+    }
+
+    public enum MembershipStatus {
+        ACTIVE,
+        PASSIVE,
+        RESIGNED
     }
 
     @NotBlank
@@ -84,7 +78,7 @@ public class User implements UserDetails
     private List<Division> divisions;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private LocalDate memberSince;
+    private LocalDate activeSince;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private LocalDate passiveSince;
@@ -111,7 +105,7 @@ public class User implements UserDetails
     private String street;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private int streetNumber;
+    private String streetNumber;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String iban;
@@ -119,19 +113,23 @@ public class User implements UserDetails
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String bic;
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private MembershipStatus membershipStatus;
+
     @Transient
     @JsonIgnore
     Collection<? extends GrantedAuthority> authorities;
 
     @Transient
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    boolean administrationAllowed;
+    private String administrationNotAllowedMessage;
 
     public User() {}
 
     public User(String firstName, String lastName, String email, String password)
     {
         this(firstName, lastName, email, password, null, null);
+        updateMembershipStatus();
     }
 
     public User(String firstName, String lastName, String email, String password, HashMap<String,String> privateInformation, HashMap<String,String> publicInformation)
@@ -142,6 +140,7 @@ public class User implements UserDetails
         this.privateInformation = privateInformation;
         this.publicInformation = publicInformation;
         setPassword(password);
+        updateMembershipStatus();
     }
 
     @Override
@@ -207,7 +206,7 @@ public class User implements UserDetails
 
     public void setFirstName(String firstName)
     {
-        this.firstName = firstName;
+        this.firstName = firstName.isEmpty() ? null : firstName;
     }
 
     public String getLastName()
@@ -217,7 +216,7 @@ public class User implements UserDetails
 
     public void setLastName(String lastName)
     {
-        this.lastName = lastName;
+        this.lastName = lastName.isEmpty() ? null : lastName;
     }
 
     public String getEmail()
@@ -227,7 +226,7 @@ public class User implements UserDetails
 
     public void setEmail(String email)
     {
-        this.email = email;
+        this.email = email.isEmpty() ? null : email;
     }
 
     public String getPassword()
@@ -316,24 +315,25 @@ public class User implements UserDetails
         this.salt = salt;
     }
 
-    public boolean isAdministrationAllowed()
+    public String getAdministrationNotAllowedMessage()
     {
-        return administrationAllowed;
+        return administrationNotAllowedMessage;
     }
 
-    public void setAdministrationAllowed(boolean administrationAllowed)
+    public void setAdministrationNotAllowedMessage(String administrationNotAllowedMessage)
     {
-        this.administrationAllowed = administrationAllowed;
+        this.administrationNotAllowedMessage = administrationNotAllowedMessage;
     }
 
-    public LocalDate getMemberSince()
+    public LocalDate getActiveSince()
     {
-        return memberSince;
+        return activeSince;
     }
 
-    public void setMemberSince(LocalDate memberSince)
+    public void setActiveSince(LocalDate activeSince)
     {
-        this.memberSince = memberSince;
+        this.activeSince = activeSince;
+        updateMembershipStatus();
     }
 
     public LocalDate getBirthday()
@@ -354,6 +354,7 @@ public class User implements UserDetails
     public void setPassiveSince(LocalDate passiveSince)
     {
         this.passiveSince = passiveSince;
+        updateMembershipStatus();
     }
 
     public LocalDate getResignationDate()
@@ -364,6 +365,7 @@ public class User implements UserDetails
     public void setResignationDate(LocalDate resignationDate)
     {
         this.resignationDate = resignationDate;
+        updateMembershipStatus();
     }
 
     public Gender getGender()
@@ -383,7 +385,7 @@ public class User implements UserDetails
 
     public void setZipCode(String zipCode)
     {
-        this.zipCode = zipCode;
+        this.zipCode = zipCode.isEmpty() ? null : zipCode;
     }
 
     public String getCity()
@@ -393,7 +395,7 @@ public class User implements UserDetails
 
     public void setCity(String city)
     {
-        this.city = city;
+        this.city = city.isEmpty() ? null : city;
     }
 
     public String getCountry()
@@ -403,7 +405,7 @@ public class User implements UserDetails
 
     public void setCountry(String country)
     {
-        this.country = country;
+        this.country = country.isEmpty() ? null : country;
     }
 
     public String getStreet()
@@ -413,15 +415,15 @@ public class User implements UserDetails
 
     public void setStreet(String street)
     {
-        this.street = street;
+        this.street = street.isEmpty() ? null : street;
     }
 
-    public int getStreetNumber()
+    public String getStreetNumber()
     {
         return streetNumber;
     }
 
-    public void setStreetNumber(int streetNumber)
+    public void setStreetNumber(String streetNumber)
     {
         this.streetNumber = streetNumber;
     }
@@ -433,7 +435,7 @@ public class User implements UserDetails
 
     public void setIban(String iban)
     {
-        this.iban = iban;
+        this.iban = iban.isEmpty() ? null : iban;
     }
 
     public String getBic()
@@ -443,6 +445,63 @@ public class User implements UserDetails
 
     public void setBic(String bic)
     {
-        this.bic = bic;
+        this.bic = bic.isEmpty() ? null : bic;
+    }
+
+    public MembershipStatus getMembershipStatus()
+    {
+        return membershipStatus;
+    }
+
+    public void setMembershipStatus(MembershipStatus membershipStatus)
+    {
+        this.membershipStatus = membershipStatus;
+    }
+
+    /**
+     * This function checks the stated dates of a user and sets the current membership status accordingly.
+     */
+    public void updateMembershipStatus()
+    {
+        if(activeSince != null)
+        {   //Is it there or irrelevant
+            if(passiveSince == null || passiveSince.isBefore(activeSince))
+            {
+                if(resignationDate == null || resignationDate.isBefore(activeSince))
+                {
+                    membershipStatus = MembershipStatus.ACTIVE;
+                } else
+                {
+                    membershipStatus = MembershipStatus.RESIGNED;
+                }
+            } else
+            {
+                if(resignationDate == null || resignationDate.isBefore(passiveSince))
+                {
+                    membershipStatus = MembershipStatus.PASSIVE;
+                } else
+                {
+                    membershipStatus = MembershipStatus.RESIGNED;
+                }
+            }
+        } else
+        {
+            if(passiveSince != null)
+            {
+                if(resignationDate == null || resignationDate.isBefore(passiveSince))
+                {
+                    membershipStatus = MembershipStatus.PASSIVE;
+                } else
+                {
+                    membershipStatus = MembershipStatus.RESIGNED;
+                }
+            } else if(resignationDate != null)
+            {
+                membershipStatus = MembershipStatus.RESIGNED;
+            } else
+            {
+                membershipStatus = null;
+            }
+        }
     }
 }

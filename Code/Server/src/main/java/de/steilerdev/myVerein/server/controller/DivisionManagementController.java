@@ -36,7 +36,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.validation.ConstraintViolationException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.stream.Collectors;
 
 /**
@@ -53,16 +52,6 @@ public class DivisionManagementController
     UserRepository userRepository;
 
     private static Logger logger = LoggerFactory.getLogger(DivisionManagementController.class);
-
-    /**
-     * This request mapping is processing the request to view the division management page.
-     * @return The path to the view for the division management page.
-     */
-    @RequestMapping(method = RequestMethod.GET)
-    public String showDivisionManagement()
-    {
-        return "division";
-    }
 
     /**
      * If a modification on a division needs to be stored durable this controller is invoked by posting the parameters to the URI /division
@@ -189,7 +178,7 @@ public class DivisionManagementController
             searchedDivision.getAdminUser().setPublicInformation(null);
             searchedDivision.getAdminUser().setDivisions(null);
             searchedDivision.getAdminUser().setBirthday(null);
-            searchedDivision.getAdminUser().setMemberSince(null);
+            searchedDivision.getAdminUser().setActiveSince(null);
         }
         return searchedDivision;
     }
