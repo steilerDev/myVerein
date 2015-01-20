@@ -38,6 +38,23 @@ import java.util.List;
 
 public class User implements UserDetails
 {
+    public enum Gender {
+        MALE {
+            @Override
+            public String toString()
+            {
+                return "Male";
+            }
+        },
+        FEMALE {
+            @Override
+            public String toString()
+            {
+                return "Female";
+            }
+        },
+    }
+
     @NotBlank
     private String firstName;
     @NotBlank
@@ -73,7 +90,34 @@ public class User implements UserDetails
     private LocalDate passiveSince;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
+    private LocalDate resignationDate;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private LocalDate birthday;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Gender gender;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String zipCode;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String city;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String country;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String street;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private int streetNumber;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String iban;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String bic;
 
     @Transient
     @JsonIgnore
@@ -310,5 +354,95 @@ public class User implements UserDetails
     public void setPassiveSince(LocalDate passiveSince)
     {
         this.passiveSince = passiveSince;
+    }
+
+    public LocalDate getResignationDate()
+    {
+        return resignationDate;
+    }
+
+    public void setResignationDate(LocalDate resignationDate)
+    {
+        this.resignationDate = resignationDate;
+    }
+
+    public Gender getGender()
+    {
+        return gender;
+    }
+
+    public void setGender(Gender gender)
+    {
+        this.gender = gender;
+    }
+
+    public String getZipCode()
+    {
+        return zipCode;
+    }
+
+    public void setZipCode(String zipCode)
+    {
+        this.zipCode = zipCode;
+    }
+
+    public String getCity()
+    {
+        return city;
+    }
+
+    public void setCity(String city)
+    {
+        this.city = city;
+    }
+
+    public String getCountry()
+    {
+        return country;
+    }
+
+    public void setCountry(String country)
+    {
+        this.country = country;
+    }
+
+    public String getStreet()
+    {
+        return street;
+    }
+
+    public void setStreet(String street)
+    {
+        this.street = street;
+    }
+
+    public int getStreetNumber()
+    {
+        return streetNumber;
+    }
+
+    public void setStreetNumber(int streetNumber)
+    {
+        this.streetNumber = streetNumber;
+    }
+
+    public String getIban()
+    {
+        return iban;
+    }
+
+    public void setIban(String iban)
+    {
+        this.iban = iban;
+    }
+
+    public String getBic()
+    {
+        return bic;
+    }
+
+    public void setBic(String bic)
+    {
+        this.bic = bic;
     }
 }

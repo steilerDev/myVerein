@@ -227,7 +227,9 @@ function loadUserPage() {
 
     if(!$('#userForm').data('bootstrapValidator')) {
         //Enable bootstrap validator
-        $('#userForm').bootstrapValidator() //The constrains are configured within the HTML
+        $('#userForm').bootstrapValidator({
+            excluded: [':disabled', ':hidden', ':not(:visible)']
+        }) //The constrains are configured within the HTML
             .on('success.form.bv', function (e) { //The submission function
                 // Prevent form submission
                 e.preventDefault();

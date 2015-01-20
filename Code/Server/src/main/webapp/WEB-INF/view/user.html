@@ -54,7 +54,7 @@
                 </div>
             </div>
             <div class="col-sm-6">
-                <h2 id="heading">Create new user</h2>
+                <h2 id="heading"><span id="newUserHeading">Create new user</span><span id="oldUserHeading">Edit user </span><span id="oldUserHeadingName"></span></h2>
                 <hr />
                 <form id="userForm" method="post" class="form-horizontal"
                       data-bv-feedbackicons-valid="glyphicon glyphicon-ok"
@@ -110,7 +110,7 @@
                             <input id="password" type="password" class="form-control" name="password"
                                 data-bv-notempty="true"
                                 data-bv-notempty-message="The last name is required and cannot be empty" />
-                            <input type="hidden" name="newUser" value="true" />
+                            <input id="userFlag" type="hidden" name="userFlag" value="true" />
                         </div>
                     </div>
                     <div class="form-group">
@@ -122,15 +122,35 @@
                                    data-bv-date-message="The date needs to be formated according to this pattern DD/MM/YYYY"/>
                         </div>
                     </div>
+                    <hr>
                     <div class="form-group">
-                        <label class="col-sm-3 control-label">Member since</label>
+                        <label class="col-sm-3 control-label">Active member since</label>
                         <div class="col-sm-9">
-                            <input id="memberSince" type="text" class="form-control" name="memberSince"
+                            <input id="activeMemberSince" type="text" class="form-control" name="memberSince"
                                    data-bv-date="true"
                                    data-bv-date-format="DD/MM/YYYY"
                                    data-bv-date-message="The date needs to be formated according to this pattern DD/MM/YYYY" />
                         </div>
                     </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Passive member since</label>
+                        <div class="col-sm-9">
+                            <input id="passiveMemberSince" type="text" class="form-control" name="memberSince"
+                                   data-bv-date="true"
+                                   data-bv-date-format="DD/MM/YYYY"
+                                   data-bv-date-message="The date needs to be formated according to this pattern DD/MM/YYYY" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Resignation date</label>
+                        <div class="col-sm-9">
+                            <input id="resignationDate" type="text" class="form-control" name="memberSince"
+                                   data-bv-date="true"
+                                   data-bv-date-format="DD/MM/YYYY"
+                                   data-bv-date-message="The date needs to be formated according to this pattern DD/MM/YYYY" />
+                        </div>
+                    </div>
+                    <hr>
                     <div class="form-group">
                         <label class="col-sm-3 control-label">Divisions</label>
                         <div class="col-sm-9">

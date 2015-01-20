@@ -67,6 +67,23 @@ public class UserManagementController
         return "user";
     }
 
+    /**
+     * This function saves the user, according to the parameters posted through this request.
+     * @param email
+     * @param firstName
+     * @param lastName
+     * @param birthday
+     * @param memberSince
+     * @param passiveSince
+     * @param divisions
+     * @param newUser
+     * @param oldUser
+     * @param password
+     * @param parameters
+     * @param currentUser
+     * @param locale
+     * @return
+     */
     @RequestMapping(method = RequestMethod.POST)
     public @ResponseBody ResponseEntity saveUser(@RequestParam String email,
                                                  @RequestParam String firstName,
