@@ -504,4 +504,33 @@ public class User implements UserDetails
             }
         }
     }
+
+    /**
+     * This function removes all unnecessary information besides the email and name of a user.
+     */
+    public void removeEverythingExceptEmailAndName()
+    {
+        privateInformation = null;
+        publicInformation = null;
+        divisions = null;
+
+        activeSince = null;
+        passiveSince = null;
+        resignationDate = null;
+        birthday = null;
+
+        gender  = null;
+
+        zipCode = null;
+        city = null;
+        country = null;
+        street = null;
+        streetNumber = null;
+
+        iban = null;
+        bic = null;
+
+        membershipStatus = null;
+        administrationNotAllowedMessage = null;
+    }
 }

@@ -53,6 +53,8 @@ public class DivisionManagementController
 
     private static Logger logger = LoggerFactory.getLogger(DivisionManagementController.class);
 
+    private static final String newDivisionName = "New division";
+
     /**
      * If a modification on a division needs to be stored durable this controller is invoked by posting the parameters to the URI /division
      * @param name The new name of the division.
@@ -65,10 +67,11 @@ public class DivisionManagementController
     @RequestMapping(method = RequestMethod.POST)
     public @ResponseBody ResponseEntity<String> saveDivision(@RequestParam String name,
                                                              @RequestParam String oldName,
-                                                             @RequestParam(required = false) String description,
-                                                             @RequestParam(required = false) String admin,
+                                                             @RequestParam String description,
+                                                             @RequestParam String admin,
                                                              @CurrentUser User currentUser)
     {
+        String successMessage = "Successfully saved division";
         List<Division> administratedDivisions = getOptimizedSetOfAdministratedDivisions(currentUser);
         if(administratedDivisions.size() > 0)
         {
@@ -77,16 +80,8 @@ public class DivisionManagementController
 
             if(oldName.isEmpty())
             {
-                if(divisionRepository.findByName(name) != null)
-                {
-                    logger.warn("An unused new division is overwritten.");
-                    return new ResponseEntity<>("An unused new division is overwritten", HttpStatus.OK);
-                }
-
-                logger.debug("A new division is created");
-                division = new Division();
-                //If there is a new division the parent is one of the administrated divisions. The correct layout is updated through a different request.
-                division.setParent(administratedDivisions.get(0));
+                logger.warn("The original name of the division is missing");
+                return new ResponseEntity<>("The original name of the division is missing", HttpStatus.BAD_REQUEST);
             } else if(oldName.equals(name) && divisionRepository.findByName(oldName) != null)
             {
                 //A division is changed, name stays.
@@ -105,7 +100,6 @@ public class DivisionManagementController
 
             if(administratedDivisions.parallelStream().anyMatch(div -> division.getAncestors().contains(div))) //Check if user is allowed to change the division (if he administrates one of the parent divisions)
             {
-
                 User adminUser = null;
                 if (admin != null && !admin.isEmpty())
                 {
@@ -133,7 +127,8 @@ public class DivisionManagementController
                     logger.warn("A database constraint was violated while saving the division.");
                     return new ResponseEntity<>("A database constraint was violated while saving the division.", HttpStatus.BAD_REQUEST);
                 }
-                return new ResponseEntity<>("Successfully saved division", HttpStatus.OK);
+                logger.debug(successMessage);
+                return new ResponseEntity<>(successMessage, HttpStatus.OK);
             } else
             {
                 logger.warn("User is not allowed to change declared division.");
@@ -143,6 +138,72 @@ public class DivisionManagementController
         {
             logger.warn("User is not allowed to create a new division.");
             return new ResponseEntity<>("You are not allowed to create a new division", HttpStatus.FORBIDDEN);
+        }
+    }
+
+    /**
+     * This controller is creating a new division and chooses the name based on the new division name and an integer, depending how many unnamed division exist.
+     * @param currentUser The currently logged in user.
+     * @return A HTTP response with an status code. If an error occurred an error message is bundled into the response. If the division gets created successfully, the name is returned within the response.
+     */
+    @RequestMapping(method = RequestMethod.POST, value = "new")
+    public @ResponseBody ResponseEntity<String> createDivision(@CurrentUser User currentUser)
+    {
+        List<Division> administratedDivisions = getOptimizedSetOfAdministratedDivisions(currentUser);
+        Division newDivision;
+        if(administratedDivisions.size() > 0)
+        {
+            String newName = newDivisionName;
+            for(int i = 1; divisionRepository.findByName(newName) != null; i++)
+            {
+                newName = newDivisionName.concat(" " + i);
+            }
+
+            logger.debug("A new division is created: " + newName);
+
+            newDivision = new Division();
+            //If there is a new division the parent is one of the administrated divisions. The correct layout is updated through a different request.
+            newDivision.setParent(administratedDivisions.get(0));
+            newDivision.setName(newName);
+            try
+            {
+                divisionRepository.save(newDivision);
+                return new ResponseEntity<>("The new division was successfully created||" + newName, HttpStatus.OK);
+            } catch (ConstraintViolationException e)
+            {
+                logger.warn("A database constraint was violated while saving the division.");
+                return new ResponseEntity<>("A database constraint was violated while saving the division.", HttpStatus.BAD_REQUEST);
+            }
+        } else
+        {
+            return new ResponseEntity<>("You are not allowed to create a new division", HttpStatus.FORBIDDEN);
+        }
+    }
+
+
+    @RequestMapping(method = RequestMethod.POST, value = "deleteDivision")
+    public @ResponseBody ResponseEntity<String> deleteDivision(@RequestParam String divisionName, @CurrentUser User currentUser)
+    {
+        Division deletedDivision = divisionRepository.findByName(divisionName);
+        if(deletedDivision == null)
+        {
+            logger.warn("Unable to find stated division " + divisionName);
+            return new ResponseEntity<>("Unable to find the stated division", HttpStatus.BAD_REQUEST);
+        } else if (!isAllowedToAdministrate(currentUser, deletedDivision))
+        {
+            logger.warn("Not allowed to delete division.");
+            return new ResponseEntity<>("You are not allowed to delete the selected division", HttpStatus.BAD_REQUEST);
+        } else
+        {
+            try
+            {
+                divisionRepository.delete(deletedDivision);
+                return new ResponseEntity<>("Successfully deleted selected division", HttpStatus.OK);
+            } catch (IllegalArgumentException e)
+            {
+                logger.warn("Unable to delete selected division.");
+                return new ResponseEntity<>("Unable to delete the selected division", HttpStatus.INTERNAL_SERVER_ERROR);
+            }
         }
     }
 
@@ -174,11 +235,7 @@ public class DivisionManagementController
         Division searchedDivision = divisionRepository.findByName(name);
         if(searchedDivision.getAdminUser() != null)
         {
-            searchedDivision.getAdminUser().setPrivateInformation(null);
-            searchedDivision.getAdminUser().setPublicInformation(null);
-            searchedDivision.getAdminUser().setDivisions(null);
-            searchedDivision.getAdminUser().setBirthday(null);
-            searchedDivision.getAdminUser().setActiveSince(null);
+            searchedDivision.getAdminUser().removeEverythingExceptEmailAndName();
         }
         return searchedDivision;
     }
@@ -240,6 +297,8 @@ public class DivisionManagementController
             }
         }
     }
+
+
 
     /**
      * This function moves the selected division (and all subdivisions) to a new parent. The function evaluates if the user is allowed to perform this action.
@@ -333,6 +392,17 @@ public class DivisionManagementController
                     .collect(Collectors.toList()); // Converting the stream to a list
         }
         return reducedDivisions;
+    }
+
+    /**
+     * Checks if a user is allowed to modify a selected division
+     * @param adminUser The currently logged in user.
+     * @param selectedDivision The division, the user is trying to modify
+     * @return True if the user is allowed, false otherwise.
+     */
+    private boolean isAllowedToAdministrate(User adminUser, Division selectedDivision)
+    {
+        return getOptimizedSetOfAdministratedDivisions(adminUser).parallelStream().anyMatch(div -> selectedDivision.getAncestors().contains(div));
     }
 
 

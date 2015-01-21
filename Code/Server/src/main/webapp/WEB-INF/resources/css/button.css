@@ -42,6 +42,16 @@
 	color: #fff;
 }
 
+.progress-button-disabled button {
+	border: 2px solid #999999;
+	color: #999999;
+}
+
+.progress-button-disabled button:hover {
+	background-color: #eeeeee;
+	color: #999999;
+}
+
 .progress-button button:focus {
 	outline: none;
 }

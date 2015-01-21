@@ -163,11 +163,13 @@
 
     // enable button
     UIProgressButton.prototype.enable = function() {
+        classie.removeClass(this.el, 'progress-button-disabled');
         this.button.removeAttribute( 'disabled' );
     }
 
     // disable button
     UIProgressButton.prototype.disable = function() {
+        classie.add(this.el, 'progress-button-disabled');
         this.button.setAttribute( 'disabled', '' );
     }
 
