@@ -43,168 +43,140 @@
                     <div class="col-sm-6">
                         <h2 id="heading"><span id="newUserHeading">Create new user</span><span id="oldUserHeading">Edit user </span><span id="oldUserHeadingName"></span></h2>
                         <hr />
-                        <form id="userForm" method="post" class="form-horizontal"
+                        <form id="userForm" method="post"
                               data-bv-feedbackicons-valid="glyphicon glyphicon-ok"
                               data-bv-feedbackicons-invalid="glyphicon glyphicon-remove"
                               data-bv-feedbackicons-validating="glyphicon glyphicon-refresh">
 
                             <div class="form-group">
-                                <label class="col-sm-3 control-label">First Name</label>
-                                <div class="col-sm-9">
-                                    <input id="firstName" type="text" class="form-control" name="firstName"
-                                           data-bv-notempty="true"
-                                           data-bv-notempty-message="The first name is required and cannot be empty"
+                                <label for="firstName">First Name</label>
+                                <input id="firstName" type="text" class="form-control" name="firstName"
+                                       data-bv-notempty="true"
+                                       data-bv-notempty-message="The first name is required and cannot be empty"
 
-                                           data-bv-regexp="true"
-                                           data-bv-regexp-regexp="^[a-zA-Z0-9]+$"
-                                           data-bv-regexp-message="The first name can only consist of alphabetical and number"
+                                       data-bv-regexp="true"
+                                       data-bv-regexp-regexp="^[a-zA-Z0-9]+$"
+                                       data-bv-regexp-message="The first name can only consist of alphabetical and number"
 
-                                           data-bv-different="true"
-                                           data-bv-different-field="password"
-                                           data-bv-different-message="The first name and password cannot be the same as each other" />
-                                </div>
+                                       data-bv-different="true"
+                                       data-bv-different-field="password"
+                                       data-bv-different-message="The first name and password cannot be the same as each other" />
                             </div>
                             <div class="form-group">
-                                <label class="col-sm-3 control-label">Last Name</label>
-                                <div class="col-sm-9">
-                                    <input id="lastName" type="text" class="form-control" name="lastName"
-                                           data-bv-notempty="true"
-                                           data-bv-notempty-message="The last name is required and cannot be empty"
+                                <label for="lastName">Last Name</label>
+                                <input id="lastName" type="text" class="form-control" name="lastName"
+                                       data-bv-notempty="true"
+                                       data-bv-notempty-message="The last name is required and cannot be empty"
 
-                                           data-bv-regexp="true"
-                                           data-bv-regexp-regexp="^[a-zA-Z0-9]+$"
-                                           data-bv-regexp-message="The last name can only consist of alphabetical and number"
+                                       data-bv-regexp="true"
+                                       data-bv-regexp-regexp="^[a-zA-Z0-9]+$"
+                                       data-bv-regexp-message="The last name can only consist of alphabetical and number"
 
-                                           data-bv-different="true"
-                                           data-bv-different-field="password"
-                                           data-bv-different-message="The last name and password cannot be the same as each other" />
-                                </div>
+                                       data-bv-different="true"
+                                       data-bv-different-field="password"
+                                       data-bv-different-message="The last name and password cannot be the same as each other" />
                             </div>
                             <div class="form-group">
-                                <label class="col-sm-3 control-label">Email address</label>
-                                <div class="col-sm-9">
-                                    <input id="email" type="text" class="form-control" name="email"
-                                           data-bv-notempty="true"
-                                           data-bv-notempty-message="The email address is required and cannot be empty"
+                                <label for="email">Email address</label>
+                                <input id="email" type="text" class="form-control" name="email"
+                                       data-bv-notempty="true"
+                                       data-bv-notempty-message="The email address is required and cannot be empty"
 
-                                           data-bv-emailaddress="true"
-                                           data-bv-emailaddress-message="The email address is not a valid" />
-                                </div>
+                                       data-bv-emailaddress="true"
+                                       data-bv-emailaddress-message="The email address is not a valid" />
                             </div>
                             <div id="newUser" class="form-group">
-                                <label class="col-sm-3 control-label">Password</label>
-                                <div class="col-sm-9">
-                                    <input id="password" type="password" class="form-control" name="password"
-                                        data-bv-notempty="true"
-                                        data-bv-notempty-message="The last name is required and cannot be empty" />
-                                    <input id="userFlag" type="hidden" name="userFlag" value="true" />
-                                </div>
+                                <label for="password">Password</label>
+                                <input id="password" type="password" class="form-control" name="password"
+                                    data-bv-notempty="true"
+                                    data-bv-notempty-message="The last name is required and cannot be empty" />
+                                <input id="userFlag" type="hidden" name="userFlag" value="true" />
                             </div>
                             <div class="form-group">
-                                <label class="col-sm-3 control-label">Birthday</label>
-                                <div class="col-sm-9">
-                                    <input id="birthday" type="text" class="form-control" name="birthday"
-                                           data-bv-date="true"
-                                           data-bv-date-format="DD/MM/YYYY"
-                                           data-bv-date-message="The date needs to be formated according to this pattern DD/MM/YYYY"/>
-                                </div>
+                                <label for="birthday">Birthday</label>
+                                <input id="birthday" type="text" class="form-control" name="birthday"
+                                       data-bv-date="true"
+                                       data-bv-date-format="DD/MM/YYYY"
+                                       data-bv-date-message="The date needs to be formated according to this pattern DD/MM/YYYY"/>
                             </div>
                             <div class="form-group">
-                                <label class="col-sm-3 control-label">Gender</label>
-                                <div class="col-sm-9">
-                                    <select id="gender" class="form-control" name="gender">
-                                        <option value="default" disabled="disabled" selected="selected"> -- select a gender -- </option>
-                                        <option value="MALE">Male</option>
-                                        <option value="FEMALE">Female</option>
-                                    </select>
-                                </div>
+                                <label for="gender">Gender</label>
+                                <select id="gender" class="form-control" name="gender">
+                                    <option value="default" disabled="disabled" selected="selected"> -- select a gender -- </option>
+                                    <option value="MALE">Male</option>
+                                    <option value="FEMALE">Female</option>
+                                </select>
                             </div>
 
                             <hr />
 
                             <div class="form-group">
-                                <label class="col-sm-3 control-label">Street &amp; Number</label>
-                                <div class="col-sm-7">
+                                    <label for="street">Street name</label>
                                     <input id="street" type="text" class="form-control" name="street" />
-                                </div>
-                                <div class="col-sm-2">
-                                    <input id="streetNumber" type="text" class="form-control" name="streetNumber" />
-                                </div>
                             </div>
                             <div class="form-group">
-                                <label class="col-sm-3 control-label">Zip code</label>
-                                <div class="col-sm-9">
-                                    <input id="zip" type="text" class="form-control" name="zip" />
-                                </div>
+                                <label for="streetNumber">Street number</label>
+                                <input id="streetNumber" type="text" class="form-control" name="streetNumber" />
                             </div>
                             <div class="form-group">
-                                <label class="col-sm-3 control-label">City</label>
-                                <div class="col-sm-9">
-                                    <input id="city" type="text" class="form-control" name="city" />
-                                </div>
+                                <label for="zip">Zip code</label>
+                                <input id="zip" type="text" class="form-control" name="zip" />
                             </div>
                             <div class="form-group">
-                                <label class="col-sm-3 control-label">Country</label>
-                                <div class="col-sm-9">
-                                    <input id="country" type="text" class="form-control" name="country" />
-                                </div>
+                                <label for="city">City</label>
+                                <input id="city" type="text" class="form-control" name="city" />
+                            </div>
+                            <div class="form-group">
+                                <label for="country">Country</label>
+                                <input id="country" type="text" class="form-control" name="country" />
                             </div>
 
                             <hr />
 
                             <div class="form-group">
-                                <label class="col-sm-3 control-label">Active member</label>
-                                <div class="col-sm-9">
-                                    <input id="activeMemberSince" type="text" class="form-control" name="activeMemberSince"
-                                           data-bv-date="true"
-                                           data-bv-date-format="DD/MM/YYYY"
-                                           data-bv-date-message="The date needs to be formated according to this pattern DD/MM/YYYY" />
-                                </div>
+                                <label for="activeMemberSince">Active member</label>
+                                <input id="activeMemberSince" type="text" class="form-control" name="activeMemberSince"
+                                       data-bv-date="true"
+                                       data-bv-date-format="DD/MM/YYYY"
+                                       data-bv-date-message="The date needs to be formated according to this pattern DD/MM/YYYY" />
                             </div>
                             <div class="form-group">
-                                <label class="col-sm-3 control-label">Passive member</label>
-                                <div class="col-sm-9">
-                                    <input id="passiveMemberSince" type="text" class="form-control" name="passiveMemberSince"
-                                           data-bv-date="true"
-                                           data-bv-date-format="DD/MM/YYYY"
-                                           data-bv-date-message="The date needs to be formated according to this pattern DD/MM/YYYY" />
-                                </div>
+                                <label for="passiveMemberSince">Passive member</label>
+                                <input id="passiveMemberSince" type="text" class="form-control" name="passiveMemberSince"
+                                       data-bv-date="true"
+                                       data-bv-date-format="DD/MM/YYYY"
+                                       data-bv-date-message="The date needs to be formated according to this pattern DD/MM/YYYY" />
+                                <p class="help-block">Leave this field empty, if the user is not a passive member.</p>
                             </div>
                             <div class="form-group">
-                                <label class="col-sm-3 control-label">Resignation date</label>
-                                <div class="col-sm-9">
-                                    <input id="resignationDate" type="text" class="form-control" name="resignationDate"
-                                           data-bv-date="true"
-                                           data-bv-date-format="DD/MM/YYYY"
-                                           data-bv-date-message="The date needs to be formated according to this pattern DD/MM/YYYY" />
-                                </div>
+                                <label for="resignationDate">Resignation date</label>
+                                <input id="resignationDate" type="text" class="form-control" name="resignationDate"
+                                       data-bv-date="true"
+                                       data-bv-date-format="DD/MM/YYYY"
+                                       data-bv-date-message="The date needs to be formated according to this pattern DD/MM/YYYY" />
+                                <p class="help-block">Leave this field empty, if the user has not resigned.</p>
                             </div>
 
                             <hr />
 
                             <div class="form-group">
-                                <label class="col-sm-3 control-label">IBAN</label>
-                                <div class="col-sm-9">
-                                    <input id="iban" type="text" class="form-control" name="iban"
-                                           data-bv-iban="true"
-                                           data-bv-iban-message="The value is not valid IBAN" />
-                                </div>
+                                <label for="iban">IBAN</label>
+                                <input id="iban" type="text" class="form-control" name="iban"
+                                       data-bv-iban="true"
+                                       data-bv-iban-message="The value is not valid IBAN" />
                             </div>
                             <div class="form-group">
-                                <label class="col-sm-3 control-label">BIC</label>
-                                <div class="col-sm-9">
-                                    <input id="bic" type="text" class="form-control" name="bic" />
-                                </div>
+                                <label for="bic">BIC</label>
+                                <input id="bic" type="text" class="form-control" name="bic" />
                             </div>
 
                             <hr />
 
                             <div class="form-group">
-                                <label class="col-sm-3 control-label">Divisions</label>
-                                <div class="col-sm-9">
-                                    <input name="divisions" class="form-control" id="divisions" type="text" />
-                                </div>
+                                <label for="divisions">Divisions</label>
+                                <input name="divisions" class="form-control" id="divisions" type="text" />
                             </div>
+
                             <div class="privateInformation">
                                 <div class="row text-center col-sm-12" >Private Information</div>
                             </div>
