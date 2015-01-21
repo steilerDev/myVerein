@@ -68,7 +68,7 @@ function addNewInformation(target) {
 }
 
 //Reset the user form
-function resetUserForm() {
+function resetUserForm(doNotHideDeleteButton) {
     $('#firstName').val('');
     $('#lastName').val('');
     $('#email').val('');
@@ -112,8 +112,10 @@ function resetUserForm() {
     $("#userForm :input").prop("disabled", false);
     $('#divisions')[0].selectize.enable();
 
-    //Hide delete button
-    $('#userDelete').addClass('hidden');
+    if(!doNotHideDeleteButton) {
+        //Hide delete button
+        $('#userDelete').addClass('hidden');
+    }
 
     //Hide and clear heading
     $('#newUserHeading').addClass("hidden");
@@ -255,8 +257,8 @@ function loadUser(email) {
 }
 
 //Set up everything to create a new user
-function loadNewUser() {
-    resetUserForm();
+function loadNewUser(doNotHideDeleteButton) {
+    resetUserForm(doNotHideDeleteButton);
     $('#userFlag').val("true");
     $('#newUserHeading').removeClass('hidden');
     $('#newUser').removeClass('hidden');
@@ -380,9 +382,9 @@ function loadUserPage() {
                     showMessage(response.responseText, 'error', 'icon_error-triangle');
                 },
                 success: function (response) {
-                    resetUserForm();
                     userDeleteButton.stopAnimation(0);
                     showMessage(response, 'success', 'icon_check');
+                    loadNewUser(true);
                     loadUserList();
                 }
             });

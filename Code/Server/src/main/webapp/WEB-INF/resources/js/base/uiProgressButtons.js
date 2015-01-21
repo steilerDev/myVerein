@@ -102,7 +102,7 @@
                         progress = Math.min(progress + Math.random() * 0.1, 1);
                         self.setProgress(progress);
 
-                        if (progress >= 0.7) {
+                        if (progress >= 0.8) {
                             clearInterval(interval);
                         }
                     }, 150);
@@ -136,7 +136,13 @@
                     setTimeout( function() {
                         classie.remove( self.el, statusClass );
                         statusEl.draw(0);
-                        self.enable();
+                        //Automatically hides error buttons
+                        if(self.el.classList.contains('progress-error-button')){
+                            classie.add(self.el, 'hidden');
+                        } else
+                        {
+                            self.enable();
+                        }
                     }, self.options.statusTime );
                 }
                 else {

@@ -72,6 +72,11 @@
 	stroke-width: 5;
 }
 
+.progress-error-button svg.progress-circle path {
+	stroke: #FF5617;
+	stroke-width: 5;
+}
+
 .progress-button svg.checkmark path,
 .progress-button svg.cross path {
 	stroke: #fff;
