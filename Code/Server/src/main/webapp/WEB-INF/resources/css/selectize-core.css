@@ -116,8 +116,8 @@
 .selectize-input,
 .selectize-input input {
     color: #303030;
-    font-family: inherit;
-    font-size: 13px;
+    /*font-family: inherit;*/
+    /*font-size: 13px;*/
     line-height: 18px;
     -webkit-font-smoothing: inherit;
 }

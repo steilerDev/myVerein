@@ -22,7 +22,127 @@
                 <div id="calendar" class="calendar"></div>
             </div>
             <div class="col-sm-6">
+                <div class="materialBox">
+                    <h2 id="heading">
+                        <span id="newEventHeading">Create new event</span>
+                        <span id="oldEventHeading">Edit event </span><span id="oldEventHeadingName"></span></h2>
+                    <hr />
+                    <form id="eventForm" method="post"
+                          data-bv-feedbackicons-valid="icon_check"
+                          data-bv-feedbackicons-invalid="icon_error-triangle_alt"
+                          data-bv-feedbackicons-validating="icon_loading">
 
+                        <input id="eventFlag" type="hidden" name="oldEventName" value="" />
+
+                        <div class="form-group">
+                            <label for="eventName">Event name</label>
+                            <input id="eventName" type="text" class="form-control" name="eventName" placeholder="Enter the name of the event"
+                                   data-bv-notempty="true"
+                                   data-bv-notempty-message="The event name is required and cannot be empty"/>
+                        </div>
+                        <div class="form-group">
+                            <label for="eventDescription">Description</label>
+                            <textarea id="eventDescription" type="text" name="eventDescription" class="form-control" rows="3" placeholder="Enter a short description for the event" />
+                        </div>
+
+                        <hr/>
+
+                        <div class="form-group">
+                            <label for="startDate">Start date &amp; time</label>
+                            <input id="startDate" type="text" class="form-control eventDatePicker" name="startDate" placeholder="Enter the start date of the event (DD/MM/YYYY)"
+                                   data-bv-notempty="true"
+                                   data-bv-notempty-message="The start date is required and cannot be empty"
+                                   data-bv-date="true"
+                                   data-bv-date-format="DD/MM/YYYY"
+                                   data-bv-date-message="The starting date needs to be formated according to this pattern DD/MM/YYYY" />
+                            <input id="startTime" type="text" class="form-control eventTimePicker" name="startTime" placeholder="Enter the start time of the event (HH:MM)"
+                                   data-bv-notempty="true"
+                                   data-bv-notempty-message="The start time is required and cannot be empty"
+                                   data-bv-regexp="true"
+                                   data-bv-regexp-regexp="^(1?[0-9]|2[0-3]):([0-5]{1}[0-9]{1})$"
+                                   data-bv-regexp-message="The time needs to be formatted according to this pattern HH/mm"/>
+                        </div>
+                        <div class="form-group">
+                            <label for="endDate">End date &amp; time</label>
+                            <input id="endDate" type="text" class="form-control eventDatePicker" name="endDate" placeholder="Enter the end date of the event (DD/MM/YYYY)"
+                                   data-bv-notempty="true"
+                                   data-bv-notempty-message="The end date is required and cannot be empty"
+                                   data-bv-date="true"
+                                   data-bv-date-format="DD/MM/YYYY"
+                                   data-bv-date-message="The ending date needs to be formated according to this pattern DD/MM/YYYY" />
+                            <input id="endTime" type="text" class="form-control eventTimePicker" name="endTime" placeholder="Enter the end time of the event (HH:MM)"
+                                   data-bv-notempty="true"
+                                   data-bv-notempty-message="The end time is required and cannot be empty"
+                                   data-bv-regexp="true"
+                                   data-bv-regexp-regexp="^(1?[0-9]|2[0-3]):([0-5]{1}[0-9]{1})$"
+                                   data-bv-regexp-message="The time needs to be formatted according to this pattern HH/mm"/>
+                        </div>
+                        <div class="form-group">
+                            <label for="location">Location</label>
+                            <input id="location" type="text" class="form-control" name="location" placeholder="Enter the location of the event"/>
+                        </div>
+                        <div id="map" class="map"/>
+
+                        <hr/>
+
+                        <div class="form-group">
+                            <label for="invitedDivisions">Invited divisions</label>
+                            <input name="invitedDivisions" class="form-control" id="invitedDivisions" type="text" placeholder="Enter all divisions that are invited to join this event"
+                                   data-bv-notempty="true"
+                                   data-bv-notempty-message="There needs to be at least one division invited"/>
+                            <p class="help-block">Every user within the stated divisions is going to receive an invitation</p>
+                        </div>
+
+                        <hr/>
+
+                        <div id="submitGroup" class="form-group">
+                            <div class="progress-button" id="eventSubmitButton">
+                                <button type="submit"><span id="oldEventButton">Save event</span><span id="newEventButton">Create event</span></button>
+                                <svg class="progress-circle" width="50" height="50">
+                                    <g transform="scale(0.71)">
+                                        <path d="m35,2.5c17.955803,0 32.5,14.544199 32.5,32.5c0,17.955803 -14.544197,32.5 -32.5,32.5c-17.955803,0 -32.5,-14.544197 -32.5,-32.5c0,-17.955801 14.544197,-32.5 32.5,-32.5z"/>
+                                    </g>
+                                </svg>
+                                <svg class="checkmark" width="50" height="50">
+                                    <g transform="scale(0.71)">
+                                        <path d="m31.5,46.5l15.3,-23.2"/>
+                                        <path d="m31.5,46.5l-8.5,-7.1"/>
+                                    </g>
+                                </svg>
+                                <svg class="cross" width="50" height="50">
+                                    <g transform="scale(0.71)">
+                                        <path d="m35,35l-9.3,-9.3"/>
+                                        <path d="m35,35l9.3,9.3"/>
+                                        <path d="m35,35l-9.3,9.3"/>
+                                        <path d="m35,35l9.3,-9.3"/>
+                                    </g>
+                                </svg>
+                            </div>
+                            <div class="progress-button progress-error-button" id="eventDelete">
+                                <button id="eventDeleteButton"><span>Delete event</span></button>
+                                <svg class="progress-circle" width="50" height="50">
+                                    <g transform="scale(0.71)">
+                                        <path d="m35,2.5c17.955803,0 32.5,14.544199 32.5,32.5c0,17.955803 -14.544197,32.5 -32.5,32.5c-17.955803,0 -32.5,-14.544197 -32.5,-32.5c0,-17.955801 14.544197,-32.5 32.5,-32.5z"/>
+                                    </g>
+                                </svg>
+                                <svg class="checkmark" width="50" height="50">
+                                    <g transform="scale(0.71)">
+                                        <path d="m31.5,46.5l15.3,-23.2"/>
+                                        <path d="m31.5,46.5l-8.5,-7.1"/>
+                                    </g>
+                                </svg>
+                                <svg class="cross" width="50" height="50">
+                                    <g transform="scale(0.71)">
+                                        <path d="m35,35l-9.3,-9.3"/>
+                                        <path d="m35,35l9.3,9.3"/>
+                                        <path d="m35,35l-9.3,9.3"/>
+                                        <path d="m35,35l9.3,-9.3"/>
+                                    </g>
+                                </svg>
+                            </div>
+                        </div>
+                    </form>
+                </div>
             </div>
         </section>
     </div>

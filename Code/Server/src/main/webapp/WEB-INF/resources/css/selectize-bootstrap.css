@@ -115,8 +115,8 @@
 .selectize-input,
 .selectize-input input {
     color: #333333;
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-    font-size: 14px;
+    /*font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;*/
+    /*font-size: 14px;*/
     line-height: 20px;
     -webkit-font-smoothing: inherit;
 }
@@ -275,7 +275,7 @@
 .selectize-dropdown-content {
     overflow-y: auto;
     overflow-x: hidden;
-    max-height: 200px;
+    max-height: 150px;
 }
 .selectize-control.single .selectize-input,
 .selectize-control.single .selectize-input input {

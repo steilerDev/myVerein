@@ -65,6 +65,7 @@
   transition: left 0.5s;
   background-color: #ebebeb;
 }
+
 .calendar .clndr .days-container .days .day,
 .calendar .clndr .days-container .days .empty {
   width: 42px;
@@ -110,6 +111,9 @@
   text-align: center;
   color: white;
 }
+.calendar .clndr .days-container .days .today{
+  color: #00904F;
+}
 .calendar .clndr .days-container .events {
   /*position: absolute;*/
   /*left: 294px;*/
@@ -150,7 +154,7 @@
 }
 .calendar .clndr .days-container .events .events-list {
   overflow: scroll;
-  height: 185px;
+  max-height: 200px;
 }
 .calendar .clndr .days-container .events .events-list .event {
   padding-top: 8px;

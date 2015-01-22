@@ -15,6 +15,15 @@
 	background: #ffffff;
 }
 
+.tabs nav.materialNavBox {
+	background: none repeat scroll 0% 0% rgb(238, 238, 238);
+	overflow: visible;
+	box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.16), 0px 3px 6px rgba(0, 0, 0, 0.23);
+	line-height: 1;
+	margin-bottom: 10px;
+	padding-bottom: 0px;
+}
+
 .tabs nav ul {
 	position: relative;
 	display: -ms-flexbox;
