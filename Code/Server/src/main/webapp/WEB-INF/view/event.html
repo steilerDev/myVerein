@@ -1,0 +1,31 @@
+<!--/*
+    Document   : Event Management
+    Description: This page contains the fragment included within the application, that is used to manage the events.
+    Copyright  : (c) 2014 Frank Steiler <frank@steilerdev.de>
+    License    : GNU General Public License v2.0
+*/-->
+
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Event Management</title>
+</head>
+<body>
+<div id="tab" class="tabs tabs-style-underline">
+    <div class="content-wrap">
+        <!-- Only the following container is going to be used within the production page-->
+        <section th:fragment="content">
+            <div class="col-sm-6">
+                <div id="calendar" class="calendar"></div>
+            </div>
+            <div class="col-sm-6">
+
+            </div>
+        </section>
+    </div>
+</div>
+</body>
+</html>

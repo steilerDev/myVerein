@@ -218,7 +218,7 @@ function loadUser(email) {
             }
         } else //If not allowed to edit disable some stuff and tell user
         {
-            showMessage(user.administrationNotAllowedMessage, 'warning', 'icon_error-triangle');
+            showMessage(user.administrationNotAllowedMessage, 'warning', 'icon_error-triangle_alt');
             disableUserForm();
         }
 
@@ -349,7 +349,7 @@ function loadUserPage() {
                     data: $(e.target).serialize(),
                     error: function (response) {
                         userSubmitButton.stopAnimation(-1);
-                        showMessage(response.responseText, 'error', 'icon_error-triangle');
+                        showMessage(response.responseText, 'error', 'icon_error-triangle_alt');
                     },
                     success: function (response) {
                         userSubmitButton.stopAnimation(0);
@@ -379,7 +379,7 @@ function loadUserPage() {
                 },
                 error: function (response) {
                     userDeleteButton.stopAnimation(-1);
-                    showMessage(response.responseText, 'error', 'icon_error-triangle');
+                    showMessage(response.responseText, 'error', 'icon_error-triangle_alt');
                 },
                 success: function (response) {
                     userDeleteButton.stopAnimation(0);

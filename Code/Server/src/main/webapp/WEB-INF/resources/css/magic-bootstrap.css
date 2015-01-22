@@ -330,7 +330,7 @@ hr {
   margin-top: 22px;
   margin-bottom: 22px;
   border: 0;
-  border-top: 1px solid #eeeeee;
+  border-top: 1px solid #999999;
 }
 .sr-only {
   position: absolute;
@@ -1826,7 +1826,7 @@ select[multiple].input-lg {
 }
 .has-feedback .form-control-feedback {
   position: absolute;
-  top: 27px;
+  top: 23px;
   right: 0;
   display: block;
   width: 36px;
@@ -2034,17 +2034,20 @@ fieldset[disabled] .btn {
 }
 .btn-default {
   color: #13cd78;
-  background-color: #ffffff;
-  border-color: #13cd78;
+  border-radius: 40px;
+  background-color: transparent;
+  border: 2px solid #13cd78;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-transition: background-color 0.3s, color 0.3s, width 0.3s, border-width 0.3s, border-color 0.3s;
+  transition: background-color 0.3s, color 0.3s, width 0.3s, border-width 0.3s, border-color 0.3s;
 }
 .btn-default:hover,
 .btn-default:focus,
 .btn-default:active,
 .btn-default.active,
 .open .dropdown-toggle.btn-default {
-  color: #13cd78;
-  background-color: #ebebeb;
-  border-color: #0e9557;
+  background-color: #13CD78;
+  color: #FFF;
 }
 .btn-default:active,
 .btn-default.active,

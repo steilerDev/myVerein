@@ -108,7 +108,7 @@ function loadDivisionPage() {
                 return !(!target_node.parent.parent && (position == 'before' || position == 'after'));
             },
             onLoadFailed: function (response) {
-                showMessage(response.responseText, 'error', 'icon_error-triangle');
+                showMessage(response.responseText, 'error', 'icon_error-triangle_alt');
                 $('#division-tree-loading').removeClass('heartbeat');
             }
         });
@@ -134,7 +134,7 @@ function loadDivisionPage() {
                         previous_parent: event.move_info.previous_parent.name
                     },
                     error: function (response) {
-                        showMessage(response.responseText, 'error', 'icon_error-triangle');
+                        showMessage(response.responseText, 'error', 'icon_error-triangle_alt');
                         loadTree()
                     },
                     success: function (response) {
@@ -199,7 +199,7 @@ function loadDivisionPage() {
                     data: $(e.target).serialize(),
                     error: function (response) {
                         divisionSubmitButton.stopAnimation(-1);
-                        showMessage(response.responseText, 'error', 'icon_error-triangle');
+                        showMessage(response.responseText, 'error', 'icon_error-triangle_alt');
                     },
                     success: function (response) {
                         divisionSubmitButton.stopAnimation(1);
@@ -229,7 +229,7 @@ function loadDivisionPage() {
                 },
                 error: function (response) {
                     divisionDeleteButton.stopAnimation(-1);
-                    showMessage(response.responseText, 'error', 'icon_error-triangle');
+                    showMessage(response.responseText, 'error', 'icon_error-triangle_alt');
                 },
                 success: function (response) {
                     divisionDeleteButton.stopAnimation(0);
@@ -252,7 +252,7 @@ function loadDivisionPage() {
                 loadTree();
                 resetDivisionForm();
                 divisionSubmitButton.stopAnimation(-1);
-                showMessage(response.responseText, 'error', 'icon_error-triangle');
+                showMessage(response.responseText, 'error', 'icon_error-triangle_alt');
             },
             success: function(response) {
                 //Seperating response message and name of the new division

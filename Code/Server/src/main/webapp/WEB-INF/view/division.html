@@ -19,93 +19,93 @@
                 <!-- Only the following container is going to be used within the production page-->
                 <section th:fragment="content">
                     <div class="col-sm-6">
-                        <div class="row">
-                            <div class="col-sm-4 col-sm-offset-8">
-                                <button id="addDivision" class="btn btn-default">
-                                    Create new division
-                                </button>
-                            </div>
+                        <div class="materialBox">
+                            <button id="addDivision" class="btn btn-default">
+                                Create new division
+                            </button>
                         </div>
-                        <div id="division-tree"></div>
+                        <div class="materialBox" id="division-tree"></div>
                         <div id="division-tree-loading" class="center-block heartbeat" />
                     </div>
                     <div class="col-sm-6">
-                        <h2 id="heading">
-                            <span id="initDivisionHeading">Division</span>
-                            <span id="newDivisionHeading">Create new division</span>
-                            <span id="oldDivisionHeading">Edit division </span><span id="oldDivisionHeadingName"></span></h2>
-                        <hr />
-                        <form id="divisionForm" method="post"
-                              data-bv-feedbackicons-valid="glyphicon glyphicon-ok"
-                              data-bv-feedbackicons-invalid="glyphicon glyphicon-remove"
-                              data-bv-feedbackicons-validating="glyphicon glyphicon-refresh">
+                        <div class="materialBox">
+                            <h2 id="heading">
+                                <span id="initDivisionHeading">Division</span>
+                                <span id="newDivisionHeading">Create new division</span>
+                                <span id="oldDivisionHeading">Edit division </span><span id="oldDivisionHeadingName"></span></h2>
+                            <hr />
+                            <form id="divisionForm" method="post"
+                                  data-bv-feedbackicons-valid="icon_check"
+                                  data-bv-feedbackicons-invalid="icon_error-triangle_alt"
+                                  data-bv-feedbackicons-validating="icon_loading">
 
-                            <input id="oldName" type="hidden" name="oldName" value="" />
+                                <input id="oldName" type="hidden" name="oldName" value="" />
 
-                            <div class="form-group">
-                                <label for="name">Division Name</label>
-                                <input disabled="disabled" id="name" type="text" class="form-control" name="name"
-                                       data-bv-notempty="true"
-                                       data-bv-notempty-message="The division name is required and cannot be empty"/>
-                            </div>
-                            <div class="form-group">
-                                <label for="description">Description</label>
-                                <input disabled="disabled" id="description" type="text" class="form-control" name="description" />
-                            </div>
-
-                            <div class="form-group">
-                                <label for="admin">Division Administrator</label>
-                                <input disabled="disabled" name="admin" id="admin" type="text" />
-                            </div>
-
-                            <hr/>
-                            <div id="submitGroup" class="form-group">
-                                <div id="divisionSubmitButton" class="col-sm-offset-3 col-sm-9 progress-button">
-                                    <button type="submit"><span>Save division</span></button>
-                                    <svg class="progress-circle" width="50" height="50">
-                                        <g transform="scale(0.71)">
-                                            <path d="m35,2.5c17.955803,0 32.5,14.544199 32.5,32.5c0,17.955803 -14.544197,32.5 -32.5,32.5c-17.955803,0 -32.5,-14.544197 -32.5,-32.5c0,-17.955801 14.544197,-32.5 32.5,-32.5z"/>
-                                        </g>
-                                    </svg>
-                                    <svg class="checkmark" width="50" height="50">
-                                        <g transform="scale(0.71)">
-                                            <path d="m31.5,46.5l15.3,-23.2"/>
-                                            <path d="m31.5,46.5l-8.5,-7.1"/>
-                                        </g>
-                                    </svg>
-                                    <svg class="cross" width="50" height="50">
-                                        <g transform="scale(0.71)">
-                                            <path d="m35,35l-9.3,-9.3"/>
-                                            <path d="m35,35l9.3,9.3"/>
-                                            <path d="m35,35l-9.3,9.3"/>
-                                            <path d="m35,35l9.3,-9.3"/>
-                                        </g>
-                                    </svg>
+                                <div class="form-group">
+                                    <label for="name">Division Name</label>
+                                    <input disabled="disabled" id="name" type="text" class="form-control" name="name"
+                                           data-bv-notempty="true"
+                                           data-bv-notempty-message="The division name is required and cannot be empty"/>
                                 </div>
-                                <div class="col-sm-9 col-sm-offset-3 progress-button progress-error-button" id="divisionDelete">
-                                    <button id="divisionDeleteButton"><span>Delete Division</span></button>
-                                    <svg class="progress-circle" width="50" height="50">
-                                        <g transform="scale(0.71)">
-                                            <path d="m35,2.5c17.955803,0 32.5,14.544199 32.5,32.5c0,17.955803 -14.544197,32.5 -32.5,32.5c-17.955803,0 -32.5,-14.544197 -32.5,-32.5c0,-17.955801 14.544197,-32.5 32.5,-32.5z"/>
-                                        </g>
-                                    </svg>
-                                    <svg class="checkmark" width="50" height="50">
-                                        <g transform="scale(0.71)">
-                                            <path d="m31.5,46.5l15.3,-23.2"/>
-                                            <path d="m31.5,46.5l-8.5,-7.1"/>
-                                        </g>
-                                    </svg>
-                                    <svg class="cross" width="50" height="50">
-                                        <g transform="scale(0.71)">
-                                            <path d="m35,35l-9.3,-9.3"/>
-                                            <path d="m35,35l9.3,9.3"/>
-                                            <path d="m35,35l-9.3,9.3"/>
-                                            <path d="m35,35l9.3,-9.3"/>
-                                        </g>
-                                    </svg>
+                                <div class="form-group">
+                                    <label for="description">Description</label>
+                                    <input disabled="disabled" id="description" type="text" class="form-control" name="description" />
                                 </div>
-                            </div>
-                        </form>
+
+                                <div class="form-group">
+                                    <label for="admin">Division Administrator</label>
+                                    <input disabled="disabled" name="admin" id="admin" type="text" />
+                                </div>
+
+                                <hr/>
+                                <div id="submitGroup" class="form-group">
+                                    <div id="divisionSubmitButton" class="progress-button">
+                                        <button type="submit"><span>Save division</span></button>
+                                        <svg class="progress-circle" width="50" height="50">
+                                            <g transform="scale(0.71)">
+                                                <path d="m35,2.5c17.955803,0 32.5,14.544199 32.5,32.5c0,17.955803 -14.544197,32.5 -32.5,32.5c-17.955803,0 -32.5,-14.544197 -32.5,-32.5c0,-17.955801 14.544197,-32.5 32.5,-32.5z"/>
+                                            </g>
+                                        </svg>
+                                        <svg class="checkmark" width="50" height="50">
+                                            <g transform="scale(0.71)">
+                                                <path d="m31.5,46.5l15.3,-23.2"/>
+                                                <path d="m31.5,46.5l-8.5,-7.1"/>
+                                            </g>
+                                        </svg>
+                                        <svg class="cross" width="50" height="50">
+                                            <g transform="scale(0.71)">
+                                                <path d="m35,35l-9.3,-9.3"/>
+                                                <path d="m35,35l9.3,9.3"/>
+                                                <path d="m35,35l-9.3,9.3"/>
+                                                <path d="m35,35l9.3,-9.3"/>
+                                            </g>
+                                        </svg>
+                                    </div>
+                                    <div class="progress-button progress-error-button" id="divisionDelete">
+                                        <button id="divisionDeleteButton"><span>Delete Division</span></button>
+                                        <svg class="progress-circle" width="50" height="50">
+                                            <g transform="scale(0.71)">
+                                                <path d="m35,2.5c17.955803,0 32.5,14.544199 32.5,32.5c0,17.955803 -14.544197,32.5 -32.5,32.5c-17.955803,0 -32.5,-14.544197 -32.5,-32.5c0,-17.955801 14.544197,-32.5 32.5,-32.5z"/>
+                                            </g>
+                                        </svg>
+                                        <svg class="checkmark" width="50" height="50">
+                                            <g transform="scale(0.71)">
+                                                <path d="m31.5,46.5l15.3,-23.2"/>
+                                                <path d="m31.5,46.5l-8.5,-7.1"/>
+                                            </g>
+                                        </svg>
+                                        <svg class="cross" width="50" height="50">
+                                            <g transform="scale(0.71)">
+                                                <path d="m35,35l-9.3,-9.3"/>
+                                                <path d="m35,35l9.3,9.3"/>
+                                                <path d="m35,35l-9.3,9.3"/>
+                                                <path d="m35,35l9.3,-9.3"/>
+                                            </g>
+                                        </svg>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </section>
             </div>

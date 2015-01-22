@@ -11,20 +11,23 @@
 		<link th:href="@{/resources/css/tabs.css}" href="../resources/css/tabs.css" rel="stylesheet" type="text/css" />
 		<link th:href="@{/resources/css/jquery-ui.min.css}" href="../resources/css/jquery-ui.min.css" rel="stylesheet" type="text/css" />
 		<link th:href="@{/resources/css/magic-bootstrap.css}" href="../resources/css/magic-bootstrap.css" rel="stylesheet" type="text/css" />
+		<link th:href="@{/resources/css/button.css}" href="../resources/css/button.css" rel="stylesheet" type="text/css" />
 		<link th:href="@{/resources/css/myVerein.css}" href="../resources/css/myVerein.css" rel="stylesheet" type="text/css" />
 		<link th:href="@{/resources/css/jqtree.css}" href="../resources/css/jqtree.css" rel="stylesheet" type="text/css" />
 		<link th:href="@{/resources/css/selectize-core.css}" href="../resources/css/selectize-core.css" rel="stylesheet" type="text/css" />
 		<link th:href="@{/resources/css/selectize-bootstrap.css}" href="../resources/css/selectize-bootstrap.css" rel="stylesheet" type="text/css" />
 		<link th:href="@{/resources/css/notification.css}" href="../resources/css/notification.css" rel="stylesheet" type="text/css" />
 		<link th:href="@{/resources/css/icons.css}" href="../resources/css/icons.css" rel="stylesheet" type="text/css" />
-		<link th:href="@{/resources/css/button.css}" href="../resources/css/button.css" rel="stylesheet" type="text/css" />
 		<link th:href="@{/resources/css/bootstrap-validator.css}" href="../resources/css/bootstrap-validator.css" rel="stylesheet" type="text/css" />
 		<link th:href="@{/resources/css/datepicker3.css}" href="../resources/css/datepicker3.css" rel="stylesheet" type="text/css" />
+		<link th:href="@{/resources/css/clndr.css}" href="../resources/css/clndr.css" rel="stylesheet" type="text/css" />
 
 		<script th:src="@{/resources/js/myVerein.base.js}" src="../resources/js/myVerein.base.js" type="application/javascript" />
 		<script th:src="@{/resources/js/myVerein.division.js}" src="../resources/js/myVerein.division.js" type="application/javascript" />
 		<script th:src="@{/resources/js/myVerein.user.js}" src="../resources/js/myVerein.user.js" type="application/javascript" />
 		<script th:src="@{/resources/js/myVerein.index.js}" src="../resources/js/myVerein.index.js" type="application/javascript" />
+		<script th:src="@{/resources/js/myVerein.event.js}" src="../resources/js/myVerein.event.js" type="application/javascript" />
+		<script th:src="@{/resources/js/event/clndr.js}" src="../resources/js/event/clndr.js" type="application/javascript" />
 
 	</head>
 
@@ -32,13 +35,15 @@
 		<div id="tabs" class="tabs tabs-style-underline">
 			<nav>
 				<ul>
-					<li id="userTab"><a href="#user"><span class="icon icon_profile"></span><span> User management</span></a></li>
-					<li id="divisionTab"><a href="#division"><span class="icon icon_group"></span><span> Division management</span></a></li>
+					<li id="userTab"><a href="#user"><span class="icon icon_id-2"></span><span> User management</span></a></li>
+					<li id="divisionTab"><a href="#division"><span class="icon icon_flowchart"></span><span> Division management</span></a></li>
+					<li id="eventTab"><a href="#event"><span class="icon icon_calendar"></span><span> Event management</span></a></li>
 				</ul>
 			</nav>
 			<div class="content-wrap">
 				<section th:include="user :: content" id="user"></section>
 				<section th:include="division :: content" id="division"></section>
+				<section th:include="event :: content" id="event"></section>
 			</div>
 		</div>
 	</body>

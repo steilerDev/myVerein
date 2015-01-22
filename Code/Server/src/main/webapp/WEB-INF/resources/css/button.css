@@ -20,8 +20,6 @@
 	background: transparent;
 	color: #13CD78;
 	letter-spacing: 1px;
-	/*font-size: 18px;*/
-	/*font-family: 'Montserrat', sans-serif;*/
 	-webkit-tap-highlight-color: transparent;
 	-webkit-transition: background-color 0.3s, color 0.3s, width 0.3s, border-width 0.3s, border-color 0.3s;
 	transition: background-color 0.3s, color 0.3s, width 0.3s, border-width 0.3s, border-color 0.3s;

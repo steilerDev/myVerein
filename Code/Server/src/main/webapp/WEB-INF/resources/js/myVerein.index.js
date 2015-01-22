@@ -15,6 +15,9 @@ $(document).ready(function() {
             } else if(currentTab.id == "divisionTab")
             {
                 loadDivisionPage();
+            } else if(currentTab.id == "eventTab")
+            {
+                loadEventPage();
             }
         }
     }

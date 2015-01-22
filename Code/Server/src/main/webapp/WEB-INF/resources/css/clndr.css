@@ -1,0 +1,191 @@
+
+.calendar {
+  overflow: visible;
+  -moz-box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+  -webkit-box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+  box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+  margin: 10px;
+}
+.calendar .clndr {
+  /*border-bottom: 7px solid #69a776;*/
+}
+.calendar .clndr .controls {
+  background-color: #00BC67;
+  color: white;
+}
+.calendar .clndr .controls .clndr-previous-button,
+.calendar .clndr .controls .clndr-next-button {
+  width: 15%;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  display: inline-block;
+  text-align: center;
+  cursor: pointer;
+  -webkit-user-select: none;
+  /* Chrome/Safari */
+  -moz-user-select: none;
+  /* Firefox */
+  -ms-user-select: none;
+  /* IE10+ */
+  -webkit-transition: background-color 0.5s;
+  -moz-transition: background-color 0.5s;
+  -ms-transition: background-color 0.5s;
+  -o-transition: background-color 0.5s;
+  transition: background-color 0.5s;
+}
+.calendar .clndr .controls .clndr-previous-button:hover,
+.calendar .clndr .controls .clndr-next-button:hover {
+  background-color: #00904F;
+}
+.calendar .clndr .controls .month {
+  width: 70%;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  display: inline-block;
+  text-align: center;
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+.calendar .clndr .days-container {
+  position: relative;
+  /*width: 294px;*/
+  /*height: 213px;*/
+  /*display: inline-block;*/
+}
+.calendar .clndr .days-container .days {
+  /*position: absolute;*/
+  left: 0;
+  /*width: 294px;*/
+  /*height: 217px;*/
+  -webkit-transition: left 0.5s;
+  -moz-transition: left 0.5s;
+  -ms-transition: left 0.5s;
+  -o-transition: left 0.5s;
+  transition: left 0.5s;
+  background-color: #ebebeb;
+}
+.calendar .clndr .days-container .days .day,
+.calendar .clndr .days-container .days .empty {
+  width: 42px;
+  display: inline-block;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  font-size: 12px;
+  text-align: center;
+  color: #212121;
+  border-right: 1px solid rgba(255, 255, 255, 0.5);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+}
+.calendar .clndr .days-container .days .day.event,
+.calendar .clndr .days-container .days .empty.event {
+  background-color: #d2d2d2;
+  -webkit-transition: background-color 0.5s;
+  -moz-transition: background-color 0.5s;
+  -ms-transition: background-color 0.5s;
+  -o-transition: background-color 0.5s;
+  transition: background-color 0.5s;
+  cursor: pointer;
+}
+.calendar .clndr .days-container .days .day.event:hover,
+.calendar .clndr .days-container .days .empty.event:hover {
+  background-color: #b8b8b8;
+}
+.calendar .clndr .days-container .days .day.adjacent-month,
+.calendar .clndr .days-container .days .empty.adjacent-month {
+  color: rgba(0, 0, 0, 0.3);
+}
+.calendar .clndr .days-container .days .empty {
+  height: 31px;
+  vertical-align: bottom;
+}
+.calendar .clndr .days-container .days .headers {
+  background-color: #13CD78;
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+.calendar .clndr .days-container .days .headers .day-header {
+  width: 42px;
+  display: inline-block;
+  text-align: center;
+  color: white;
+}
+.calendar .clndr .days-container .events {
+  /*position: absolute;*/
+  /*left: 294px;*/
+  /*width: 294px;*/
+  /*height: 217px;*/
+  -webkit-transition: left 0.5s;
+  -moz-transition: left 0.5s;
+  -ms-transition: left 0.5s;
+  -o-transition: left 0.5s;
+  transition: left 0.5s;
+  background-color: #ebebeb;
+}
+.calendar .clndr .days-container .events .headers {
+  position: relative;
+}
+.calendar .clndr .days-container .events .event-header {
+  width: 100%;
+  background-color: #13CD78;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  text-align: center;
+  color: white;
+}
+.calendar .clndr .days-container .events .x-button {
+  position: absolute;
+  font-size: 80%;
+  top: 7px;
+  left: 20px;
+  cursor: pointer;
+  -webkit-transition: color 0.25s;
+  -moz-transition: color 0.25s;
+  -ms-transition: color 0.25s;
+  -o-transition: color 0.25s;
+  transition: color 0.25s;
+}
+.calendar .clndr .days-container .events .x-button:hover {
+  color: white;
+}
+.calendar .clndr .days-container .events .events-list {
+  overflow: scroll;
+  height: 185px;
+}
+.calendar .clndr .days-container .events .events-list .event {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+  -webkit-transition: background-color 0.25s;
+  -moz-transition: background-color 0.25s;
+  -ms-transition: background-color 0.25s;
+  -o-transition: background-color 0.25s;
+  transition: background-color 0.25s;
+}
+.calendar .clndr .days-container .events .events-list .event:hover {
+  background-color: #f5f5f5;
+}
+.calendar .clndr .days-container .events .events-list .event a {
+  position: relative;
+  font-size: 12px;
+  letter-spacing: 1px;
+  background-color: transparent;
+  color: #212121;
+  text-decoration: none;
+  -webkit-transition: color 0.25s;
+  -moz-transition: color 0.25s;
+  -ms-transition: color 0.25s;
+  -o-transition: color 0.25s;
+  transition: color 0.25s;
+}
+.calendar .clndr .days-container .events .events-list .event a:hover {
+  background-color: transparent;
+  color: #13CD78;
+}
+.calendar .clndr .days-container.show-events .days {
+  /*left: -294px;*/
+}
+.calendar .clndr .days-container.show-events .events {
+  left: 0;
+}
