@@ -5,7 +5,18 @@
  * License    : GNU General Public License v2.0
  */
 
+//This variable is holding the language code for the current locale.
+var locale;
+
 $(document).ready(function() {
+    //Reading locale from cookie
+    locale = $.cookie('myVereinLocaleCookie');
+    if(!locale)
+    {
+        locale = "en";
+    }
+    moment.locale(locale);
+
     //Defining callbacks, as soon as the page is loaded.
     var tabOptions = {
         onShow: function(currentTab){
