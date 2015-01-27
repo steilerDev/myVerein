@@ -3,14 +3,15 @@
 	<Properties>
 		<Property name="third-party-log-level">info</Property>
 		<Property name="logFileName">myVerein</Property>
+		<Property name="logFileBaseDirectory">/var/log</Property>
 	</Properties>
 
 	<Appenders>
-		<Console name="Console" target="SYSTEM_OUT">
+		<Console name="console" target="SYSTEM_OUT">
 			<PatternLayout pattern="%d{HH:mm:ss} %-5p [%t] %c{1} - %m%n"/>
 		</Console>
 
-		<RollingFile name="file-log" fileName="${catalina.base}/logs/${logFileName}" filePattern="${catalina.base}/logs/${logFileName}-%d{yyyy-MM-dd}.log">
+		<RollingFile name="file-log" fileName="${logFileBaseDirectory}/${logFileName}.log" filePattern="${logFileBaseDirectory}/${logFileName}-%d{yyyy-MM-dd}.log">
 			<PatternLayout pattern="%d{HH:mm:ss} %-5p [%t] %c{1} - %m%n"/>
 			<Policies>
 				<TimeBasedTriggeringPolicy interval="1" modulate="true"/>
@@ -38,8 +39,8 @@
 		<Logger name="org.thymeleaf.TemplateEngine" level="${third-party-log-level}" />
 
 		<Root level="error">
-			<AppenderRef ref="Console"/>
-			<AppenderRef ref="file-log"/>
+			<AppenderRef ref="console"/>
+			<!--AppenderRef ref="file-log"/-->
 		</Root>
 	</Loggers>
 </Configuration>
