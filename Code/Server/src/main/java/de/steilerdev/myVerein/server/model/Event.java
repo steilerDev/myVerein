@@ -16,17 +16,23 @@
  */
 package de.steilerdev.myVerein.server.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import de.steilerdev.myVerein.server.controller.DivisionManagementController;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.DBRef;
-import org.springframework.format.annotation.DateTimeFormat;
 
-import javax.validation.constraints.Future;
 import javax.validation.constraints.NotNull;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+//Todo: Equals method
 
 public class Event
 {
@@ -37,30 +43,36 @@ public class Event
     private String name;
     private String description;
     private String location;
+    private double locationLat;
+    private double locationLog;
+
+    @NotNull
+    @JsonIgnore
+    private int startDateDayOfMonth, startDateMonth, startDateYear, startDateHour, startDateMinute;
+    @NotNull
+    @JsonIgnore
+    private int endDateDayOfMonth, endDateMonth,endDateYear, endDateHour, endDateMinute;
 
     @LastModifiedDate
     private Date lastChanged;
 
-    @NotNull
-    @Future
-    @DateTimeFormat(iso= DateTimeFormat.ISO.DATE)
-    private Date eventDate;
+    @Transient
+    private LocalDateTime startDateTime;
+    @Transient
+    private LocalDate startDate;
+
+    @Transient
+    private LocalDateTime endDateTime;
+    @Transient
+    private LocalDate endDate;
+
+    private boolean multiDate;
 
     @DBRef
     @NotEmpty
     private List<Division> invitedDivision;
 
     public Event() {}
-
-    public Event(String name, String description, String location, Date lastChanged, Date eventDate, List<Division> invitedDivision)
-    {
-        this.name = name;
-        this.description = description;
-        this.location = location;
-        this.lastChanged = lastChanged;
-        this.eventDate = eventDate;
-        this.invitedDivision = invitedDivision;
-    }
 
     public String getId()
     {
@@ -102,6 +114,136 @@ public class Event
         this.location = location;
     }
 
+    public double getLocationLat()
+    {
+        return locationLat;
+    }
+
+    public void setLocationLat(double locationLat)
+    {
+        this.locationLat = locationLat;
+    }
+
+    public double getLocationLog()
+    {
+        return locationLog;
+    }
+
+    public void setLocationLog(double locationLog)
+    {
+        this.locationLog = locationLog;
+    }
+
+    public int getStartDateDayOfMonth()
+    {
+        return startDateDayOfMonth;
+    }
+
+    public void setStartDateDayOfMonth(int startDateDayOfMonth)
+    {
+        this.startDateDayOfMonth = startDateDayOfMonth;
+        updateMultiDate();
+    }
+
+    public int getStartDateMonth()
+    {
+        return startDateMonth;
+    }
+
+    public void setStartDateMonth(int startDateMonth)
+    {
+        this.startDateMonth = startDateMonth;
+        updateMultiDate();
+    }
+
+    public int getStartDateYear()
+    {
+        return startDateYear;
+    }
+
+    public void setStartDateYear(int startDateYear)
+    {
+        this.startDateYear = startDateYear;
+        updateMultiDate();
+    }
+
+    public int getStartDateHour()
+    {
+        return startDateHour;
+    }
+
+    public void setStartDateHour(int startDateHour)
+    {
+        this.startDateHour = startDateHour;
+        updateMultiDate();
+    }
+
+    public int getStartDateMinute()
+    {
+        return startDateMinute;
+    }
+
+    public void setStartDateMinute(int startDateMinute)
+    {
+        this.startDateMinute = startDateMinute;
+        updateMultiDate();
+    }
+
+    public int getEndDateDayOfMonth()
+    {
+        return endDateDayOfMonth;
+    }
+
+    public void setEndDateDayOfMonth(int endDateDayOfMonth)
+    {
+        this.endDateDayOfMonth = endDateDayOfMonth;
+        updateMultiDate();
+    }
+
+    public int getEndDateMonth()
+    {
+        return endDateMonth;
+    }
+
+    public void setEndDateMonth(int endDateMonth)
+    {
+        this.endDateMonth = endDateMonth;
+        updateMultiDate();
+    }
+
+    public int getEndDateYear()
+    {
+        return endDateYear;
+    }
+
+    public void setEndDateYear(int endDateYear)
+    {
+        this.endDateYear = endDateYear;
+        updateMultiDate();
+    }
+
+    public int getEndDateHour()
+    {
+        return endDateHour;
+    }
+
+    public void setEndDateHour(int endDateHour)
+    {
+        this.endDateHour = endDateHour;
+        updateMultiDate();
+    }
+
+    public int getEndDateMinute()
+    {
+        return endDateMinute;
+    }
+
+    public void setEndDateMinute(int endDateMinute)
+    {
+        this.endDateMinute = endDateMinute;
+        updateMultiDate();
+    }
+
     public Date getLastChanged()
     {
         return lastChanged;
@@ -112,14 +254,44 @@ public class Event
         this.lastChanged = lastChanged;
     }
 
-    public Date getEventDate()
+    public LocalDateTime getStartDateTime()
     {
-        return eventDate;
+        startDateTime = LocalDateTime.of(startDateYear, startDateMonth, startDateDayOfMonth, startDateHour, startDateMinute);
+        return startDateTime;
     }
 
-    public void setEventDate(Date eventDate)
+    public void setStartDateTime(LocalDateTime startDateTime)
     {
-        this.eventDate = eventDate;
+        this.startDateTime = startDateTime;
+        if(startDateTime != null)
+        {
+            startDateYear = startDateTime.getYear();
+            startDateMonth = startDateTime.getMonthValue();
+            startDateDayOfMonth = startDateTime.getDayOfMonth();
+            startDateHour = startDateTime.getHour();
+            startDateMinute = startDateTime.getMinute();
+        }
+        updateMultiDate();
+    }
+
+    public LocalDateTime getEndDateTime()
+    {
+        endDateTime = LocalDateTime.of(endDateYear, endDateMonth, endDateDayOfMonth, endDateHour, endDateMinute);
+        return endDateTime;
+    }
+
+    public void setEndDateTime(LocalDateTime endDateTime)
+    {
+        this.endDateTime = endDateTime;
+        if(endDateTime != null)
+        {
+            endDateYear = endDateTime.getYear();
+            endDateMonth = endDateTime.getMonthValue();
+            endDateDayOfMonth = endDateTime.getDayOfMonth();
+            endDateHour = endDateTime.getHour();
+            endDateMinute = endDateTime.getMinute();
+        }
+        updateMultiDate();
     }
 
     public List<Division> getInvitedDivision()
@@ -127,8 +299,64 @@ public class Event
         return invitedDivision;
     }
 
+    /**
+     * The function is setting all invited divisions, but is optimizing the set by eliminating unnecessary divisions.
+     * @param invitedDivision
+     */
     public void setInvitedDivision(List<Division> invitedDivision)
     {
-        this.invitedDivision = invitedDivision;
+        if(invitedDivision != null)
+        {
+            this.invitedDivision = DivisionManagementController.getOptimizedSetOfDivisions(invitedDivision);
+        } else
+        {
+            this.invitedDivision = invitedDivision;
+        }
+    }
+
+    public void addDivision(Division division)
+    {
+        if(invitedDivision == null)
+        {
+            invitedDivision = new ArrayList<>();
+        }
+        invitedDivision.add(division);
+    }
+
+    public boolean isMultiDate()
+    {
+        return multiDate;
+    }
+
+    public void setMultiDate(boolean multiDate)
+    {
+        this.multiDate = multiDate;
+    }
+
+    public void updateMultiDate()
+    {
+        multiDate = (startDateDayOfMonth != endDateDayOfMonth) || (startDateMonth != endDateMonth) || (startDateYear != endDateYear);
+    }
+
+    public LocalDate getStartDate()
+    {
+        startDate = getStartDateTime().toLocalDate();
+        return startDate;
+    }
+
+    public void setStartDate(LocalDate startDate)
+    {
+        this.startDate = startDate;
+    }
+
+    public LocalDate getEndDate()
+    {
+        endDate = getEndDateTime().toLocalDate();
+        return endDate;
+    }
+
+    public void setEndDate(LocalDate endDate)
+    {
+        this.endDate = endDate;
     }
 }

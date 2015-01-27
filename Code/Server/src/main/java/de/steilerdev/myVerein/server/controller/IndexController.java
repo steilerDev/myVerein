@@ -1,9 +1,6 @@
 package de.steilerdev.myVerein.server.controller;
 
-import de.steilerdev.myVerein.server.model.Division;
-import de.steilerdev.myVerein.server.model.DivisionRepository;
-import de.steilerdev.myVerein.server.model.User;
-import de.steilerdev.myVerein.server.model.UserRepository;
+import de.steilerdev.myVerein.server.model.*;
 import de.steilerdev.myVerein.server.security.CurrentUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 /**
  * This controller is processing all general requests.
@@ -22,11 +20,17 @@ import java.time.LocalDate;
 @RequestMapping("/")
 public class IndexController
 {
+	//A global time zone variable,should be defined later using settings
+	public static final String timeZone = "";
+
 	@Autowired
 	private UserRepository userRepository;
 
 	@Autowired
 	private DivisionRepository divisionRepository;
+
+	@Autowired
+	private EventRepository eventRepository;
 
 	private static Logger logger = LoggerFactory.getLogger(IndexController.class);
 
@@ -58,6 +62,7 @@ public class IndexController
 		logger.debug("Deleting old database and reloading database example.");
 		userRepository.deleteAll();
 		divisionRepository.deleteAll();
+		eventRepository.deleteAll();
 
 		User user1 = new User("Frank", "Steiler", "frank@steiler.eu", "asdf");
 		user1.setBirthday(LocalDate.of(1994, 6, 28));
@@ -75,15 +80,16 @@ public class IndexController
 		user2.setPassiveSince(LocalDate.of(2000,6,1));
 		User user3 = new User("Peter", "Enis", "peter@enis.com", "asdf");
 		User user4 = new User("Luke", "Skywalker", "luke@skywalker.com", "asdf");
-		user4.addPrivateInformation("IBAN", "ABCDEFG");
-		user4.addPublicInformation("Gender", "Male");
+		user4.setGender(User.Gender.MALE);
 		User user5 = new User("Marty", "McFly", "marty@mcfly.com", "asdf");
+		User user6 = new User("Tammo", "Schwindt", "tammo@tammon.de", "asdf");
 
 		userRepository.save(user1);
 		userRepository.save(user2);
 		userRepository.save(user3);
 		userRepository.save(user4);
 		userRepository.save(user5);
+		userRepository.save(user6);
 
 		Division div1 = new Division("myVerein", null, user1, null);
 		Division div2 = new Division("Rugby", null, user2, div1);
@@ -109,5 +115,34 @@ public class IndexController
 		userRepository.save(user3);
 		userRepository.save(user4);
 		userRepository.save(user5);
+
+		Event event1 = new Event();
+		event1.setStartDateTime(LocalDateTime.of(2015, 1, 20, 13, 00));
+		event1.setEndDateTime(LocalDateTime.of(2015, 1, 20, 14, 00));
+		event1.setName("Super Event 1");
+		event1.addDivision(div2);
+
+		Event event2 = new Event();
+		event2.setStartDateTime(LocalDateTime.of(2015, 1, 20, 13, 00));
+		event2.setEndDateTime(LocalDateTime.of(2015, 1, 21, 13, 00));
+		event2.setName("Super Event 2");
+		event2.addDivision(div3);
+
+		Event event3 = new Event();
+		event3.setStartDateTime(LocalDateTime.of(2015, 1, 21, 13, 00));
+		event3.setEndDateTime(LocalDateTime.of(2015, 1, 21, 13, 05));
+		event3.setName("Super Event 3");
+		event3.addDivision(div1);
+
+		Event event4 = new Event();
+		event4.setStartDateTime(LocalDateTime.of(2015, 1, 11, 13, 00));
+		event4.setEndDateTime(LocalDateTime.of(2015, 1, 15, 13, 05));
+		event4.setName("Super Event 4");
+		event4.addDivision(div1);
+
+		eventRepository.save(event1);
+		eventRepository.save(event2);
+		eventRepository.save(event3);
+		eventRepository.save(event4);
 	}
 }

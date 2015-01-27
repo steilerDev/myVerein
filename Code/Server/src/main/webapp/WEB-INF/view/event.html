@@ -20,6 +20,7 @@
         <section th:fragment="content">
             <div class="col-sm-6">
                 <div id="calendar" class="calendar"></div>
+                <div id="event-calendar-loading" class="center-block" />
             </div>
             <div class="col-sm-6">
                 <div class="materialBox">
@@ -80,6 +81,8 @@
                         <div class="form-group">
                             <label for="location">Location</label>
                             <input id="location" type="text" class="form-control" name="location" placeholder="Enter the location of the event"/>
+                            <input id="locationLat" type="hidden" name="locationLat"/>
+                            <input id="locationLng" type="hidden" name="locationLng"/>
                         </div>
                         <div id="map" class="map"/>
 

@@ -312,7 +312,7 @@ function loadUserPage() {
             valueNames: ['firstName', 'lastName', 'email'],
             item: '<li class="list-item"><h3><span class="firstName"></span> <span class="lastName"></span></h3><p class="email"></p></li>',
             plugins: [ListFuzzySearch()]
-        }
+        };
 
         //Creating user list
         userList = new List('user-list', listOptions);

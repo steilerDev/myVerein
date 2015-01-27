@@ -44,11 +44,13 @@ var calendar,
                 '<div class="event-header">EVENTS</div>' +
             '</div>' +
             '<div class="events-list">' +
-                '<% _.each(eventsThisMonth, function(event) { %>' +
-                    '<div class="event">' +
-                        '<a href="<%= event.url %>"><%= moment(event.date).format(\'MMMM Do\') %>: <%= event.title %></a>' +
-                    '</div>' +
-                '<% }); %>' +
+                '<% _.each(eventsThisMonth, function(event) {' +
+                    'if(event.title != "pseudoEvent") { %>' +
+                        '<div class="event">' +
+                            '<a href="<%= event.url %>" class="events"><%= moment(event.date).format(\'MMMM Do\') %>: <%= event.title %></a>' +
+                        '</div>' +
+                    '<% }' +
+                '}); %>' +
             '</div>' +
         '</div>' +
     '</div>';
@@ -62,6 +64,8 @@ function resetEventForm(doNotHideDeleteButton) {
     $('#endDate').val('');
     $('#endTime').val('');
     $('#location').val('');
+    $('#locationLat').val('');
+    $('#locationLng').val('');
 
     //Reset divisions list
     $('#invitedDivisions')[0].selectize.clear();
@@ -105,68 +109,115 @@ function loadNewEvent(doNotHideDeleteButton) {
 
 //This function is called when either date is changed and sets the other date if it is not set yet.
 function updateDates() {
-    if($('#startDate').val() && !$('#endDate').val())
+    var startDate = $('#startDate'),
+        endDate = $('#endDate');
+    if(startDate.val() && !endDate.val())
     {
-        $('#endDate').val($('#startDate').val());
-    } else if(!$('#startDate').val() && $('#endDate').val())
+        $('#endDate').val(startDate.val());
+    } else if(!startDate.val() && endDate.val())
     {
-        $('#startDate').val($('#endDate').val());
+        startDate.val(endDate.val());
     }
 }
 
 //This function is called when either time is changed and sets the other time (one hour later/earlier) if it is not set yet. If the time set is at the date border, the time is copied.
 function updateTimes() {
-    var timesArray;
-    if($('#startTime').val() && !$('#endTime').val())
+    var timesArray,
+        startTime = $('#startTime'),
+        endTime = $('#endTime');
+    if(startTime.val() && !endTime.val())
     {
-        timesArray = $('#startTime').val().trim().split(":");
+        timesArray = startTime.val().trim().split(":");
         if(timesArray[0].indexOf('24') == 0)
         {
-            $('#endTime').val($('#startTime').val());
+            endTime.val(startTime.val());
         } else
         {
-            $('#endTime').val((parseInt(timesArray[0]) + 1) + ":" + timesArray[1]);
+            endTime.val((parseInt(timesArray[0]) + 1) + ":" + timesArray[1]);
         }
-    } else if(!$('#startTime').val() && $('#endTime').val())
+    } else if(!startTime.val() && endTime.val())
     {
-        timesArray = $('#endTime').val().trim().split(":");
+        timesArray = endTime.val().trim().split(":");
         if(timesArray[0].indexOf('0') == 0)
         {
-            $('#startTime').val($('#endTime').val());
+            startTime.val(endTime.val());
         } else
         {
-            $('#startTime').val((parseInt(timesArray[0]) - 1) + ":" + timesArray[1]);
+            startTime.val((parseInt(timesArray[0]) - 1) + ":" + timesArray[1]);
         }
     }
 }
 
+//Loads the occupied dates of a month, date needs to be a date object in UTC, if not it is converted, whose month and year are significant for the request.
+function loadOccupiedDates(date)
+{
+    if(!date._isUTC) {
+        date.add(date.utcOffset(), 'm');
+    }
+    $("#event-calendar-loading").addClass('heartbeat');
+    $.getJSON("/event/getEventsOfMonth",
+        {
+            'month': date._d.getMonth() + 1, //Month is starting at 0
+            'year': date._d.getFullYear()
+        } ,
+        function (data) {
+            if(data && data.length) {
+                var events = [];
+                $.each(data, function (index, object) {
+                    events.push({
+                        date: object.year + '-' + (object.monthValue < 10 ? "0" : "") + object.monthValue + '-' + (object.dayOfMonth < 10 ? "0" : "") + object.dayOfMonth,
+                        title: 'pseudoEvent'
+                    })
+                });
+                calendar.setEvents(events);
+            }
+            $("#event-calendar-loading").removeClass('heartbeat');
+        }
+    );
+}
+
+function loadDate(dateString)
+{
+    $("#event-calendar-loading").addClass('heartbeat');
+    $.getJSON("/event/getEventsOfDate",
+        {
+            'date': dateString
+        },
+        function (data) {
+            console.log(data);
+            if(data && data.length) {
+                var events = [];
+                $.each(data, function (index, object) {
+                    events.push({
+                        date: dateString,
+                        title: object.name
+                    })
+                });
+                calendar.addEvents(events);
+            }
+            $("#event-calendar-loading").removeClass('heartbeat');
+        }
+    );
+}
+
 function loadEventPage() {
-    // assuming you've got the appropriate language files,
-    // clndr will respect whatever moment's language is set to.
-    // moment.locale('ru');
+
     if(!calendar) {
-        // here's some magic to make sure the dates are happening this month.
-        var thisMonth = moment().format('YYYY-MM');
-
-        var eventArray = [
-            {startDate: thisMonth + '-10', endDate: thisMonth + '-14', title: 'Multi-Day Event'},
-            {startDate: thisMonth + '-21', endDate: thisMonth + '-23', title: 'Another Multi-Day Event'},
-            {date: thisMonth + '-27', title: 'Single Day Event'}
-        ];
-
-        // the order of the click handlers is predictable.
-        // direct click action callbacks come first: click, nextMonth, previousMonth, nextYear, previousYear, or today.
-        // then onMonthChange (if the month changed).
-        // finally onYearChange (if the year changed).
         calendar = $('#calendar').clndr({
             template: myVereinCLNDR,
-            events: eventArray,
             clickEvents: {
-                click: function (target) {
+                click: function (target) { //Every time the user clicks on a occupied date, the events of the date need to be loaded
                     if (target.events.length) {
-                        console.log(target);
+                        loadDate(target.date._i);
                     }
+                },
+                onMonthChange: function(month) { //Every time the month is changed, the occupied dates need to be gathered
+                    loadOccupiedDates(month);
+                    resetEventForm();
                 }
+            },
+            ready: function() { //Initially the current month needs to be loaded
+                loadOccupiedDates(this.month)
             },
             adjacentDaysChangeMonth: true,
             forceSixRows: true
@@ -187,18 +238,20 @@ function loadEventPage() {
 
     if(!($('#startTime').data().timepicker || $('#endTime').data().timepicker))
     {
-        var timepickerOptions = {
-            minuteStep: 5,
-            defaultTime: false,
-            showMeridian: false
-        }
-        $('.eventTimePicker').timepicker(timepickerOptions);
+        var eventTimePicker = $('.eventTimePicker'),
+            timepickerOptions = {
+                minuteStep: 5,
+                defaultTime: false,
+                showMeridian: false
+            };
 
-        $('.eventTimePicker').timepicker().on('hide.timepicker', function(e) {
+        eventTimePicker.timepicker(timepickerOptions);
+
+        eventTimePicker.timepicker().on('hide.timepicker', function(e) {
             updateTimes();
         });
 
-        $('.eventTimePicker').focusout(function(e){
+        eventTimePicker.focusout(function(e){
             updateTimes();
         })
     }
@@ -206,14 +259,16 @@ function loadEventPage() {
 
     if(!($('#startDate').data().datepicker || $('#endDate').data().datepicker)) {
         //Enable Datepicker
-        var datepickerOptions = {
+        var eventDatePicker = $('.eventDatePicker'),
+            datepickerOptions = {
             format: "dd/mm/yyyy",
             language: locale,
             todayHighlight: true
         };
-        $('.eventDatePicker').datepicker(datepickerOptions);
 
-        $('.eventDatePicker').focusout(function(e){
+        eventDatePicker.datepicker(datepickerOptions);
+
+        eventDatePicker.focusout(function(e){
             updateDates();
         });
     }
@@ -241,6 +296,8 @@ function loadEventPage() {
                                 lat: latlng.lat(),
                                 lng: latlng.lng()
                             });
+                            $('#locationLat').val(latlng.lat());
+                            $('#locationLng').val(latlng.lng());
                             // k is lat, D is lng
                             //console.log(map.markers[0].position);
                         }
@@ -338,7 +395,7 @@ function loadEventPage() {
         })
     }
 
-    $('')
+    //$('.events').click(function(e);
 
     loadNewEvent();
 }

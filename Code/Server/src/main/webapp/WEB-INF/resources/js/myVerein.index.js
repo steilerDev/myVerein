@@ -13,11 +13,12 @@ $(document).ready(function() {
     locale = $.cookie('myVereinLocaleCookie');
     if(!locale)
     {
+        //Default locale is english
         locale = "en";
     }
     moment.locale(locale);
 
-    //Defining callbacks, as soon as the page is loaded.
+    //Defining callbacks, for each tab.
     var tabOptions = {
         onShow: function(currentTab){
             if(currentTab.id == "userTab")

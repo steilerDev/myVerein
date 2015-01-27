@@ -386,12 +386,23 @@ public class DivisionManagementController
         } else
         {
             //Reducing the list to the divisions that are on the top of the tree, removing all unnecessary divisions.
-            reducedDivisions = administratedDivisions.stream() //Creating a stream of all divisions
-                    .filter(division -> administratedDivisions.stream() //filtering all divisions that are already defined in a divisions that is closer to the root of the tree
-                            .noneMatch(allDivisions -> division.getAncestors().contains(allDivisions))) //Checking, if there is any division in the list, that is an ancestor of the current division. If there is a match there exists a closer division.
-                    .collect(Collectors.toList()); // Converting the stream to a list
+            reducedDivisions = getOptimizedSetOfDivisions(administratedDivisions);
         }
         return reducedDivisions;
+    }
+
+    /**
+     * This function is using a set of divisions, and reduces it to the divisions closest to the root
+     * @param unoptimizedSetOfDivisions
+     * @return
+     */
+    public static List<Division> getOptimizedSetOfDivisions(List<Division> unoptimizedSetOfDivisions)
+    {
+        //Reducing the list to the divisions that are on the top of the tree, removing all unnecessary divisions.
+        return unoptimizedSetOfDivisions.stream() //Creating a stream of all divisions
+                .filter(division -> unoptimizedSetOfDivisions.stream() //filtering all divisions that are already defined in a divisions that is closer to the root of the tree
+                        .noneMatch(allDivisions -> division.getAncestors().contains(allDivisions))) //Checking, if there is any division in the list, that is an ancestor of the current division. If there is a match there exists a closer division.
+                .collect(Collectors.toList()); // Converting the stream to a list
     }
 
     /**
