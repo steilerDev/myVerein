@@ -16,9 +16,7 @@
  */
 package de.steilerdev.myVerein.server.controller;
 
-import de.steilerdev.myVerein.server.model.Event;
-import de.steilerdev.myVerein.server.model.EventRepository;
-import de.steilerdev.myVerein.server.model.User;
+import de.steilerdev.myVerein.server.model.*;
 import de.steilerdev.myVerein.server.security.CurrentUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +29,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.validation.ConstraintViolationException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
@@ -49,17 +49,10 @@ public class EventManagementController
     @Autowired
     EventRepository eventRepository;
 
-    private static Logger logger = LoggerFactory.getLogger(DivisionManagementController.class);
+    @Autowired
+    DivisionRepository divisionRepository;
 
-    @RequestMapping(method = RequestMethod.POST)
-    public @ResponseBody ResponseEntity<String> saveEvent(@RequestParam String name,
-                                        @RequestParam String oldName,
-                                        @RequestParam String description,
-                                        @RequestParam String admin,
-                                        @CurrentUser User currentUser)
-    {
-        return new ResponseEntity<>("No", HttpStatus.BAD_REQUEST);
-    }
+    private static Logger logger = LoggerFactory.getLogger(DivisionManagementController.class);
 
     /**
      * This function gathers all dates where an event takes place within a specific month and year.
@@ -105,7 +98,7 @@ public class EventManagementController
 
     /**
      * Returns all events, that are taking place on a specified date. The date needs to be formatted according to the following pattern: YYYY/MM/DD
-     * @param dateString The selected date
+     * @param date The selected date
      * @return A list of events meeting the stated requirements.
      */
     @RequestMapping(value = "getEventsOfDate", produces = "application/json")
@@ -117,6 +110,7 @@ public class EventManagementController
         try
         {
             dateObject = LocalDate.parse(date, DateTimeFormatter.ISO_LOCAL_DATE);
+            logger.debug("Converted to date object: " + dateObject.toString());
         } catch (DateTimeParseException e)
         {
             logger.warn("Unable to parse date: " + date + ": " + e.toString());
@@ -129,9 +123,183 @@ public class EventManagementController
         eventsOfDay.addAll(Stream.concat(eventRepository.findEventsByStartDateMonthAndStartDateYearAndMultiDate(dateObject.getMonthValue(), dateObject.getYear(), true).stream(), //All multi date events starting within the month
                 eventRepository.findEventsByEndDateMonthAndEndDateYearAndMultiDate(dateObject.getMonthValue(), dateObject.getYear(), true).stream()) //All multi date events ending within the month
                 .distinct() //Removing all duplicated events
-                .filter(event -> event.getStartDate().isEqual(dateObject) || event.getEndDate().isEqual(dateObject) || (event.getEndDate().isBefore(dateObject) && event.getStartDate().isAfter(dateObject))) //Filter all multi date events that do not span over the date
+                .filter(event -> event.getStartDate().isEqual(dateObject) || event.getEndDate().isEqual(dateObject) || (event.getEndDate().isAfter(dateObject) && event.getStartDate().isBefore(dateObject))) //Filter all multi date events that do not span over the date
                 .collect(Collectors.toList()));
+
+        eventsOfDay.stream().forEach(event -> {
+            event.setInvitedDivision(null);
+            event.setLocation(null);
+            event.setDescription(null);
+            event.setEventAdmin(null);
+        });
+
         logger.debug("Returning " + eventsOfDay.size() + " events.");
         return eventsOfDay;
+    }
+
+    /**
+     * Returns a specific event based on its id.
+     * @param id The id of the selected event
+     * @return The event.
+     */
+    @RequestMapping(value = "getEvent", produces = "application/json")
+    public @ResponseBody Event getEvent(@RequestParam String id, @CurrentUser User currentUser)
+    {
+        if(id.isEmpty())
+        {
+            logger.warn("The ID can not be empty.");
+            return null;
+        } else
+        {
+            Event selectedEvent = eventRepository.findEventById(id);
+            if (selectedEvent == null)
+            {
+                logger.warn("Unable to load specified element.");
+                return null;
+            } else
+            {
+                if (!(selectedEvent.getEventAdmin().equals(currentUser) || currentUser.getAuthorities().parallelStream().anyMatch(authority -> authority.getAuthority().equals("ROLE_SUPERADMIN"))))
+                {
+                    selectedEvent.setAdministrationNotAllowedMessage("You are not allowed to modify this event, since you did not create it.");
+                }
+
+                //Preventing data loop
+                if(selectedEvent.getInvitedDivision() != null)
+                {
+                    selectedEvent.getInvitedDivision().parallelStream().forEach(division -> division.setAdminUser(null));
+                }
+                if(selectedEvent.getEventAdmin().getDivisions() != null)
+                {
+                    selectedEvent.getEventAdmin().getDivisions().parallelStream().forEach(division -> division.setAdminUser(null));
+                }
+                return selectedEvent;
+            }
+        }
+    }
+
+    /**
+     * Saves an event
+     */
+    @RequestMapping(method = RequestMethod.POST)
+    public @ResponseBody ResponseEntity<String> saveEvent(@RequestParam String eventFlag,
+                                                          @RequestParam String eventName,
+                                                          @RequestParam String eventDescription,
+                                                          @RequestParam String startDate,
+                                                          @RequestParam String startTime,
+                                                          @RequestParam String endDate,
+                                                          @RequestParam String endTime,
+                                                          @RequestParam String location,
+                                                          @RequestParam String locationLat,
+                                                          @RequestParam String locationLng,
+                                                          @RequestParam String invitedDivisions,
+                                                          @CurrentUser User currentUser)
+    {
+        Event oldEvent = null,
+              currentEvent;
+        if(eventFlag.isEmpty())
+        {
+            logger.warn("The event flag is not allowed to be empty.");
+            return new ResponseEntity<>("The event flag is not allowed to be empty", HttpStatus.BAD_REQUEST);
+        } else if(eventFlag.equals("true"))
+        {
+            logger.debug("A new event is created.");
+            currentEvent = new Event();
+        } else
+        {
+            logger.debug("An existing event is altered.");
+            oldEvent = currentEvent = eventRepository.findEventById(eventFlag);
+            if(oldEvent == null)
+            {
+                logger.warn("Unable to find the specified event with id " + eventFlag);
+                return new ResponseEntity<>("Unable to find the specified event", HttpStatus.BAD_REQUEST);
+            } else if(oldEvent.getEventAdmin().equals(currentUser))
+            {
+                logger.warn("The current user " + currentUser.getEmail() + " is not allowed to alter the selected event " + eventFlag);
+                return new ResponseEntity<>("You are not allowed to edit the selected event", HttpStatus.FORBIDDEN);
+            }
+        }
+
+        currentEvent.setName(eventName);
+        currentEvent.setDescription(eventDescription);
+
+        if(startDate.isEmpty() || startTime.isEmpty() || endDate.isEmpty() || endTime.isEmpty())
+        {
+            logger.warn("The date and times defining the event are not allowed to be empty.");
+            return new ResponseEntity<>("The date and times defining the event are not allowed to be empty", HttpStatus.BAD_REQUEST);
+        } else
+        {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/MM/y'T'H:m");
+            try
+            {
+                currentEvent.setStartDateTime(LocalDateTime.parse(startDate + "T" + startTime, formatter));
+            } catch (DateTimeParseException e)
+            {
+                logger.warn("Unrecognized date format " + startDate + "T" + startTime);
+                return new ResponseEntity<>("Unrecognized date or time format within start time", HttpStatus.BAD_REQUEST);
+            }
+
+            try
+            {
+                currentEvent.setEndDateTime(LocalDateTime.parse(endDate + "T" + endTime, formatter));
+            } catch (DateTimeParseException e)
+            {
+                logger.warn("Unrecognized date format " + endDate + "T" + endTime);
+                return new ResponseEntity<>("Unrecognized date or time format within end time", HttpStatus.BAD_REQUEST);
+            }
+        }
+
+        currentEvent.setLocation(location);
+
+        try
+        {
+            currentEvent.setLocationLat(Double.parseDouble(locationLat));
+        } catch (NumberFormatException e)
+        {
+            logger.warn("Unable to paste lat " + locationLat);
+            return new ResponseEntity<>("Unable to parse latitude coordinate", HttpStatus.BAD_REQUEST);
+        }
+
+        try
+        {
+            currentEvent.setLocationLng(Double.parseDouble(locationLng));
+        } catch (NumberFormatException e)
+        {
+            logger.warn("Unable to paste lng " + locationLng);
+            return new ResponseEntity<>("Unable to parse longitude coordinate", HttpStatus.BAD_REQUEST);
+        }
+
+        if (!invitedDivisions.isEmpty())
+        {
+            String[] divArray = invitedDivisions.split(",");
+            for (String division : divArray)
+            {
+                Division div = divisionRepository.findByName(division);
+                if (div == null)
+                {
+                    logger.warn("Unrecognized division (" + div + ")");
+                    return new ResponseEntity<>("Division " + div + " does not exist", HttpStatus.BAD_REQUEST);
+                }
+                currentEvent.addDivision(div);
+            }
+        }
+
+        currentEvent.setEventAdmin(currentUser);
+        currentEvent.setLastChanged(LocalDateTime.now());
+        currentEvent.updateMultiDate();
+        currentEvent.optimizeInvitedDivisionSet();
+
+        try
+        {
+            eventRepository.save(currentEvent);
+            if(oldEvent != null)
+            {
+                eventRepository.delete(oldEvent);
+            }
+        } catch (ConstraintViolationException e)
+        {
+            logger.warn("A database constraint was violated while saving the event " + eventFlag);
+            return new ResponseEntity<>("A database constraint was violated while saving the event.", HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>("Successfully saved the event", HttpStatus.OK);
     }
 }

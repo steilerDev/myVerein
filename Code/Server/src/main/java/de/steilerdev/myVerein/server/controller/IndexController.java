@@ -121,24 +121,32 @@ public class IndexController
 		event1.setEndDateTime(LocalDateTime.of(2015, 1, 20, 14, 00));
 		event1.setName("Super Event 1");
 		event1.addDivision(div2);
+		event1.setEventAdmin(user1);
+		event1.updateMultiDate();
 
 		Event event2 = new Event();
 		event2.setStartDateTime(LocalDateTime.of(2015, 1, 20, 13, 00));
 		event2.setEndDateTime(LocalDateTime.of(2015, 1, 21, 13, 00));
 		event2.setName("Super Event 2");
 		event2.addDivision(div3);
+		event2.setEventAdmin(user4);
+		event2.updateMultiDate();
 
 		Event event3 = new Event();
 		event3.setStartDateTime(LocalDateTime.of(2015, 1, 21, 13, 00));
 		event3.setEndDateTime(LocalDateTime.of(2015, 1, 21, 13, 05));
 		event3.setName("Super Event 3");
 		event3.addDivision(div1);
+		event3.setEventAdmin(user1);
+		event3.updateMultiDate();
 
 		Event event4 = new Event();
 		event4.setStartDateTime(LocalDateTime.of(2015, 1, 11, 13, 00));
 		event4.setEndDateTime(LocalDateTime.of(2015, 1, 15, 13, 05));
 		event4.setName("Super Event 4");
 		event4.addDivision(div1);
+		event4.setEventAdmin(user2);
+		event4.updateMultiDate();
 
 		eventRepository.save(event1);
 		eventRepository.save(event2);

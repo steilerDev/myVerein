@@ -124,13 +124,15 @@ function resetUserForm(doNotHideDeleteButton) {
 
 //Disabling the user form, if a user is not allowed to manipulate the user
 function disableUserForm(){
-    userSubmitButton.disable();
+    $('#userDelete').addClass('hidden');
     $("#userForm :input").prop("disabled", true);
     $('#divisions')[0].selectize.disable();
+    userSubmitButton.disable();
 }
 
 //Loading a user's information into the form
 function loadUser(email) {
+    userSubmitButton.startAnimation();
     //Sending JSON request with the email as parameter to get the user details
     $.getJSON("/user/getUser", {email: email}, function(user) {
         resetUserForm();
@@ -195,6 +197,8 @@ function loadUser(email) {
             $('#zip').val(user.zipCode);
             $('#city').val(user.city);
 
+            $('#userDelete').removeClass('hidden');
+
             if(user.birthday)
             {
                 //Parsing date from response
@@ -244,11 +248,12 @@ function loadUser(email) {
         }
 
         //Show important fields
-        $('#userDelete').removeClass('hidden');
         $('#oldUserHeading').removeClass("hidden");
         $('#oldUserHeadingName').text('<' + user.email + '>');
         $('#oldUserButton').removeClass('hidden');
         $('#userFlag').val(user.email);
+
+        userSubmitButton.stopAnimation(1, user.administrationNotAllowedMessage);
     });
 }
 
@@ -321,9 +326,7 @@ function loadUserPage() {
         userList.on("updated", function () {
             $("li.list-item").click(function (e) {
                 //Get the email as identification of the selected user and loading the user into the form
-                userSubmitButton.startAnimation();
                 loadUser($(this).children(".email").text());
-                userSubmitButton.stopAnimation(1);
             });
         });
     }

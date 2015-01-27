@@ -206,7 +206,7 @@ public class User implements UserDetails
 
     public void setFirstName(String firstName)
     {
-        this.firstName = firstName.isEmpty() ? null : firstName;
+        this.firstName = firstName != null && !firstName.isEmpty() ? firstName : null;
     }
 
     public String getLastName()
@@ -216,7 +216,7 @@ public class User implements UserDetails
 
     public void setLastName(String lastName)
     {
-        this.lastName = lastName.isEmpty() ? null : lastName;
+        this.lastName = lastName != null && !lastName.isEmpty() ? lastName : null;
     }
 
     public String getEmail()
@@ -226,7 +226,7 @@ public class User implements UserDetails
 
     public void setEmail(String email)
     {
-        this.email = email.isEmpty() ? null : email;
+        this.email = email != null && !email.isEmpty() ? email : null;
     }
 
     public String getPassword()
@@ -385,7 +385,7 @@ public class User implements UserDetails
 
     public void setZipCode(String zipCode)
     {
-        this.zipCode = zipCode.isEmpty() ? null : zipCode;
+        this.zipCode = zipCode != null && !zipCode.isEmpty() ? zipCode : null;
     }
 
     public String getCity()
@@ -395,7 +395,7 @@ public class User implements UserDetails
 
     public void setCity(String city)
     {
-        this.city = city.isEmpty() ? null : city;
+        this.city = city != null && !city.isEmpty() ? city : null;
     }
 
     public String getCountry()
@@ -405,7 +405,7 @@ public class User implements UserDetails
 
     public void setCountry(String country)
     {
-        this.country = country.isEmpty() ? null : country;
+        this.country = country != null && !country.isEmpty() ? country : null;
     }
 
     public String getStreet()
@@ -415,7 +415,7 @@ public class User implements UserDetails
 
     public void setStreet(String street)
     {
-        this.street = street.isEmpty() ? null : street;
+        this.street = street != null && !street.isEmpty() ? street : null;
     }
 
     public String getStreetNumber()
@@ -435,7 +435,7 @@ public class User implements UserDetails
 
     public void setIban(String iban)
     {
-        this.iban = iban.isEmpty() ? null : iban;
+        this.iban = iban != null && !iban.isEmpty() ? iban : null;
     }
 
     public String getBic()
@@ -445,7 +445,7 @@ public class User implements UserDetails
 
     public void setBic(String bic)
     {
-        this.bic = bic.isEmpty() ? null : bic;
+        this.bic = bic != null && !bic.isEmpty() ? bic : null;
     }
 
     public MembershipStatus getMembershipStatus()
@@ -532,5 +532,17 @@ public class User implements UserDetails
 
         membershipStatus = null;
         administrationNotAllowedMessage = null;
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        return obj != null && obj instanceof User && this.email != null && this.email.equals(((User) obj).getEmail());
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return email != null? 0: email.hashCode();
     }
 }

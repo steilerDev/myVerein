@@ -28,6 +28,8 @@ public interface EventRepository extends MongoRepository<Event, String> {
     public List<Event> findEventsByEndDateMonthAndEndDateYearAndMultiDate(int endDateMonth, int endDateYear, boolean multiDate);
 
     public List<Event> findEventsByStartDateDayOfMonthAndStartDateMonthAndStartDateYearAndMultiDate(int startDateDayOfMonth, int startDateMonth, int startDateYear, boolean multiDate);
+
+    public Event findEventById(String id);
 //    public List<Event> findEventsByStartDateDateAndStartDateMonthAndStartDateYear(int startDateDate, int startDateMonth, int startDateYear);
 //    public List<Event> findEvents
 }

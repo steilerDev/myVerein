@@ -17,11 +17,11 @@
 package de.steilerdev.myVerein.server.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import de.steilerdev.myVerein.server.controller.DivisionManagementController;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 
@@ -29,7 +29,6 @@ import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 //Todo: Equals method
@@ -37,14 +36,19 @@ import java.util.List;
 public class Event
 {
     @Id
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String id;
 
     @NotBlank
     private String name;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String description;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String location;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private double locationLat;
-    private double locationLog;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private double locationLng;
 
     @NotNull
     @JsonIgnore
@@ -53,24 +57,38 @@ public class Event
     @JsonIgnore
     private int endDateDayOfMonth, endDateMonth,endDateYear, endDateHour, endDateMinute;
 
-    @LastModifiedDate
-    private Date lastChanged;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private LocalDateTime lastChanged = LocalDateTime.now();
 
     @Transient
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private LocalDateTime startDateTime;
     @Transient
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private LocalDate startDate;
 
     @Transient
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private LocalDateTime endDateTime;
     @Transient
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private LocalDate endDate;
 
     private boolean multiDate;
 
+    @Transient
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private String administrationNotAllowedMessage;
+
     @DBRef
     @NotEmpty
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<Division> invitedDivision;
+
+    @DBRef
+    @NotNull
+    private User eventAdmin;
 
     public Event() {}
 
@@ -101,7 +119,7 @@ public class Event
 
     public void setDescription(String description)
     {
-        this.description = description;
+        this.description = description != null && !description.isEmpty()? description: null;
     }
 
     public String getLocation()
@@ -111,7 +129,7 @@ public class Event
 
     public void setLocation(String location)
     {
-        this.location = location;
+        this.location = location != null && !location.isEmpty()? location: null;
     }
 
     public double getLocationLat()
@@ -124,14 +142,14 @@ public class Event
         this.locationLat = locationLat;
     }
 
-    public double getLocationLog()
+    public double getLocationLng()
     {
-        return locationLog;
+        return locationLng;
     }
 
-    public void setLocationLog(double locationLog)
+    public void setLocationLng(double locationLng)
     {
-        this.locationLog = locationLog;
+        this.locationLng = locationLng;
     }
 
     public int getStartDateDayOfMonth()
@@ -142,7 +160,6 @@ public class Event
     public void setStartDateDayOfMonth(int startDateDayOfMonth)
     {
         this.startDateDayOfMonth = startDateDayOfMonth;
-        updateMultiDate();
     }
 
     public int getStartDateMonth()
@@ -153,7 +170,6 @@ public class Event
     public void setStartDateMonth(int startDateMonth)
     {
         this.startDateMonth = startDateMonth;
-        updateMultiDate();
     }
 
     public int getStartDateYear()
@@ -164,7 +180,6 @@ public class Event
     public void setStartDateYear(int startDateYear)
     {
         this.startDateYear = startDateYear;
-        updateMultiDate();
     }
 
     public int getStartDateHour()
@@ -175,7 +190,6 @@ public class Event
     public void setStartDateHour(int startDateHour)
     {
         this.startDateHour = startDateHour;
-        updateMultiDate();
     }
 
     public int getStartDateMinute()
@@ -186,7 +200,6 @@ public class Event
     public void setStartDateMinute(int startDateMinute)
     {
         this.startDateMinute = startDateMinute;
-        updateMultiDate();
     }
 
     public int getEndDateDayOfMonth()
@@ -197,7 +210,6 @@ public class Event
     public void setEndDateDayOfMonth(int endDateDayOfMonth)
     {
         this.endDateDayOfMonth = endDateDayOfMonth;
-        updateMultiDate();
     }
 
     public int getEndDateMonth()
@@ -208,7 +220,6 @@ public class Event
     public void setEndDateMonth(int endDateMonth)
     {
         this.endDateMonth = endDateMonth;
-        updateMultiDate();
     }
 
     public int getEndDateYear()
@@ -219,7 +230,6 @@ public class Event
     public void setEndDateYear(int endDateYear)
     {
         this.endDateYear = endDateYear;
-        updateMultiDate();
     }
 
     public int getEndDateHour()
@@ -230,7 +240,6 @@ public class Event
     public void setEndDateHour(int endDateHour)
     {
         this.endDateHour = endDateHour;
-        updateMultiDate();
     }
 
     public int getEndDateMinute()
@@ -241,15 +250,14 @@ public class Event
     public void setEndDateMinute(int endDateMinute)
     {
         this.endDateMinute = endDateMinute;
-        updateMultiDate();
     }
 
-    public Date getLastChanged()
+    public LocalDateTime getLastChanged()
     {
         return lastChanged;
     }
 
-    public void setLastChanged(Date lastChanged)
+    public void setLastChanged(LocalDateTime lastChanged)
     {
         this.lastChanged = lastChanged;
     }
@@ -271,7 +279,6 @@ public class Event
             startDateHour = startDateTime.getHour();
             startDateMinute = startDateTime.getMinute();
         }
-        updateMultiDate();
     }
 
     public LocalDateTime getEndDateTime()
@@ -291,7 +298,6 @@ public class Event
             endDateHour = endDateTime.getHour();
             endDateMinute = endDateTime.getMinute();
         }
-        updateMultiDate();
     }
 
     public List<Division> getInvitedDivision()
@@ -305,13 +311,7 @@ public class Event
      */
     public void setInvitedDivision(List<Division> invitedDivision)
     {
-        if(invitedDivision != null)
-        {
-            this.invitedDivision = DivisionManagementController.getOptimizedSetOfDivisions(invitedDivision);
-        } else
-        {
-            this.invitedDivision = invitedDivision;
-        }
+        this.invitedDivision = invitedDivision;
     }
 
     public void addDivision(Division division)
@@ -333,6 +333,9 @@ public class Event
         this.multiDate = multiDate;
     }
 
+    /**
+     * This function updates the multi date flag, depending on the start and end date.
+     */
     public void updateMultiDate()
     {
         multiDate = (startDateDayOfMonth != endDateDayOfMonth) || (startDateMonth != endDateMonth) || (startDateYear != endDateYear);
@@ -358,5 +361,53 @@ public class Event
     public void setEndDate(LocalDate endDate)
     {
         this.endDate = endDate;
+    }
+
+    public User getEventAdmin()
+    {
+        return eventAdmin;
+    }
+
+    public void setEventAdmin(User eventAdmin)
+    {
+        this.eventAdmin = eventAdmin;
+    }
+
+    public String getAdministrationNotAllowedMessage()
+    {
+        return administrationNotAllowedMessage;
+    }
+
+    public void setAdministrationNotAllowedMessage(String administrationNotAllowedMessage)
+    {
+        this.administrationNotAllowedMessage = administrationNotAllowedMessage;
+    }
+
+    /**
+     * This function is removing unnecessary divisions from the invited division set.
+     */
+    public void optimizeInvitedDivisionSet()
+    {
+        if(invitedDivision != null && !invitedDivision.isEmpty())
+        {
+            invitedDivision = DivisionManagementController.getOptimizedSetOfDivisions(invitedDivision);
+        }
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return id == null? 0: id.hashCode();
+    }
+
+    /**
+     * Equality is based on the same id String within the database.
+     * @param obj The object compared to the current object.
+     * @return True if the IDs of the two objects
+     */
+    @Override
+    public boolean equals(Object obj)
+    {
+        return obj != null && obj instanceof Event && this.id != null && this.id.equals(((Event) obj).getId());
     }
 }

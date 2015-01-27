@@ -117,7 +117,7 @@
     }
 
     // runs after the progress reaches 100%, if status >= 0 success, failure otherwise
-    UIProgressButton.prototype.stopAnimation = function( status ) {
+    UIProgressButton.prototype.stopAnimation = function( status, disableAfter ) {
         var self = this,
             endLoading = function() {
                 self.setProgress(1);
@@ -141,12 +141,23 @@
                             classie.add(self.el, 'hidden');
                         } else
                         {
-                            self.enable();
+                            if(disableAfter)
+                            {
+                                self.disable()
+                            } else
+                            {
+                                self.enable();
+                            }
                         }
                     }, self.options.statusTime );
                 }
                 else {
-                    self.enable();
+                    if(disableAfter) {
+                        self.disable()
+                    } else
+                    {
+                        self.enable();
+                    }
                 }
                 // finally remove class loading and reset progress.
                 self.setProgress(0);
