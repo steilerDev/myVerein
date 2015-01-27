@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+	<Properties>
+		<Property name="third-party-log-level">info</Property>
+		<Property name="logFileName">info</Property>
+	</Properties>
+
+	<Appenders>
+		<Console name="Console" target="SYSTEM_OUT">
+			<PatternLayout pattern="%d{HH:mm:ss} %-5p [%t] %c{1} - %m%n"/>
+		</Console>
+
+		<RollingFile name="file-log" fileName="${catalina.base}/logs/${logFileName}" filePattern="${catalina.base}/logs/${logFileName}-%d{yyyy-MM-dd}.log">
+			<PatternLayout pattern="%d{HH:mm:ss} %-5p [%t] %c{1} - %m%n"/>
+			<Policies>
+				<TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+			</Policies>
+		</RollingFile>
+	</Appenders>
+
+	<Loggers>
+		<Logger name="de.steilerdev.myVerein" level="debug" />
+
+		<Logger name="org.springframework.core" level="${third-party-log-level}" />
+
+		<Logger name="org.springframework.data.mongodb" level="${third-party-log-level}" />
+
+		<Logger name="org.springframework.beans" level="${third-party-log-level}" />
+
+		<Logger name="org.springframework.context" level="${third-party-log-level}" />
+
+		<Logger name="org.springframework.http" level="${third-party-log-level}" />
+
+		<Logger name="org.springframework.web" level="${third-party-log-level}" />
+
+		<Logger name="org.springframework.security" level="${third-party-log-level}" />
+
+		<Logger name="org.thymeleaf.TemplateEngine" level="${third-party-log-level}" />
+
+		<Root level="error">
+			<AppenderRef ref="Console"/>
+		</Root>
+	</Loggers>
+</Configuration>
