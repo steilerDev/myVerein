@@ -8,6 +8,8 @@
     <name>myVerein_Server</name>
 
     <properties>
+        <server.host>http://it14-myVerein.dhbw-stuttgart.de</server.host>
+
         <java.version>1.8</java.version>
 
         <!-- Spring Framework -->
@@ -165,22 +167,26 @@
 
     </dependencies>
 
+
     <build>
         <finalName>${name}</finalName>
         <plugins>
+            <plugin>
+                <groupId>org.apache.tomcat.maven</groupId>
+                <artifactId>tomcat7-maven-plugin</artifactId>
+                <version>2.2</version>
+                <configuration>
+                    <path>/</path>
+                    <update>true</update>
+                    <server>myVereinServer</server>
+                    <url>${server.host}/manager/text</url>
+                </configuration>
+            </plugin>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
-                </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <includes>
-                        <include>**/*Tests.java</include>
-                    </includes>
                 </configuration>
             </plugin>
         </plugins>
