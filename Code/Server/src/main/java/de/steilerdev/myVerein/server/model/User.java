@@ -19,6 +19,8 @@ package de.steilerdev.myVerein.server.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.sun.org.apache.xpath.internal.operations.Div;
+import de.steilerdev.myVerein.server.controller.DivisionManagementController;
 import de.steilerdev.myVerein.server.security.PasswordEncoder;
 import de.steilerdev.myVerein.server.security.UserAuthenticationService;
 import org.hibernate.validator.constraints.Email;
@@ -37,6 +39,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class User implements UserDetails
 {
@@ -546,9 +549,14 @@ public class User implements UserDetails
      * @param event The selected event.
      * @return True if the user is allowed, false otherwise.
      */
-    public boolean isAllowedToAdministrateEvent(Event event)
+    @JsonIgnore
+    public boolean isAllowedToAdministrate(Event event)
     {
-        return event.getEventAdmin().equals(this) || authorities.parallelStream().anyMatch(authority -> authority.getAuthority().equals(UserAuthenticationService.AuthorityRoles.SUPERADMIN.toString()));
+        return this.isAdmin() &&
+                (
+                        event.getEventAdmin().equals(this) ||
+                        this.isSuperAdmin()
+                );
     }
 
     /**
@@ -556,18 +564,60 @@ public class User implements UserDetails
      * @param selectedUser The selected user.
      * @return True if the user is allowed, false otherwise.
      */
-    public boolean isAllowedToAdministrateUser(User selectedUser)
+    @JsonIgnore
+    public boolean isAllowedToAdministrate(User selectedUser)
     {
         //Getting the list of administrated divisions
         List<Division> administratedDivisions = divisionRepository.findByAdminUser(this);
 
-        return selectedUser.getDivisions() == null ||  //If there is no divisions or
-                selectedUser.getDivisions().isEmpty() ||  //the list of divisions is empty, the user is allowed to administrate the user
-                selectedUser.equals(this) || //If the user is the same he is allowed
-                selectedUser.getDivisions().parallelStream() //Streaming all divisions the user is part of
-                        .anyMatch(div -> //If there is any match the admin is allowed to view the user
-                                div.getAncestors().parallelStream() //Streaming all ancestors of the user's divisions
-                                        .anyMatch(anc -> administratedDivisions.contains(anc))); //If there is any match between administrated divisions and ancestors of one of the users divisions
+        return this.isAdmin() && //First of all the user needs to be an administrator
+                (
+                    this.isSuperAdmin() || //If the user is the super admin he can do whatever he wants
+                    selectedUser.getDivisions() == null ||  //If there is no divisions or
+                    selectedUser.getDivisions().isEmpty() ||  //the list of divisions is empty, the user is allowed to administrate the user
+                    selectedUser.equals(this) || //If the user is the same he is allowed
+                    selectedUser.getDivisions().parallelStream() //Streaming all divisions the user is part of
+                            .anyMatch(div -> //If there is any match the admin is allowed to view the user
+                                    div.getAncestors().parallelStream() //Streaming all ancestors of the user's divisions
+                                            .anyMatch(anc -> administratedDivisions.contains(anc))) //If there is any match between administrated divisions and ancestors of one of the users divisions
+                );
+    }
+
+    @JsonIgnore
+    public boolean isAllowedToAdministrate(Division division)
+    {
+        return this.isAdmin() && //The user needs to be an administrator
+                (
+                    this.isSuperAdmin() || //If the user is a super admin he can do whatever he wants
+                    DivisionManagementController.getOptimizedSetOfDivisions(divisionRepository.findByAdminUser(this)) //Getting all divisions administrated by the user, should not be empty, since the user is an admin
+                            .parallelStream().anyMatch(div -> div.equals(division) ||  //If the selected division is one of the administrated ones
+                                                              division.getAncestors().contains(div)) //If the selected division is an ancestor of the administrated ones
+                );
+    }
+
+    /**
+     * This function checks if the current user has the role superadmin.
+     * @return True if the user is the super admin, false otherwise.
+     */
+    @JsonIgnore
+    public boolean isSuperAdmin()
+    {
+        return authorities != null &&
+               authorities.parallelStream()
+                    .anyMatch(authority -> authority.getAuthority().equals(UserAuthenticationService.AuthorityRoles.SUPERADMIN.toString()));
+    }
+
+    /**
+     * This function checks if the user is an administrator
+     * @return
+     */
+    @JsonIgnore
+    public boolean isAdmin()
+    {
+        return authorities != null &&
+               authorities.parallelStream()
+                    .anyMatch(authority -> authority.getAuthority().equals(UserAuthenticationService.AuthorityRoles.ADMIN.toString()) ||
+                                        authority.getAuthority().equals(UserAuthenticationService.AuthorityRoles.SUPERADMIN.toString()));
     }
 
     @Override

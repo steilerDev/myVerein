@@ -72,8 +72,7 @@ public class DivisionManagementController
                                                              @CurrentUser User currentUser)
     {
         String successMessage = "Successfully saved division";
-        List<Division> administratedDivisions = getOptimizedSetOfAdministratedDivisions(currentUser);
-        if(administratedDivisions.size() > 0)
+        if(currentUser.isAdmin())
         {
             Division division;
             Division oldDivision = null;
@@ -82,23 +81,20 @@ public class DivisionManagementController
             {
                 logger.warn("The original name of the division is missing");
                 return new ResponseEntity<>("The original name of the division is missing", HttpStatus.BAD_REQUEST);
-            } else if(oldName.equals(name) && divisionRepository.findByName(oldName) != null)
+            } else if(oldName.equals(name) && (division = divisionRepository.findByName(oldName)) != null)
             {
                 //A division is changed, name stays.
                 logger.debug("An existing division is changed. The identification is unchanged.");
-                division = divisionRepository.findByName(oldName);
-            } else if(divisionRepository.findByName(oldName) != null && divisionRepository.findByName(name) == null)
+            } else if((oldDivision = division = divisionRepository.findByName(oldName)) != null && divisionRepository.findByName(name) == null)
             {
                 //An existing divisions name is changed and the name is unique
                 logger.debug("An existing division is changed. The identification has changed as well.");
-                division = divisionRepository.findByName(oldName);
-                oldDivision = divisionRepository.findByName(oldName);
             } else
             {
                 return new ResponseEntity<>("Problem finding existing division, either the existing division could not be located or the new name is already taken", HttpStatus.BAD_REQUEST);
             }
 
-            if(administratedDivisions.parallelStream().anyMatch(div -> division.getAncestors().contains(div))) //Check if user is allowed to change the division (if he administrates one of the parent divisions)
+            if(currentUser.isAllowedToAdministrate(division)) //Check if user is allowed to change the division (if he administrates one of the parent divisions)
             {
                 User adminUser = null;
                 if (admin != null && !admin.isEmpty())
@@ -150,8 +146,10 @@ public class DivisionManagementController
     public @ResponseBody ResponseEntity<String> createDivision(@CurrentUser User currentUser)
     {
         List<Division> administratedDivisions = getOptimizedSetOfAdministratedDivisions(currentUser);
+        System.err.println("Size: " + administratedDivisions.size());
+        System.err.println("First division " + administratedDivisions.get(0));
         Division newDivision;
-        if(administratedDivisions.size() > 0)
+        if(administratedDivisions != null && administratedDivisions.size() > 0)
         {
             String newName = newDivisionName;
             for(int i = 1; divisionRepository.findByName(newName) != null; i++)
@@ -189,7 +187,7 @@ public class DivisionManagementController
         {
             logger.warn("Unable to find stated division " + divisionName);
             return new ResponseEntity<>("Unable to find the stated division", HttpStatus.BAD_REQUEST);
-        } else if (!isAllowedToAdministrate(currentUser, deletedDivision))
+        } else if (!currentUser.isAllowedToAdministrate(deletedDivision))
         {
             logger.warn("Not allowed to delete division.");
             return new ResponseEntity<>("You are not allowed to delete the selected division", HttpStatus.BAD_REQUEST);
@@ -230,7 +228,7 @@ public class DivisionManagementController
      * @return A JSON object of the division.
      */
     @RequestMapping(value = "getDivision", produces = "application/json", params = "name")
-    public @ResponseBody Division getSingleDivision (@RequestParam String name)
+    public @ResponseBody Division getSingleDivision (@RequestParam String name, @CurrentUser User user)
     {
         Division searchedDivision = divisionRepository.findByName(name);
         if(searchedDivision.getAdminUser() != null)
@@ -298,8 +296,6 @@ public class DivisionManagementController
         }
     }
 
-
-
     /**
      * This function moves the selected division (and all subdivisions) to a new parent. The function evaluates if the user is allowed to perform this action.
      * @param selectedDivision The division that needs to be moved.
@@ -310,10 +306,9 @@ public class DivisionManagementController
     private ResponseEntity<String> changeDivisionParent(Division selectedDivision, Division newParent, User currentUser)
     {
         logger.debug("Changing layout: " + selectedDivision.getName() + " moved to parent " + newParent.getName());
-        List<Division> adminDivision = getOptimizedSetOfAdministratedDivisions(currentUser);
 
         //The moved node and the target need to be administrated by the user. The nodes should not be root nodes of the user's administration.
-        if(adminDivision.parallelStream().anyMatch(div -> newParent.equals(div) || newParent.getAncestors().contains(div)) && adminDivision.parallelStream().anyMatch(div -> selectedDivision.getAncestors().contains(div))) //Check if user is allowed to change the division (if he administrates one of the parent divisions)
+        if(currentUser.isAllowedToAdministrate(newParent) && currentUser.isAllowedToAdministrate(selectedDivision))
         {
             logger.debug("Changing structure.");
             updateSubtree(selectedDivision, newParent);
@@ -373,22 +368,13 @@ public class DivisionManagementController
      * @param currentUser The currently logged in user.
      * @return The optimized set of administrated divisions.
      */
-    private List<Division> getOptimizedSetOfAdministratedDivisions(User currentUser)
+    public List<Division> getOptimizedSetOfAdministratedDivisions(User currentUser)
     {
-        List<Division> administratedDivisions = divisionRepository.findByAdminUser(currentUser);
-        List<Division> reducedDivisions;
-
         // Checking if user is superadmin, which concludes he would administrate every division.
-        if(currentUser.getAuthorities().stream().anyMatch(auth -> auth.getAuthority().equals("ROLE_SUPERADMIN")))
-        {
-            //Finding and returning root node.
-            reducedDivisions = administratedDivisions.parallelStream().filter(div -> div.getParent() == null).collect(Collectors.toList());
-        } else
-        {
-            //Reducing the list to the divisions that are on the top of the tree, removing all unnecessary divisions.
-            reducedDivisions = getOptimizedSetOfDivisions(administratedDivisions);
-        }
-        return reducedDivisions;
+        return currentUser.isSuperAdmin()
+                ? divisionRepository.findByParent(null)
+                //? divisionRepository.findByAdminUser(currentUser).parallelStream().filter(div -> div.getParent() == null).collect(Collectors.toList()) //Return the root node if the user is superadmin
+                : getOptimizedSetOfDivisions(divisionRepository.findByAdminUser(currentUser)); //Return an optimized set of divisions if he is a normal admin
     }
 
     /**
@@ -404,18 +390,6 @@ public class DivisionManagementController
                         .noneMatch(allDivisions -> division.getAncestors().contains(allDivisions))) //Checking, if there is any division in the list, that is an ancestor of the current division. If there is a match there exists a closer division.
                 .collect(Collectors.toList()); // Converting the stream to a list
     }
-
-    /**
-     * Checks if a user is allowed to modify a selected division
-     * @param adminUser The currently logged in user.
-     * @param selectedDivision The division, the user is trying to modify
-     * @return True if the user is allowed, false otherwise.
-     */
-    private boolean isAllowedToAdministrate(User adminUser, Division selectedDivision)
-    {
-        return getOptimizedSetOfAdministratedDivisions(adminUser).parallelStream().anyMatch(div -> selectedDivision.getAncestors().contains(div));
-    }
-
 
     /**
      * This subclass is representing the data structure needed by the jqTree framework

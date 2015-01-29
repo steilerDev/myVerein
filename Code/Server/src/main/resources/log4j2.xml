@@ -8,7 +8,7 @@
 
 	<Appenders>
 		<Console name="console" target="SYSTEM_OUT">
-			<PatternLayout pattern="%d{ISO8601} %p [%t] %c{1} [%M] - %m%n %throwable{short}"/>
+			<PatternLayout pattern="%d{ISO8601} %p [%t] %c{1} [%M] - %m%throwable{short}%n"/>
 		</Console>
 
 		<!--RollingFile name="file-log" fileName="${logFileBaseDirectory}/${logFileName}.log" filePattern="${logFileBaseDirectory}/${logFileName}-%d{yyyy-MM-dd}.log">

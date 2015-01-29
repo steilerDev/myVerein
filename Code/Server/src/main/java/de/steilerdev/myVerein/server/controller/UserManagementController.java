@@ -140,7 +140,7 @@ public class UserManagementController
 
          */
 
-        if(!currentUser.isAllowedToAdministrateUser(newUserObject))
+        if(!currentUser.isAllowedToAdministrate(newUserObject))
         {
             logger.warn("The user is not allowed to perform these changes.");
             return new ResponseEntity<>("The user is not allowed to perform these changes.", HttpStatus.FORBIDDEN);
@@ -332,7 +332,7 @@ public class UserManagementController
     {
         User searchedUser = userRepository.findByEmail(email);
 
-        if(!currentUser.isAllowedToAdministrateUser(searchedUser))
+        if(!currentUser.isAllowedToAdministrate(searchedUser))
         {
             logger.debug("Currently logged in user is not administrating selected user. Hiding private information");
             searchedUser.setPrivateInformation(null);
@@ -370,7 +370,7 @@ public class UserManagementController
         {
             logger.warn("Unable to find stated user " + email);
             return new ResponseEntity<>("Unable to find the stated user", HttpStatus.BAD_REQUEST);
-        } else if (!currentUser.isAllowedToAdministrateUser(deletedUser))
+        } else if (!currentUser.isAllowedToAdministrate(deletedUser))
         {
             logger.warn("Not allowed to delete user.");
             return new ResponseEntity<>("You are not allowed to delete the selected user", HttpStatus.BAD_REQUEST);

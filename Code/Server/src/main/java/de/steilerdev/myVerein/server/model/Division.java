@@ -161,20 +161,19 @@ public class Division
     }
 
     /**
-     * Comparing two objects of the division class according to their name. Overwritten to be able to use the contains() method of java.util.List
-     * @param object
-     * @return
+     * Comparing two objects of the division class according to their name. Overwritten to be able to use the contains() method of java.util.List.
+     * @param obj The object compared to the current object.
+     * @return True if the two objects are equal, false otherwise.
      */
     @Override
-    public boolean equals(Object object)
+    public boolean equals(Object obj)
     {
-        boolean sameSame = false;
+        return obj != null && obj instanceof Division && this.name != null && this.name.equals(((Division) obj).getName());
+    }
 
-        if (object != null && object instanceof Division)
-        {
-            sameSame = ((Division) object).name.equals(this.name);
-        }
-
-        return sameSame;
+    @Override
+    public int hashCode()
+    {
+        return name == null? 0: name.hashCode();
     }
 }

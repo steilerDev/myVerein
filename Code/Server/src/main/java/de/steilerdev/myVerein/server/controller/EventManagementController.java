@@ -158,7 +158,7 @@ public class EventManagementController
                 return null;
             } else
             {
-                if (!currentUser.isAllowedToAdministrateEvent(selectedEvent))
+                if (!currentUser.isAllowedToAdministrate(selectedEvent))
                 {
                     selectedEvent.setAdministrationNotAllowedMessage("You are not allowed to modify this event, since you did not create it.");
                 }
@@ -211,7 +211,7 @@ public class EventManagementController
             {
                 logger.warn("Unable to find the specified event with id " + eventFlag);
                 return new ResponseEntity<>("Unable to find the specified event", HttpStatus.BAD_REQUEST);
-            } else if(!currentUser.isAllowedToAdministrateEvent(event))
+            } else if(!currentUser.isAllowedToAdministrate(event))
             {
                 logger.warn("The current user " + currentUser.getEmail() + " is not allowed to alter the selected event " + eventFlag);
                 return new ResponseEntity<>("You are not allowed to edit the selected event", HttpStatus.FORBIDDEN);
@@ -324,7 +324,7 @@ public class EventManagementController
         {
             logger.warn("Unable to find the selected event");
             return new ResponseEntity<>("Unable to find the selected event", HttpStatus.BAD_REQUEST);
-        } else if(!currentUser.isAllowedToAdministrateEvent(event))
+        } else if(!currentUser.isAllowedToAdministrate(event))
         {
             logger.warn("The user " + currentUser.getEmail() + " is not allowed to modify the event owned by " + event.getEventAdmin().getEmail());
             return new ResponseEntity<>("You are not allowed to modify the selected event", HttpStatus.FORBIDDEN);
