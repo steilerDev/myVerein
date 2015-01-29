@@ -5,6 +5,7 @@
 
     <head>
         <title>Login Page</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link th:href="@{/resources/css/tabs.css}" href="../resources/css/tabs.css" rel="stylesheet" type="text/css" />
         <link th:href="@{/resources/css/jquery-ui.min.css}" href="../resources/css/jquery-ui.min.css" rel="stylesheet" type="text/css" />
         <link th:href="@{/resources/css/magic-bootstrap.css}" href="../resources/css/magic-bootstrap.css" rel="stylesheet" type="text/css" />
@@ -23,22 +24,23 @@
 
     </head>
     <body>
-        <div class="container">
-
-            <form class="form-signin materialBox" name='f' action='/j_spring_security_check' method='POST' accept-charset="UTF-8">
-                <h2 th:text="#{login.message}">Login with Username and Password</h2>
-                <label for="inputEmail" class="sr-only" th:text="#{login.email}">Email address</label>
-                <input name="j_username" type="email" id="inputEmail" th:placeholder="#{login.email}" class="form-control" placeholder="Email address"/>
-                <label for="inputPassword" class="sr-only" th:text="#{login.password}">Password</label>
-                <input name="j_password" type="password" id="inputPassword" class="form-control" th:placeholder="#{login.password}" placeholder="Password"/>
-                <div class="checkbox">
-                    <label>
-                        <input class="loginCheckbox" type="checkbox" value="remember-me">Remember me</input>
-                    </label>
-                </div>
-                <button class="btn btn-lg btn-primary btn-block" type="submit" th:text="#{login.button}">Sign in</button>
-            </form>
-
+        <div class="verticalCentered">
+            <div class="loginContainer container">
+                <form class="form-signin materialBox" name='f' action='/j_spring_security_check' method='POST' accept-charset="UTF-8">
+                    <h2 th:text="#{login.message}">Login with Username and Password</h2>
+                    <label for="inputEmail" class="sr-only" th:text="#{login.email}">Email address</label>
+                    <input name="j_username" type="email" id="inputEmail" th:placeholder="#{login.email}" class="form-control" placeholder="Email address"/>
+                    <label for="inputPassword" class="sr-only" th:text="#{login.password}">Password</label>
+                    <input name="j_password" type="password" id="inputPassword" class="form-control" th:placeholder="#{login.password}" placeholder="Password"/>
+                    <div class="checkbox">
+                        <label class="loginCheckbox">
+                            <input type="checkbox" value="remember-me"/>
+                            Remember me
+                        </label>
+                    </div>
+                    <button class="btn btn-lg btn-primary btn-block" type="submit" th:text="#{login.button}">Sign in</button>
+                </form>
+            </div>
         </div>
     </body>
 </html>
