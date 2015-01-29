@@ -5,24 +5,40 @@
 
     <head>
         <title>Login Page</title>
+        <link th:href="@{/resources/css/tabs.css}" href="../resources/css/tabs.css" rel="stylesheet" type="text/css" />
+        <link th:href="@{/resources/css/jquery-ui.min.css}" href="../resources/css/jquery-ui.min.css" rel="stylesheet" type="text/css" />
+        <link th:href="@{/resources/css/magic-bootstrap.css}" href="../resources/css/magic-bootstrap.css" rel="stylesheet" type="text/css" />
+        <link th:href="@{/resources/css/button.css}" href="../resources/css/button.css" rel="stylesheet" type="text/css" />
+        <link th:href="@{/resources/css/myVerein.css}" href="../resources/css/myVerein.css" rel="stylesheet" type="text/css" />
+        <link th:href="@{/resources/css/jqtree.css}" href="../resources/css/jqtree.css" rel="stylesheet" type="text/css" />
+        <link th:href="@{/resources/css/selectize-core.css}" href="../resources/css/selectize-core.css" rel="stylesheet" type="text/css" />
+        <link th:href="@{/resources/css/selectize-bootstrap.css}" href="../resources/css/selectize-bootstrap.css" rel="stylesheet" type="text/css" />
+        <link th:href="@{/resources/css/notification.css}" href="../resources/css/notification.css" rel="stylesheet" type="text/css" />
+        <link th:href="@{/resources/css/icons.css}" href="../resources/css/icons.css" rel="stylesheet" type="text/css" />
+        <link th:href="@{/resources/css/bootstrap-validator.css}" href="../resources/css/bootstrap-validator.css" rel="stylesheet" type="text/css" />
+        <link th:href="@{/resources/css/datepicker3.css}" href="../resources/css/datepicker3.css" rel="stylesheet" type="text/css" />
+        <link th:href="@{/resources/css/clndr.css}" href="../resources/css/clndr.css" rel="stylesheet" type="text/css" />
+        <link th:href="@{/resources/css/bootstrap-timepicker.css}" href="../resources/css/bootstrap-timepicker.css" rel="stylesheet" type="text/css" />
+        <link th:href="@{/resources/css/login.css}" href="../resources/css/login.css" rel="stylesheet" type="text/css" />
+
     </head>
-    <body onload='document.f.j_username.focus();'>
-        <h1 th:text="#{login.heading}">My custom login page</h1>
-        <h3 th:text="#{login.message}">Login with Username and Password</h3>
-        <form name='f' action='/j_spring_security_check' method='POST' accept-charset="UTF-8">
-            <table>
-                <tr>
-                    <td th:text="#{login.user}">User:</td>
-                    <td><input type='text' name='j_username' value='' /></td>
-                </tr>
-                <tr>
-                    <td th:text="#{login.password}">Password:</td>
-                    <td><input type='password' name='j_password'/></td>
-                </tr>
-                <tr>
-                    <td colspan='2'><input name="submit" type="submit" th:value="#{login.button}" value="Login"/></td>
-                </tr>
-            </table>
-        </form>
+    <body>
+        <div class="container">
+
+            <form class="form-signin materialBox" name='f' action='/j_spring_security_check' method='POST' accept-charset="UTF-8">
+                <h2 th:text="#{login.message}">Login with Username and Password</h2>
+                <label for="inputEmail" class="sr-only" th:text="#{login.email}">Email address</label>
+                <input name="j_username" type="email" id="inputEmail" th:placeholder="#{login.email}" class="form-control" placeholder="Email address"/>
+                <label for="inputPassword" class="sr-only" th:text="#{login.password}">Password</label>
+                <input name="j_password" type="password" id="inputPassword" class="form-control" th:placeholder="#{login.password}" placeholder="Password"/>
+                <div class="checkbox">
+                    <label>
+                        <input class="loginCheckbox" type="checkbox" value="remember-me">Remember me</input>
+                    </label>
+                </div>
+                <button class="btn btn-lg btn-primary btn-block" type="submit" th:text="#{login.button}">Sign in</button>
+            </form>
+
+        </div>
     </body>
 </html>

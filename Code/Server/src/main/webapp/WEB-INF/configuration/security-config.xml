@@ -12,6 +12,7 @@
             <intercept-url pattern="/login" access="permitAll" />
             <intercept-url pattern="/logout" access="permitAll" />
             <intercept-url pattern="/signup" access="permitAll" />
+            <intercept-url pattern="/resources/**" access="permitAll" />
             <intercept-url pattern="/accessdenied" access="permitAll" />
             <intercept-url pattern="/settings" access="hasRole('ROLE_SUPERADMIN')" />
             <intercept-url pattern="/**" access="hasRole('ROLE_ADMIN')" />
