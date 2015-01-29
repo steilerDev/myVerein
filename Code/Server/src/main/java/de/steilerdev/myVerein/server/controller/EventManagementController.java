@@ -158,7 +158,7 @@ public class EventManagementController
                 return null;
             } else
             {
-                if (!(selectedEvent.getEventAdmin().equals(currentUser) || currentUser.getAuthorities().parallelStream().anyMatch(authority -> authority.getAuthority().equals("ROLE_SUPERADMIN"))))
+                if (!currentUser.isAllowedToAdministrateEvent(selectedEvent))
                 {
                     selectedEvent.setAdministrationNotAllowedMessage("You are not allowed to modify this event, since you did not create it.");
                 }
@@ -194,8 +194,7 @@ public class EventManagementController
                                                           @RequestParam String invitedDivisions,
                                                           @CurrentUser User currentUser)
     {
-        Event oldEvent = null,
-              currentEvent;
+        Event event;
         if(eventFlag.isEmpty())
         {
             logger.warn("The event flag is not allowed to be empty.");
@@ -203,24 +202,24 @@ public class EventManagementController
         } else if(eventFlag.equals("true"))
         {
             logger.debug("A new event is created.");
-            currentEvent = new Event();
+            event = new Event();
         } else
         {
             logger.debug("An existing event is altered.");
-            oldEvent = currentEvent = eventRepository.findEventById(eventFlag);
-            if(oldEvent == null)
+            event = eventRepository.findEventById(eventFlag);
+            if(event == null)
             {
                 logger.warn("Unable to find the specified event with id " + eventFlag);
                 return new ResponseEntity<>("Unable to find the specified event", HttpStatus.BAD_REQUEST);
-            } else if(oldEvent.getEventAdmin().equals(currentUser))
+            } else if(!currentUser.isAllowedToAdministrateEvent(event))
             {
                 logger.warn("The current user " + currentUser.getEmail() + " is not allowed to alter the selected event " + eventFlag);
                 return new ResponseEntity<>("You are not allowed to edit the selected event", HttpStatus.FORBIDDEN);
             }
         }
 
-        currentEvent.setName(eventName);
-        currentEvent.setDescription(eventDescription);
+        event.setName(eventName);
+        event.setDescription(eventDescription);
 
         if(startDate.isEmpty() || startTime.isEmpty() || endDate.isEmpty() || endTime.isEmpty())
         {
@@ -231,7 +230,7 @@ public class EventManagementController
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/MM/y'T'H:m");
             try
             {
-                currentEvent.setStartDateTime(LocalDateTime.parse(startDate + "T" + startTime, formatter));
+                event.setStartDateTime(LocalDateTime.parse(startDate + "T" + startTime, formatter));
             } catch (DateTimeParseException e)
             {
                 logger.warn("Unrecognized date format " + startDate + "T" + startTime);
@@ -240,7 +239,7 @@ public class EventManagementController
 
             try
             {
-                currentEvent.setEndDateTime(LocalDateTime.parse(endDate + "T" + endTime, formatter));
+                event.setEndDateTime(LocalDateTime.parse(endDate + "T" + endTime, formatter));
             } catch (DateTimeParseException e)
             {
                 logger.warn("Unrecognized date format " + endDate + "T" + endTime);
@@ -248,25 +247,32 @@ public class EventManagementController
             }
         }
 
-        currentEvent.setLocation(location);
+        event.setLocation(location);
 
-        try
+        if(!locationLat.isEmpty())
         {
-            currentEvent.setLocationLat(Double.parseDouble(locationLat));
-        } catch (NumberFormatException e)
-        {
-            logger.warn("Unable to paste lat " + locationLat);
-            return new ResponseEntity<>("Unable to parse latitude coordinate", HttpStatus.BAD_REQUEST);
+            try
+            {
+                event.setLocationLat(Double.parseDouble(locationLat));
+            } catch (NumberFormatException e)
+            {
+                logger.warn("Unable to paste lat " + locationLat);
+                return new ResponseEntity<>("Unable to parse latitude coordinate", HttpStatus.BAD_REQUEST);
+            }
         }
 
-        try
+        if(!locationLng.isEmpty())
         {
-            currentEvent.setLocationLng(Double.parseDouble(locationLng));
-        } catch (NumberFormatException e)
-        {
-            logger.warn("Unable to paste lng " + locationLng);
-            return new ResponseEntity<>("Unable to parse longitude coordinate", HttpStatus.BAD_REQUEST);
+            try
+            {
+                event.setLocationLng(Double.parseDouble(locationLng));
+            } catch (NumberFormatException e)
+            {
+                logger.warn("Unable to paste lng " + locationLng);
+                return new ResponseEntity<>("Unable to parse longitude coordinate", HttpStatus.BAD_REQUEST);
+            }
         }
+
 
         if (!invitedDivisions.isEmpty())
         {
@@ -276,30 +282,63 @@ public class EventManagementController
                 Division div = divisionRepository.findByName(division);
                 if (div == null)
                 {
-                    logger.warn("Unrecognized division (" + div + ")");
-                    return new ResponseEntity<>("Division " + div + " does not exist", HttpStatus.BAD_REQUEST);
+                    logger.warn("Unrecognized division (" + division + ")");
+                    return new ResponseEntity<>("Division " + division + " does not exist", HttpStatus.BAD_REQUEST);
                 }
-                currentEvent.addDivision(div);
+                event.addDivision(div);
             }
         }
 
-        currentEvent.setEventAdmin(currentUser);
-        currentEvent.setLastChanged(LocalDateTime.now());
-        currentEvent.updateMultiDate();
-        currentEvent.optimizeInvitedDivisionSet();
+        //Updating several fields.
+        event.setEventAdmin(currentUser);
+        event.setLastChanged(LocalDateTime.now());
+        event.updateMultiDate();
+        event.optimizeInvitedDivisionSet();
 
         try
         {
-            eventRepository.save(currentEvent);
-            if(oldEvent != null)
-            {
-                eventRepository.delete(oldEvent);
-            }
+            eventRepository.save(event);
         } catch (ConstraintViolationException e)
         {
             logger.warn("A database constraint was violated while saving the event " + eventFlag);
             return new ResponseEntity<>("A database constraint was violated while saving the event.", HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>("Successfully saved the event", HttpStatus.OK);
+    }
+
+    /**
+     * Deletes an event
+     */
+    @RequestMapping(method = RequestMethod.POST, value = "deleteEvent")
+    public @ResponseBody ResponseEntity<String> saveEvent(@RequestParam String id, @CurrentUser User currentUser)
+    {
+        if(id.isEmpty())
+        {
+            logger.warn("The id of an event is not allowed to be empty.");
+            return new ResponseEntity<>("The ID of an event is not allowed to be empty", HttpStatus.BAD_REQUEST);
+        }
+
+        Event event = eventRepository.findEventById(id);
+
+        if(event == null)
+        {
+            logger.warn("Unable to find the selected event");
+            return new ResponseEntity<>("Unable to find the selected event", HttpStatus.BAD_REQUEST);
+        } else if(!currentUser.isAllowedToAdministrateEvent(event))
+        {
+            logger.warn("The user " + currentUser.getEmail() + " is not allowed to modify the event owned by " + event.getEventAdmin().getEmail());
+            return new ResponseEntity<>("You are not allowed to modify the selected event", HttpStatus.FORBIDDEN);
+        } else
+        {
+            try
+            {
+                eventRepository.delete(event);
+                return new ResponseEntity<>("Successfully deleted selected event", HttpStatus.OK);
+            } catch (IllegalArgumentException e)
+            {
+                logger.warn("Unable to delete selected event: " + e.getMessage());
+                return new ResponseEntity<>("Unable to delete the selected event", HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        }
     }
 }

@@ -24,7 +24,6 @@ import de.steilerdev.myVerein.server.security.CurrentUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -85,6 +84,12 @@ public class UserManagementController
         User newUserObject;
         User oldUserObject = null;
 
+        /*
+
+            Loading user
+
+         */
+
         //The user needs always an email identifier
         if(email.isEmpty() || userFlag.isEmpty())
         {
@@ -128,162 +133,182 @@ public class UserManagementController
                 return new ResponseEntity<>("A problem occurred while retrieving the user, either the existing user could not be located or the new email is already taken", HttpStatus.BAD_REQUEST);
             }
         }
-        if(isAllowedToAdministrate(currentUser, newUserObject))
+
+        /*
+
+            Checking permissions
+
+         */
+
+        if(!currentUser.isAllowedToAdministrateUser(newUserObject))
         {
-            if (newUserObject == null || firstName.isEmpty() || lastName.isEmpty())
-            {
-                logger.warn("Required parameter missing.");
-                return new ResponseEntity<>("Required parameter missing", HttpStatus.BAD_REQUEST);
-            }
-            newUserObject.setFirstName(firstName);
-            newUserObject.setLastName(lastName);
-            newUserObject.setEmail(email);
-
-            if(!birthday.isEmpty())
-            {
-                try
-                {
-                    newUserObject.setBirthday(LocalDate.parse(birthday, DateTimeFormatter.ofPattern("d/MM/y")));
-                } catch (DateTimeParseException e)
-                {
-                    logger.warn("Unrecognized date format (" + birthday + ")");
-                    return new ResponseEntity<>("Wrong date format within birthday field", HttpStatus.BAD_REQUEST);
-                }
-            } else
-            {
-                newUserObject.setBirthday(null);
-            }
-
-            if(!gender.isEmpty() && !gender.equals("default"))
-            try
-            {
-                newUserObject.setGender(User.Gender.valueOf(gender));
-            } catch (IllegalArgumentException e)
-            {
-                logger.warn("Unable to parse gender: " + e.getMessage());
-                return new ResponseEntity<>("Unable to parse gender", HttpStatus.BAD_REQUEST);
-            }
-
-            newUserObject.setStreet(street);
-            newUserObject.setStreetNumber(streetNumber);
-            newUserObject.setZipCode(zip);
-            newUserObject.setCity(city);
-            newUserObject.setCountry(country);
-
-            if(!activeMemberSince.isEmpty())
-            {
-                try
-                {
-                    newUserObject.setActiveSince(LocalDate.parse(activeMemberSince, DateTimeFormatter.ofPattern("d/MM/y")));
-                } catch (DateTimeParseException e)
-                {
-                    logger.warn("Unrecognized date format (" + activeMemberSince + ")");
-                    return new ResponseEntity<>("Wrong date format within active member field", HttpStatus.BAD_REQUEST);
-                }
-            } else
-            {
-                newUserObject.setActiveSince(null);
-            }
-
-            if(!passiveMemberSince.isEmpty())
-            {
-                try
-                {
-                    newUserObject.setPassiveSince(LocalDate.parse(passiveMemberSince, DateTimeFormatter.ofPattern("d/MM/y")));
-                } catch (DateTimeParseException e)
-                {
-                    logger.warn("Unrecognized date format (" + passiveMemberSince + ")");
-                    return new ResponseEntity<>("Wrong date format within passive member field", HttpStatus.BAD_REQUEST);
-                }
-            } else
-            {
-                newUserObject.setPassiveSince(null);
-            }
-
-            if(!resignationDate.isEmpty())
-            {
-                try
-                {
-                    newUserObject.setResignationDate(LocalDate.parse(resignationDate, DateTimeFormatter.ofPattern("d/MM/y")));
-                } catch (DateTimeParseException e)
-                {
-                    logger.warn("Unrecognized date format (" + resignationDate + ")");
-                    return new ResponseEntity<>("Wrong date format within resignation date field", HttpStatus.BAD_REQUEST);
-                }
-            } else
-            {
-                newUserObject.setResignationDate(null);
-            }
-
-            newUserObject.setIban(iban);
-            newUserObject.setBic(bic);
-
-            if (!divisions.isEmpty())
-            {
-                String[] divArray = divisions.split(",");
-                for (String division : divArray)
-                {
-                    Division div = divisionRepository.findByName(division);
-                    if (div == null)
-                    {
-                        logger.warn("Unrecognized division (" + div + ")");
-                        return new ResponseEntity<>("Division " + div + " does not exist", HttpStatus.BAD_REQUEST);
-                    }
-                    newUserObject.addDivision(div);
-                }
-            }
-
-            parameters.keySet().parallelStream().forEach(key -> {
-                String normalizedKey;
-                if (key.startsWith("_old."))
-                {
-                    normalizedKey = key.substring(5);
-                    if (normalizedKey.startsWith("privateInformation"))
-                    {
-                        normalizedKey = normalizedKey.substring(18);
-                        newUserObject.addPrivateInformation(normalizedKey, parameters.get(key));
-                    } else if (normalizedKey.startsWith("publicInformation"))
-                    {
-                        normalizedKey = normalizedKey.substring(17);
-                        newUserObject.addPublicInformation(normalizedKey, parameters.get(key));
-                    } else
-                    {
-                        logger.warn("Unrecognized custom field (" + key + ").");
-                    }
-                } else if (key.startsWith("_new.") && key.endsWith("_key"))
-                {
-                    normalizedKey = key.substring(5);
-                    if (normalizedKey.startsWith("privateInformation"))
-                    {
-                        String value = key.replace("_key", "_value");
-                        newUserObject.addPrivateInformation(parameters.get(key), parameters.get(value));
-                    } else if (normalizedKey.startsWith("publicInformation"))
-                    {
-                        String value = key.replace("_key", "_value");
-                        newUserObject.addPublicInformation(parameters.get(key), parameters.get(value));
-                    } else
-                    {
-                        logger.warn("Unrecognized custom field (" + key + ").");
-                    }
-                }
-            });
-
-            try
-            {
-                userRepository.save(newUserObject);
-                if(oldUserObject != null)
-                {
-                    userRepository.delete(oldUserObject);
-                }
-            } catch (ConstraintViolationException e)
-            {
-                logger.warn("A database constraint was violated while saving the user.");
-                return new ResponseEntity<>("A database constraint was violated while saving the user.", HttpStatus.BAD_REQUEST);
-            }
-            return new ResponseEntity<>("Successfully saved user", HttpStatus.OK);
+            logger.warn("The user is not allowed to perform these changes.");
+            return new ResponseEntity<>("The user is not allowed to perform these changes.", HttpStatus.FORBIDDEN);
         }
-        logger.warn("The user is not allowed to perform these changes.");
-        return new ResponseEntity<>("The user is not allowed to perform these changes.", HttpStatus.FORBIDDEN);
+
+        /*
+
+            Parsing user
+
+         */
+
+        if (newUserObject == null || firstName.isEmpty() || lastName.isEmpty())
+        {
+            logger.warn("Required parameter missing.");
+            return new ResponseEntity<>("Required parameter missing", HttpStatus.BAD_REQUEST);
+        }
+        newUserObject.setFirstName(firstName);
+        newUserObject.setLastName(lastName);
+        newUserObject.setEmail(email);
+
+        if(!birthday.isEmpty())
+        {
+            try
+            {
+                newUserObject.setBirthday(LocalDate.parse(birthday, DateTimeFormatter.ofPattern("d/MM/y")));
+            } catch (DateTimeParseException e)
+            {
+                logger.warn("Unrecognized date format (" + birthday + ")");
+                return new ResponseEntity<>("Wrong date format within birthday field", HttpStatus.BAD_REQUEST);
+            }
+        } else
+        {
+            newUserObject.setBirthday(null);
+        }
+
+        if(!gender.isEmpty() && !gender.equals("default"))
+        try
+        {
+            newUserObject.setGender(User.Gender.valueOf(gender));
+        } catch (IllegalArgumentException e)
+        {
+            logger.warn("Unable to parse gender: " + e.getMessage());
+            return new ResponseEntity<>("Unable to parse gender", HttpStatus.BAD_REQUEST);
+        }
+
+        newUserObject.setStreet(street);
+        newUserObject.setStreetNumber(streetNumber);
+        newUserObject.setZipCode(zip);
+        newUserObject.setCity(city);
+        newUserObject.setCountry(country);
+
+        if(!activeMemberSince.isEmpty())
+        {
+            try
+            {
+                newUserObject.setActiveSince(LocalDate.parse(activeMemberSince, DateTimeFormatter.ofPattern("d/MM/y")));
+            } catch (DateTimeParseException e)
+            {
+                logger.warn("Unrecognized date format (" + activeMemberSince + ")");
+                return new ResponseEntity<>("Wrong date format within active member field", HttpStatus.BAD_REQUEST);
+            }
+        } else
+        {
+            newUserObject.setActiveSince(null);
+        }
+
+        if(!passiveMemberSince.isEmpty())
+        {
+            try
+            {
+                newUserObject.setPassiveSince(LocalDate.parse(passiveMemberSince, DateTimeFormatter.ofPattern("d/MM/y")));
+            } catch (DateTimeParseException e)
+            {
+                logger.warn("Unrecognized date format (" + passiveMemberSince + ")");
+                return new ResponseEntity<>("Wrong date format within passive member field", HttpStatus.BAD_REQUEST);
+            }
+        } else
+        {
+            newUserObject.setPassiveSince(null);
+        }
+
+        if(!resignationDate.isEmpty())
+        {
+            try
+            {
+                newUserObject.setResignationDate(LocalDate.parse(resignationDate, DateTimeFormatter.ofPattern("d/MM/y")));
+            } catch (DateTimeParseException e)
+            {
+                logger.warn("Unrecognized date format (" + resignationDate + ")");
+                return new ResponseEntity<>("Wrong date format within resignation date field", HttpStatus.BAD_REQUEST);
+            }
+        } else
+        {
+            newUserObject.setResignationDate(null);
+        }
+
+        newUserObject.setIban(iban);
+        newUserObject.setBic(bic);
+
+        if (!divisions.isEmpty())
+        {
+            String[] divArray = divisions.split(",");
+            for (String division : divArray)
+            {
+                Division div = divisionRepository.findByName(division);
+                if (div == null)
+                {
+                    logger.warn("Unrecognized division (" + division + ")");
+                    return new ResponseEntity<>("Division " + division + " does not exist", HttpStatus.BAD_REQUEST);
+                }
+                newUserObject.addDivision(div);
+            }
+        }
+
+        parameters.keySet().parallelStream().forEach(key -> {
+            String normalizedKey;
+            if (key.startsWith("_old."))
+            {
+                normalizedKey = key.substring(5);
+                if (normalizedKey.startsWith("privateInformation"))
+                {
+                    normalizedKey = normalizedKey.substring(18);
+                    newUserObject.addPrivateInformation(normalizedKey, parameters.get(key));
+                } else if (normalizedKey.startsWith("publicInformation"))
+                {
+                    normalizedKey = normalizedKey.substring(17);
+                    newUserObject.addPublicInformation(normalizedKey, parameters.get(key));
+                } else
+                {
+                    logger.warn("Unrecognized custom field (" + key + ").");
+                }
+            } else if (key.startsWith("_new.") && key.endsWith("_key"))
+            {
+                normalizedKey = key.substring(5);
+                if (normalizedKey.startsWith("privateInformation"))
+                {
+                    String value = key.replace("_key", "_value");
+                    newUserObject.addPrivateInformation(parameters.get(key), parameters.get(value));
+                } else if (normalizedKey.startsWith("publicInformation"))
+                {
+                    String value = key.replace("_key", "_value");
+                    newUserObject.addPublicInformation(parameters.get(key), parameters.get(value));
+                } else
+                {
+                    logger.warn("Unrecognized custom field (" + key + ").");
+                }
+            }
+        });
+
+        /*
+
+            Saving new user/deleting old user
+
+         */
+
+        try
+        {
+            userRepository.save(newUserObject);
+            if(oldUserObject != null)
+            {
+                userRepository.delete(oldUserObject);
+            }
+        } catch (ConstraintViolationException e)
+        {
+            logger.warn("A database constraint was violated while saving the user.");
+            return new ResponseEntity<>("A database constraint was violated while saving the user.", HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>("Successfully saved user", HttpStatus.OK);
     }
 
     /**
@@ -307,7 +332,7 @@ public class UserManagementController
     {
         User searchedUser = userRepository.findByEmail(email);
 
-        if(!isAllowedToAdministrate(currentUser, searchedUser))
+        if(!currentUser.isAllowedToAdministrateUser(searchedUser))
         {
             logger.debug("Currently logged in user is not administrating selected user. Hiding private information");
             searchedUser.setPrivateInformation(null);
@@ -335,12 +360,17 @@ public class UserManagementController
     @RequestMapping(method = RequestMethod.POST, value = "deleteUser")
     public @ResponseBody ResponseEntity<String> deleteUser(@RequestParam String email, @CurrentUser User currentUser)
     {
+        if(email.isEmpty())
+        {
+            logger.warn("The email is not allowed to be empty");
+            return new ResponseEntity<>("The email is not allowed to be empty", HttpStatus.BAD_REQUEST);
+        }
         User deletedUser = userRepository.findByEmail(email);
         if(deletedUser == null)
         {
             logger.warn("Unable to find stated user " + email);
             return new ResponseEntity<>("Unable to find the stated user", HttpStatus.BAD_REQUEST);
-        } else if (!isAllowedToAdministrate(currentUser, deletedUser))
+        } else if (!currentUser.isAllowedToAdministrateUser(deletedUser))
         {
             logger.warn("Not allowed to delete user.");
             return new ResponseEntity<>("You are not allowed to delete the selected user", HttpStatus.BAD_REQUEST);
@@ -356,33 +386,5 @@ public class UserManagementController
                 return new ResponseEntity<>("Unable to delete the selected user", HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
-    }
-
-    /**
-     * This function checks if the currently logged in user is allowed to administrate (view private information and change user details) the selected user.
-     * @param currentUser The currently logged in user.
-     * @param selectedUser The selected user.
-     * @return True if the user is allowed, false otherwise.
-     */
-    private boolean isAllowedToAdministrate(User currentUser, User selectedUser)
-    {
-        //Getting the list of administrated divisions
-        List<Division> administratedDivisions = divisionRepository.findByAdminUser(currentUser);
-
-        boolean allowedToAdministrate;
-
-        //Is the user does not have any divisions at the moment, the admin is allowed to administrate the user.
-        if(selectedUser.getDivisions() == null || selectedUser.getDivisions().isEmpty() || selectedUser.getEmail().equals(currentUser.getEmail()))
-        {
-            allowedToAdministrate = true;
-        } else
-        {
-            //Checking if the current administrator is administrating any of the divisions the user is part of
-            allowedToAdministrate = selectedUser.getDivisions().parallelStream() //Streaming all divisions the user is part of
-                    .anyMatch(div -> //If there is any match the admin is allowed to view the user
-                            div.getAncestors().parallelStream() //Streaming all ancestors of the user's divisions
-                                    .anyMatch(anc -> administratedDivisions.contains(anc))); //If there is any match between administrated divisions and ancestors of one of the users divisions
-        }
-        return allowedToAdministrate;
     }
 }

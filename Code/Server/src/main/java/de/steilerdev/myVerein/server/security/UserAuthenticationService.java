@@ -34,6 +34,39 @@ import java.util.List;
 
 public class UserAuthenticationService implements UserDetailsService
 {
+    public enum AuthorityRoles {
+        /**
+         * This enum is representing a regular user, who is not administrating any divisions.
+         */
+        USER {
+            @Override
+            public String toString()
+            {
+                return "ROLE_USER";
+            }
+        },
+        /**
+         * This enum is representing an user, who is at least administrating one division.
+         */
+        ADMIN {
+            @Override
+            public String toString()
+            {
+                return "ROLE_ADMIN";
+            }
+        },
+        /**
+         * This enum is representing a user who is administrating the complete system.
+         */
+        SUPERADMIN {
+            @Override
+            public String toString()
+            {
+                return "ROLE_SUPERADMIN";
+            }
+        },
+    }
+
     @Autowired
     UserRepository userRepository;
 
@@ -70,16 +103,16 @@ public class UserAuthenticationService implements UserDetailsService
         List<Division> administratedDiv = divisionRepository.findByAdminUser(user);
         if(administratedDiv.isEmpty())
         {
-            logger.debug("Authenticated user is ROLE_USER");
-            authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+            logger.debug("Authenticated user is " + AuthorityRoles.USER.toString());
+            authorities.add(new SimpleGrantedAuthority(AuthorityRoles.USER.toString()));
         } else
         {
-            logger.debug("Authenticated user is ROLE_ADMIN");
-            authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
+            logger.debug("Authenticated user is " + AuthorityRoles.ADMIN.toString());
+            authorities.add(new SimpleGrantedAuthority(AuthorityRoles.ADMIN.toString()));
             if(administratedDiv.stream().anyMatch(div -> div.getParent() == null))
             {
-                logger.debug("Authenticated user is ROLE_SUPERADMIN");
-                authorities.add(new SimpleGrantedAuthority("ROLE_SUPERADMIN"));
+                logger.debug("Authenticated user is " + AuthorityRoles.SUPERADMIN.toString());
+                authorities.add(new SimpleGrantedAuthority(AuthorityRoles.SUPERADMIN.toString()));
             }
         }
         return authorities;

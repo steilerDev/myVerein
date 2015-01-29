@@ -20,8 +20,10 @@ package de.steilerdev.myVerein.server.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import de.steilerdev.myVerein.server.security.PasswordEncoder;
+import de.steilerdev.myVerein.server.security.UserAuthenticationService;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotBlank;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -48,6 +50,11 @@ public class User implements UserDetails
         PASSIVE,
         RESIGNED
     }
+
+    @Transient
+    @JsonIgnore
+    @Autowired
+    private DivisionRepository divisionRepository;
 
     @NotBlank
     private String firstName;
@@ -532,6 +539,35 @@ public class User implements UserDetails
 
         membershipStatus = null;
         administrationNotAllowedMessage = null;
+    }
+
+    /**
+     * This function checks if the current user is allowed to modify a specified event. He is allowed to do this if he is either the creator or the superadmin.
+     * @param event The selected event.
+     * @return True if the user is allowed, false otherwise.
+     */
+    public boolean isAllowedToAdministrateEvent(Event event)
+    {
+        return event.getEventAdmin().equals(this) || authorities.parallelStream().anyMatch(authority -> authority.getAuthority().equals(UserAuthenticationService.AuthorityRoles.SUPERADMIN.toString()));
+    }
+
+    /**
+     * This function checks if the user is allowed to administrate (view private information and change user details) the selected user.
+     * @param selectedUser The selected user.
+     * @return True if the user is allowed, false otherwise.
+     */
+    public boolean isAllowedToAdministrateUser(User selectedUser)
+    {
+        //Getting the list of administrated divisions
+        List<Division> administratedDivisions = divisionRepository.findByAdminUser(this);
+
+        return selectedUser.getDivisions() == null ||  //If there is no divisions or
+                selectedUser.getDivisions().isEmpty() ||  //the list of divisions is empty, the user is allowed to administrate the user
+                selectedUser.equals(this) || //If the user is the same he is allowed
+                selectedUser.getDivisions().parallelStream() //Streaming all divisions the user is part of
+                        .anyMatch(div -> //If there is any match the admin is allowed to view the user
+                                div.getAncestors().parallelStream() //Streaming all ancestors of the user's divisions
+                                        .anyMatch(anc -> administratedDivisions.contains(anc))); //If there is any match between administrated divisions and ancestors of one of the users divisions
     }
 
     @Override

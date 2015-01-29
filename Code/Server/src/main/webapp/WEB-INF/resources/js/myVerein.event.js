@@ -80,6 +80,7 @@ function resetEventForm(doNotHideDeleteButton) {
 
     //Re-enable submit button
     eventSubmitButton.enable();
+    eventDeleteButton.enable();
 
     if(!doNotHideDeleteButton) {
         //Hide delete button
@@ -263,10 +264,11 @@ function loadEvent(eventID) {
                 $('#oldEventHeadingName').text('<' + event.name + '>');
 
                 $('#oldEventButton').removeClass("hidden");
+                $('#eventDelete').removeClass('hidden');
 
                 //Fill division list
-                if (event.invitedDivisions) {
-                    $.each(event.invitedDivisions, function (index, division) {
+                if (event.invitedDivision) {
+                    $.each(event.invitedDivision, function (index, division) {
                         $('#invitedDivisions')[0].selectize.addItem(division.name);
                     });
                 }
@@ -305,14 +307,13 @@ function localDateTimeToString(localDateTime) {
     }
 }
 
-function updateMapUsingLocationField()
-{
+function updateMapUsingLocationField() {
     GMaps.geocode({
         address: $('#location').val().trim(),
         callback: function (results, status) {
             if (status == 'OK') {
                 var latlng = results[0].geometry.location;
-                updateMapUsingLatLng(latlng.lat, latlng.lng);
+                updateMapUsingLatLng(latlng.lat(), latlng.lng());
             }
         }
     });
@@ -467,7 +468,7 @@ function loadEventPage() {
                 // Prevent form submission
                 e.preventDefault();
                 //Starting button animation
-                userSubmitButton.startAnimation();
+                eventSubmitButton.startAnimation();
                 //Send the serialized form
                 $.ajax({
                     url: '/event',
@@ -495,26 +496,26 @@ function loadEventPage() {
     if(!eventDeleteButton) {
         //Enabling progress button
         eventDeleteButton = new UIProgressButton(document.getElementById('eventDelete'));
-        $('#userDeleteButton').click(function(e){
-            //e.preventDefault();
-            //userDeleteButton.startAnimation();
-            //$.ajax({
-            //    url: '/user/deleteUser',
-            //    type: 'POST',
-            //    data: {
-            //        email: $('#userFlag').val()
-            //    },
-            //    error: function (response) {
-            //        userDeleteButton.stopAnimation(-1);
-            //        showMessage(response.responseText, 'error', 'icon_error-triangle_alt');
-            //    },
-            //    success: function (response) {
-            //        userDeleteButton.stopAnimation(0);
-            //        showMessage(response, 'success', 'icon_check');
-            //        loadNewUser(true);
-            //        loadUserList();
-            //    }
-            //});
+        $('#eventDeleteButton').click(function(e){
+            e.preventDefault();
+            eventDeleteButton.startAnimation();
+            $.ajax({
+                url: '/event/deleteEvent',
+                type: 'POST',
+                data: {
+                    id: $('#eventFlag').val()
+                },
+                error: function (response) {
+                    eventDeleteButton.stopAnimation(-1);
+                    showMessage(response.responseText, 'error', 'icon_error-triangle_alt');
+                },
+                success: function (response) {
+                    eventDeleteButton.stopAnimation(0);
+                    showMessage(response, 'success', 'icon_check');
+                    loadNewEvent(true);
+                    loadOccupiedDates(calendar.month);
+                }
+            });
         })
     }
 
