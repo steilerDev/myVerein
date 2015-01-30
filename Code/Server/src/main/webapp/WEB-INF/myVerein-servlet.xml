@@ -13,12 +13,13 @@
        <!-- Thymeleaf (Template engine, JSP replacement) configuration -->
        <import resource="configuration/thymeleaf-config.xml" />
 
-       <!-- Java Spring Security configuration -->
-       <import resource="configuration/security-config.xml" />
-
        <!-- Internationalization configuration, defining MessageSource etc. -->
        <import resource="configuration/internationalization-config.xml" />
 
        <!-- Content negotiation (Serving JSON instead of html, when JSON is requested) -->
        <import resource="configuration/content-negotiation-config.xml" />
+
+        <!-- Java Spring Security configuration -->
+        <import resource="configuration/security-config.xml" />
+
 </beans>

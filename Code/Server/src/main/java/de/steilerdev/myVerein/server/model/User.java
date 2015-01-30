@@ -54,11 +54,6 @@ public class User implements UserDetails
         RESIGNED
     }
 
-    @Transient
-    @JsonIgnore
-    @Autowired
-    private DivisionRepository divisionRepository;
-
     @NotBlank
     private String firstName;
     @NotBlank
@@ -562,10 +557,12 @@ public class User implements UserDetails
     /**
      * This function checks if the user is allowed to administrate (view private information and change user details) the selected user.
      * @param selectedUser The selected user.
+     * @param divisionRepository The division repository used to retrieve all divisions information, due to a problem of injecting the resource within the user object.
      * @return True if the user is allowed, false otherwise.
      */
     @JsonIgnore
-    public boolean isAllowedToAdministrate(User selectedUser)
+    @Transient
+    public boolean isAllowedToAdministrate(User selectedUser, DivisionRepository divisionRepository)
     {
         //Getting the list of administrated divisions
         List<Division> administratedDivisions = divisionRepository.findByAdminUser(this);
@@ -583,8 +580,15 @@ public class User implements UserDetails
                 );
     }
 
+    /**
+     * This function checks if the user is allowed to administrate a selected division.
+     * @param division The selected division.
+     * @param divisionRepository The division repository used to retrieve all divisions information, due to a problem of injecting the resource within the user object.
+     * @return True if the user is allowed, false otherwise.
+     */
     @JsonIgnore
-    public boolean isAllowedToAdministrate(Division division)
+    @Transient
+    public boolean isAllowedToAdministrate(Division division, DivisionRepository divisionRepository)
     {
         return this.isAdmin() && //The user needs to be an administrator
                 (
@@ -600,6 +604,7 @@ public class User implements UserDetails
      * @return True if the user is the super admin, false otherwise.
      */
     @JsonIgnore
+    @Transient
     public boolean isSuperAdmin()
     {
         return authorities != null &&

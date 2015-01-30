@@ -94,7 +94,7 @@ public class DivisionManagementController
                 return new ResponseEntity<>("Problem finding existing division, either the existing division could not be located or the new name is already taken", HttpStatus.BAD_REQUEST);
             }
 
-            if(currentUser.isAllowedToAdministrate(division)) //Check if user is allowed to change the division (if he administrates one of the parent divisions)
+            if(currentUser.isAllowedToAdministrate(division, divisionRepository)) //Check if user is allowed to change the division (if he administrates one of the parent divisions)
             {
                 User adminUser = null;
                 if (admin != null && !admin.isEmpty())
@@ -187,7 +187,7 @@ public class DivisionManagementController
         {
             logger.warn("Unable to find stated division " + divisionName);
             return new ResponseEntity<>("Unable to find the stated division", HttpStatus.BAD_REQUEST);
-        } else if (!currentUser.isAllowedToAdministrate(deletedDivision))
+        } else if (!currentUser.isAllowedToAdministrate(deletedDivision, divisionRepository))
         {
             logger.warn("Not allowed to delete division.");
             return new ResponseEntity<>("You are not allowed to delete the selected division", HttpStatus.BAD_REQUEST);
@@ -308,7 +308,7 @@ public class DivisionManagementController
         logger.debug("Changing layout: " + selectedDivision.getName() + " moved to parent " + newParent.getName());
 
         //The moved node and the target need to be administrated by the user. The nodes should not be root nodes of the user's administration.
-        if(currentUser.isAllowedToAdministrate(newParent) && currentUser.isAllowedToAdministrate(selectedDivision))
+        if(currentUser.isAllowedToAdministrate(newParent, divisionRepository) && currentUser.isAllowedToAdministrate(selectedDivision, divisionRepository))
         {
             logger.debug("Changing structure.");
             updateSubtree(selectedDivision, newParent);

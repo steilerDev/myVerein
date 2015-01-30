@@ -5,6 +5,9 @@ import de.steilerdev.myVerein.server.security.CurrentUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PropertiesLoaderUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -12,10 +15,13 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
+import java.io.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.Properties;
 
 /**
  * This controller is processing all general requests.
@@ -51,10 +57,20 @@ public class IndexController
 	 * This request mapping is processing the request to view the login page.
 	 * @return The path to the view for the login page.
 	 */
-	@RequestMapping(value = "login", method = RequestMethod.GET)
-	public String login()
+	@RequestMapping(value = "login",method = RequestMethod.GET)
+	public String login(@RequestParam (required = false) String error,
+                        @RequestParam (required = false) String logout,
+                        ModelMap modelMap)
 	{
-		//createDatabaseExample();
+//        if(error != null)
+//        {
+//            modelMap.addAttribute("loginError", "Unable to log in, please check your credentials");
+//        }
+//        if(logout != null)
+//        {
+//            modelMap.addAttribute("logout", "You successfully logged out");
+//        }
+        //createDatabaseExample();
 		return "login";
 	}
 
@@ -62,11 +78,16 @@ public class IndexController
      * Dummy method for a work around to disable application flooding by IntelliJ. See IntelliJ support request #51574.
      * @return OK
      */
-//    @RequestMapping(method = RequestMethod.HEAD, value = "*")
-//    public ResponseEntity<String> fuck()
-//    {
-//        return new ResponseEntity<>("Shut up!", HttpStatus.OK);
-//    }
+    @RequestMapping(method = RequestMethod.HEAD, value = "*")
+    public ResponseEntity<String> fuck(@RequestHeader Map<String, String> headers)
+    {
+        for(String headerKey: headers.keySet())
+        {
+            System.err.print(headerKey + ": " + headers.get(headerKey) + "; ");
+        }
+        System.err.print("\n");
+        return new ResponseEntity<>("No", HttpStatus.OK);
+    }
 
 	/**
 	 * This function is clearing the current database and creates a new set of test data.

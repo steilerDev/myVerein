@@ -25,16 +25,26 @@
     </head>
     <body>
         <div class="verticalCentered">
+
+            <div class="container">
+                <div th:if="${param.error != null}">
+                    <div class="center-block alert alert-danger alertLogin" role="alert">Unable to log in, please check your credentials</div>
+                </div>
+                <div th:if="${param.logout != null}">
+                    <div class="center-block alert alert-success alertLogin" role="alert">You successfully logged out</div>
+                </div>
+            </div>
+
             <div class="loginContainer container">
-                <form class="form-signin materialBox" name='f' action='/j_spring_security_check' method='POST' accept-charset="UTF-8">
+                <form class="form-signin materialBox" action='/login_check' method='POST' accept-charset="UTF-8">
                     <h2 th:text="#{login.message}">Login with Username and Password</h2>
                     <label for="inputEmail" class="sr-only" th:text="#{login.email}">Email address</label>
-                    <input name="j_username" type="email" id="inputEmail" th:placeholder="#{login.email}" class="form-control" placeholder="Email address"/>
+                    <input name="username" type="email" id="inputEmail" th:placeholder="#{login.email}" class="form-control" placeholder="Email address"/>
                     <label for="inputPassword" class="sr-only" th:text="#{login.password}">Password</label>
-                    <input name="j_password" type="password" id="inputPassword" class="form-control" th:placeholder="#{login.password}" placeholder="Password"/>
+                    <input name="password" type="password" id="inputPassword" class="form-control" th:placeholder="#{login.password}" placeholder="Password"/>
                     <div class="checkbox">
                         <label class="loginCheckbox">
-                            <input type="checkbox" value="remember-me"/>
+                            <input type="checkbox" name="rememberMe"/>
                             Remember me
                         </label>
                     </div>

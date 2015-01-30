@@ -17,13 +17,37 @@
             <intercept-url pattern="/settings" access="hasRole('ROLE_SUPERADMIN')" />
             <intercept-url pattern="/**" access="hasRole('ROLE_ADMIN')" />
 
-            <form-login login-page="/login"/>
-            <logout logout-url="/logout" />
+           <form-login login-page="/login"
+                       default-target-url="/"
+                       username-parameter="username"
+                       password-parameter="password"
+                       authentication-failure-url="/login?error"
+                       login-processing-url="/login_check"/>
+
+            <logout logout-url="/logout"
+                    logout-success-url="/login?logout"
+                    delete-cookies="myVereinSessionCookie, myVereinRememberMeCookie" />
+
+            <remember-me services-ref="rememberMeServices" />
        </http>
 
+        <!-- Remember me configuration -->
+        <beans:bean id="rememberMeServices" class="org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices">
+            <beans:constructor-arg value="myVereinRememberMeKey"/>
+            <beans:constructor-arg ref="UserAuthenticationService"/>
+            <beans:constructor-arg ref="tokenDataProvider"/>
+            <beans:property name="cookieName" value="myVereinRememberMeCookie"/>
+            <beans:property name="tokenLength" value="32"/>
+            <beans:property name="parameter" value="rememberMe"/>
+            <beans:property name="tokenValiditySeconds" value="604800" />
+            <!--beans:property name="useSecureCookie" value="true" /-->
+        </beans:bean>
 
+        <beans:bean id="tokenDataProvider" class="de.steilerdev.myVerein.server.security.RememberMeTokenDataProvider" />
+
+        <!-- Authentication configuration -->
        <authentication-manager>
-              <!--  Plain text authentication without database -->
+              <!--  Plain text authentication without database as a fall back solution if a password got lost-->
               <!--authentication-provider>
                      <user-service properties="classpath:admin.properties" />
               </authentication-provider-->
