@@ -1,0 +1,135 @@
+<!--/*
+    Document   : Settings
+    Description: This page contains the fragment included within the application, that is used to set the system wide settings.
+    Copyright  : (c) 2014 Frank Steiler <frank@steilerdev.de>
+    License    : GNU General Public License v2.0
+*/-->
+
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+
+    <head>
+        <title>Event Management</title>
+    </head>
+    <body>
+        <div id="tab" class="tabs tabs-style-underline">
+            <div class="content-wrap">
+                <!-- Only the following container is going to be used within the production page-->
+                <section th:fragment="content">
+                    <div class="col-sm-offset-2 col-sm-8">
+                        <div class="materialBox">
+                            <h2 id="heading">Change system settings</h2>
+                            <hr />
+                            <form id="settingsForm" method="post"
+                                  data-bv-feedbackicons-valid="icon_check"
+                                  data-bv-feedbackicons-invalid="icon_error-triangle_alt"
+                                  data-bv-feedbackicons-validating="icon_loading">
+
+                                <div class="form-group">
+                                    <label for="superAdmin">Super Admin</label>
+                                    <input id="superAdmin" type="text" class="form-control" name="superAdmin" placeholder="Select the super admin"
+                                           data-bv-notempty="true"
+                                           data-bv-notempty-message="The super admin name is required and cannot be empty"/>
+                                </div>
+                                <div class="form-group">
+                                    <label for="superAdminPasswordOld">Super admin password</label>
+                                    <input id="superAdminPasswordOld" type="password" name="superAdminPassword" class="form-control" placeholder="Enter the old password of the super admin to change it" />
+                                    <input id="superAdminPasswordNew" type="password" name="superAdminPassword" class="form-control" placeholder="Enter a new password of the super admin to change it" />
+                                    <input id="superAdminPasswordNewRe" type="password" name="superAdminPassword" class="form-control" placeholder="Re-type the new password of the super admin to change it"/>
+                                </div>
+
+                                <hr/>
+
+                                <div class="form-group">
+                                    <label for="clubName">Club name</label>
+                                    <input name="clubName" class="form-control" id="clubName" type="text" placeholder="Enter the name of your club"
+                                           data-bv-notempty="true"
+                                           data-bv-notempty-message="The name of your club is required and cannot be empty"/>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="clubLogo">Club logo</label>
+                                    <br/>
+                                    <br/>
+                                    <span class="btn btn-default btn-file">
+                                        Browse <input id="clubLogo" type="file" name="file"/>
+                                    </span>
+                                    <span id="clubLogoLabel" class="btn-file-label">No file selected</span>
+                                </div>
+
+                                <hr/>
+
+                                <div class="form-group">
+                                    <label for="databaseHost">Database host</label>
+                                    <input id="databaseHost" type="text" class="form-control " name="databaseHost" placeholder="Enter the host of the database"
+                                           data-bv-notempty="true"
+                                           data-bv-notempty-message="The database host is required and cannot be empty" />
+                                </div>
+                                <div class="form-group">
+                                    <label for="databasePort">Database port</label>
+                                    <input id="databasePort" type="text" class="form-control " name="dataBasePort" placeholder="Enter the port of the database"
+                                           data-bv-notempty="true"
+                                           data-bv-notempty-message="The database port is required and cannot be empty" />
+                                </div>
+                                <div class="form-group">
+                                    <label for="dataBaseUser">Database user</label>
+                                    <input id="dataBaseUser" type="text" class="form-control" name="dataBaseUser" placeholder="Enter the username of the database user" />
+                                </div>
+                                <div class="form-group">
+                                    <label for="dataBasePassword">Database password</label>
+                                    <input id="dataBasePassword" type="password" class="form-control" name="dataBasePassword" placeholder="Enter the password of the database user"/>
+                                </div>
+                                <div class="form-group">
+                                    <label for="dataBaseCollection">Database collection name</label>
+                                    <input id="dataBaseCollection" type="text" class="form-control" name="dataBaseCollection" placeholder="Enter the name of the database collection used"
+                                           data-bv-notempty="true"
+                                           data-bv-notempty-message="The name of the database collection is required and cannot be empty" />
+                                    <p class="help-block">When changing this value you might reset the whole system. Handle with care!</p>
+                                </div>
+
+                                <hr/>
+
+                                <div class="form-group">
+                                    <label for="rememberMeTokenKey">Remember me token key</label>
+                                    <input id="rememberMeTokenKey" type="text" class="form-control" name="rememberMeTokenKey" placeholder="Enter your private key, used to secure the remember me token"
+                                            data-bv-notempty="true"
+                                            data-bv-notempty-message="The remember me token key is required and cannot be empty" />
+                                    <p class="help-block">This key is used to secure the "remember-me" functionality. Please use a random phrase.</p>
+                                </div>
+
+                                <hr/>
+
+                                <div id="submitGroup" class="form-group">
+                                    <div class="progress-button" id="settingsSubmitButton">
+                                        <button type="submit">Update settings</button>
+                                        <svg class="progress-circle" width="50" height="50">
+                                            <g transform="scale(0.71)">
+                                                <path d="m35,2.5c17.955803,0 32.5,14.544199 32.5,32.5c0,17.955803 -14.544197,32.5 -32.5,32.5c-17.955803,0 -32.5,-14.544197 -32.5,-32.5c0,-17.955801 14.544197,-32.5 32.5,-32.5z"/>
+                                            </g>
+                                        </svg>
+                                        <svg class="checkmark" width="50" height="50">
+                                            <g transform="scale(0.71)">
+                                                <path d="m31.5,46.5l15.3,-23.2"/>
+                                                <path d="m31.5,46.5l-8.5,-7.1"/>
+                                            </g>
+                                        </svg>
+                                        <svg class="cross" width="50" height="50">
+                                            <g transform="scale(0.71)">
+                                                <path d="m35,35l-9.3,-9.3"/>
+                                                <path d="m35,35l9.3,9.3"/>
+                                                <path d="m35,35l-9.3,9.3"/>
+                                                <path d="m35,35l9.3,-9.3"/>
+                                            </g>
+                                        </svg>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </body>
+</html>

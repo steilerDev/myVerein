@@ -16,6 +16,7 @@
  */
 package de.steilerdev.myVerein.server.model;
 
+import org.springframework.data.annotation.Id;
 import org.springframework.security.web.authentication.rememberme.PersistentRememberMeToken;
 
 import java.util.Date;
@@ -26,6 +27,9 @@ import java.util.Date;
  */
 public class RememberMeToken
 {
+    @Id
+    private String id;
+
     private String username;
     private String series;
     private String tokenValue;
@@ -56,7 +60,7 @@ public class RememberMeToken
 
     public String getSeries()
     {
-        return getSeries();
+        return series;
     }
 
     public String getTokenValue()
@@ -87,6 +91,16 @@ public class RememberMeToken
     public void setDate(Date date)
     {
         this.date = date;
+    }
+
+    public String getId()
+    {
+        return id;
+    }
+
+    public void setId(String id)
+    {
+        this.id = id;
     }
 
     public PersistentRememberMeToken toPersistentRememberMeToken()

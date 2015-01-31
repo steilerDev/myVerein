@@ -19,6 +19,8 @@ package de.steilerdev.myVerein.server.model;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 /**
  * This repository is used to store and retrieve tokens for the remember me functionality
  */
@@ -26,5 +28,5 @@ import org.springframework.stereotype.Repository;
 public interface RememberMeTokenRepository extends MongoRepository<RememberMeToken, String>
 {
     public abstract RememberMeToken findRememberMeTokenBySeries(String series);
-    public abstract RememberMeToken findRememberMeTokenByUsername(String username);
+    public abstract List<RememberMeToken> findRememberMeTokenByUsername(String username);
 }

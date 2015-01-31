@@ -25,6 +25,7 @@ import org.springframework.security.web.authentication.rememberme.PersistentReme
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * This data provider is implementing the necessary functions to enable a persistent token repository. This provider is needed to user the remember me functionality.
@@ -68,11 +69,16 @@ public class RememberMeTokenDataProvider implements PersistentTokenRepository
     @Override
     public void removeUserTokens(String username)
     {
-        RememberMeToken token = rememberMeTokenRepository.findRememberMeTokenByUsername(username);
-        if(token != null)
+        List<RememberMeToken> tokens = rememberMeTokenRepository.findRememberMeTokenByUsername(username);
+        if(tokens != null)
         {
             logger.debug("Deleting remember me token for user " + username);
-            rememberMeTokenRepository.delete(token);
+            try {
+                rememberMeTokenRepository.delete(tokens);
+            } catch(IllegalArgumentException e)
+            {
+                logger.error("Unable to delete remember me token for user " + username + ": " + e.getMessage());
+            }
         } else
         {
             logger.warn("Unable to delete remember me token for user " + username);

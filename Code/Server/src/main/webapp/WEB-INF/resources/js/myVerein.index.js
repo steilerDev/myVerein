@@ -37,6 +37,9 @@ $(document).ready(function() {
             } else if(currentTab.id == "eventTab")
             {
                 loadEventPage();
+            } else if(currentTab.id == "settingsTab")
+            {
+                loadSettingsPage();
             }
         }
     }

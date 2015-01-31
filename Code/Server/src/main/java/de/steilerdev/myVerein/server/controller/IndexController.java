@@ -60,22 +60,34 @@ public class IndexController
 	@RequestMapping(value = "login",method = RequestMethod.GET)
 	public String login(@RequestParam (required = false) String error,
                         @RequestParam (required = false) String logout,
-                        ModelMap modelMap)
+                        @RequestParam (required = false) String cookieTheft)
 	{
-//        if(error != null)
-//        {
-//            modelMap.addAttribute("loginError", "Unable to log in, please check your credentials");
-//        }
-//        if(logout != null)
-//        {
-//            modelMap.addAttribute("logout", "You successfully logged out");
-//        }
+        if(error != null)
+        {
+            logger.warn("An error occurred during log in");
+        }
+        if(logout != null)
+        {
+            logger.debug("A user successfully logged out");
+        }
+        if(cookieTheft != null)
+        {
+            logger.error("A possible cookie theft was observed!");
+        }
         //createDatabaseExample();
 		return "login";
 	}
 
+    @RequestMapping(value = "error", method = RequestMethod.GET)
+    public String error()
+    {
+        logger.warn("An unexpected error was recognized, redirecting to error page.");
+        return "error";
+    }
+
     /**
-     * Dummy method for a work around to disable application flooding by IntelliJ. See IntelliJ support request #51574.
+     * Dummy method for a work around to disable application flooding by IntelliJ.
+     * See https://youtrack.jetbrains.com/issue/IDEA-135196
      * @return OK
      */
     @RequestMapping(method = RequestMethod.HEAD, value = "*")
