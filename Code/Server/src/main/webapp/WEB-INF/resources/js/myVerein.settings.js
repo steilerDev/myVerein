@@ -8,20 +8,87 @@
 var settingsSubmitButton;
 
 function disableSettings() {
+    //Disable the complete form
     $("#settingsForm :input").prop("disabled", true);
-    $('#superAdmin')[0].selectize.disable();
-    settingsSubmitButton.disable();
+    $('#clubLogoButton').addClass('btn-disabled');
+    $('#currentAdmin')[0].selectize.disable();
+
+    //Hides settings that are only supposed to be edited by the super admin
+    $('#superAdminSettings').addClass("hidden");
+
+    //Re-enable fields that are open for everyone
+    $('#adminPasswordNew').prop("disabled", false);
+    $('#adminPasswordNewRe').prop("disabled", false);
+    $('#currentAdminPassword').prop("disabled", false);
+    $('#locale').prop("disabled", false);
+}
+
+function resetSettingsForm() {
+
+    $("#settingsForm :input").prop("disabled", false);
+    $('#clubLogoButton').removeClass('btn-disabled');
+    settingsSubmitButton.enable();
+    $('#currentAdminLabel').addClass("hidden");
+    $('#superAdminLabel').addClass("hidden");
+
+    $('#superAdminSettings').removeClass("hidden");
+
+    $('#databaseHost').val("");
+    $('#databasePort').val("");
+    $('#databaseUser').val("");
+    $('#databasePassword').val("");
+    $('#databaseCollection').val("");
+    $('#rememberMeTokenKey').val("");
+    $('#clubName').val("");
+    $('#locale').val("default");
+    clearPasswords();
+
+    var currentAdmin = $('#currentAdmin')[0].selectize;
+    currentAdmin.enable();
+    currentAdmin.clear();
+
+    //Reseting previous validation annotation
+    $('#settingsForm').data('bootstrapValidator').resetForm();
+}
+
+function clearPasswords() {
+    $('#adminPasswordNew').val("");
+    $('#adminPasswordNewRe').val("");
+    $('#currentAdminPassword').val("");
 }
 
 function loadSettings() {
-
+    resetSettingsForm();
+    settingsSubmitButton.startAnimation();
+    //Sending JSON request with the division name as parameter to get the division details
+    $.getJSON("/settings", function (settings) {
+        if(settings)
+        {
+            if(settings.administrationNotAllowedMessage) {
+                disableSettings();
+                $('#currentAdminLabel').removeClass("hidden");
+                showMessage(settings.administrationNotAllowedMessage, 'warning', 'icon_error-triangle_alt');
+            } else {
+                $('#superAdminLabel').removeClass("hidden");
+                $('#databaseHost').val(settings.dbHost);
+                $('#databasePort').val(settings.dbPort);
+                $('#databaseUser').val(settings.dbUser);
+                $('#databasePassword').val(settings.dbPassword);
+                $('#databaseCollection').val(settings.dbName);
+                $('#rememberMeTokenKey').val(settings.rememberMeKey);
+                $('#clubName').val(settings.clubName);
+            }
+            $('#currentAdmin')[0].selectize.addItem(settings.currentAdmin.email);
+            $('#locale').val(locale);
+        }
+        settingsSubmitButton.stopAnimation(0);
+    })
 }
 
 function loadSettingsPage(){
-    console.log("loading settings page");
-    if (!$('#superAdmin')[0].selectize) {
+    if (!$('#currentAdmin')[0].selectize) {
         //Enabling selection of super admin user from existing user
-        $('#superAdmin').selectize({
+        $('#currentAdmin').selectize({
             persist: false,
             createOnBlur: true,
             create: false, //Not allowing the creation of user specific items
@@ -75,23 +142,29 @@ function loadSettingsPage(){
                 $.ajax({
                     url: '/settings',
                     type: 'POST',
-                    data: $(e.target).serialize(),
+                    data: new FormData($('#settingsForm')[0]),
                     error: function (response) {
                         settingsSubmitButton.stopAnimation(-1);
                         showMessage(response.responseText, 'error', 'icon_error-triangle_alt');
+                        clearPasswords();
                     },
                     success: function (response) {
                         settingsSubmitButton.stopAnimation(1);
                         showMessage(response, 'success', 'icon_check');
-                    }
+                        if(locale != $('#locale').val()) {
+                            window.location.reload(false);
+                        }
+                        clearPasswords();
+                    },
+                    cache: false,
+                    contentType: false,
+                    processData: false
                 });
             });
     }
 
-    $('#clubLogo').on('fileselect', function(event, numFiles, label) {
-        console.log(numFiles);
-        console.log(label);
-        console.log($('#clubLogo').val());
+    $('#clubLogo').change(function() {
+        $('#clubLogoLabel').text($('#clubLogo').val());
     });
 
     loadSettings();

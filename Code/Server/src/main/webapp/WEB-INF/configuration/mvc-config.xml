@@ -23,4 +23,6 @@
        <!-- Resource folder, for static content serving -->
        <resources location="/WEB-INF/resources/" mapping="/resources/**" />
 
+        <beans:bean id="multipartResolver" class="org.springframework.web.multipart.support.StandardServletMultipartResolver" />
+
 </beans:beans>

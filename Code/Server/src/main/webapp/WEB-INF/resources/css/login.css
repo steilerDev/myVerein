@@ -43,8 +43,8 @@ body {
 }
 
 .loginContainer {
-    background-image: url("/resources/images/Logo.svg");
-    background-size: 20% auto;
+    background-image: url("/content/clubLogo");
+    background-size: 250px auto;
     background-repeat: no-repeat;
     background-position: 30% center;
 }

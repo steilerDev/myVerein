@@ -16,11 +16,15 @@
        <repositories base-package="de.steilerdev.myVerein.server.model" />
        <template db-factory-ref="mongoDbFactory" converter-ref="javaTimeConverter"/>
 
+       <!-- GridFS bean for file access within MongoDB -->
+       <gridFsTemplate id="gridFS" db-factory-ref="mongoDbFactory" converter-ref="javaTimeConverter"/>
+
        <db-factory host="${dbHost}"
                    port="${dbPort}"
                    dbname="${dbName}"
-                   username="${dbUsername}"
+                   username="${dbUser}"
                    password="${dbPassword}"/>
+
 
        <!-- Data Validation using Hibernate Validator and JavaX validation interface -->
        <beans:bean id="dataValidator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean"/>
@@ -28,5 +32,7 @@
        <beans:bean id="mongoValidator" class="org.springframework.data.mongodb.core.mapping.event.ValidatingMongoEventListener">
               <beans:constructor-arg name="validator" ref="dataValidator"/>
        </beans:bean>
+
+        <beans:bean id="gridFSRepository" name="gridFSRepository" class="de.steilerdev.myVerein.server.model.GridFSRepository" />
 
 </beans:beans>

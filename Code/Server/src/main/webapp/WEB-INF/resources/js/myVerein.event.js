@@ -67,7 +67,8 @@ function resetEventForm(doNotHideDeleteButton) {
     $('#locationLng').val('');
 
     //Reset divisions list
-    $('#invitedDivisions')[0].selectize.clear();
+    var invitedDivisions =$('#invitedDivisions')[0].selectize;
+    invitedDivisions.clear();
 
     //Reset map
     map.setCenter(initLat, initLng);
@@ -93,7 +94,7 @@ function resetEventForm(doNotHideDeleteButton) {
 
     //Re-enable form
     $("#eventForm :input").prop("disabled", false);
-    $('#invitedDivisions')[0].selectize.enable();
+    invitedDivisions.enable();
 
     //Reseting previous validation annotation
     $('#eventForm').data('bootstrapValidator').resetForm();

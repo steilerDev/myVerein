@@ -68,7 +68,7 @@
 
 .calendar .clndr .days-container .days .day,
 .calendar .clndr .days-container .days .empty {
-  width: 42px;
+  width: 14.2857%;
   display: inline-block;
   padding-top: 8px;
   padding-bottom: 8px;
@@ -106,7 +106,7 @@
   padding-bottom: 5px;
 }
 .calendar .clndr .days-container .days .headers .day-header {
-  width: 42px;
+  width: 14.2857%;
   display: inline-block;
   text-align: center;
   color: white;

@@ -22,88 +22,115 @@
                         <div class="materialBox">
                             <h2 id="heading">Change system settings</h2>
                             <hr />
-                            <form id="settingsForm" method="post"
+                            <form id="settingsForm" method="post" enctype="multipart/form-data"
                                   data-bv-feedbackicons-valid="icon_check"
                                   data-bv-feedbackicons-invalid="icon_error-triangle_alt"
                                   data-bv-feedbackicons-validating="icon_loading">
 
                                 <div class="form-group">
-                                    <label for="superAdmin">Super Admin</label>
-                                    <input id="superAdmin" type="text" class="form-control" name="superAdmin" placeholder="Select the super admin"
+                                    <label for="currentAdmin"><span id="superAdminLabel">Super admin user</span><span id="currentAdminLabel">Current admin</span></label>
+                                    <input id="currentAdmin" type="text" class="form-control" name="currentAdmin" placeholder="Select the super admin"
                                            data-bv-notempty="true"
                                            data-bv-notempty-message="The super admin name is required and cannot be empty"/>
                                 </div>
                                 <div class="form-group">
-                                    <label for="superAdminPasswordOld">Super admin password</label>
-                                    <input id="superAdminPasswordOld" type="password" name="superAdminPassword" class="form-control" placeholder="Enter the old password of the super admin to change it" />
-                                    <input id="superAdminPasswordNew" type="password" name="superAdminPassword" class="form-control" placeholder="Enter a new password of the super admin to change it" />
-                                    <input id="superAdminPasswordNewRe" type="password" name="superAdminPassword" class="form-control" placeholder="Re-type the new password of the super admin to change it"/>
+                                    <label for="adminPasswordNew">Change your password</label>
+                                    <input id="adminPasswordNew" type="password" name="adminPasswordNew" class="form-control" placeholder="Enter a new password to change it"
+                                            data-bv-different="true"
+                                            data-bv-different-field="currentAdminPassword"
+                                            data-bv-different-message="The new password needs to be different from the current one"/>
+                                    <input id="adminPasswordNewRe" type="password" name="adminPasswordNewRe" class="form-control" placeholder="Re-type the new password to change it"
+                                           data-bv-different="true"
+                                           data-bv-different-field="currentAdminPassword"
+                                           data-bv-different-message="The new password needs to be different from the current one"/>
+                                    <p class="help-block">If you want to change your password enter a new one, otherwise leave this field empty.</p>
+                                </div>
+                                <div id="superAdminSettings">
+                                    <hr/>
+
+                                    <div class="form-group">
+                                        <label for="clubName">Club name</label>
+                                        <input name="clubName" class="form-control" id="clubName" type="text" placeholder="Enter the name of your club"
+                                               data-bv-notempty="true"
+                                               data-bv-notempty-message="The name of your club is required and cannot be empty"/>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="clubLogo">Club logo</label>
+                                        <br/>
+                                        <br/>
+                                        <span id="clubLogoButton" class="btn btn-default btn-file">
+                                            Browse <input id="clubLogo" type="file" name="clubLogo"/>
+                                        </span>
+                                        <span id="clubLogoLabel" class="btn-file-label">No file selected</span>
+                                        <p class="help-block">Upload a new logo, if you want to override your current one</p>
+                                    </div>
+
+                                    <hr/>
+
+                                    <div class="form-group">
+                                        <label for="databaseHost">Database host</label>
+                                        <input id="databaseHost" type="text" class="form-control " name="databaseHost" placeholder="Enter the host of the database"
+                                               data-bv-notempty="true"
+                                               data-bv-notempty-message="The database host is required and cannot be empty" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="databasePort">Database port</label>
+                                        <input id="databasePort" type="text" class="form-control " name="databasePort" placeholder="Enter the port of the database"
+                                               data-bv-notempty="true"
+                                               data-bv-notempty-message="The database port is required and cannot be empty" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="databaseUser">Database user</label>
+                                        <input id="databaseUser" type="text" class="form-control" name="databaseUser" placeholder="Enter the username of the database user" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="databasePassword">Database password</label>
+                                        <input id="databasePassword" type="password" class="form-control" name="databasePassword" placeholder="Enter the password of the database user"/>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="databaseCollection">Database collection name</label>
+                                        <input id="databaseCollection" type="text" class="form-control" name="databaseCollection" placeholder="Enter the name of the database collection used"
+                                               data-bv-notempty="true"
+                                               data-bv-notempty-message="The name of the database collection is required and cannot be empty" />
+                                        <p class="help-block">When changing this value you might reset the whole system. Handle with care!</p>
+                                    </div>
+
+                                    <hr/>
+
+                                    <div class="form-group">
+                                        <label for="rememberMeTokenKey">Remember me token key</label>
+                                        <input id="rememberMeTokenKey" type="text" class="form-control" name="rememberMeTokenKey" placeholder="Enter your private key, used to secure the remember me token"
+                                                data-bv-notempty="true"
+                                                data-bv-notempty-message="The remember me token key is required and cannot be empty" />
+                                        <p class="help-block">This key is used to secure the "remember-me" functionality. Please use a random phrase.</p>
+                                    </div>
                                 </div>
 
                                 <hr/>
 
                                 <div class="form-group">
-                                    <label for="clubName">Club name</label>
-                                    <input name="clubName" class="form-control" id="clubName" type="text" placeholder="Enter the name of your club"
+                                    <label for="locale">Website language</label>
+                                    <select id="locale"  name="locale" class="form-control">
+                                        <option value="default" disabled="disabled" selected="selected"> -- choose a language -- </option>
+                                        <option value="en">English</option>
+                                        <option value="de">Deutsch</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="currentAdminPassword">Your current password</label>
+                                    <input id="currentAdminPassword" type="password" name="currentAdminPassword" class="form-control" placeholder="Enter your current password to change any settings"
                                            data-bv-notempty="true"
-                                           data-bv-notempty-message="The name of your club is required and cannot be empty"/>
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="clubLogo">Club logo</label>
-                                    <br/>
-                                    <br/>
-                                    <span class="btn btn-default btn-file">
-                                        Browse <input id="clubLogo" type="file" name="file"/>
-                                    </span>
-                                    <span id="clubLogoLabel" class="btn-file-label">No file selected</span>
-                                </div>
-
-                                <hr/>
-
-                                <div class="form-group">
-                                    <label for="databaseHost">Database host</label>
-                                    <input id="databaseHost" type="text" class="form-control " name="databaseHost" placeholder="Enter the host of the database"
-                                           data-bv-notempty="true"
-                                           data-bv-notempty-message="The database host is required and cannot be empty" />
-                                </div>
-                                <div class="form-group">
-                                    <label for="databasePort">Database port</label>
-                                    <input id="databasePort" type="text" class="form-control " name="dataBasePort" placeholder="Enter the port of the database"
-                                           data-bv-notempty="true"
-                                           data-bv-notempty-message="The database port is required and cannot be empty" />
-                                </div>
-                                <div class="form-group">
-                                    <label for="dataBaseUser">Database user</label>
-                                    <input id="dataBaseUser" type="text" class="form-control" name="dataBaseUser" placeholder="Enter the username of the database user" />
-                                </div>
-                                <div class="form-group">
-                                    <label for="dataBasePassword">Database password</label>
-                                    <input id="dataBasePassword" type="password" class="form-control" name="dataBasePassword" placeholder="Enter the password of the database user"/>
-                                </div>
-                                <div class="form-group">
-                                    <label for="dataBaseCollection">Database collection name</label>
-                                    <input id="dataBaseCollection" type="text" class="form-control" name="dataBaseCollection" placeholder="Enter the name of the database collection used"
-                                           data-bv-notempty="true"
-                                           data-bv-notempty-message="The name of the database collection is required and cannot be empty" />
-                                    <p class="help-block">When changing this value you might reset the whole system. Handle with care!</p>
-                                </div>
-
-                                <hr/>
-
-                                <div class="form-group">
-                                    <label for="rememberMeTokenKey">Remember me token key</label>
-                                    <input id="rememberMeTokenKey" type="text" class="form-control" name="rememberMeTokenKey" placeholder="Enter your private key, used to secure the remember me token"
-                                            data-bv-notempty="true"
-                                            data-bv-notempty-message="The remember me token key is required and cannot be empty" />
-                                    <p class="help-block">This key is used to secure the "remember-me" functionality. Please use a random phrase.</p>
+                                           data-bv-notempty-message="Your password is required to change the settings"/>
+                                    <p class="help-block">To change any settings you have to enter your password.</p>
                                 </div>
 
                                 <hr/>
 
                                 <div id="submitGroup" class="form-group">
                                     <div class="progress-button" id="settingsSubmitButton">
-                                        <button type="submit">Update settings</button>
+                                        <button type="submit"><span>Update settings</span></button>
                                         <svg class="progress-circle" width="50" height="50">
                                             <g transform="scale(0.71)">
                                                 <path d="m35,2.5c17.955803,0 32.5,14.544199 32.5,32.5c0,17.955803 -14.544197,32.5 -32.5,32.5c-17.955803,0 -32.5,-14.544197 -32.5,-32.5c0,-17.955801 14.544197,-32.5 32.5,-32.5z"/>

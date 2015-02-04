@@ -33,6 +33,9 @@
 
         <!-- JSON conversion -->
         <jackson.version>2.4.3</jackson.version>
+
+        <!-- Apache commons IO-->
+        <commons.io.version>2.4</commons.io.version>
     </properties>
 
     <dependencies>
@@ -168,6 +171,12 @@
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
             <version>${jackson.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>${commons.io.version}</version>
         </dependency>
 
     </dependencies>

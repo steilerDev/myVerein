@@ -170,13 +170,49 @@
 	transform: translate3d(0,0,0);
 }
 
-.tabs-style-underline nav li a::after:hover {
+.tabs-style-underline nav li a:hover::after {
 	-webkit-transition: -webkit-transform 0.3s;
 	transition: transform 0.3s;
-	-webkit-transform: translate3d(0,150%,0);
-	transform: translate3d(0,150%,0);
+	-webkit-transform: translate3d(0,50%,0);
+	transform: translate3d(0,50%,0);
 }
 
 .tabs-style-underline nav a span {
 	/*font-weight: 700;*/
+}
+
+#fixedRightNavBox {
+    position: fixed;
+    top: 0;
+    right: 0;
+    margin-right: 10px;
+}
+
+#fixedRightNavBox li a {
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+#fixedRightNavBox li a:hover span.hoverText {
+    -webkit-transition: opacity 0.3s;
+    -moz-transition: opacity 0.3s;
+    -o-transition: opacity 0.3s;
+    transition: opacity 0.3s;
+    opacity: 1;
+}
+
+#fixedRightNavBox li a:hover span.hoverIcon {
+    -webkit-transition: opacity 0.3s;
+    -moz-transition: opacity 0.3s;
+    -o-transition: opacity 0.3s;
+    transition: opacity 0.3s;
+    opacity: 0;
+}
+
+#fixedRightNavBox li a span.hoverText {
+    opacity: 1;
+ }
+
+#fixedRightNavBox li a span.hoverIcon {
+    opacity: 0;
 }

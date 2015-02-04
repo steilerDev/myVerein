@@ -35,7 +35,7 @@
 
   CBPFWTabs.prototype._init = function() {
     // tabs elems
-    this.tabs = [].slice.call( this.el.querySelectorAll( 'nav > ul > li' ) );
+    this.tabs = [].slice.call( this.el.querySelectorAll( 'nav > ul > li.tab' ) );
     // content items
     this.items = [].slice.call( this.el.querySelectorAll( '.content-wrap > section' ) );
     // current index
