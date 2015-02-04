@@ -1,24 +1,21 @@
 package de.steilerdev.myVerein.server.controller;
 
 import de.steilerdev.myVerein.server.model.*;
-import de.steilerdev.myVerein.server.security.CurrentUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.support.PropertiesLoaderUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
-import java.io.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Map;
-import java.util.Properties;
 
 /**
  * This controller is processing all general requests.
@@ -40,6 +37,9 @@ public class IndexController
 	private EventRepository eventRepository;
 
     @Autowired
+    private SettingsRepository settingsRepository;
+
+    @Autowired
     private GridFSRepository gridFSRepository;
 
 	private static Logger logger = LoggerFactory.getLogger(IndexController.class);
@@ -49,7 +49,8 @@ public class IndexController
 	 * @return The path to the view for the index page.
 	 */
 	@RequestMapping(method = RequestMethod.GET)
-	public String startApplication() {
+	public String startApplication(Model model) {
+        model.addAttribute("clubName", settingsRepository.getClubName());
 		return "index";
 	}
 
@@ -60,8 +61,10 @@ public class IndexController
 	@RequestMapping(value = "login",method = RequestMethod.GET)
 	public String login(@RequestParam (required = false) String error,
                         @RequestParam (required = false) String logout,
-                        @RequestParam (required = false) String cookieTheft)
+                        @RequestParam (required = false) String cookieTheft,
+                        Model model)
 	{
+        model.addAttribute("clubName", settingsRepository.getClubName());
         if(error != null)
         {
             logger.warn("An error occurred during log in");

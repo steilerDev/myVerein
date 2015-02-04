@@ -52,7 +52,7 @@ public class EventManagementController
     @Autowired
     DivisionRepository divisionRepository;
 
-    private static Logger logger = LoggerFactory.getLogger(DivisionManagementController.class);
+    private static Logger logger = LoggerFactory.getLogger(EventManagementController.class);
 
     /**
      * This function gathers all dates where an event takes place within a specific month and year.

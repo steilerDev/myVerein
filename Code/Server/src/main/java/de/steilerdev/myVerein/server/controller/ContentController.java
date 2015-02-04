@@ -17,24 +17,19 @@
 package de.steilerdev.myVerein.server.controller;
 
 import com.mongodb.gridfs.GridFSDBFile;
-import com.mongodb.gridfs.GridFSFile;
 import de.steilerdev.myVerein.server.model.GridFSRepository;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.support.PropertiesLoaderUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.ServletContext;
 import java.io.IOException;
-import java.util.Properties;
 
 /**
  * This controller is used to server files, stored within the database.
@@ -44,9 +39,6 @@ import java.util.Properties;
 public class ContentController
 {
     private static Logger logger = LoggerFactory.getLogger(ContentController.class);
-
-    @Autowired
-    ServletContext servletContext;
 
     @Autowired
     GridFSRepository gridFSRepository;

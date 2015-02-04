@@ -22,7 +22,7 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 
 /**
- * This class is a converter used by SpringData, to convert a Java 8 LocalDateTime to a Java 7 Date
+ * This class is a converter used by SpringData, to convert a Java 8 LocalDateTime to a String
  */
 @Component
 public class LocalDateTimeToStringConverter implements Converter<LocalDateTime, String>

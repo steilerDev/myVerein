@@ -16,11 +16,9 @@
  */
 package de.steilerdev.myVerein.server.model;
 
-import com.mongodb.Mongo;
 import com.mongodb.MongoException;
 import com.mongodb.gridfs.GridFSDBFile;
 import com.mongodb.gridfs.GridFSFile;
-import de.steilerdev.myVerein.server.controller.UserManagementController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +41,7 @@ public class GridFSRepository
     @Autowired
     private GridFsTemplate gridFS;
 
-    private static Logger logger = LoggerFactory.getLogger(UserManagementController.class);
+    private static Logger logger = LoggerFactory.getLogger(GridFSRepository.class);
 
     /**
      * The name of the club logo file stored within GridFS

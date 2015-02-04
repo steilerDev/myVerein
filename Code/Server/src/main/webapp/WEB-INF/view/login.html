@@ -4,7 +4,7 @@
       xmlns:th="http://www.thymeleaf.org">
 
     <head>
-        <title>Login Page</title>
+        <title th:text="${clubName} + ' - Login Page'" th:unless="${clubName == null || clubName.isEmpty()}">Login Page</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
         <!-- Favicons -->
@@ -45,7 +45,7 @@
         <link th:href="@{/resources/css/login.css}" href="../resources/css/login.css" rel="stylesheet" type="text/css" />
 
     </head>
-    <body onload='document.getElementById("inputEmail").focus();'>
+    <body>
         <div class="verticalCentered">
 
             <div class="container">
@@ -64,7 +64,7 @@
                 <form class="form-signin materialBox" action='/login_check' method='POST' accept-charset="UTF-8">
                     <h2 th:text="#{login.message}">Login with Username and Password</h2>
                     <label for="inputEmail" class="sr-only" th:text="#{login.email}">Email address</label>
-                    <input name="username" type="email" id="inputEmail" th:placeholder="#{login.email}" class="form-control" placeholder="Email address"/>
+                    <input name="username" type="email" id="inputEmail" th:placeholder="#{login.email}" class="form-control" placeholder="Email address" autofocus="autofocus"/>
                     <label for="inputPassword" class="sr-only" th:text="#{login.password}">Password</label>
                     <input name="password" type="password" id="inputPassword" class="form-control" th:placeholder="#{login.password}" placeholder="Password"/>
                     <div class="checkbox">

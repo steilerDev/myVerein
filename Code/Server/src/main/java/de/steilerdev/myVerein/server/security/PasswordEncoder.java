@@ -16,7 +16,6 @@
  */
 package de.steilerdev.myVerein.server.security;
 
-import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
 
 /**

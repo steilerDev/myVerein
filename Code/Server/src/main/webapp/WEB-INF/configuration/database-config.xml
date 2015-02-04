@@ -33,6 +33,7 @@
               <beans:constructor-arg name="validator" ref="dataValidator"/>
        </beans:bean>
 
-        <beans:bean id="gridFSRepository" name="gridFSRepository" class="de.steilerdev.myVerein.server.model.GridFSRepository" />
+       <beans:bean id="gridFSRepository" name="gridFSRepository" class="de.steilerdev.myVerein.server.model.GridFSRepository" />
+       <beans:bean id="settingsRepository" name="settingsRepository" class="de.steilerdev.myVerein.server.model.SettingsRepository" />
 
 </beans:beans>

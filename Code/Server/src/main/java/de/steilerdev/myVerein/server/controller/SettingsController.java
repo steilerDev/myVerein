@@ -18,6 +18,7 @@ package de.steilerdev.myVerein.server.controller;
 
 import com.mongodb.MongoException;
 import de.steilerdev.myVerein.server.model.GridFSRepository;
+import de.steilerdev.myVerein.server.model.SettingsRepository;
 import de.steilerdev.myVerein.server.model.User;
 import de.steilerdev.myVerein.server.model.UserRepository;
 import de.steilerdev.myVerein.server.security.CurrentUser;
@@ -25,12 +26,6 @@ import de.steilerdev.myVerein.server.security.PasswordEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.support.PropertiesLoaderUtils;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.gridfs.GridFsOperations;
-import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -41,14 +36,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.ConstraintViolationException;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+
+//Todo: Enable deletion of logo
 
 /**
  * This class handles all requests done through the settings page
@@ -66,35 +58,33 @@ public class SettingsController
     @Autowired
     private GridFSRepository gridFSRepository;
 
-    private static Logger logger = LoggerFactory.getLogger(UserManagementController.class);
+    @Autowired
+    private SettingsRepository settingsRepository;
 
-    public void settings()
-    {
-
-    }
+    private static Logger logger = LoggerFactory.getLogger(SettingsController.class);
 
     /**
      * This request mapping is processing the request to get the current settings of the system.
      * @return The path to the view for the index page.
      */
     @RequestMapping(method = RequestMethod.GET, produces = "application/json")
-    public @ResponseBody Properties loadSettings(@CurrentUser User currentUser)
+    public @ResponseBody Map loadSettings(@CurrentUser User currentUser)
     {
         logger.debug("Loading settings for " + currentUser.getEmail());
-        Properties settings;
+        Map settings;
         try
         {
-            logger.debug("Loading properties file from classpath");
-            settings = PropertiesLoaderUtils.loadProperties(new ClassPathResource("myVerein.properties"));
+            //Cloning settings, because this would result in a fatal error where the application is trying to convert the user to String
+            settings = (Map)settingsRepository.loadSettings().clone();
         } catch (IOException e)
         {
-            logger.warn("Unable to load the system settings");
+            logger.warn("Unable to load system settings");
             return null;
         }
 
         if(settings == null)
         {
-            logger.warn("Unable to load system settings.");
+            logger.warn("Unable to load system settings");
             return null;
         } else if(!currentUser.isAdmin())
         {
@@ -170,15 +160,10 @@ public class SettingsController
                 logger.debug("The user is a super admin");
                 try
                 {
-                    Resource resource = new ClassPathResource("myVerein.properties");
-                    Properties properties = PropertiesLoaderUtils.loadProperties(resource);
-
-                    logger.debug("Loaded settings file from classpath: " + properties.toString());
-
                     if (clubName != null && !clubName.isEmpty())
                     {
                         logger.debug("Setting club name to " + clubName);
-                        properties.setProperty("clubName", clubName);
+                        settingsRepository.setClubName(clubName);
                     }
 
                     if (clubLogo != null && !clubLogo.isEmpty())
@@ -192,49 +177,46 @@ public class SettingsController
                             logger.warn("Problem while saving club logo: " + e.getMessage());
                             return new ResponseEntity<>("Problem while saving club logo: " + e.getMessage(), HttpStatus.BAD_REQUEST);
                         }
-                    } else
-                    {
-                        System.err.println("Unable to see clubLogo");
                     }
 
                     if (databaseHost != null && !databaseHost.isEmpty())
                     {
                         logger.debug("Setting database host to " + databaseHost);
-                        properties.setProperty("dbHost", databaseHost);
+                        settingsRepository.setDatabaseHost(databaseHost);
                     }
 
                     if (databasePort != null && !databasePort.isEmpty())
                     {
                         logger.debug("Setting database port to " + databasePort);
-                        properties.setProperty("dbPort", databasePort);
+                        settingsRepository.setDatabasePort(databasePort);
                     }
 
                     if (databaseUser != null)
                     {
                         logger.debug("Setting database user to " + databaseUser);
-                        properties.setProperty("dbUser", databaseUser);
+                        settingsRepository.setDatabaseUser(databaseUser);
                     }
 
                     if (databasePassword != null)
                     {
                         logger.debug("Setting database password");
-                        properties.setProperty("dbPassword", databasePassword);
+                        settingsRepository.setDatabasePassword(databasePassword);
                     }
 
                     if (databaseCollection != null && !databaseCollection.isEmpty())
                     {
                         logger.debug("Setting database collection name " + databaseCollection);
-                        properties.setProperty("dbName", databaseCollection);
+                        settingsRepository.setDatabaseName(databaseCollection);
                     }
 
                     if (rememberMeTokenKey != null && !rememberMeTokenKey.isEmpty())
                     {
                         logger.debug("Setting remember me token key " + rememberMeTokenKey);
-                        properties.setProperty("rememberMeKey", rememberMeTokenKey);
+                        settingsRepository.setRememberMeKey(rememberMeTokenKey);
                     }
 
                     logger.debug("Saving updated settings file.");
-                    properties.store(new FileOutputStream(resource.getFile()), "Settings last changed by " + currentUser.getEmail() + " (" + LocalDateTime.now().toString() + ")");
+                    settingsRepository.saveSettings(currentUser);
                 } catch (IOException e)
                 {
                     logger.warn("Unable to update settings file: " + e.getMessage());
