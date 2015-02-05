@@ -1,0 +1,7 @@
+.init-content {
+    padding-top: 260px;
+    background-image: url("/content/clubLogo");
+    background-size: 230px auto;
+    background-repeat: no-repeat;
+    background-position: center top;
+}

@@ -59,14 +59,14 @@ if("undefined"==typeof jQuery)throw new Error("BootstrapValidator requires jQuer
 !function(e){e.fn.datepicker.dates.de={days:["Sonntag","Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag","Sonntag"],daysShort:["Son","Mon","Die","Mit","Don","Fre","Sam","Son"],daysMin:["So","Mo","Di","Mi","Do","Fr","Sa","So"],months:["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"],monthsShort:["Jan","Feb","Mär","Apr","Mai","Jun","Jul","Aug","Sep","Okt","Nov","Dez"],today:"Heute",clear:"Löschen",weekStart:1,format:"dd.mm.yyyy"}}(jQuery);
 
 //Custom JS code
-function showMessage(message, level, icon) {
+function showMessage (message, level, icon) {
 	// create the notification
     var notification = new NotificationFx({
-        wrapper : document.querySelector(".content-current"),
+        wrapper : document.querySelector('.content-current'),
         message : '<span class="icon ' + icon + '"></span><p>' + message + '.</p>',
         layout : 'attached',
         effect : 'bouncyflip',
-        ttl : 5000,
+        ttl : 7000,
         type : level, // notice, warning or error
     });
 

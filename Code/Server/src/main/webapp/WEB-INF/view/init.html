@@ -1,0 +1,273 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+
+    <head>
+        <title>Welcome to myVerein</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        <!-- Favicons -->
+        <link rel="apple-touch-icon" sizes="57x57" href="/resources/icon/apple-touch-icon-57x57.png"/>
+        <link rel="apple-touch-icon" sizes="60x60" href="/resources/icon/apple-touch-icon-60x60.png"/>
+        <link rel="apple-touch-icon" sizes="72x72" href="/resources/icon/apple-touch-icon-72x72.png"/>
+        <link rel="apple-touch-icon" sizes="76x76" href="/resources/icon/apple-touch-icon-76x76.png"/>
+        <link rel="apple-touch-icon" sizes="114x114" href="/resources/icon/apple-touch-icon-114x114.png"/>
+        <link rel="apple-touch-icon" sizes="120x120" href="/resources/icon/apple-touch-icon-120x120.png"/>
+        <link rel="apple-touch-icon" sizes="144x144" href="/resources/icon/apple-touch-icon-144x144.png"/>
+        <link rel="apple-touch-icon" sizes="152x152" href="/resources/icon/apple-touch-icon-152x152.png"/>
+        <link rel="apple-touch-icon" sizes="180x180" href="/resources/icon/apple-touch-icon-180x180.png"/>
+        <link rel="icon" type="image/png" href="/resources/icon/favicon-32x32.png" sizes="32x32"/>
+        <link rel="icon" type="image/png" href="/resources/icon/android-chrome-192x192.png" sizes="192x192"/>
+        <link rel="icon" type="image/png" href="/resources/icon/favicon-96x96.png" sizes="96x96"/>
+        <link rel="icon" type="image/png" href="/resources/icon/favicon-16x16.png" sizes="16x16"/>
+        <link rel="manifest" href="/resources/icon/manifest.json"/>
+        <link rel="shortcut icon" href="/resources/icon/favicon.ico"/>
+        <meta name="msapplication-TileColor" content="#00a300"/>
+        <meta name="msapplication-TileImage" content="/resources/icon/mstile-144x144.png"/>
+        <meta name="msapplication-config" content="/resources/icon/browserconfig.xml"/>
+        <meta name="theme-color" content="#ffffff"/>
+
+        <link th:href="@{/resources/css/tabs.css}" href="../resources/css/tabs.css" rel="stylesheet" type="text/css" />
+        <link th:href="@{/resources/css/jquery-ui.min.css}" href="../resources/css/jquery-ui.min.css" rel="stylesheet" type="text/css" />
+        <link th:href="@{/resources/css/magic-bootstrap.css}" href="../resources/css/magic-bootstrap.css" rel="stylesheet" type="text/css" />
+        <link th:href="@{/resources/css/button.css}" href="../resources/css/button.css" rel="stylesheet" type="text/css" />
+        <link th:href="@{/resources/css/myVerein.css}" href="../resources/css/myVerein.css" rel="stylesheet" type="text/css" />
+        <link th:href="@{/resources/css/jqtree.css}" href="../resources/css/jqtree.css" rel="stylesheet" type="text/css" />
+        <link th:href="@{/resources/css/selectize-core.css}" href="../resources/css/selectize-core.css" rel="stylesheet" type="text/css" />
+        <link th:href="@{/resources/css/selectize-bootstrap.css}" href="../resources/css/selectize-bootstrap.css" rel="stylesheet" type="text/css" />
+        <link th:href="@{/resources/css/notification.css}" href="../resources/css/notification.css" rel="stylesheet" type="text/css" />
+        <link th:href="@{/resources/css/icons.css}" href="../resources/css/icons.css" rel="stylesheet" type="text/css" />
+        <link th:href="@{/resources/css/bootstrap-validator.css}" href="../resources/css/bootstrap-validator.css" rel="stylesheet" type="text/css" />
+        <link th:href="@{/resources/css/datepicker3.css}" href="../resources/css/datepicker3.css" rel="stylesheet" type="text/css" />
+        <link th:href="@{/resources/css/clndr.css}" href="../resources/css/clndr.css" rel="stylesheet" type="text/css" />
+        <link th:href="@{/resources/css/bootstrap-timepicker.css}" href="../resources/css/bootstrap-timepicker.css" rel="stylesheet" type="text/css" />
+        <link th:href="@{/resources/css/login.css}" href="../resources/css/login.css" rel="stylesheet" type="text/css" />
+        <link th:href="@{/resources/css/init.css}" href="../resources/css/init.css" rel="stylesheet" type="text/css" />
+
+        <script th:src="@{/resources/js/myVerein.base.js}" src="../resources/js/myVerein.base.js" type="application/javascript" />
+        <script th:src="@{/resources/js/myVerein.init.js}" src="../resources/js/myVerein.init.js" type="application/javascript" />
+
+    </head>
+    <body class="content-current">
+        <div class="verticalCentered">
+            <div>
+                <div class="col-sm-offset-2 col-sm-8 init-content">
+                    <div class="materialBox">
+                        <h2>Welcome to myVerein!</h2>
+                        <h3>Thank you for choosing the best club management system ever!</h3>
+                        <p>This page is going to guide you through the initial configuration of your system and explain all functionalities of the product.</p>
+                    </div>
+
+                    <div id="initSettingsBox" class="materialBox">
+                        <h2>Set the general system settings</h2>
+                        <hr />
+                        <form id="initSettingsForm" method="post" enctype="multipart/form-data"
+                              data-bv-feedbackicons-valid="icon_check"
+                              data-bv-feedbackicons-invalid="icon_error-triangle_alt"
+                              data-bv-feedbackicons-validating="icon_loading">
+
+                            <div class="form-group">
+                                <label for="clubName">Club name</label>
+                                <input name="clubName" class="form-control" id="clubName" type="text" placeholder="Enter the name of your club" autofocus="autofocus"
+                                       data-bv-notempty="true"
+                                       data-bv-notempty-message="The name of your club is required and cannot be empty"/>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="clubLogo">Club logo</label>
+                                <br/>
+                                <br/>
+                                <span id="clubLogoButton" class="btn btn-default btn-file">
+                                    Browse <input id="clubLogo" type="file" name="clubLogo"/>
+                                </span>
+                                <span id="clubLogoLabel" class="btn-file-label">No file selected</span>
+                                <p class="help-block">Upload a club logo, to customize the system</p>
+                            </div>
+
+                            <hr/>
+
+                            <div class="form-group">
+                                <label for="databaseHost">Database host</label>
+                                <input id="databaseHost" type="text" class="form-control " name="databaseHost" placeholder="Enter the host of the database"
+                                       data-bv-notempty="true"
+                                       data-bv-notempty-message="The database host is required and cannot be empty" />
+                            </div>
+                            <div class="form-group">
+                                <label for="databasePort">Database port</label>
+                                <input id="databasePort" type="text" class="form-control " name="databasePort" placeholder="Enter the port of the database"
+                                       data-bv-notempty="true"
+                                       data-bv-notempty-message="The database port is required and cannot be empty" />
+                            </div>
+                            <div class="form-group">
+                                <label for="databaseUser">Database user</label>
+                                <input id="databaseUser" type="text" class="form-control" name="databaseUser" placeholder="Enter the username of the database user" />
+                            </div>
+                            <div class="form-group">
+                                <label for="databasePassword">Database password</label>
+                                <input id="databasePassword" type="password" class="form-control" name="databasePassword" placeholder="Enter the password of the database user"/>
+                            </div>
+                            <div class="form-group">
+                                <label for="databaseCollection">Database collection name</label>
+                                <input id="databaseCollection" type="text" class="form-control" name="databaseCollection" placeholder="Enter the name of the database collection used"
+                                       data-bv-notempty="true"
+                                       data-bv-notempty-message="The name of the database collection is required and cannot be empty" />
+                                <p class="help-block">When changing this value you might reset the whole system. Handle with care!</p>
+                            </div>
+
+                            <hr/>
+
+                            <div class="form-group">
+                                <label for="rememberMeTokenKey">Remember me token key</label>
+                                <input id="rememberMeTokenKey" type="text" class="form-control" name="rememberMeTokenKey" placeholder="Enter your private key, used to secure the remember me token"
+                                       data-bv-notempty="true"
+                                       data-bv-notempty-message="The remember me token key is required and cannot be empty" />
+                                <p class="help-block">This key is used to secure the "remember-me" functionality. Please use a random phrase.</p>
+                            </div>
+
+                            <hr/>
+
+                            <div class="form-group">
+                                <div class="progress-button" id="initSettingsSubmitButton">
+                                    <button type="submit"><span>Proceed</span></button>
+                                    <svg class="progress-circle" width="50" height="50">
+                                        <g transform="scale(0.71)">
+                                            <path d="m35,2.5c17.955803,0 32.5,14.544199 32.5,32.5c0,17.955803 -14.544197,32.5 -32.5,32.5c-17.955803,0 -32.5,-14.544197 -32.5,-32.5c0,-17.955801 14.544197,-32.5 32.5,-32.5z"/>
+                                        </g>
+                                    </svg>
+                                    <svg class="checkmark" width="50" height="50">
+                                        <g transform="scale(0.71)">
+                                            <path d="m31.5,46.5l15.3,-23.2"/>
+                                            <path d="m31.5,46.5l-8.5,-7.1"/>
+                                        </g>
+                                    </svg>
+                                    <svg class="cross" width="50" height="50">
+                                        <g transform="scale(0.71)">
+                                            <path d="m35,35l-9.3,-9.3"/>
+                                            <path d="m35,35l9.3,9.3"/>
+                                            <path d="m35,35l-9.3,9.3"/>
+                                            <path d="m35,35l9.3,-9.3"/>
+                                        </g>
+                                    </svg>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div id="initAdminBox" class="materialBox hidden">
+                        <h2>Create the super admin user</h2>
+                        <p>This user is going to be able to adjust all settings available within the system. This should be you.</p>
+                        <form id="initAdminForm" method="post"
+                              data-bv-feedbackicons-valid="icon_check"
+                              data-bv-feedbackicons-invalid="icon_error-triangle_alt"
+                              data-bv-feedbackicons-validating="icon_loading">
+
+                            <div class="form-group">
+                                <label for="firstName">First name</label>
+                                <input id="firstName" type="text" class="form-control" name="firstName" placeholder="Enter the user's first name"
+                                       data-bv-notempty="true"
+                                       data-bv-notempty-message="The first name is required and cannot be empty"
+
+                                       data-bv-regexp="true"
+                                       data-bv-regexp-regexp="^[a-zA-Z0-9]+$"
+                                       data-bv-regexp-message="The first name can only consist of alphabetical and number"
+
+                                       data-bv-different="true"
+                                       data-bv-different-field="password"
+                                       data-bv-different-message="The first name and password cannot be the same as each other" />
+                            </div>
+                            <div class="form-group">
+                                <label for="lastName">Last name</label>
+                                <input id="lastName" type="text" class="form-control" name="lastName" placeholder="Enter the user's last name"
+                                       data-bv-notempty="true"
+                                       data-bv-notempty-message="The last name is required and cannot be empty"
+
+                                       data-bv-regexp="true"
+                                       data-bv-regexp-regexp="^[a-zA-Z0-9]+$"
+                                       data-bv-regexp-message="The last name can only consist of alphabetical and number"
+
+                                       data-bv-different="true"
+                                       data-bv-different-field="password"
+                                       data-bv-different-message="The last name and password cannot be the same as each other" />
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Email address</label>
+                                <input id="email" type="text" class="form-control" name="email" placeholder="Enter the user's email"
+                                       data-bv-notempty="true"
+                                       data-bv-notempty-message="The email address is required and cannot be empty"
+
+                                       data-bv-emailaddress="true"
+                                       data-bv-emailaddress-message="The email address is not a valid" />
+                            </div>
+                            <div class="form-group">
+                                <label for="password">Password</label>
+                                <input id="password" type="password" class="form-control" name="password" placeholder="Enter an initial password"
+                                       data-bv-notempty="true"
+                                       data-bv-notempty-message="The password is required and cannot be empty" />
+                                <input id="passwordRe" type="password" class="form-control" name="password" placeholder="Re-type your initial password"
+                                       data-bv-notempty="true"
+                                       data-bv-notempty-message="The password is required and cannot be empty" />
+                            </div>
+
+                            <p>You can adjust this user later and add additional information.</p>
+
+                            <hr/>
+                            <div id="submitGroupUser" class="form-group">
+                                <div class="progress-button" id="initAdminSubmitButton">
+                                    <button type="submit"><span>Proceed</span></button>
+                                    <svg class="progress-circle" width="50" height="50">
+                                        <g transform="scale(0.71)">
+                                            <path d="m35,2.5c17.955803,0 32.5,14.544199 32.5,32.5c0,17.955803 -14.544197,32.5 -32.5,32.5c-17.955803,0 -32.5,-14.544197 -32.5,-32.5c0,-17.955801 14.544197,-32.5 32.5,-32.5z"/>
+                                        </g>
+                                    </svg>
+                                    <svg class="checkmark" width="50" height="50">
+                                        <g transform="scale(0.71)">
+                                            <path d="m31.5,46.5l15.3,-23.2"/>
+                                            <path d="m31.5,46.5l-8.5,-7.1"/>
+                                        </g>
+                                    </svg>
+                                    <svg class="cross" width="50" height="50">
+                                        <g transform="scale(0.71)">
+                                            <path d="m35,35l-9.3,-9.3"/>
+                                            <path d="m35,35l9.3,9.3"/>
+                                            <path d="m35,35l-9.3,9.3"/>
+                                            <path d="m35,35l9.3,-9.3"/>
+                                        </g>
+                                    </svg>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div id="initTutorialBox" class="materialBox hidden">
+                        <h2>Tutorial</h2>
+                        <p>This part is reserved for giving a brief tutorial on how to create and manipulate settings.</p>
+
+                        <div class="progress-button" id="initTutorialSubmit">
+                            <button id="initTutorialSubmitButton" type="submit"><span>Finish!</span></button>
+                            <svg class="progress-circle" width="50" height="50">
+                                <g transform="scale(0.71)">
+                                    <path d="m35,2.5c17.955803,0 32.5,14.544199 32.5,32.5c0,17.955803 -14.544197,32.5 -32.5,32.5c-17.955803,0 -32.5,-14.544197 -32.5,-32.5c0,-17.955801 14.544197,-32.5 32.5,-32.5z"/>
+                                </g>
+                            </svg>
+                            <svg class="checkmark" width="50" height="50">
+                                <g transform="scale(0.71)">
+                                    <path d="m31.5,46.5l15.3,-23.2"/>
+                                    <path d="m31.5,46.5l-8.5,-7.1"/>
+                                </g>
+                            </svg>
+                            <svg class="cross" width="50" height="50">
+                                <g transform="scale(0.71)">
+                                    <path d="m35,35l-9.3,-9.3"/>
+                                    <path d="m35,35l9.3,9.3"/>
+                                    <path d="m35,35l-9.3,9.3"/>
+                                    <path d="m35,35l9.3,-9.3"/>
+                                </g>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

@@ -50,6 +50,7 @@ public class SettingsRepository
     private final static String databasePassword = "dbPassword";
     private final static String rememberMeKey = "rememberMeKey";
     private final static String clubName = "clubName";
+    private final static String initSetup = "initSetup";
 
     private boolean changed;
 
@@ -248,6 +249,33 @@ public class SettingsRepository
         {
             logger.debug("Unable to load club name");
             return null;
+        }
+    }
+
+    /**
+     * This function checks if the init setup flag is set within the settings file. If the flag is available, but empty or true, the function is returning true, otherwise false.
+     * @return
+     */
+    public boolean isInitSetup()
+    {
+        try
+        {
+            String initSetupString = loadSettings().getProperty(initSetup);
+            return initSetupString != null && (initSetupString.isEmpty() || initSetupString.trim().equals("true"));
+        } catch (IOException e)
+        {
+            logger.debug("Unable to load init setup flag");
+            return false;
+        }
+    }
+
+    public void setInitSetup(boolean initSetupFlag) throws IOException
+    {
+        boolean oldInitSetupFlag = isInitSetup();
+        if((initSetupFlag && oldInitSetupFlag) || (!initSetupFlag && !oldInitSetupFlag))
+        {
+            changed = true;
+            loadSettings().setProperty(initSetup, initSetupFlag? "true": "false");
         }
     }
 

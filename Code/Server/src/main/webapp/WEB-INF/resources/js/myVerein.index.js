@@ -42,6 +42,6 @@ $(document).ready(function() {
                 loadSettingsPage();
             }
         }
-    }
+    };
     new CBPFWTabs(document.getElementById('tabs'), tabOptions);
 });

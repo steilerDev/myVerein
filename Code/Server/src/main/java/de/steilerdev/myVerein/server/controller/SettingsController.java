@@ -126,38 +126,14 @@ public class SettingsController
             return new ResponseEntity<>("The stated password is incorrect, please try again", HttpStatus.FORBIDDEN);
         } else if(currentUser.isAdmin())
         {
-            logger.debug("The user is an admin");
-            if(currentAdmin != null && !currentAdmin.equals(currentUser.getEmail()) && !currentUser.isSuperAdmin())
-            {
-                logger.warn("The current user differs from the stated user.");
-                return new ResponseEntity<>("The current user differs from the stated user", HttpStatus.BAD_REQUEST);
-            }
-
-            if(adminPasswordNew != null && adminPasswordNewRe != null && !adminPasswordNew.isEmpty() && !adminPasswordNewRe.isEmpty())
-            {
-                logger.debug(currentUser.getEmail() + " wants to change his password.");
-                if(!adminPasswordNew.equals(adminPasswordNewRe))
-                {
-                    logger.warn("The stated passwords did not match");
-                    return new ResponseEntity<>("The stated passwords did not match", HttpStatus.BAD_REQUEST);
-                } else
-                {
-                    currentUser.setPassword(adminPasswordNew);
-                    try
-                    {
-                        logger.debug("Saving new user password.");
-                        userRepository.save(currentUser);
-                    } catch (ConstraintViolationException e)
-                    {
-                        logger.warn("A database constraint was violated while saving the user.");
-                        return new ResponseEntity<>("A database constraint was violated while saving the user.", HttpStatus.BAD_REQUEST);
-                    }
-                }
-            }
-
             if(currentUser.isSuperAdmin())
             {
                 logger.debug("The user is a super admin");
+                if(currentAdmin != null && !currentAdmin.equals(currentUser.getEmail()))
+                {
+                    logger.warn("The super admin user is changing.");
+                    //Todo: Change admin user, bear in mind that the user afterwards could have no divisions!
+                }
                 try
                 {
                     if (clubName != null && !clubName.isEmpty())
@@ -221,6 +197,36 @@ public class SettingsController
                 {
                     logger.warn("Unable to update settings file: " + e.getMessage());
                     return new ResponseEntity<>("Unable to update settings file", HttpStatus.INTERNAL_SERVER_ERROR);
+                }
+            } else
+            {
+                logger.debug("The user is an admin");
+                if(currentAdmin != null && !currentAdmin.equals(currentUser.getEmail()))
+                {
+                    logger.warn("The current user differs from the stated user.");
+                    return new ResponseEntity<>("The current user differs from the stated user", HttpStatus.BAD_REQUEST);
+                }
+            }
+
+            if(adminPasswordNew != null && adminPasswordNewRe != null && !adminPasswordNew.isEmpty() && !adminPasswordNewRe.isEmpty())
+            {
+                logger.debug(currentUser.getEmail() + " wants to change his password.");
+                if(!adminPasswordNew.equals(adminPasswordNewRe))
+                {
+                    logger.warn("The stated passwords did not match");
+                    return new ResponseEntity<>("The stated passwords did not match", HttpStatus.BAD_REQUEST);
+                } else
+                {
+                    currentUser.setPassword(adminPasswordNew);
+                    try
+                    {
+                        logger.debug("Saving new user password.");
+                        userRepository.save(currentUser);
+                    } catch (ConstraintViolationException e)
+                    {
+                        logger.warn("A database constraint was violated while saving the user.");
+                        return new ResponseEntity<>("A database constraint was violated while saving the user.", HttpStatus.BAD_REQUEST);
+                    }
                 }
             }
         } else

@@ -11,9 +11,9 @@
        <http auto-config="false"  use-expressions="true" access-denied-page="/login?accessdenied">
             <intercept-url pattern="/login" access="permitAll" />
             <intercept-url pattern="/logout" access="permitAll" />
-            <intercept-url pattern="/signup" access="permitAll" />
-            <intercept-url pattern="/resources/**" access="permitAll" />
-            <intercept-url pattern="/content/**" access="permitAll" />
+            <intercept-url pattern="/resources/**" access="permitAll" /> <!-- Static content -->
+            <intercept-url pattern="/content/**" access="permitAll" /> <!-- Variable content served by controller -->
+            <intercept-url pattern="/init/**" access="permitAll" />
             <intercept-url pattern="/**" access="hasRole('ROLE_ADMIN')" />
 
            <form-login login-page="/login"
@@ -33,13 +33,13 @@
         <!-- Remember me configuration -->
         <beans:bean id="rememberMeServices" class="org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices">
             <beans:constructor-arg value="${rememberMeKey}"/>
-            <beans:constructor-arg ref="UserAuthenticationService"/>
+            <beans:constructor-arg ref="userAuthenticationService"/>
             <beans:constructor-arg ref="tokenDataProvider"/>
             <beans:property name="cookieName" value="myVereinRememberMeCookie"/>
             <beans:property name="tokenLength" value="32"/>
             <beans:property name="parameter" value="rememberMe"/>
             <beans:property name="tokenValiditySeconds" value="604800" />
-            <!-- A secure cookie should be enabled as soon as the product leaves development stage, to ensure the cookie is only transmitted via a secure connection-->
+            <!-- Todo: enable secure cookie -->
             <!--beans:property name="useSecureCookie" value="true" /-->
         </beans:bean>
 
@@ -51,20 +51,20 @@
               <authentication-provider>
                      <user-service properties="classpath:myVereinUser.properties" />
               </authentication-provider>
-              <authentication-provider user-service-ref="UserAuthenticationService">
+              <authentication-provider user-service-ref="userAuthenticationService">
                      <password-encoder ref="passwordEncoder">
                             <salt-source user-property="salt" />
                      </password-encoder>
               </authentication-provider>
-              <authentication-provider ref="RememberMeAuthenticationService"/>
+              <authentication-provider ref="rememberMeAuthenticationService"/>
        </authentication-manager>
 
         <!-- Password encoder with SHA-512 hashing method and 1000 iterations using 8byte salting -->
        <beans:bean id="passwordEncoder" class="de.steilerdev.myVerein.server.security.PasswordEncoder" />
 
-       <beans:bean id="UserAuthenticationService" class="de.steilerdev.myVerein.server.security.UserAuthenticationService" />
+       <beans:bean id="userAuthenticationService" class="de.steilerdev.myVerein.server.security.UserAuthenticationService" />
 
-        <beans:bean id="RememberMeAuthenticationService" class="org.springframework.security.authentication.RememberMeAuthenticationProvider">
+        <beans:bean id="rememberMeAuthenticationService" class="org.springframework.security.authentication.RememberMeAuthenticationProvider">
             <beans:constructor-arg value="${rememberMeKey}"/>
         </beans:bean>
 

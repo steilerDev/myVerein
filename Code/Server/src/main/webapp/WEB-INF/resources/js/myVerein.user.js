@@ -85,7 +85,6 @@ function resetUserForm(doNotHideDeleteButton) {
     $('#iban').val('');
     $('#bic').val('');
 
-    $('#divisions')[0].selectize.clear();
 
     //Hiding private and public information
     $('.publicInformation').addClass('hidden');
@@ -95,7 +94,6 @@ function resetUserForm(doNotHideDeleteButton) {
 
     //Hide & reset Password field
     $('#newUser').addClass("hidden");
-    $('#password').val('');
 
     //Clear submit button
     $('#newUserButton').addClass('hidden');
@@ -107,6 +105,7 @@ function resetUserForm(doNotHideDeleteButton) {
     //Re-enable form
     $("#userForm :input").prop("disabled", false);
     $('#divisions')[0].selectize.enable();
+    $('#divisions')[0].selectize.clear();
 
     if(!doNotHideDeleteButton) {
         //Hide delete button
@@ -143,11 +142,11 @@ function loadUser(email) {
 
         $("#gender").val(user.gender);
         $('#country').val(user.country);
-
+        var date;
         if(user.activeSince)
         {
             //Parsing date from response
-            var date = new Date(0);
+            date = new Date(0);
             date.setUTCDate(user.activeSince.dayOfMonth);
             date.setUTCMonth(user.activeSince.monthValue - 1); //LocalDate is not a 0 starting index at the month
             date.setUTCFullYear(user.activeSince.year);
@@ -157,7 +156,7 @@ function loadUser(email) {
         if(user.passiveSince)
         {
             //Parsing date from response
-            var date = new Date(0);
+            date = new Date(0);
             date.setUTCDate(user.passiveSince.dayOfMonth);
             date.setUTCMonth(user.passiveSince.monthValue - 1); //LocalDate is not a 0 starting index at the month
             date.setUTCFullYear(user.passiveSince.year);
@@ -167,7 +166,7 @@ function loadUser(email) {
         if(user.resignationDate)
         {
             //Parsing date from response
-            var date = new Date(0);
+            date = new Date(0);
             date.setUTCDate(user.resignationDate.dayOfMonth);
             date.setUTCMonth(user.resignationDate.monthValue - 1); //LocalDate is not a 0 starting index at the month
             date.setUTCFullYear(user.resignationDate.year);

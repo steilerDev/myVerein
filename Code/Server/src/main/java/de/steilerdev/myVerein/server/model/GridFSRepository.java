@@ -22,6 +22,7 @@ import com.mongodb.gridfs.GridFSFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.query.BasicQuery;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.gridfs.GridFsTemplate;
@@ -53,9 +54,14 @@ public class GridFSRepository
     private static final String clubLogoFileFormat = "png";
     private static final String clubLogoFileFormatMIME = "image/png";
 
+    /**
+     * The name of the filename column within the database
+     */
+    private static final String filenameColumn = "filename";
+
     public void deleteCurrentClubLogo()
     {
-        gridFS.delete(new Query().addCriteria(Criteria.where("filename").is(clubLogoFileName)));
+        gridFS.delete(new Query().addCriteria(Criteria.where(filenameColumn).is(clubLogoFileName)));
     }
 
     /**
@@ -129,5 +135,14 @@ public class GridFSRepository
                 }
             }
         }
+    }
+
+    /**
+     * This function should delete the complete collection.
+     * Todo: Check!
+     */
+    public void deleteAll()
+    {
+        gridFS.delete(new BasicQuery("{}"));
     }
 }
