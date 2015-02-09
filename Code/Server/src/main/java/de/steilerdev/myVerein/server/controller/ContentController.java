@@ -27,6 +27,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.io.IOException;
@@ -45,14 +46,21 @@ public class ContentController
 
     /**
      * This function gathers the club logo either from the database or the classpath, depending if the user uploaded a custom logo.
+     * @param defaultLogo If this parameter is present the method will return the default logo, without searching through the database.
      * @return The current club logo.
      */
     @RequestMapping(value = "clubLogo", produces = "image/png")
-    @ResponseBody ResponseEntity<byte[]> getClubLogo()
+    @ResponseBody ResponseEntity<byte[]> getClubLogo(@RequestParam (required = false) String defaultLogo)
     {
         logger.debug("Loading club logo");
-        GridFSDBFile clubLogo = gridFSRepository.findClubLogo();
-        if(clubLogo == null)
+        GridFSDBFile clubLogo = null;
+        if(defaultLogo == null)
+        {
+            //Loading file only from database if the request did not state the fact to use the default logo.
+            clubLogo = gridFSRepository.findClubLogo();
+        }
+
+        if(clubLogo == null || defaultLogo != null)
         {
             logger.info("No club logo found, using default logo");
             try
