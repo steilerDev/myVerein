@@ -38,8 +38,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-//Todo: Include administrationNOtAllowedMessage
-
 /**
  * This controller is processing all requests associated with the division management.
  */

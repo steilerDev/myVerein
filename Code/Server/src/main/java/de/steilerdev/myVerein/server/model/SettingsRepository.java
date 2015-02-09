@@ -19,11 +19,15 @@ package de.steilerdev.myVerein.server.model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
+import org.springframework.web.context.ContextLoader;
+import org.springframework.web.context.support.XmlWebApplicationContext;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -272,7 +276,7 @@ public class SettingsRepository
     public void setInitSetup(boolean initSetupFlag) throws IOException
     {
         boolean oldInitSetupFlag = isInitSetup();
-        if((initSetupFlag && oldInitSetupFlag) || (!initSetupFlag && !oldInitSetupFlag))
+        if(!((initSetupFlag && oldInitSetupFlag) || (!initSetupFlag && !oldInitSetupFlag)))
         {
             changed = true;
             loadSettings().setProperty(initSetup, initSetupFlag? "true": "false");
@@ -288,7 +292,7 @@ public class SettingsRepository
     {
         if(changed)
         {
-            logger.debug("Saving settings");
+            logger.debug("Saving settings to " + settingsResource.getFile().getAbsolutePath());
             settings.store(new FileOutputStream(settingsResource.getFile()), "Settings last changed " + (currentUser != null ? ("by " + currentUser.getEmail() + " (" + LocalDateTime.now().toString() + ")") : LocalDateTime.now().toString()));
             ((ConfigurableApplicationContext)applicationContext).refresh();
             this.settings = null;

@@ -307,6 +307,14 @@ public class User implements UserDetails
         }
     }
 
+    public void removeDivision(Division division)
+    {
+        if(divisions != null && !divisions.isEmpty())
+        {
+            divisions.remove(division);
+        }
+    }
+
     public String getSalt()
     {
         return salt;

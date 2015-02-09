@@ -1,9 +1,14 @@
 package de.steilerdev.myVerein.server.controller;
 
+import com.mongodb.DB;
+import com.mongodb.MongoException;
+import com.mongodb.MongoTimeoutException;
 import de.steilerdev.myVerein.server.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.MongoDbFactory;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -26,6 +31,9 @@ public class IndexController
 {
     //A global time zone variable,should be defined later using settings
     public static final String timeZone = "";
+
+    @Autowired
+    private MongoTemplate mongoTemplate;
 
     @Autowired
     private UserRepository userRepository;
@@ -70,16 +78,24 @@ public class IndexController
 
     /**
      * This request mapping is processing the request to view the login page.
-     *
      * @return The path to the view for the login page.
      */
     @RequestMapping(value = "login", method = RequestMethod.GET)
     public String login(@RequestParam(required = false) String error, @RequestParam(required = false) String logout, @RequestParam(required = false) String cookieTheft, Model model)
     {
+        //createDatabaseExample();
         if (settingsRepository.isInitSetup())
         {
-            logger.warn("Starting initial setup, resetting database.");
-            //resetDatabase();
+            logger.warn("Starting initial setup.");
+            new Thread(() -> {
+                    try
+                    {
+                        logger.debug("Trying to drop database.");
+                        mongoTemplate.getDb().dropDatabase();
+                    } catch (MongoTimeoutException e)
+                    {
+                        logger.debug("Unable to drop database, because the database is not available.");
+                    }}).run();
             return "init";
         } else
         {
@@ -98,7 +114,6 @@ public class IndexController
             }
             return "login";
         }
-        //createDatabaseExample();
     }
 
     @RequestMapping(value = "error", method = RequestMethod.GET)
@@ -123,17 +138,6 @@ public class IndexController
         }
         System.err.print("\n");
         return new ResponseEntity<>("No", HttpStatus.OK);
-    }
-
-    /**
-     * This function is serving the favicon of the server
-     *
-     * @return
-     */
-    @RequestMapping("favicon.ico")
-    String favicon()
-    {
-        return "forward:/resources/images/favicon.ico";
     }
 
     /**

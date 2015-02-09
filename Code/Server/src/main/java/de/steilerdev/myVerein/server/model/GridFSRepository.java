@@ -17,6 +17,7 @@
 package de.steilerdev.myVerein.server.model;
 
 import com.mongodb.MongoException;
+import com.mongodb.MongoTimeoutException;
 import com.mongodb.gridfs.GridFSDBFile;
 import com.mongodb.gridfs.GridFSFile;
 import org.slf4j.Logger;
@@ -70,8 +71,17 @@ public class GridFSRepository
      */
     public GridFSDBFile findClubLogo()
     {
-        List<GridFSDBFile> clubLogoFiles = gridFS.find(new Query().addCriteria(Criteria.where("filename").is(clubLogoFileName)));
-        if(clubLogoFiles.isEmpty())
+        List<GridFSDBFile> clubLogoFiles;
+        try
+        {
+            clubLogoFiles = gridFS.find(new Query().addCriteria(Criteria.where("filename").is(clubLogoFileName)));
+        } catch (MongoTimeoutException e)
+        {
+            logger.warn("Timeout exception thrown while trying to find club logo");
+            return null;
+        }
+
+        if(clubLogoFiles == null || clubLogoFiles.isEmpty())
         {
             logger.warn("Unable to find any club logo");
             return null;
