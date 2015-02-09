@@ -4,7 +4,7 @@
       xmlns:th="http://www.thymeleaf.org">
 
     <head>
-        <title>Welcome to myVerein</title>
+        <title th:text="init.page.title">Welcome to myVerein</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
         <!-- Favicons -->
@@ -54,13 +54,13 @@
             <div>
                 <div class="col-sm-offset-2 col-sm-8 init-content">
                     <div class="materialBox">
-                        <h2>Welcome to myVerein!</h2>
-                        <h3>Thank you for choosing the best club management system ever!</h3>
-                        <p>This page is going to guide you through the initial configuration of your system and explain all functionalities of the product.</p>
+                        <h2 th:text="#{init.page.heading}">Welcome to myVerein!</h2>
+                        <h3 th:text="#{init.page.subHeading}">Thank you for choosing the best club management system ever!</h3>
+                        <p th:text="#{init.page.subSubHeading}">This page is going to guide you through the initial configuration of your system and explain all functionalities of the product.</p>
                     </div>
 
                     <div id="initSettingsBox" class="materialBox">
-                        <h2>Set the general system settings</h2>
+                        <h2 th:text="#{init.page.settings.heading}">Set the general system settings</h2>
                         <hr />
                         <form id="initSettingsForm" method="post" enctype="multipart/form-data"
                               data-bv-feedbackicons-valid="icon_check"
@@ -68,57 +68,83 @@
                               data-bv-feedbackicons-validating="icon_loading">
 
                             <div class="form-group">
-                                <label for="clubName">Club name</label>
-                                <input name="clubName" class="form-control" id="clubName" type="text" placeholder="Enter the name of your club" autofocus="autofocus"
+                                <label for="clubName" th:text="#{init.page.settings.clubName.label}">Club name</label>
+                                <input id="clubName" name="clubName" class="form-control" type="text" autofocus="autofocus"
+                                       placeholder="Enter the name of your club"
+                                       th:placeholder="#{init.page.settings.clubName.placeholder}"
+
                                        data-bv-notempty="true"
-                                       data-bv-notempty-message="The name of your club is required and cannot be empty"/>
+                                       data-bv-notempty-message="The name of your club is required and cannot be empty"
+                                       th:attr="data-bv-notempty-message=#{init.page.settings.clubName.bv}"/>
                             </div>
 
                             <hr/>
 
                             <div class="form-group">
-                                <label for="databaseHost">Database host</label>
-                                <input id="databaseHost" type="text" class="form-control " name="databaseHost" placeholder="Enter the host of the database"
+                                <label for="databaseHost" th:text="#{init.page.settings.dbHost.label}">Database host</label>
+                                <input id="databaseHost" name="databaseHost" class="form-control" type="text"
+                                       placeholder="Enter the host of the database"
+                                       th:placeholder="#{init.page.settings.dbHost.placeholder}"
+
                                        data-bv-notempty="true"
-                                       data-bv-notempty-message="The database host is required and cannot be empty" />
+                                       data-bv-notempty-message="The database host is required and cannot be empty"
+                                       th:attr="data-bv-notempty-message=#{init.page.settings.dbHost.bv}"/>
                             </div>
                             <div class="form-group">
-                                <label for="databasePort">Database port</label>
-                                <input id="databasePort" type="text" class="form-control " name="databasePort" placeholder="Enter the port of the database"
+                                <label for="databasePort" th:text="#{init.page.settings.dbPort.label}">Database port</label>
+                                <input id="databasePort" name="databasePort" class="form-control" type="text"
+                                       placeholder="Enter the port of the database"
+                                       th:placeholder="#{init.page.settings.dbPort.placeholder}"
+
                                        data-bv-notempty="true"
-                                       data-bv-notempty-message="The database port is required and cannot be empty" />
+                                       data-bv-notempty-message="The database port is required and cannot be empty"
+                                       th:attr="data-bv-notempty-message=#{init.page.settings.dbPort.bv}"/>
                             </div>
                             <div class="form-group">
-                                <label for="databaseUser">Database user</label>
-                                <input id="databaseUser" type="text" class="form-control" name="databaseUser" placeholder="Enter the username of the database user" />
+                                <label for="databaseUser" th:text="#{init.page.settings.dbUser.label}">Database user</label>
+                                <input id="databaseUser" name="databaseUser" class="form-control" type="text"
+                                       placeholder="Enter the username of the database user"
+                                       th:placeholder="${init.page.settings.dbUser.placeholder}"/>
                             </div>
                             <div class="form-group">
-                                <label for="databasePassword">Database password</label>
-                                <input id="databasePassword" type="password" class="form-control" name="databasePassword" placeholder="Enter the password of the database user"/>
+                                <label for="databasePassword" th:text="#{init.page.settings.dbPassword.label}">Database password</label>
+                                <input id="databasePassword" name="databasePassword" class="form-control" type="password"
+                                       placeholder="Enter the password of the database user"
+                                       th:placeholder="#{init.page.settings.dbPassword.placeholder}"/>
                             </div>
                             <div class="form-group">
-                                <label for="databaseCollection">Database collection name</label>
-                                <input id="databaseCollection" type="text" class="form-control" name="databaseCollection" placeholder="Enter the name of the database collection used"
+                                <label for="databaseCollection" th:text="#{init.page.settings.dbCollectionName.label}">Database collection name</label>
+                                <input id="databaseCollection" name="databaseCollection" class="form-control" type="text"
+                                       placeholder="Enter the name of the database collection used"
+                                       th:placeholder="#{init.page.settings.dbCollectionName.placeholder}"
+
                                        data-bv-notempty="true"
-                                       data-bv-notempty-message="The name of the database collection is required and cannot be empty" />
-                                <p class="help-block">When changing this value you might reset the whole system. Handle with care!</p>
+                                       data-bv-notempty-message="The name of the database collection is required and cannot be empty"
+                                       th:attr="data-bv-notempty-message=#{init.page.settings.dbCollectionName.bv}"/>
+
+                                <p class="help-block" th:text="#{init.page.settings.dbCollectionName.help}">When changing this value you might reset the whole system. Handle with care!</p>
                             </div>
 
                             <hr/>
 
                             <div class="form-group">
-                                <label for="rememberMeTokenKey">Remember me token key</label>
-                                <input id="rememberMeTokenKey" type="text" class="form-control" name="rememberMeTokenKey" placeholder="Enter your private key, used to secure the remember me token"
+                                <label for="rememberMeTokenKey" th:text="#{init.page.settings.rememberMeKey.label}">Remember me token key</label>
+                                <input id="rememberMeTokenKey" name="rememberMeTokenKey" class="form-control" type="text"
+                                       placeholder="Enter your private key, used to secure the remember me token"
+                                       th:placeholder="#{init.page.settings.rememberMeKey.placeholder}"
+
                                        data-bv-notempty="true"
-                                       data-bv-notempty-message="The remember me token key is required and cannot be empty" />
-                                <p class="help-block">This key is used to secure the "remember-me" functionality. Please use a random phrase.</p>
+                                       data-bv-notempty-message="The remember me token key is required and cannot be empty"
+                                       th:attr="data-bv-notempty-message=#{init.page.settings.rememberMeKey.bv}"/>
+
+                                <p class="help-block" th:text="#{init.page.settings.rememberMeKey.help}">This key is used to secure the cookie used by the"remember-me" functionality. Please use a random phrase.</p>
                             </div>
 
                             <hr/>
 
                             <div class="form-group">
                                 <div class="progress-button" id="initSettingsSubmitButton">
-                                    <button type="submit"><span>Proceed</span></button>
+                                    <button type="submit"><span th:text="#{init.page.settings.proceed}">Proceed</span></button>
                                     <svg class="progress-circle" width="50" height="50">
                                         <g transform="scale(0.71)">
                                             <path d="m35,2.5c17.955803,0 32.5,14.544199 32.5,32.5c0,17.955803 -14.544197,32.5 -32.5,32.5c-17.955803,0 -32.5,-14.544197 -32.5,-32.5c0,-17.955801 14.544197,-32.5 32.5,-32.5z"/>
@@ -144,66 +170,93 @@
                     </div>
 
                     <div id="initAdminBox" class="materialBox hidden">
-                        <h2>Create the super admin user</h2>
-                        <p>This user is going to be able to adjust all settings available within the system. This should be you.</p>
+                        <h2 th:text="#{init.page.admin.heading}">Create the super admin user</h2>
+                        <p th:text="#{init.page.admin.subHeading}">This user is going to be able to adjust all settings available within the system. This should be you.</p>
                         <form id="initAdminForm" method="post"
                               data-bv-feedbackicons-valid="icon_check"
                               data-bv-feedbackicons-invalid="icon_error-triangle_alt"
                               data-bv-feedbackicons-validating="icon_loading">
 
                             <div class="form-group">
-                                <label for="firstName">First name</label>
-                                <input id="firstName" type="text" class="form-control" name="firstName" placeholder="Enter the user's first name"
+                                <label for="firstName" th:text="init.page.admin.firstName.label">First name</label>
+                                <input id="firstName" name="firstName" class="form-control" type="text"
+                                       placeholder="Enter the user's first name"
+                                       th:placeholder="#{init.page.admin.firstName.placeholder}"
+
                                        data-bv-notempty="true"
                                        data-bv-notempty-message="The first name is required and cannot be empty"
+                                       th:attr="data-bv-notempty-message=#{init.page.admin.firstName.bv.notEmpty}"
 
                                        data-bv-regexp="true"
                                        data-bv-regexp-regexp="^[a-zA-Z0-9]+$"
-                                       data-bv-regexp-message="The first name can only consist of alphabetical and number"
+                                       data-bv-regexp-message="The first name can only consist of alphabetical characters and numbers"
+                                       th:attr="data-bv-regexp-message=#{init.page.admin.firstName.bv.regEx}"
 
                                        data-bv-different="true"
                                        data-bv-different-field="password"
-                                       data-bv-different-message="The first name and password cannot be the same as each other" />
+                                       data-bv-different-message="The first name and password cannot be the same"
+                                       th:attr="data-bv-different-message=#{init.page.admin.firstName.bv.different}"/>
                             </div>
                             <div class="form-group">
-                                <label for="lastName">Last name</label>
-                                <input id="lastName" type="text" class="form-control" name="lastName" placeholder="Enter the user's last name"
+                                <label for="lastName" th:text="#{init.page.admin.lastName.label}">Last name</label>
+                                <input id="lastName" name="lastName" class="form-control" type="text"
+                                       placeholder="Enter the user's last name"
+                                       th:placeholder="#{init.page.admin.lastName.placeholder}"
+
                                        data-bv-notempty="true"
                                        data-bv-notempty-message="The last name is required and cannot be empty"
+                                       th:attr="data-bv-notempty-message=#{init.page.admin.lastName.bv.notEmpty}"
 
                                        data-bv-regexp="true"
                                        data-bv-regexp-regexp="^[a-zA-Z0-9]+$"
-                                       data-bv-regexp-message="The last name can only consist of alphabetical and number"
+                                       data-bv-regexp-message="The last name can only consist of alphabetical characters and numbers"
+                                       th:attr="data-bv-regexp-message=#{init.page.admin.firstName.bv.regEx}"
 
                                        data-bv-different="true"
                                        data-bv-different-field="password"
-                                       data-bv-different-message="The last name and password cannot be the same as each other" />
+                                       data-bv-different-message="The last name and password cannot be the same"
+                                       th:attr="data-bv-different-message=#{init.page.admin.lastName.bv.different}"/>
                             </div>
                             <div class="form-group">
-                                <label for="email">Email address</label>
-                                <input id="email" type="text" class="form-control" name="email" placeholder="Enter the user's email"
+                                <label for="email" th:text="#{init.page.admin.email.label}">Email address</label>
+                                <input id="email" name="email" class="form-control" type="text"
+                                       placeholder="Enter the user's email"
+                                       th:placeholder="#{init.page.admin.email.placeholder}"
+
                                        data-bv-notempty="true"
                                        data-bv-notempty-message="The email address is required and cannot be empty"
+                                       th:attr="data-bv-notempty-message=#{init.page.admin.email.bv.notEmpty}"
 
                                        data-bv-emailaddress="true"
-                                       data-bv-emailaddress-message="The email address is not a valid" />
+                                       data-bv-emailaddress-message="The email address is not valid"
+                                       th:attr="data-bv-emailaddress-message=#{init.page.admin.email.bv.email}"/>
                             </div>
                             <div class="form-group">
-                                <label for="password">Password</label>
-                                <input id="password" type="password" class="form-control" name="password" placeholder="Enter an initial password"
+                                <label for="password" th:text="#{init.page.admin.password.label}">Password</label>
+                                <input id="password"name="password" class="form-control" type="password"
+                                       placeholder="Enter an initial password"
+                                       th:placeholder="#{init.page.admin.password.placeholder}"
+
                                        data-bv-notempty="true"
-                                       data-bv-notempty-message="The password is required and cannot be empty" />
-                                <input id="passwordRe" type="password" class="form-control" name="passwordRe" placeholder="Re-type your initial password"
+                                       data-bv-notempty-message="The password is required and cannot be empty"
+                                       th:attr="data-bv-notempty-message=#{init.page.admin.password.bv}"/>
+
+                                <input id="passwordRe" name="passwordRe" class="form-control" type="password"
+                                       placeholder="Re-type your initial password"
+                                       th:placeholder="#{init.page.admin.passwordRe.placeholder}"
+
                                        data-bv-notempty="true"
-                                       data-bv-notempty-message="The password is required and cannot be empty" />
+                                       data-bv-notempty-message="The retyped password is required and cannot be empty"
+                                       th:attr="data-bv-notempty-message=#{init.page.admin.passwordRe.bv}"/>
                             </div>
 
-                            <p>You can adjust this user later and add additional information.</p>
+                            <p th:text="#{init.page.admin.note}">You can adjust this user later and add additional information.</p>
 
                             <hr/>
+
                             <div id="submitGroupUser" class="form-group">
                                 <div class="progress-button" id="initAdminSubmitButton">
-                                    <button type="submit"><span>Proceed</span></button>
+                                    <button type="submit"><span th:text="#{init.page.admin.proceed}">Proceed</span></button>
                                     <svg class="progress-circle" width="50" height="50">
                                         <g transform="scale(0.71)">
                                             <path d="m35,2.5c17.955803,0 32.5,14.544199 32.5,32.5c0,17.955803 -14.544197,32.5 -32.5,32.5c-17.955803,0 -32.5,-14.544197 -32.5,-32.5c0,-17.955801 14.544197,-32.5 32.5,-32.5z"/>
@@ -229,11 +282,11 @@
                     </div>
 
                     <div id="initTutorialBox" class="materialBox hidden">
-                        <h2>Tutorial</h2>
-                        <p>This part is reserved for giving a brief tutorial on how to create and manipulate settings.</p>
+                        <h2 th:text="init.page.tutorial.heading">Tutorial</h2>
+                        <p th:text="init.page.tutorial.subHeading">This part is reserved for giving a brief tutorial on how to create and manipulate settings.</p>
 
                         <div class="progress-button" id="initTutorialSubmit">
-                            <button id="initTutorialSubmitButton" type="submit"><span>Finish!</span></button>
+                            <button id="initTutorialSubmitButton" type="submit"><span th:text="init.page.tutorial.finish">Finish!</span></button>
                             <svg class="progress-circle" width="50" height="50">
                                 <g transform="scale(0.71)">
                                     <path d="m35,2.5c17.955803,0 32.5,14.544199 32.5,32.5c0,17.955803 -14.544197,32.5 -32.5,32.5c-17.955803,0 -32.5,-14.544197 -32.5,-32.5c0,-17.955801 14.544197,-32.5 32.5,-32.5z"/>
