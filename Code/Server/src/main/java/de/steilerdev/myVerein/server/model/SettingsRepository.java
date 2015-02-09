@@ -26,6 +26,9 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
+import org.springframework.data.mongodb.MongoDbFactory;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.SimpleMongoDbFactory;
 import org.springframework.web.context.ContextLoader;
 import org.springframework.web.context.support.XmlWebApplicationContext;
 
@@ -39,6 +42,12 @@ import java.util.Properties;
  */
 public class SettingsRepository
 {
+    @Autowired
+    private MongoTemplate mongoTemplate;
+
+    @Autowired
+    private SimpleMongoDbFactory mongoDbFactory;
+
     @Autowired
     private ApplicationContext applicationContext;
 
@@ -269,6 +278,7 @@ public class SettingsRepository
      */
     public boolean isInitSetup()
     {
+        logger.trace("Checking if initial setup needs to be run.");
         try
         {
             String initSetupString = loadSettings().getProperty(initSetup);
@@ -303,6 +313,13 @@ public class SettingsRepository
             settings.store(new FileOutputStream(settingsResource.getFile()), "Settings last changed " + (currentUser != null ? ("by " + currentUser.getEmail() + " (" + LocalDateTime.now().toString() + ")") : LocalDateTime.now().toString()));
             if(databaseChanged)
             {
+                try
+                {
+                    mongoDbFactory.destroy();
+                } catch (Exception e)
+                {
+                    System.err.println("Problem destroying factory");
+                }
                 ((ConfigurableApplicationContext) applicationContext).refresh();
             }
             this.settings = null;

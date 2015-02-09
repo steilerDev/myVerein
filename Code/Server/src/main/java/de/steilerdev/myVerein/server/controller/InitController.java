@@ -16,6 +16,10 @@
  */
 package de.steilerdev.myVerein.server.controller;
 
+import com.mongodb.MongoClient;
+import com.mongodb.MongoCredential;
+import com.mongodb.MongoException;
+import com.mongodb.ServerAddress;
 import de.steilerdev.myVerein.server.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +33,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.validation.ConstraintViolationException;
 import java.io.IOException;
+import java.net.UnknownHostException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 
 @Controller
@@ -70,6 +77,7 @@ public class InitController
             return new ResponseEntity<>(messageSource.getMessage("init.message.settings.noKeyOrName", null, "The club name and remember me key is required", locale), HttpStatus.BAD_REQUEST);
         } else
         {
+            int databasePortInt = 27017;
             if(databaseHost.isEmpty())
             {
                 logger.warn("The database host is empty, using default value.");
@@ -83,7 +91,7 @@ public class InitController
             {
                 try
                 {
-                    Integer.parseInt(databasePort);
+                    databasePortInt = Integer.parseInt(databasePort);
                 } catch (NumberFormatException e)
                 {
                     logger.warn("The database port seems not to be a number " + databasePort);
@@ -94,6 +102,12 @@ public class InitController
             {
                 logger.warn("The database collection name is empty, using default value");
                 databaseCollection = "myVerein";
+            }
+
+            if(!mongoIsAvailable(databaseHost, databasePortInt, databaseUser, databasePassword, databaseCollection))
+            {
+                logger.warn("The stated MongoDB is not available");
+                return new ResponseEntity<>(messageSource.getMessage("init.message.settings.mongoNotAvailable", null, "The stated MongoDB is not available", locale), HttpStatus.BAD_REQUEST);
             }
 
             try
@@ -169,6 +183,52 @@ public class InitController
                 return new ResponseEntity<>(messageSource.getMessage("init.message.admin.constraintViolation", null, "A database constraint was violated while saving the new super admin", locale), HttpStatus.BAD_REQUEST);
             }
             return new ResponseEntity<>(messageSource.getMessage("init.message.admin.savingAdminSuccess", null, "Successfully saved the new super admin. The settings are now being saved and the application is restarted.", locale) , HttpStatus.OK);
+        }
+    }
+
+    private boolean mongoIsAvailable(String databaseHost, int databasePort, String databaseUser, String databasePassword, String databaseCollection)
+    {
+        logger.debug("Creating mongo client to test connection");
+        List<MongoCredential> credential = null;
+        MongoClient mongoClient = null;
+        if(!databaseUser.isEmpty() && !databasePassword.isEmpty())
+        {
+            credential = Arrays.asList(MongoCredential.createMongoCRCredential(databaseUser, databaseCollection, databasePassword.toCharArray()));
+        }
+
+        try
+        {
+            mongoClient = new MongoClient(new ServerAddress(databaseHost, databasePort),credential);
+
+            //Checking if connection REALLY works
+            List<String> databases = mongoClient.getDatabaseNames();
+            if(databases == null)
+            {
+                logger.warn("The list of databases is null");
+                return false;
+            } else if(databases.isEmpty())
+            {
+                logger.info("The databases are empty");
+                return true;
+            } else
+            {
+                logger.debug("The database connection seems okay.");
+                return true;
+            }
+        } catch (UnknownHostException e)
+        {
+            logger.warn("Unable to resolve mongoDB host: " + e.getMessage());
+            return false;
+        } catch (MongoException e)
+        {
+            logger.warn("Unable to receive list of present databases: " + e.getMessage());
+            return false;
+        } finally
+        {
+            if(mongoClient != null)
+            {
+                mongoClient.close();
+            }
         }
     }
 }

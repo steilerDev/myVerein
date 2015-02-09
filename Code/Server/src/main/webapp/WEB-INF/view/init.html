@@ -4,7 +4,7 @@
       xmlns:th="http://www.thymeleaf.org">
 
     <head>
-        <title th:text="init.page.title">Welcome to myVerein</title>
+        <title th:text="#{init.page.title}">Welcome to myVerein</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
         <!-- Favicons -->
@@ -104,7 +104,7 @@
                                 <label for="databaseUser" th:text="#{init.page.settings.dbUser.label}">Database user</label>
                                 <input id="databaseUser" name="databaseUser" class="form-control" type="text"
                                        placeholder="Enter the username of the database user"
-                                       th:placeholder="${init.page.settings.dbUser.placeholder}"/>
+                                       th:placeholder="#{init.page.settings.dbUser.placeholder}"/>
                             </div>
                             <div class="form-group">
                                 <label for="databasePassword" th:text="#{init.page.settings.dbPassword.label}">Database password</label>
@@ -178,24 +178,25 @@
                               data-bv-feedbackicons-validating="icon_loading">
 
                             <div class="form-group">
-                                <label for="firstName" th:text="init.page.admin.firstName.label">First name</label>
+                                <label for="firstName" th:text="#{init.page.admin.firstName.label}">First name</label>
                                 <input id="firstName" name="firstName" class="form-control" type="text"
                                        placeholder="Enter the user's first name"
                                        th:placeholder="#{init.page.admin.firstName.placeholder}"
 
                                        data-bv-notempty="true"
                                        data-bv-notempty-message="The first name is required and cannot be empty"
-                                       th:attr="data-bv-notempty-message=#{init.page.admin.firstName.bv.notEmpty}"
 
                                        data-bv-regexp="true"
                                        data-bv-regexp-regexp="^[a-zA-Z0-9]+$"
                                        data-bv-regexp-message="The first name can only consist of alphabetical characters and numbers"
-                                       th:attr="data-bv-regexp-message=#{init.page.admin.firstName.bv.regEx}"
 
                                        data-bv-different="true"
                                        data-bv-different-field="password"
                                        data-bv-different-message="The first name and password cannot be the same"
-                                       th:attr="data-bv-different-message=#{init.page.admin.firstName.bv.different}"/>
+
+                                       th:attr="data-bv-notempty-message=#{init.page.admin.firstName.bv.notEmpty},
+                                                data-bv-regexp-message=#{init.page.admin.firstName.bv.regEx},
+                                                data-bv-different-message=#{init.page.admin.firstName.bv.different}"/>
                             </div>
                             <div class="form-group">
                                 <label for="lastName" th:text="#{init.page.admin.lastName.label}">Last name</label>
@@ -205,17 +206,17 @@
 
                                        data-bv-notempty="true"
                                        data-bv-notempty-message="The last name is required and cannot be empty"
-                                       th:attr="data-bv-notempty-message=#{init.page.admin.lastName.bv.notEmpty}"
 
                                        data-bv-regexp="true"
                                        data-bv-regexp-regexp="^[a-zA-Z0-9]+$"
                                        data-bv-regexp-message="The last name can only consist of alphabetical characters and numbers"
-                                       th:attr="data-bv-regexp-message=#{init.page.admin.firstName.bv.regEx}"
 
                                        data-bv-different="true"
                                        data-bv-different-field="password"
                                        data-bv-different-message="The last name and password cannot be the same"
-                                       th:attr="data-bv-different-message=#{init.page.admin.lastName.bv.different}"/>
+                                       th:attr="data-bv-notempty-message=#{init.page.admin.lastName.bv.notEmpty},
+                                                data-bv-regexp-message=#{init.page.admin.firstName.bv.regEx},
+                                                data-bv-different-message=#{init.page.admin.lastName.bv.different}"/>
                             </div>
                             <div class="form-group">
                                 <label for="email" th:text="#{init.page.admin.email.label}">Email address</label>
@@ -225,15 +226,15 @@
 
                                        data-bv-notempty="true"
                                        data-bv-notempty-message="The email address is required and cannot be empty"
-                                       th:attr="data-bv-notempty-message=#{init.page.admin.email.bv.notEmpty}"
 
                                        data-bv-emailaddress="true"
                                        data-bv-emailaddress-message="The email address is not valid"
-                                       th:attr="data-bv-emailaddress-message=#{init.page.admin.email.bv.email}"/>
+                                       th:attr="data-bv-notempty-message=#{init.page.admin.email.bv.notEmpty},
+                                                data-bv-emailaddress-message=#{init.page.admin.email.bv.email}"/>
                             </div>
                             <div class="form-group">
                                 <label for="password" th:text="#{init.page.admin.password.label}">Password</label>
-                                <input id="password"name="password" class="form-control" type="password"
+                                <input id="password" name="password" class="form-control" type="password"
                                        placeholder="Enter an initial password"
                                        th:placeholder="#{init.page.admin.password.placeholder}"
 
@@ -282,11 +283,11 @@
                     </div>
 
                     <div id="initTutorialBox" class="materialBox hidden">
-                        <h2 th:text="init.page.tutorial.heading">Tutorial</h2>
-                        <p th:text="init.page.tutorial.subHeading">This part is reserved for giving a brief tutorial on how to create and manipulate settings.</p>
+                        <h2 th:text="#{init.page.tutorial.heading}">Tutorial</h2>
+                        <p th:text="#{init.page.tutorial.subHeading}">This part is reserved for giving a brief tutorial on how to create and manipulate settings.</p>
 
                         <div class="progress-button" id="initTutorialSubmit">
-                            <button id="initTutorialSubmitButton" type="submit"><span th:text="init.page.tutorial.finish">Finish!</span></button>
+                            <button id="initTutorialSubmitButton" type="submit"><span th:text="#{init.page.tutorial.finish}">Finish!</span></button>
                             <svg class="progress-circle" width="50" height="50">
                                 <g transform="scale(0.71)">
                                     <path d="m35,2.5c17.955803,0 32.5,14.544199 32.5,32.5c0,17.955803 -14.544197,32.5 -32.5,32.5c-17.955803,0 -32.5,-14.544197 -32.5,-32.5c0,-17.955801 14.544197,-32.5 32.5,-32.5z"/>
