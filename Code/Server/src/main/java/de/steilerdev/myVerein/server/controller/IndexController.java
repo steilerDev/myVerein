@@ -47,21 +47,6 @@ public class IndexController
     @Autowired
     private SettingsRepository settingsRepository;
 
-    @Autowired
-    private EventResponseRepository eventResponseRepository;
-
-    @Autowired
-    private MessageRepository messageRepository;
-
-    @Autowired
-    private PictureRepository pictureRepository;
-
-    @Autowired
-    private RememberMeTokenRepository rememberMeTokenRepository;
-
-    @Autowired
-    private GridFSRepository gridFSRepository;
-
     private static Logger logger = LoggerFactory.getLogger(IndexController.class);
 
     /**
@@ -87,15 +72,7 @@ public class IndexController
         if (settingsRepository.isInitSetup())
         {
             logger.warn("Starting initial setup.");
-            new Thread(() -> {
-                    try
-                    {
-                        logger.debug("Trying to drop database.");
-                        mongoTemplate.getDb().dropDatabase();
-                    } catch (MongoTimeoutException e)
-                    {
-                        logger.debug("Unable to drop database, because the database is not available.");
-                    }}).run();
+            resetDatabase();
             return "init";
         } else
         {
@@ -117,9 +94,18 @@ public class IndexController
     }
 
     @RequestMapping(value = "error", method = RequestMethod.GET)
-    public String error()
+    public String error(@RequestParam(required = false) String noDB, @RequestParam(required = false) String pageNotFound)
     {
-        logger.warn("An unexpected error was recognized, redirecting to error page.");
+        if(noDB != null)
+        {
+            logger.warn("An exception was recognized: Unable to access database. Redirecting to error page.");
+        } else if(pageNotFound != null)
+        {
+            logger.warn("The requested page was not found.");
+        } else
+        {
+            logger.warn("An unexpected exception was recognized. Redirecting to error page.");
+        }
         return "error";
     }
 
@@ -240,13 +226,14 @@ public class IndexController
 
     private void resetDatabase()
     {
-        divisionRepository.deleteAll();
-        eventRepository.deleteAll();
-        eventResponseRepository.deleteAll();
-        gridFSRepository.deleteAll();
-        messageRepository.deleteAll();
-        pictureRepository.deleteAll();
-        rememberMeTokenRepository.deleteAll();
-        userRepository.deleteAll();
+        new Thread(() -> {
+            try
+            {
+                logger.debug("Trying to drop database.");
+                mongoTemplate.getDb().dropDatabase();
+            } catch (MongoTimeoutException e)
+            {
+                logger.debug("Unable to drop database, because the database is not available.");
+            }}).run();
     }
 }

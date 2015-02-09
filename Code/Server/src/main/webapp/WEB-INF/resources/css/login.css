@@ -43,10 +43,8 @@ body {
 }
 
 .loginContainer {
-    background-image: url("/content/clubLogo");
+    background: url("/content/clubLogo") no-repeat 30% center;
     background-size: 250px auto;
-    background-repeat: no-repeat;
-    background-position: 30% center;
 }
 
 .verticalCentered {

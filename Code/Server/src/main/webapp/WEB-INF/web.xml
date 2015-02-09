@@ -54,7 +54,22 @@
 
     <error-page>
         <exception-type>org.springframework.security.web.authentication.rememberme.CookieTheftException</exception-type>
-        <location>/login?cookieTheft</location>
+        <location>/login?cookieTheft=true</location>
+    </error-page>
+
+    <error-page>
+        <exception-type>org.springframework.dao.DataAccessResourceFailureException</exception-type>
+        <location>/error?noDB=true</location>
+    </error-page>
+
+    <error-page>
+        <error-code>404</error-code>
+        <location>/error?pageNotFound=true</location>
+    </error-page>
+
+    <error-page>
+        <error-code>405</error-code>
+        <location>/error?pageNotFound=true</location>
     </error-page>
 
     <!-- Todo: use error page -->
