@@ -17,10 +17,7 @@
 package de.steilerdev.myVerein.server.controller;
 
 import com.mongodb.MongoException;
-import de.steilerdev.myVerein.server.model.GridFSRepository;
-import de.steilerdev.myVerein.server.model.SettingsRepository;
-import de.steilerdev.myVerein.server.model.User;
-import de.steilerdev.myVerein.server.model.UserRepository;
+import de.steilerdev.myVerein.server.model.*;
 import de.steilerdev.myVerein.server.security.CurrentUser;
 import de.steilerdev.myVerein.server.security.PasswordEncoder;
 import org.slf4j.Logger;
@@ -60,6 +57,9 @@ public class SettingsController
 
     @Autowired
     private SettingsRepository settingsRepository;
+
+    @Autowired
+    private DivisionRepository divisionRepository;
 
     private static Logger logger = LoggerFactory.getLogger(SettingsController.class);
 
@@ -132,13 +132,37 @@ public class SettingsController
                 if(currentAdmin != null && !currentAdmin.equals(currentUser.getEmail()))
                 {
                     logger.warn("The super admin user is changing.");
-                    //Todo: Change admin user, bear in mind that the user afterwards could have no divisions!
+                    Division rootDivision = divisionRepository.findByName(settingsRepository.getClubName());
+                    if(rootDivision == null)
+                    {
+                        logger.warn("Unable to find root division.");
+                        return new ResponseEntity<>("Unable to find root division", HttpStatus.INTERNAL_SERVER_ERROR);
+                    }
+
+                    User newSuperAdmin = userRepository.findByEmail(currentAdmin);
+                    if(newSuperAdmin == null)
+                    {
+                        logger.warn("Unable to find new super admin.");
+                        return new ResponseEntity<>("Unable to find new super admin", HttpStatus.INTERNAL_SERVER_ERROR);
+                    }
+
+                    rootDivision.setAdminUser(newSuperAdmin);
+                    divisionRepository.save(rootDivision);
                 }
                 try
                 {
                     if (clubName != null && !clubName.isEmpty())
                     {
                         logger.debug("Setting club name to " + clubName);
+                        Division rootDivision = divisionRepository.findByName(settingsRepository.getClubName());
+                        if(rootDivision == null)
+                        {
+                            logger.warn("Unable to find former root division.");
+                            return new ResponseEntity<>("Unable to find former root division", HttpStatus.INTERNAL_SERVER_ERROR);
+                        }
+                        //Changing and saving the root division
+                        rootDivision.setName(clubName);
+                        divisionRepository.save(rootDivision);
                         settingsRepository.setClubName(clubName);
                     }
 
