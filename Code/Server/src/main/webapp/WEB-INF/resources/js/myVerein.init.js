@@ -53,17 +53,28 @@ $(document).ready(function() {
                     url: '/init/settings',
                     type: 'POST',
                     data: new FormData($('#initSettingsForm')[0]),
-                    error: function (response) {
-                        initSettingsButton.stopAnimation(-1);
-                        showMessage(response, 'success', 'icon_check');
+                    xhr: function() {
+                        var xhr = new window.XMLHttpRequest();
+                        //Upload progress
+                        xhr.upload.addEventListener("progress", function(evt){
+                            if (evt.lengthComputable) {
+                                var percentComplete = evt.loaded / evt.total;
+                                console.log(percentComplete);
+                            }
+                        }, false);
+                        return xhr;
                     },
                     success: function (response) {
-                        showMessage(response, 'error', 'icon_error-triangle_alt');
+                        showMessage(response, 'success', 'icon_check');
                         initSettingsButton.stopAnimation(1);
                         $('#initAdminBox').removeClass("hidden");
                         $('#initSettingsBox').addClass("hidden");
                         $('#firstName').focus();
                         $('body').scrollTop(0);
+                    },
+                    error: function (response) {
+                        showMessage(response.responseText, 'error', 'icon_error-triangle_alt');
+                        initSettingsButton.stopAnimation(-1);
                     },
                     cache: false,
                     contentType: false,

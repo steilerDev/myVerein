@@ -110,6 +110,10 @@ function loadDivisionPage() {
             onLoadFailed: function (response) {
                 showMessage(response.responseText, 'error', 'icon_error-triangle_alt');
                 $('#division-tree-loading').removeClass('heartbeat');
+            },
+            onCanSelectNode: function(node) {
+                console.log(node);
+                return true;
             }
         });
 
