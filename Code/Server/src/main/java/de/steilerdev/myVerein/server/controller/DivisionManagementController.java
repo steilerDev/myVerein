@@ -89,6 +89,10 @@ public class DivisionManagementController
             {
                 //An existing divisions name is changed and the name is unique
                 logger.debug("An existing division is changed. The identification has changed as well.");
+            } else if(division.getParent() == null)
+            {
+                logger.debug("The root division is not allowed to be modified through this API");
+                return new ResponseEntity<>("The root division is not allowed to be modified through this API", HttpStatus.FORBIDDEN);
             } else
             {
                 return new ResponseEntity<>("Problem finding existing division, either the existing division could not be located or the new name is already taken", HttpStatus.BAD_REQUEST);

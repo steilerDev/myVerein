@@ -1,0 +1,10 @@
+.errorBox {
+    text-align: center;
+    max-width: 800px;
+    font-size: 1.5em;
+    margin: 50px auto;
+    background: url("/content/clubLogo?defaultLogo") no-repeat top center;
+    background-size: 250px auto;
+    overflow: visible;
+    padding-top: 270px;
+}

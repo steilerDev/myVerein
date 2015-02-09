@@ -18,6 +18,7 @@ package de.steilerdev.myVerein.server.controller;
 
 import com.mongodb.gridfs.GridFSDBFile;
 import de.steilerdev.myVerein.server.model.GridFSRepository;
+import de.steilerdev.myVerein.server.model.SettingsRepository;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,6 +44,9 @@ public class ContentController
 
     @Autowired
     GridFSRepository gridFSRepository;
+
+    @Autowired
+    SettingsRepository settingsRepository;
 
     /**
      * This function gathers the club logo either from the database or the classpath, depending if the user uploaded a custom logo.
@@ -82,6 +86,19 @@ public class ContentController
                 logger.warn("Unable to load club logo from database: " + e.getMessage());
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
+        }
+    }
+
+    @RequestMapping("clubName")
+    @ResponseBody ResponseEntity<String> getClubName()
+    {
+        String clubName = settingsRepository.getClubName();
+        if(clubName == null || clubName.isEmpty())
+        {
+            return new ResponseEntity<>("Unable to get club name", HttpStatus.INTERNAL_SERVER_ERROR);
+        } else
+        {
+            return new ResponseEntity<>(clubName, HttpStatus.OK);
         }
     }
 }

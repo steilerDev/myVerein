@@ -57,6 +57,7 @@ public class SettingsRepository
     private final static String initSetup = "initSetup";
 
     private boolean changed;
+    private boolean databaseChanged;
 
     private static Logger logger = LoggerFactory.getLogger(SettingsRepository.class);
 
@@ -67,6 +68,7 @@ public class SettingsRepository
             logger.debug("Loading settings file from classpath");
             settingsResource = new ClassPathResource(settingsFileName);
             changed = false;
+            databaseChanged = false;
             return (settings = PropertiesLoaderUtils.loadProperties(settingsResource));
         } else
         {
@@ -84,6 +86,7 @@ public class SettingsRepository
         if(newDatabaseHost != null && !newDatabaseHost.equals(getDatabaseHost()))
         {
             changed = true;
+            databaseChanged = true;
             loadSettings().setProperty(databaseHost, newDatabaseHost);
         }
     }
@@ -110,6 +113,7 @@ public class SettingsRepository
         if(newDatabasePort != null && !newDatabasePort.equals(getDatabasePort()))
         {
             changed = true;
+            databaseChanged = true;
             loadSettings().setProperty(databasePort, newDatabasePort);
         }
     }
@@ -136,6 +140,7 @@ public class SettingsRepository
         if(newDatabaseName != null && !newDatabaseName.equals(getDatabaseName()))
         {
             changed = true;
+            databaseChanged = true;
             loadSettings().setProperty(databaseName, newDatabaseName);
         }
     }
@@ -162,6 +167,7 @@ public class SettingsRepository
         if(newDatabaseUser != null && !newDatabaseUser.equals(getDatabaseUser()))
         {
             changed = true;
+            databaseChanged = true;
             loadSettings().setProperty(databaseUser, newDatabaseUser);
         }
     }
@@ -188,6 +194,7 @@ public class SettingsRepository
         if(newDatabasePassword != null && !newDatabasePassword.equals(getDatabasePassword()))
         {
             changed = true;
+            databaseChanged = true;
             loadSettings().setProperty(databasePassword, newDatabasePassword);
         }
     }
@@ -294,7 +301,10 @@ public class SettingsRepository
         {
             logger.debug("Saving settings to " + settingsResource.getFile().getAbsolutePath());
             settings.store(new FileOutputStream(settingsResource.getFile()), "Settings last changed " + (currentUser != null ? ("by " + currentUser.getEmail() + " (" + LocalDateTime.now().toString() + ")") : LocalDateTime.now().toString()));
-            ((ConfigurableApplicationContext)applicationContext).refresh();
+            if(databaseChanged)
+            {
+                ((ConfigurableApplicationContext) applicationContext).refresh();
+            }
             this.settings = null;
         } else
         {
