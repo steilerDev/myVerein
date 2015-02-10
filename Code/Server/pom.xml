@@ -34,7 +34,7 @@
         <!-- JSON conversion -->
         <jackson.version>2.4.3</jackson.version>
 
-        <!-- Apache commons IO-->
+        <!-- Apache commons -->
         <commons.io.version>2.4</commons.io.version>
     </properties>
 
@@ -112,14 +112,6 @@
             <version>${spring.security.version}</version>
         </dependency>
 
-        <!-- Testing -->
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>${junit.version}</version>
-            <scope>test</scope>
-        </dependency>
-
         <!-- Logging -->
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -173,6 +165,7 @@
             <version>${jackson.version}</version>
         </dependency>
 
+        <!-- Apache commons-->
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
@@ -180,7 +173,6 @@
         </dependency>
 
     </dependencies>
-
 
     <build>
         <finalName>${name}</finalName>
