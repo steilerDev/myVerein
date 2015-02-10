@@ -69,10 +69,21 @@ public class IndexController
     public String login(@RequestParam(required = false) String error, @RequestParam(required = false) String logout, @RequestParam(required = false) String cookieTheft, Model model)
     {
         //createDatabaseExample();
+
+        System.err.println(settingsRepository.getDatabaseHost());
+        System.err.println(settingsRepository.getDatabasePort());
+        System.err.println(settingsRepository.getDatabaseName());
+        try
+        {
+            System.err.println(mongoTemplate.getDb().getCollectionNames());
+        } catch (Exception e)
+        {
+            System.err.println("DB not available");
+        }
+
         if (settingsRepository.isInitSetup())
         {
             logger.warn("Starting initial setup.");
-            resetDatabase();
             return "init";
         } else
         {

@@ -176,7 +176,7 @@ public class UserManagementController
             newUserObject.setBirthday(null);
         }
 
-        if(!gender.isEmpty() && !gender.equals("default"))
+        if(gender != null && !gender.isEmpty() && !gender.equals("default"))
         try
         {
             newUserObject.setGender(User.Gender.valueOf(gender));

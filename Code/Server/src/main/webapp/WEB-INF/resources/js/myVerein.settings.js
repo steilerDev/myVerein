@@ -121,8 +121,14 @@ function loadSettingsPage(){
                         callback(data);
                     }
                 });
+            },
+            onInitialize: function() {
+                loadSettings();
             }
         });
+    } else
+    {
+        //Todo: Add reload
     }
 
     if (!settingsSubmitButton) {
@@ -166,6 +172,4 @@ function loadSettingsPage(){
     $('#clubLogo').change(function() {
         $('#clubLogoLabel').text($('#clubLogo').val());
     });
-
-    loadSettings();
 }

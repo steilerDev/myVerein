@@ -77,7 +77,7 @@ public class GridFSRepository
             clubLogoFiles = gridFS.find(new Query().addCriteria(Criteria.where("filename").is(clubLogoFileName)));
         } catch (MongoTimeoutException e)
         {
-            logger.warn("Timeout exception thrown while trying to find club logo");
+            logger.warn("Timeout while trying to find club logo");
             return null;
         }
 

@@ -55,7 +55,7 @@
                 <div class="col-sm-offset-2 col-sm-8 init-content">
                     <div class="materialBox">
                         <h2 th:text="#{init.page.heading}">Welcome to myVerein!</h2>
-                        <h3 th:text="#{init.page.subHeading}">Thank you for choosing the best club management system ever!</h3>
+                        <h3><span id="subHeading" th:text="#{init.page.subHeading}">Thank you for choosing the best club management system ever!</span><span id="subHeadingWait" class="hidden" th:text="#{init.page.subHeading.wait}">Your settings are applied and the system is restarted afterwards, please wait, you are getting notified as soon as everything is set.</span></h3>
                         <p th:text="#{init.page.subSubHeading}">This page is going to guide you through the initial configuration of your system and explain all functionalities of the product.</p>
                     </div>
 
@@ -122,7 +122,7 @@
                                        data-bv-notempty-message="The name of the database collection is required and cannot be empty"
                                        th:attr="data-bv-notempty-message=#{init.page.settings.dbCollectionName.bv}"/>
 
-                                <p class="help-block" th:text="#{init.page.settings.dbCollectionName.help}">When changing this value you might reset the whole system. Handle with care!</p>
+                                <p class="help-block" th:text="#{init.page.settings.dbCollectionName.help}">If a collection with the same name already exists, the existing data is going to be delete!</p>
                             </div>
 
                             <hr/>

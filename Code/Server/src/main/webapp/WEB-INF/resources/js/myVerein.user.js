@@ -308,6 +308,9 @@ function loadUserPage() {
                 });
             }
         });
+    } else
+    {
+        //Todo: Add reload
     }
 
     if(!userList) {

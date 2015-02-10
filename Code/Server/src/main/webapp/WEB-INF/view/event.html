@@ -19,6 +19,11 @@
         <!-- Only the following container is going to be used within the production page-->
         <section th:fragment="content">
             <div class="col-sm-6">
+                <div class="materialBox">
+                    <button id="addEvent" class="btn btn-default">
+                        Create new event
+                    </button>
+                </div>
                 <div id="calendar" class="calendar"></div>
                 <div id="event-calendar-loading" class="center-block" />
             </div>

@@ -36,6 +36,9 @@
 
         <!-- Apache commons -->
         <commons.io.version>2.4</commons.io.version>
+
+        <!-- JavaX servlet -->
+        <javax.servlet.version>3.0.1</javax.servlet.version>
     </properties>
 
     <dependencies>
@@ -170,6 +173,13 @@
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
             <version>${commons.io.version}</version>
+        </dependency>
+
+        <!-- JavaX Servlet -->
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>${javax.servlet.version}</version>
         </dependency>
 
     </dependencies>

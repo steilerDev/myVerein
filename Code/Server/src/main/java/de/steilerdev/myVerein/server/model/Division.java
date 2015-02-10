@@ -18,11 +18,14 @@ package de.steilerdev.myVerein.server.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
 import org.hibernate.validator.constraints.NotBlank;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
+import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 
@@ -162,7 +165,7 @@ public class Division
         logger.debug("Adding ancestor " + ancestor.getName() + " to " + this.name);
         if(ancestors == null)
         {
-            ancestors = new ArrayList<Division>();
+            ancestors = new ArrayList<>();
         }
         ancestors.add(ancestor);
     }

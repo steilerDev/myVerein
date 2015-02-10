@@ -16,13 +16,16 @@
  */
 package de.steilerdev.myVerein.server.model;
 
+import com.mongodb.MongoException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
@@ -32,6 +35,7 @@ import org.springframework.data.mongodb.core.SimpleMongoDbFactory;
 import org.springframework.web.context.ContextLoader;
 import org.springframework.web.context.support.XmlWebApplicationContext;
 
+import javax.servlet.ServletContext;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -305,7 +309,7 @@ public class SettingsRepository
         saveSettings(loadSettings(), currentUser);
     }
 
-    public void saveSettings(Properties settings, User currentUser) throws IOException
+    public void saveSettings(Properties settings, User currentUser) throws IOException, BeansException, IllegalStateException, MongoException
     {
         if(changed)
         {
@@ -313,14 +317,24 @@ public class SettingsRepository
             settings.store(new FileOutputStream(settingsResource.getFile()), "Settings last changed " + (currentUser != null ? ("by " + currentUser.getEmail() + " (" + LocalDateTime.now().toString() + ")") : LocalDateTime.now().toString()));
             if(databaseChanged)
             {
+                logger.info("Restarting application context, because database configuration changed");
+
                 try
                 {
+                    //Getting servlet context to be able to re initiate it.
+                    ServletContext servletContext = ((XmlWebApplicationContext) applicationContext).getServletContext();
+
+                    //Closing application context, mongoDB and servlet context.
                     mongoDbFactory.destroy();
+                    ContextLoader contextLoader = new ContextLoader();
+                    contextLoader.closeWebApplicationContext(servletContext);
+
+                    //Restarting servlet context
+                    contextLoader.initWebApplicationContext(servletContext);
                 } catch (Exception e)
                 {
-                    System.err.println("Problem destroying factory");
+                    throw new MongoException(e.getMessage());
                 }
-                ((ConfigurableApplicationContext) applicationContext).refresh();
             }
             this.settings = null;
         } else

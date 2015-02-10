@@ -66,7 +66,13 @@ public class ContentController
 
         if(clubLogo == null || defaultLogo != null)
         {
-            logger.info("No club logo found, using default logo");
+            if(defaultLogo != null)
+            {
+                logger.info("Instantly using default logo");
+            } else
+            {
+                logger.info("No club logo found, using default logo");
+            }
             try
             {
                 return new ResponseEntity<>(IOUtils.toByteArray(new ClassPathResource("content/Logo.png").getInputStream()), HttpStatus.OK);

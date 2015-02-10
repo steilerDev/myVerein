@@ -18,23 +18,25 @@ $(document).ready(function() {
             .on('success.form.bv', function (e) { //The submission function
                 // Prevent form submission
                 e.preventDefault();
-                //Starting button animation
-                initAdminButton.startAnimation();
-                //Send the serialized form
+
+                //Setting everything straight
+                $('#subHeading').addClass('hidden');
+                $('#subHeadingWait').removeClass('hidden');
+                $('#initAdminBox').addClass('hidden');
+                $('#initTutorialBox').removeClass('hidden');
+                $('body').scrollTop(0);
+
+               //Send the serialized form
                 $.ajax({
                     url: '/init/superAdmin',
                     type: 'POST',
                     data: $(e.target).serialize(),
                     error: function (response) {
                         showMessage(response.responseText, 'error', 'icon_error-triangle_alt');
-                        initAdminButton.stopAnimation(-1);
+                        $('#initAdminBox').removeClass('hidden');
                     },
                     success: function (response) {
                         showMessage(response, 'success', 'icon_check');
-                        initAdminButton.stopAnimation(0);
-                        $('#initAdminBox').addClass('hidden');
-                        $('#initTutorialBox').removeClass('hidden');
-                        $('body').scrollTop(0);
                     }
                 });
             });
@@ -53,17 +55,18 @@ $(document).ready(function() {
                     url: '/init/settings',
                     type: 'POST',
                     data: new FormData($('#initSettingsForm')[0]),
-                    xhr: function() {
-                        var xhr = new window.XMLHttpRequest();
-                        //Upload progress
-                        xhr.upload.addEventListener("progress", function(evt){
-                            if (evt.lengthComputable) {
-                                var percentComplete = evt.loaded / evt.total;
-                                console.log(percentComplete);
-                            }
-                        }, false);
-                        return xhr;
-                    },
+                    //Todo: Maybe later everywhere
+                    //xhr: function() {
+                    //    var xhr = new window.XMLHttpRequest();
+                    //    //Upload progress
+                    //    xhr.upload.addEventListener("progress", function(evt){
+                    //        if (evt.lengthComputable) {
+                    //            var percentComplete = evt.loaded / evt.total;
+                    //            console.log(percentComplete);
+                    //        }
+                    //    }, false);
+                    //    return xhr;
+                    //},
                     success: function (response) {
                         showMessage(response, 'success', 'icon_check');
                         initSettingsButton.stopAnimation(1);

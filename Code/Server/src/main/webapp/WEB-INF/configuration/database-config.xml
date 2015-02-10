@@ -8,16 +8,16 @@
                                    http://www.springframework.org/schema/data/mongo/spring-mongo.xsd">
 
         <!-- Converter used to enable the use of Java 8 time classes with Spring Data -->
-        <mapping-converter id="javaTimeConverter">
+        <mapping-converter id="mappingMongoConverter">
             <custom-converters base-package="de.steilerdev.myVerein.server.converter"/>
         </mapping-converter>
 
        <!-- Database configuration -->
        <repositories base-package="de.steilerdev.myVerein.server.model" />
-       <template db-factory-ref="mongoDbFactory" converter-ref="javaTimeConverter"/>
+       <template db-factory-ref="mongoDbFactory" converter-ref="mappingMongoConverter"/>
 
        <!-- GridFS bean for file access within MongoDB -->
-       <gridFsTemplate id="gridFS" db-factory-ref="mongoDbFactory" converter-ref="javaTimeConverter"/>
+       <gridFsTemplate id="gridFS" db-factory-ref="mongoDbFactory" converter-ref="mappingMongoConverter"/>
 
        <db-factory host="${dbHost}"
                    port="${dbPort}"

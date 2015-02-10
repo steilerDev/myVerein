@@ -134,7 +134,7 @@ function loadDivisionPage() {
         $('#division-tree').bind(
             'tree.click',
             function (event) {
-                if(node.name != clubName) {
+                if(event.node.name != clubName) {
                     loadDivision(event.node.name);
                 }
             }
@@ -201,6 +201,9 @@ function loadDivisionPage() {
                 });
             }
         });
+    } else
+    {
+        //Todo: Add reload
     }
 
     if (!$('#divisionForm').data('bootstrapValidator')) {

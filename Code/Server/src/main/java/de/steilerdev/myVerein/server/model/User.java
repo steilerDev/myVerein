@@ -19,11 +19,15 @@ package de.steilerdev.myVerein.server.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
 import de.steilerdev.myVerein.server.controller.DivisionManagementController;
 import de.steilerdev.myVerein.server.security.PasswordEncoder;
 import de.steilerdev.myVerein.server.security.UserAuthenticationService;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotBlank;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -40,6 +44,10 @@ import java.util.List;
 
 public class User implements UserDetails
 {
+    @Transient
+    @JsonIgnore
+    private static Logger logger = LoggerFactory.getLogger(User.class);
+
     public enum Gender {
         MALE,
         FEMALE

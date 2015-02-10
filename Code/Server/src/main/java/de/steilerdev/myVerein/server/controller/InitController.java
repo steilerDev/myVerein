@@ -16,27 +16,23 @@
  */
 package de.steilerdev.myVerein.server.controller;
 
-import com.mongodb.MongoClient;
-import com.mongodb.MongoCredential;
-import com.mongodb.MongoException;
-import com.mongodb.ServerAddress;
+import com.mongodb.*;
 import de.steilerdev.myVerein.server.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
+import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.validation.ConstraintViolationException;
 import java.io.IOException;
 import java.net.UnknownHostException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 @Controller
 @RequestMapping("/init")
@@ -53,6 +49,16 @@ public class InitController
 
     @Autowired
     private ReloadableResourceBundleMessageSource messageSource;
+
+    @Autowired
+    private MappingMongoConverter mappingMongoConverter;
+
+    private ServerAddress mongoAddress = null;
+    private List<MongoCredential> mongoCredential = null;
+    private String databaseName = null;
+
+    private boolean succesfullyStoredDataInDatabase = false;
+    private boolean successfullyReloadedApplicationContext = false;
 
     private static Logger logger = LoggerFactory.getLogger(InitController.class);
 
@@ -119,6 +125,7 @@ public class InitController
                 settingsRepository.setDatabaseUser(databaseUser);
                 settingsRepository.setDatabasePassword(databasePassword);
                 settingsRepository.setDatabaseName(databaseCollection);
+                databaseName = databaseCollection;
                 settingsRepository.setRememberMeKey(rememberMeTokenKey);
             } catch (IOException e)
             {
@@ -161,45 +168,58 @@ public class InitController
             logger.debug("Creating a new initial root division.");
             Division rootDivision = new Division(settingsRepository.getClubName(), null, superAdmin, null);
 
-            //Saving changes and restarting context
             try
             {
+                //Un-setting init flag.
                 settingsRepository.setInitSetup(false);
-                //This call is restarting the application.
-                settingsRepository.saveSettings(superAdmin);
             } catch (IOException e)
             {
                 logger.warn("Unable to save settings.");
                 return new ResponseEntity<>(messageSource.getMessage("init.message.admin.savingSettingsError", null, "Unable to save settings, please try again", locale), HttpStatus.INTERNAL_SERVER_ERROR);
             }
 
-            try
+            logger.debug("Everything in place, now the settings are stored durable.");
+
+            if(!savingUserAndDivision(superAdmin, rootDivision))
             {
-                userRepository.save(superAdmin);
-                divisionRepository.save(rootDivision);
-            } catch (ConstraintViolationException e)
+                logger.warn("Storing data into database was not successfully.");
+                return new ResponseEntity<>(messageSource.getMessage("init.message.admin.savingAdminError", null, "Unable to save new super admin, please try again", locale), HttpStatus.INTERNAL_SERVER_ERROR);
+            } else if(!savingSettings(superAdmin))
             {
-                logger.warn("A database constraint was violated while saving the new super admin.");
-                return new ResponseEntity<>(messageSource.getMessage("init.message.admin.constraintViolation", null, "A database constraint was violated while saving the new super admin", locale), HttpStatus.BAD_REQUEST);
+                logger.warn("Unable to save settings or refresh application context");
+                return new ResponseEntity<>(messageSource.getMessage("init.message.admin.savingSettingsError", null, "Unable to save settings, please try again", locale), HttpStatus.INTERNAL_SERVER_ERROR);
+            } else
+            {
+                logger.debug("Successfully saved new admin, settings and restarted application context.");
+                return new ResponseEntity<>(messageSource.getMessage("init.message.admin.success", null, "Successfully saved the new super admin, updated all settings and restarted the application. Refresh this page and start using myVerein.", locale) , HttpStatus.OK);
             }
-            return new ResponseEntity<>(messageSource.getMessage("init.message.admin.savingAdminSuccess", null, "Successfully saved the new super admin. The settings are now being saved and the application is restarted.", locale) , HttpStatus.OK);
         }
     }
 
     private boolean mongoIsAvailable(String databaseHost, int databasePort, String databaseUser, String databasePassword, String databaseCollection)
     {
         logger.debug("Creating mongo client to test connection");
-        List<MongoCredential> credential = null;
-        MongoClient mongoClient = null;
+
+        //Creating credentials
         if(!databaseUser.isEmpty() && !databasePassword.isEmpty())
         {
-            credential = Arrays.asList(MongoCredential.createMongoCRCredential(databaseUser, databaseCollection, databasePassword.toCharArray()));
+            mongoCredential = Arrays.asList(MongoCredential.createMongoCRCredential(databaseUser, databaseCollection, databasePassword.toCharArray()));
         }
 
+        //Creating server address
         try
         {
-            mongoClient = new MongoClient(new ServerAddress(databaseHost, databasePort),credential);
+            mongoAddress = new ServerAddress(databaseHost, databasePort);
+        } catch (UnknownHostException e)
+        {
+            logger.warn("Unable to resolve mongoDB host: " + e.getMessage());
+            return false;
+        }
 
+        //Creating and testing mongo client
+        MongoClient mongoClient = new MongoClient(mongoAddress, mongoCredential);
+        try
+        {
             //Checking if connection REALLY works
             List<String> databases = mongoClient.getDatabaseNames();
             if(databases == null)
@@ -215,10 +235,6 @@ public class InitController
                 logger.debug("The database connection seems okay.");
                 return true;
             }
-        } catch (UnknownHostException e)
-        {
-            logger.warn("Unable to resolve mongoDB host: " + e.getMessage());
-            return false;
         } catch (MongoException e)
         {
             logger.warn("Unable to receive list of present databases: " + e.getMessage());
@@ -229,6 +245,69 @@ public class InitController
             {
                 mongoClient.close();
             }
+        }
+    }
+
+    private boolean savingUserAndDivision(User user, Division division)
+    {
+        if(mongoAddress != null && databaseName != null && !databaseName.isEmpty())
+        {
+            MongoClient mongoClient = new MongoClient(mongoAddress, mongoCredential);
+
+            logger.debug("Saving user using new MongoDB connection");
+            DB mongoDB = mongoClient.getDB(databaseName);
+            if (mongoClient.getDatabaseNames().contains(databaseName))
+            {
+                logger.warn("The database already contains the defined collection, dropping content.");
+                mongoDB.dropDatabase();
+            }
+
+            try
+            {
+                logger.debug("Storing user");
+                DBObject userObject = (DBObject) mappingMongoConverter.convertToMongoType(user);
+                userObject.put("_class", user.getClass().getCanonicalName());
+                mongoDB.getCollection(user.getClass().getSimpleName().toLowerCase()).insert(userObject);
+
+                logger.debug("Storing division");
+                DBObject divisionObject = (DBObject) mappingMongoConverter.convertToMongoType(division);
+                divisionObject.put("_class", division.getClass().getCanonicalName());
+                mongoDB.getCollection(division.getClass().getSimpleName().toLowerCase()).insert(divisionObject);
+
+                return true;
+            } catch (MongoException e)
+            {
+                logger.warn("Unable to store object in database");
+                return false;
+            } finally
+            {
+                if(mongoClient != null)
+                {
+                    mongoClient.close();
+                }
+            }
+        } else
+        {
+            logger.warn("Unable to save user, because the new MongoDB connection is not available");
+            return false;
+        }
+    }
+
+    private boolean savingSettings(User currentUser)
+    {
+        try
+        {
+            //This call is restarting the application.
+            settingsRepository.saveSettings(currentUser);
+            return true;
+        } catch (BeansException | IllegalStateException | MongoException e)
+        {
+            logger.warn("Unable to refresh application context: " + e.getMessage());
+            return false;
+        } catch (IOException e)
+        {
+            logger.warn("Unable to save settings");
+            return false;
         }
     }
 }

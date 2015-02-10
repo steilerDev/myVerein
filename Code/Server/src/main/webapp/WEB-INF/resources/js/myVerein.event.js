@@ -100,7 +100,7 @@ function resetEventForm(doNotHideDeleteButton) {
     $('#eventForm').data('bootstrapValidator').resetForm();
 }
 
-//Set up everything to create a new user
+//Set up everything to create a new event
 function loadNewEvent(doNotHideDeleteButton) {
     resetEventForm(doNotHideDeleteButton);
     $('#eventFlag').val("true");
@@ -457,6 +457,9 @@ function loadEventPage() {
                 });
             }
         });
+    } else
+    {
+        //Todo: Add reload
     }
 
     if(!$('#eventForm').data('bootstrapValidator')) {
@@ -519,7 +522,10 @@ function loadEventPage() {
         })
     }
 
-    //$('.events').click(function(e);
+    $('#addEvent').click(function(e){
+        resetEventForm();
+        loadNewEvent();
+    });
 
     loadNewEvent();
 }
