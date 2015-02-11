@@ -181,38 +181,45 @@
 	/*font-weight: 700;*/
 }
 
+/*logout button*/
+
+/* Put the logout button on the right side*/
 #fixedRightNavBox {
-    position: fixed;
+    position: absolute;
     top: 0;
     right: 0;
-    margin-right: 10px;
+    margin-right: 20px;
 }
 
 #fixedRightNavBox li a {
-    padding-left: 10px;
-    padding-right: 10px;
+    width: 100%;
+}
+
+/*Text outside the box and hover animation*/
+#fixedRightNavBox li a span.hoverText {
+    position: relative;
+    -webkit-transition: top 0.3s;
+    -moz-transition: top 0.3s;
+    -o-transition: top 0.3s;
+    transition: top 0.3s;
+    top: 50px;
 }
 
 #fixedRightNavBox li a:hover span.hoverText {
-    -webkit-transition: opacity 0.3s;
-    -moz-transition: opacity 0.3s;
-    -o-transition: opacity 0.3s;
-    transition: opacity 0.3s;
-    opacity: 1;
+    -webkit-transition: top 0.3s;
+    -moz-transition: top 0.3s;
+    -o-transition: top 0.3s;
+    transition: top 0.3s;
+    top: 0;
 }
 
-#fixedRightNavBox li a:hover span.hoverIcon {
-    -webkit-transition: opacity 0.3s;
-    -moz-transition: opacity 0.3s;
-    -o-transition: opacity 0.3s;
-    transition: opacity 0.3s;
-    opacity: 0;
+/* Lock icon */
+#fixedRightNavBox li a span.hoverIcon:before {
+    content: "\e000";
 }
 
-#fixedRightNavBox li a span.hoverText {
-    opacity: 1;
- }
-
-#fixedRightNavBox li a span.hoverIcon {
-    opacity: 0;
+#fixedRightNavBox li a:hover span.hoverIcon:before {
+    content: "\7e";
 }
+
+
