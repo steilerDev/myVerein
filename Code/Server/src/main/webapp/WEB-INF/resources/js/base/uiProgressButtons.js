@@ -37,8 +37,8 @@
         // the path elements
         this.paths = [].slice.call( this.el.querySelectorAll( 'path' ) );
         // we will save both paths and its lengths in arrays
-        this.pathsArr = new Array();
-        this.lengthsArr = new Array();
+        this.pathsArr = [];
+        this.lengthsArr = [];
         this._init();
     }
 
@@ -50,14 +50,14 @@
         } );
         // undraw stroke
         this.draw(0);
-    }
+    };
 
     // val in [0,1] : 0 - no stroke is visible, 1 - stroke is visible
     SVGEl.prototype.draw = function( val ) {
         for( var i = 0, len = this.pathsArr.length; i < len; ++i ){
             this.pathsArr[ i ].style.strokeDashoffset = this.lengthsArr[ i ] * ( 1 - val );
         }
-    }
+    };
 
     function UIProgressButton( el, options ) {
         this.el = el;
@@ -69,7 +69,7 @@
     UIProgressButton.prototype.options = {
         // time in ms that the status (success or error will be displayed) - should be at least higher than the transition-duration value defined for the stroke-dashoffset transition of both checkmark and cross strokes
         statusTime : 1500
-    }
+    };
 
     UIProgressButton.prototype._init = function() {
         // the button
@@ -81,7 +81,7 @@
         this.errorEl = new SVGEl( this.el.querySelector( 'svg.cross' ) );
         // enable button
         this.enable();
-    }
+    };
 
     //The function is starting the animation up to 70percent of the circle. The rest is then filled when the callback from the request comes in.
     UIProgressButton.prototype.startAnimation = function() {
@@ -114,10 +114,10 @@
         else {
             onEndBtnTransitionFn();
         }
-    }
+    };
 
     // runs after the progress reaches 100%, if status >= 0 success, failure otherwise
-    UIProgressButton.prototype.stopAnimation = function( status, disableAfter ) {
+    UIProgressButton.prototype.stopAnimation = function( status, callback ) {
         var self = this,
             endLoading = function() {
                 self.setProgress(1);
@@ -137,27 +137,10 @@
                         classie.remove( self.el, statusClass );
                         statusEl.draw(0);
                         //Automatically hides error buttons
-                        if(self.el.classList.contains('progress-error-button')){
-                            classie.add(self.el, 'hidden');
-                        } else
-                        {
-                            if(disableAfter)
-                            {
-                                self.disable()
-                            } else
-                            {
-                                self.enable();
-                            }
+                        if(callback) {
+                            callback(self);
                         }
                     }, self.options.statusTime );
-                }
-                else {
-                    if(disableAfter) {
-                        self.disable()
-                    } else
-                    {
-                        self.enable();
-                    }
                 }
                 // finally remove class loading and reset progress.
                 self.setProgress(0);
@@ -166,23 +149,23 @@
 
         // give it a time (ideally the same like the transition time) so that the last progress increment animation is still visible.
         setTimeout( endLoading, 300 );
-    }
+    };
 
     UIProgressButton.prototype.setProgress = function( val ) {
         this.progressEl.draw( val );
-    }
+    };
 
     // enable button
     UIProgressButton.prototype.enable = function() {
         classie.removeClass(this.el, 'progress-button-disabled');
         this.button.removeAttribute( 'disabled' );
-    }
+    };
 
     // disable button
     UIProgressButton.prototype.disable = function() {
         classie.add(this.el, 'progress-button-disabled');
         this.button.setAttribute( 'disabled', '' );
-    }
+    };
 
     // add to global namespace
     window.UIProgressButton = UIProgressButton;

@@ -552,6 +552,18 @@ public class User implements UserDetails
         administrationNotAllowedMessage = null;
     }
 
+    public void removePrivateInformation()
+    {
+        privateInformation = null;
+        bic = null;
+        iban = null;
+        birthday = null;
+        street = null;
+        streetNumber = null;
+        city = null;
+        zipCode = null;
+    }
+
     /**
      * This function checks if the current user is allowed to modify a specified event. He is allowed to do this if he is either the creator or the superadmin.
      * @param event The selected event.

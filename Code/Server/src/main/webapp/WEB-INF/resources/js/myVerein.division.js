@@ -11,12 +11,15 @@
 
 var divisionSubmitButton,
     divisionDeleteButton,
+    adminSelectize,
+    divisionFormBootstrapValidator,
+    divisionTree,
     clubName;
 
 function resetDivisionForm(doNotHideDeleteButton) {
     $('#name').val('');
     $('#description').val('');
-    $('#admin')[0].selectize.clear();
+    adminSelectize[0].selectize.clear();
     $('#oldName').val('');
 
     //Reset heading
@@ -26,8 +29,8 @@ function resetDivisionForm(doNotHideDeleteButton) {
     $('#oldDivisionHeadingName').empty();
 
     //Re-enable form
-    $("#divisionForm :input").prop("disabled", false);
-    $('#admin')[0].selectize.enable();
+    divisionFormBootstrapValidator.find('input').prop("disabled", false);
+    adminSelectize[0].selectize.enable();
     divisionSubmitButton.enable();
     divisionDeleteButton.enable();
 
@@ -37,12 +40,12 @@ function resetDivisionForm(doNotHideDeleteButton) {
     }
 
     //Reseting previous validation annotation
-    $('#divisionForm').data('bootstrapValidator').resetForm();
+    divisionFormBootstrapValidator.data('bootstrapValidator').resetForm();
 }
 
 function disableDivisionForm() {
-    $("#divisionForm :input").prop("disabled", true);
-    $('#admin')[0].selectize.disable();
+    divisionFormBootstrapValidator.find('input').prop("disabled", true);
+    adminSelectize[0].selectize.disable();
     divisionSubmitButton.disable();
     divisionDeleteButton.disable();
 }
@@ -57,33 +60,35 @@ function loadDivision(name, newDivision) {
 
         $('#oldName').val(division.name);
 
+        var name = $('#name');
+        name.focus();
+
         if(newDivision)
         {
             $('#newDivisionHeading').removeClass('hidden');
         } else
         {
-            $('#name').val(division.name);
+            name.val(division.name);
             $('#description').val(division.desc);
             $('#oldDivisionHeading').removeClass('hidden');
             $('#oldDivisionHeadingName').text('<' + division.name + '>');
 
             if (division.adminUser) {
-                $('#admin')[0].selectize.addItem(division.adminUser.email);
+                adminSelectize[0].selectize.addItem(division.adminUser.email);
             }
         }
 
         $('#initDivisionHeading').addClass('hidden');
         $('#divisionDelete').removeClass('hidden');
-        $('#name').focus();
 
         divisionSubmitButton.stopAnimation(0);
     })
 }
 
 function loadTree() {
-    $('#division-tree-loading').addClass('heartbeat')
+    $('#division-tree-loading').addClass('heartbeat');
     //Loading tree through ajax
-    $('#division-tree').tree(
+    divisionTree.tree(
         'loadDataFromUrl',
         '/division/getDivisionTree', //URL
         null, //Replace existing tree
@@ -108,9 +113,9 @@ function loadDivisionPage() {
         }
     });
 
-    if (!$('#division-tree').data().simple_widget_tree) {
+    if (!(divisionTree = $('#division-tree')).data().simple_widget_tree) {
         //Configure division tree
-        $('#division-tree').tree({
+        divisionTree.tree({
             autoOpen: true,
             dragAndDrop: true,
             onCanMove: function (node) {
@@ -131,7 +136,7 @@ function loadDivisionPage() {
         });
 
         //Clicking on a tree node needs to fill the form
-        $('#division-tree').bind(
+        divisionTree.bind(
             'tree.click',
             function (event) {
                 if(event.node.name != clubName) {
@@ -140,7 +145,7 @@ function loadDivisionPage() {
             }
         );
 
-        $('#division-tree').bind(
+        divisionTree.bind(
             'tree.move',
             function (event) {
                 $.ajax({
@@ -164,9 +169,9 @@ function loadDivisionPage() {
         );
     }
 
-    if (!$('#admin')[0].selectize) {
+    if (!(adminSelectize = $('#admin'))[0].selectize) {
         //Enabling selection of admin userfrom existing user
-        $('#admin').selectize({
+        adminSelectize.selectize({
             persist: false,
             createOnBlur: true,
             create: false, //Not allowing the creation of user specific items
@@ -203,12 +208,24 @@ function loadDivisionPage() {
         });
     } else
     {
-        //Todo: Add reload
+        //Update entries within selectize list
+        adminSelectize[0].selectize.load(function (callback) {
+            $.ajax({
+                url: '/user/getUser',
+                type: 'GET',
+                error: function () {
+                    callback();
+                },
+                success: function (data) {
+                    callback(data);
+                }
+            });
+        });
     }
 
-    if (!$('#divisionForm').data('bootstrapValidator')) {
+    if (!(divisionFormBootstrapValidator = $('#divisionForm')).data('bootstrapValidator')) {
         //Enable bootstrap validator
-        $('#divisionForm').bootstrapValidator() //The constrains are configured within the HTML
+        divisionFormBootstrapValidator.bootstrapValidator() //The constrains are configured within the HTML
             .on('success.form.bv', function (e) { //The submition function
                 // Prevent form submission
                 e.preventDefault();
@@ -254,7 +271,9 @@ function loadDivisionPage() {
                     showMessage(response.responseText, 'error', 'icon_error-triangle_alt');
                 },
                 success: function (response) {
-                    divisionDeleteButton.stopAnimation(0);
+                    divisionDeleteButton.stopAnimation(0, function(button){
+                        classie.add(button.el, 'hidden');
+                    });
                     showMessage(response, 'success', 'icon_check');
                     resetDivisionForm(true);
                     disableDivisionForm();

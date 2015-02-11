@@ -14,7 +14,9 @@
 var newInformationCounter = 0, //Counter used to create unique identifiers for new input fields
     userSubmitButton,
     userDeleteButton,
-    userList;
+    userList,
+    userFormBootstrapValidator,
+    userDivisionsSelectize;
 
 //Add form fields from existing key and value to target
 function addInformation(target, key, value, edit) {
@@ -103,9 +105,10 @@ function resetUserForm(doNotHideDeleteButton) {
     userSubmitButton.enable();
 
     //Re-enable form
-    $("#userForm :input").prop("disabled", false);
-    $('#divisions')[0].selectize.enable();
-    $('#divisions')[0].selectize.clear();
+    userFormBootstrapValidator.find('input').prop("disabled", false);
+    $('#gender').prop("disabled", false);
+    userDivisionsSelectize[0].selectize.enable();
+    userDivisionsSelectize[0].selectize.clear();
 
     if(!doNotHideDeleteButton) {
         //Hide delete button
@@ -117,6 +120,8 @@ function resetUserForm(doNotHideDeleteButton) {
     $('#oldUserHeading').addClass("hidden");
     $('#oldUserHeadingName').empty();
 
+    $('.privateUserInformation').removeClass('hidden');
+
     //Reseting previous validation annotation
     $('#userForm').data('bootstrapValidator').resetForm();
 }
@@ -124,8 +129,10 @@ function resetUserForm(doNotHideDeleteButton) {
 //Disabling the user form, if a user is not allowed to manipulate the user
 function disableUserForm(){
     $('#userDelete').addClass('hidden');
-    $("#userForm :input").prop("disabled", true);
-    $('#divisions')[0].selectize.disable();
+    userFormBootstrapValidator.find('input').prop("disabled", true);
+    $('#gender').prop("disabled", true);
+    $('.privateUserInformation').addClass('hidden');
+    userDivisionsSelectize[0].selectize.disable();
     userSubmitButton.disable();
 }
 
@@ -135,14 +142,16 @@ function loadUser(email) {
     //Sending JSON request with the email as parameter to get the user details
     $.getJSON("/user/getUser", {email: email}, function(user) {
         resetUserForm();
-        //Filling obvious fields
+        var date;
+
+        //Filling fields available for everyone
         $('#firstName').val(user.firstName);
         $('#lastName').val(user.lastName);
         $('#email').val(user.email);
 
         $("#gender").val(user.gender);
         $('#country').val(user.country);
-        var date;
+
         if(user.activeSince)
         {
             //Parsing date from response
@@ -172,6 +181,27 @@ function loadUser(email) {
             date.setUTCFullYear(user.resignationDate.year);
             $('#resignationDate').datepicker('setUTCDate', date);
         }
+
+        //Fill division list
+        if (user.divisions) {
+            $.each(user.divisions, function (index, division) {
+                userDivisionsSelectize[0].selectize.addItem(division.name);
+            });
+        }
+
+        //Inserting public information if there are any
+        if (user.publicInformation) {
+            $('.publicInformation').removeClass('hidden');
+            $.each(user.publicInformation, function (key, value) {
+                addInformation('.publicInformation', key, value, user.administrationNotAllowedMessage);
+            });
+        }
+
+        //Show important fields
+        $('#oldUserHeading').removeClass("hidden");
+        $('#oldUserHeadingName').text('<' + user.email + '>');
+        $('#oldUserButton').removeClass('hidden');
+        $('#userFlag').val(user.email);
 
         if(!user.administrationNotAllowedMessage) //No message means he is allowed to administrate, everything happening in this block shouldn't be part of the response anyway
         {
@@ -215,44 +245,17 @@ function loadUser(email) {
                     addInformation('.privateInformation', key, value, user.administrationNotAllowedMessage);
                 });
             }
+            userSubmitButton.stopAnimation(1, function(button) {
+                button.enable();
+            });
         } else //If not allowed to edit disable some stuff and tell user
         {
             showMessage(user.administrationNotAllowedMessage, 'warning', 'icon_error-triangle_alt');
             disableUserForm();
-        }
-
-        if(user.memberSince)
-        {
-            //Parsing date from response
-            var date = new Date(0);
-            date.setUTCDate(user.memberSince.dayOfMonth);
-            date.setUTCMonth(user.memberSince.monthValue - 1); //LocalDate is not a 0 starting index at the month
-            date.setUTCFullYear(user.memberSince.year);
-            $('#activeMemberSince').datepicker('setUTCDate', date);
-        }
-
-        //Fill division list
-        if (user.divisions) {
-            $.each(user.divisions, function (index, division) {
-                $('#divisions')[0].selectize.addItem(division.name);
+            userSubmitButton.stopAnimation(1, function(button) {
+                button.disable();
             });
         }
-
-        //Inserting public information if there are any
-        if (user.publicInformation) {
-            $('.publicInformation').removeClass('hidden');
-            $.each(user.publicInformation, function (key, value) {
-                addInformation('.publicInformation', key, value, user.administrationNotAllowedMessage);
-            });
-        }
-
-        //Show important fields
-        $('#oldUserHeading').removeClass("hidden");
-        $('#oldUserHeadingName').text('<' + user.email + '>');
-        $('#oldUserButton').removeClass('hidden');
-        $('#userFlag').val(user.email);
-
-        userSubmitButton.stopAnimation(1, user.administrationNotAllowedMessage);
     });
 }
 
@@ -281,9 +284,9 @@ function loadUserList() {
 
 //This function is called as soon as the tab is shown. If necessary it is loading all required resources.
 function loadUserPage() {
-    if(!$('#divisions')[0].selectize) {
+    if(!(userDivisionsSelectize = $('#divisions'))[0].selectize) {
         //Configuring division input field
-        $('#divisions').selectize({
+        userDivisionsSelectize.selectize({
             persist: false,
             createOnBlur: true,
             create: false, //Not allowing the creation of user specific items
@@ -310,7 +313,19 @@ function loadUserPage() {
         });
     } else
     {
-        //Todo: Add reload
+        //Update entries within selectize list
+        userDivisionsSelectize[0].selectize.load(function (callback) {
+            $.ajax({
+                url: '/division/getDivision',
+                type: 'GET',
+                error: function () {
+                    callback();
+                },
+                success: function (data) {
+                    callback(data);
+                }
+            });
+        });
     }
 
     if(!userList) {
@@ -333,9 +348,9 @@ function loadUserPage() {
         });
     }
 
-    if(!$('#userForm').data('bootstrapValidator')) {
+    if(!(userFormBootstrapValidator = $('#userForm')).data('bootstrapValidator')) {
         //Enable bootstrap validator
-        $('#userForm').bootstrapValidator({
+        userFormBootstrapValidator.bootstrapValidator({
             excluded: [':disabled', ':hidden', ':not(:visible)']
         }) //The constrains are configured within the HTML
             .on('success.form.bv', function (e) { //The submission function

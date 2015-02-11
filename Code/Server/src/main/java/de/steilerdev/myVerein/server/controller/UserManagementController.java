@@ -335,14 +335,7 @@ public class UserManagementController
         if(!currentUser.isAllowedToAdministrate(searchedUser, divisionRepository))
         {
             logger.debug("Currently logged in user is not administrating selected user. Hiding private information");
-            searchedUser.setPrivateInformation(null);
-            searchedUser.setBic(null);
-            searchedUser.setIban(null);
-            searchedUser.setBirthday(null);
-            searchedUser.setStreet(null);
-            searchedUser.setStreetNumber(null);
-            searchedUser.setCity(null);
-            searchedUser.setZipCode(null);
+            searchedUser.removePrivateInformation();
             searchedUser.setAdministrationNotAllowedMessage("You are not allowed to modify this user, since you are not his administrator");
         } else
         {

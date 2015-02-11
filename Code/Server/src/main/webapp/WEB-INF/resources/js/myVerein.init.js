@@ -7,12 +7,14 @@
 
 var initAdminButton,
     initSettingsButton,
-    initTutorialButton;
+    initTutorialButton,
+    initSettingsFromBootstrapValidator,
+    initAdminFromBootstrapValidator;
 
 $(document).ready(function() {
-    if(!$('#initAdminForm').data('bootstrapValidator')) {
+    if(!(initAdminFromBootstrapValidator = $('#initAdminForm')).data('bootstrapValidator')) {
         //Enable bootstrap validator
-        $('#initAdminForm').bootstrapValidator({
+        initAdminFromBootstrapValidator.bootstrapValidator({
             excluded: [':disabled', ':hidden', ':not(:visible)']
         }) //The constrains are configured within the HTML
             .on('success.form.bv', function (e) { //The submission function
@@ -42,9 +44,9 @@ $(document).ready(function() {
             });
     }
 
-    if (!$('#initSettingsForm').data('bootstrapValidator')) {
+    if (!(initSettingsFromBootstrapValidator = $('#initSettingsForm')).data('bootstrapValidator')) {
         //Enable bootstrap validator
-        $('#initSettingsForm').bootstrapValidator() //The constrains are configured within the HTML
+        initSettingsFromBootstrapValidator.bootstrapValidator() //The constrains are configured within the HTML
             .on('success.form.bv', function (e) { //The submition function
                 // Prevent form submission
                 e.preventDefault();
@@ -54,7 +56,7 @@ $(document).ready(function() {
                 $.ajax({
                     url: '/init/settings',
                     type: 'POST',
-                    data: new FormData($('#initSettingsForm')[0]),
+                    data: $(e.target).serialize(),
                     //Todo: Maybe later everywhere
                     //xhr: function() {
                     //    var xhr = new window.XMLHttpRequest();
@@ -69,19 +71,17 @@ $(document).ready(function() {
                     //},
                     success: function (response) {
                         showMessage(response, 'success', 'icon_check');
-                        initSettingsButton.stopAnimation(1);
-                        $('#initAdminBox').removeClass("hidden");
-                        $('#initSettingsBox').addClass("hidden");
-                        $('#firstName').focus();
-                        $('body').scrollTop(0);
+                        initSettingsButton.stopAnimation(1, function(){
+                            $('#initAdminBox').removeClass("hidden");
+                            $('#initSettingsBox').addClass("hidden");
+                            $('#firstName').focus();
+                            $('body').scrollTop(0);
+                        });
                     },
                     error: function (response) {
                         showMessage(response.responseText, 'error', 'icon_error-triangle_alt');
                         initSettingsButton.stopAnimation(-1);
-                    },
-                    cache: false,
-                    contentType: false,
-                    processData: false
+                    }
                 });
             });
     }
@@ -104,7 +104,7 @@ $(document).ready(function() {
         //Enabling progress button
         initTutorialButton = new UIProgressButton(document.getElementById('initTutorialSubmit'));
         $('#initTutorialSubmitButton').click(function(e) {
-            window.location.reload(false);
+            window.location.replace("/");
         });
     }
 });

@@ -20,6 +20,8 @@
 var calendar, pseudoEventName = 'pseudoEvent',
     map, initLat = 48.7735272, initLng = 9.171102399999995,
     eventSubmitButton, eventDeleteButton,
+    eventFormBootstrapValidator,
+    invitedDivisionsSelectize,
     myVereinCLNDR =
     '<div class="controls">' +
         '<div class="clndr-previous-button">&lsaquo;</div><div class="month"><%= month %> <%= year %></div><div class="clndr-next-button">&rsaquo;</div>' +
@@ -67,8 +69,7 @@ function resetEventForm(doNotHideDeleteButton) {
     $('#locationLng').val('');
 
     //Reset divisions list
-    var invitedDivisions =$('#invitedDivisions')[0].selectize;
-    invitedDivisions.clear();
+    invitedDivisionsSelectize[0].selectize.clear();
 
     //Reset map
     map.setCenter(initLat, initLng);
@@ -93,11 +94,12 @@ function resetEventForm(doNotHideDeleteButton) {
     $('#oldEventHeadingName').empty();
 
     //Re-enable form
-    $("#eventForm :input").prop("disabled", false);
-    invitedDivisions.enable();
+    eventFormBootstrapValidator.find('input').prop("disabled", false);
+    $('#eventDescription').prop("disabled", false);
+    invitedDivisionsSelectize[0].selectize.enable();
 
     //Reseting previous validation annotation
-    $('#eventForm').data('bootstrapValidator').resetForm();
+    eventFormBootstrapValidator.data('bootstrapValidator').resetForm();
 }
 
 //Set up everything to create a new event
@@ -269,7 +271,7 @@ function loadEvent(eventID) {
                 //Fill division list
                 if (event.invitedDivision) {
                     $.each(event.invitedDivision, function (index, division) {
-                        $('#invitedDivisions')[0].selectize.addItem(division.name);
+                        invitedDivisionsSelectize[0].selectize.addItem(division.name);
                     });
                 }
 
@@ -277,8 +279,14 @@ function loadEvent(eventID) {
                 {
                     disableEventForm();
                     showMessage(event.administrationNotAllowedMessage, 'warning', 'icon_error-triangle_alt');
+                    eventSubmitButton.stopAnimation(1, function(button) {
+                        button.disable();
+                    });
+                } else {
+                    eventSubmitButton.stopAnimation(1, function(button) {
+                        button.enable();
+                    });
                 }
-                eventSubmitButton.stopAnimation(1, event.administrationNotAllowedMessage);
             }
         });
 }
@@ -286,9 +294,9 @@ function loadEvent(eventID) {
 //Disabling the user form, if a user is not allowed to manipulate the user
 function disableEventForm(){
     $('#eventDelete').addClass('hidden');
-    $("#eventForm :input").prop("disabled", true);
-    $('#invitedDivisions')[0].selectize.disable();
-    eventSubmitButton.disable();
+    eventFormBootstrapValidator.find('input').prop("disabled", true);
+    $('#eventDescription').prop("disabled", true);
+    invitedDivisionsSelectize[0].selectize.disable();
 }
 
 function localDateToString(localDate) {
@@ -411,7 +419,7 @@ function loadEventPage() {
 
         eventDatePicker.datepicker(datepickerOptions);
 
-        eventDatePicker.focusout(function(e){
+        eventDatePicker.focusout(function(){
             updateDates();
         });
     }
@@ -430,9 +438,9 @@ function loadEventPage() {
         });
     }
 
-    if(!$('#invitedDivisions')[0].selectize) {
+    if(!(invitedDivisionsSelectize = $('#invitedDivisions'))[0].selectize) {
         //Configuring division input field
-        $('#invitedDivisions').selectize({
+        invitedDivisionsSelectize.selectize({
             persist: false,
             createOnBlur: true,
             create: false, //Not allowing the creation of user specific items
@@ -459,36 +467,48 @@ function loadEventPage() {
         });
     } else
     {
-        //Todo: Add reload
+        //Update entries within selectize list
+        invitedDivisionsSelectize[0].selectize.load(function (callback) {
+            $.ajax({
+                url: '/division/getDivision',
+                type: 'GET',
+                error: function () {
+                    callback();
+                },
+                success: function (data) {
+                    callback(data);
+                }
+            });
+        });
     }
 
-    if(!$('#eventForm').data('bootstrapValidator')) {
+    if(!(eventFormBootstrapValidator = $('#eventForm')).data('bootstrapValidator')) {
         //Enable bootstrap validator
-        $('#eventForm').bootstrapValidator({
+        eventFormBootstrapValidator.bootstrapValidator({
             excluded: [':disabled', ':hidden', ':not(:visible)']
-        }) //The constrains are configured within the HTML
-            .on('success.form.bv', function (e) { //The submission function
-                // Prevent form submission
-                e.preventDefault();
-                //Starting button animation
-                eventSubmitButton.startAnimation();
-                //Send the serialized form
-                $.ajax({
-                    url: '/event',
-                    type: 'POST',
-                    data: $(e.target).serialize(),
-                    error: function (response) {
-                        eventSubmitButton.stopAnimation(-1);
-                        showMessage(response.responseText, 'error', 'icon_error-triangle_alt');
-                    },
-                    success: function (response) {
-                        eventSubmitButton.stopAnimation(0);
-                        showMessage(response, 'success', 'icon_check');
-                        loadNewEvent();
-                        loadOccupiedDates(calendar.month);
-                    }
-                });
-            });
+                }) //The constrains are configured within the HTML
+                    .on('success.form.bv', function (e) { //The submission function
+                        // Prevent form submission
+                        e.preventDefault();
+                        //Starting button animation
+                        eventSubmitButton.startAnimation();
+                        //Send the serialized form
+                        $.ajax({
+                            url: '/event',
+                            type: 'POST',
+                            data: $(e.target).serialize(),
+                            error: function (response) {
+                                eventSubmitButton.stopAnimation(-1);
+                                showMessage(response.responseText, 'error', 'icon_error-triangle_alt');
+                            },
+                            success: function (response) {
+                                eventSubmitButton.stopAnimation(0);
+                                showMessage(response, 'success', 'icon_check');
+                                loadNewEvent();
+                                loadOccupiedDates(calendar.month);
+                            }
+                        });
+                    });
     }
 
     if(!eventSubmitButton) {
@@ -513,7 +533,9 @@ function loadEventPage() {
                     showMessage(response.responseText, 'error', 'icon_error-triangle_alt');
                 },
                 success: function (response) {
-                    eventDeleteButton.stopAnimation(0);
+                    eventDeleteButton.stopAnimation(0, function(button) {
+                        classie.add(button.el, 'hidden');
+                    });
                     showMessage(response, 'success', 'icon_check');
                     loadNewEvent(true);
                     loadOccupiedDates(calendar.month);
@@ -522,10 +544,11 @@ function loadEventPage() {
         })
     }
 
-    $('#addEvent').click(function(e){
+    $('#addEvent').click(function(){
         resetEventForm();
         loadNewEvent();
     });
 
+    resetEventForm();
     loadNewEvent();
 }

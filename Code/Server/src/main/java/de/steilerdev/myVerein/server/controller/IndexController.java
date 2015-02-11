@@ -70,16 +70,16 @@ public class IndexController
     {
         //createDatabaseExample();
 
-        System.err.println(settingsRepository.getDatabaseHost());
-        System.err.println(settingsRepository.getDatabasePort());
-        System.err.println(settingsRepository.getDatabaseName());
-        try
-        {
-            System.err.println(mongoTemplate.getDb().getCollectionNames());
-        } catch (Exception e)
-        {
-            System.err.println("DB not available");
-        }
+//        System.err.println(settingsRepository.getDatabaseHost());
+//        System.err.println(settingsRepository.getDatabasePort());
+//        System.err.println(settingsRepository.getDatabaseName());
+//        try
+//        {
+//            System.err.println(mongoTemplate.getDb().getCollectionNames());
+//        } catch (Exception e)
+//        {
+//            System.err.println("DB not available");
+//        }
 
         if (settingsRepository.isInitSetup())
         {
@@ -240,8 +240,8 @@ public class IndexController
         new Thread(() -> {
             try
             {
-                logger.debug("Trying to drop database.");
-                mongoTemplate.getDb().dropDatabase();
+                logger.debug("Trying to drop the current collection.");
+                mongoTemplate.getDb().getCollection(settingsRepository.getDatabaseName()).drop();
             } catch (MongoTimeoutException e)
             {
                 logger.debug("Unable to drop database, because the database is not available.");

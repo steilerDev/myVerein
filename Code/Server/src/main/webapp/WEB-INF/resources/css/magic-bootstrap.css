@@ -5787,3 +5787,8 @@ button.close {
   background-color: #13CD78;
   border-color: transparent;
 }
+
+.btn-disabled {
+    border: 2px solid #999999;
+    color: #999999;
+}

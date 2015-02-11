@@ -34,6 +34,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.ConstraintViolationException;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
@@ -68,37 +69,44 @@ public class SettingsController
      * @return The path to the view for the index page.
      */
     @RequestMapping(method = RequestMethod.GET, produces = "application/json")
-    public @ResponseBody Map loadSettings(@CurrentUser User currentUser)
+    public @ResponseBody ResponseEntity<Map<String, Object>> loadSettings(@CurrentUser User currentUser)
     {
-        logger.debug("Loading settings for " + currentUser.getEmail());
-        Map settings;
-        try
-        {
-            //Cloning settings, because this would result in a fatal error where the application is trying to convert the user to String
-            settings = (Map)settingsRepository.loadSettings().clone();
-        } catch (IOException e)
-        {
-            logger.warn("Unable to load system settings");
-            return null;
-        }
-
-        if(settings == null)
-        {
-            logger.warn("Unable to load system settings");
-            return null;
-        } else if(!currentUser.isAdmin())
+        Map<String, Object> settings;
+        if(!currentUser.isAdmin())
         {
             logger.warn("A non-admin (" + currentUser.getEmail() + ") tries to access the settings");
-            return null;
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         } else if(!currentUser.isSuperAdmin())
         {
+            logger.info("A non-superadmin is accessing the settings");
+            settings = new HashMap<>();
             settings.put("administrationNotAllowedMessage", "You are not the super admin, and therefore you cannot adjust system settings.");
+        } else
+        {
+            logger.debug("Loading settings for " + currentUser.getEmail());
+            try
+            {
+                if((settings = (Map<String,Object>) settingsRepository.loadSettings().clone()) == null)
+                {
+                    throw new IOException("Settings are null");
+                }
+            } catch (IOException | ClassCastException e)
+            {
+                logger.warn("Unable to load system settings: " + e.getMessage());
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+
+            if(gridFSRepository.findClubLogo() != null)
+            {
+                logger.debug("The club logo is available");
+                settings.put("clubLogoAvailable", true);
+            }
         }
 
         currentUser.removeEverythingExceptEmailAndName();
         settings.put("currentAdmin", currentUser);
 
-        return settings;
+        return new ResponseEntity<>(settings, HttpStatus.OK);
     }
 
     /**
@@ -259,5 +267,24 @@ public class SettingsController
             return new ResponseEntity<>("You are not allowed to change these settings", HttpStatus.FORBIDDEN);
         }
         return new ResponseEntity<>("Successfully updated settings", HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/deleteClubLogo", method = RequestMethod.POST)
+    public @ResponseBody ResponseEntity<String> deleteClubLogo(@CurrentUser User currentUser)
+    {
+        if(!currentUser.isSuperAdmin())
+        {
+            logger.warn("A non-super admin tries to delete the club logo: " + currentUser.getEmail());
+            return new ResponseEntity<>("You are not allowed to perform this action", HttpStatus.FORBIDDEN);
+        } else if(gridFSRepository.findClubLogo() == null)
+        {
+            logger.warn("Unable to delete club logo, because it is not available");
+            return  new ResponseEntity<>("No club logo there to delete", HttpStatus.BAD_REQUEST);
+        } else
+        {
+            gridFSRepository.deleteCurrentClubLogo();
+            logger.debug("Successfully delete the club logo");
+            return new ResponseEntity<>("Successfully delete the club logo", HttpStatus.OK);
+        }
     }
 }

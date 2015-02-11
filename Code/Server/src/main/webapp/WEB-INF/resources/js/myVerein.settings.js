@@ -5,13 +5,16 @@
  * License    : GNU General Public License v2.0
  */
 
-var settingsSubmitButton;
+var settingsSubmitButton,
+    clubLogoDeleteButton,
+    currentAdminSelectize,
+    settingsFormBootstrapValidator;
 
 function disableSettings() {
     //Disable the complete form
-    $("#settingsForm :input").prop("disabled", true);
+    settingsFormBootstrapValidator.find('input').prop("disabled", true);
     $('#clubLogoButton').addClass('btn-disabled');
-    $('#currentAdmin')[0].selectize.disable();
+    currentAdminSelectize[0].selectize.disable();
 
     //Hides settings that are only supposed to be edited by the super admin
     $('#superAdminSettings').addClass("hidden");
@@ -25,9 +28,12 @@ function disableSettings() {
 
 function resetSettingsForm() {
 
-    $("#settingsForm :input").prop("disabled", false);
+    settingsFormBootstrapValidator.find('input').prop("disabled", false);
     $('#clubLogoButton').removeClass('btn-disabled');
+
     settingsSubmitButton.enable();
+    clubLogoDeleteButton.enable();
+
     $('#currentAdminLabel').addClass("hidden");
     $('#superAdminLabel').addClass("hidden");
 
@@ -43,12 +49,11 @@ function resetSettingsForm() {
     $('#locale').val("default");
     clearPasswords();
 
-    var currentAdmin = $('#currentAdmin')[0].selectize;
-    currentAdmin.enable();
-    currentAdmin.clear();
+    currentAdminSelectize[0].selectize.enable();
+    currentAdminSelectize[0].selectize.clear();
 
     //Reseting previous validation annotation
-    $('#settingsForm').data('bootstrapValidator').resetForm();
+    settingsFormBootstrapValidator.data('bootstrapValidator').resetForm();
 }
 
 function clearPasswords() {
@@ -77,18 +82,92 @@ function loadSettings() {
                 $('#databaseCollection').val(settings.dbName);
                 $('#rememberMeTokenKey').val(settings.rememberMeKey);
                 $('#clubName').val(settings.clubName);
+                if(settings.clubLogoAvailable) {
+                    $('#clubLogoDelete').removeClass("hidden");
+                } else {
+                    $('#clubLogoDelete').addClass("hidden");
+                }
             }
-            $('#currentAdmin')[0].selectize.addItem(settings.currentAdmin.email);
+            currentAdminSelectize[0].selectize.addItem(settings.currentAdmin.email);
             $('#locale').val(locale);
+            settingsSubmitButton.stopAnimation(1);
+        } else {
+            settingsSubmitButton.stopAnimation(-1);
         }
-        settingsSubmitButton.stopAnimation(0);
+        //Todo: Why is that needed?
+        settingsSubmitButton.enable();
     })
 }
 
 function loadSettingsPage(){
-    if (!$('#currentAdmin')[0].selectize) {
+    if (!settingsSubmitButton) {
+        //Enabling progress button
+        settingsSubmitButton = new UIProgressButton(document.getElementById('settingsSubmitButton'));
+    }
+
+    if (!(settingsFormBootstrapValidator = $('#settingsForm')).data('bootstrapValidator')) {
+        //Enable bootstrap validator
+        settingsFormBootstrapValidator.bootstrapValidator() //The constrains are configured within the HTML
+            .on('success.form.bv', function (e) { //The submition function
+                // Prevent form submission
+                e.preventDefault();
+                //Starting button animation
+                settingsSubmitButton.startAnimation();
+                //Send the serialized form
+                $.ajax({
+                    url: '/settings',
+                    type: 'POST',
+                    data: new FormData(settingsFormBootstrapValidator[0]),
+                    error: function (response) {
+                        settingsSubmitButton.stopAnimation(-1);
+                        showMessage(response.responseText, 'error', 'icon_error-triangle_alt');
+                        clearPasswords();
+                    },
+                    success: function (response) {
+                        settingsSubmitButton.stopAnimation(1);
+                        showMessage(response, 'success', 'icon_check');
+                        if(locale != $('#locale').val()) {
+                            window.location.replace("/");
+                        }
+                        clearPasswords();
+                    },
+                    cache: false,
+                    contentType: false,
+                    processData: false
+                });
+            });
+    }
+
+    if(!clubLogoDeleteButton) {
+        //Enabling progress button
+        clubLogoDeleteButton = new UIProgressButton(document.getElementById('clubLogoDelete'));
+        $('#clubLogoDeleteButton').click(function(e){
+            e.preventDefault();
+            clubLogoDeleteButton.startAnimation();
+            $.ajax({
+                url: '/settings/deleteClubLogo',
+                type: 'POST',
+                error: function (response) {
+                    clubLogoDeleteButton.stopAnimation(-1);
+                    showMessage(response.responseText, 'error', 'icon_error-triangle_alt');
+                },
+                success: function (response) {
+                    clubLogoDeleteButton.stopAnimation(0, function(button){
+                        classie.add(button.el, 'hidden');
+                    });
+                    showMessage(response, 'success', 'icon_check');
+                }
+            });
+        })
+    }
+
+    $('#clubLogo').change(function() {
+        $('#clubLogoLabel').text($('#clubLogo').val());
+    });
+
+    if (!(currentAdminSelectize = $('#currentAdmin'))[0].selectize) {
         //Enabling selection of super admin user from existing user
-        $('#currentAdmin').selectize({
+        currentAdminSelectize.selectize({
             persist: false,
             createOnBlur: true,
             create: false, //Not allowing the creation of user specific items
@@ -122,54 +201,23 @@ function loadSettingsPage(){
                     }
                 });
             },
-            onInitialize: function() {
+            onLoad: function() {
                 loadSettings();
             }
         });
     } else
     {
-        //Todo: Add reload
-    }
-
-    if (!settingsSubmitButton) {
-        //Enabling progress button
-        settingsSubmitButton = new UIProgressButton(document.getElementById('settingsSubmitButton'));
-    }
-
-    if (!$('#settingsForm').data('bootstrapValidator')) {
-        //Enable bootstrap validator
-        $('#settingsForm').bootstrapValidator() //The constrains are configured within the HTML
-            .on('success.form.bv', function (e) { //The submition function
-                // Prevent form submission
-                e.preventDefault();
-                //Starting button animation
-                settingsSubmitButton.startAnimation();
-                //Send the serialized form
-                $.ajax({
-                    url: '/settings',
-                    type: 'POST',
-                    data: new FormData($('#settingsForm')[0]),
-                    error: function (response) {
-                        settingsSubmitButton.stopAnimation(-1);
-                        showMessage(response.responseText, 'error', 'icon_error-triangle_alt');
-                        clearPasswords();
-                    },
-                    success: function (response) {
-                        settingsSubmitButton.stopAnimation(1);
-                        showMessage(response, 'success', 'icon_check');
-                        if(locale != $('#locale').val()) {
-                            window.location.reload(false);
-                        }
-                        clearPasswords();
-                    },
-                    cache: false,
-                    contentType: false,
-                    processData: false
-                });
+        currentAdminSelectize[0].selectize.load(function (callback) {
+            $.ajax({
+                url: '/user/getUser',
+                type: 'GET',
+                error: function () {
+                    callback();
+                },
+                success: function (data) {
+                    callback(data);
+                }
             });
+        });
     }
-
-    $('#clubLogo').change(function() {
-        $('#clubLogoLabel').text($('#clubLogo').val());
-    });
 }
