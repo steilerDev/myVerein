@@ -326,8 +326,8 @@ img {
   border-radius: 50%;
 }
 hr {
-  margin-top: 22px;
-  margin-bottom: 22px;
+  margin-top: 25px;
+  margin-bottom: 25px;
   border: 0;
   border-top: 1px solid #999999;
 }
@@ -5791,4 +5791,10 @@ button.close {
 .btn-disabled {
     border: 2px solid #999999;
     color: #999999;
+}
+
+.hr-small {
+    margin-top: 11px;
+    margin-bottom: 11px;
+    border-style: dashed none none;
 }

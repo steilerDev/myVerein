@@ -39,7 +39,12 @@ import javax.servlet.ServletContext;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Properties;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * This class is used for reading and writing the properties file containing the system settings.
@@ -68,6 +73,9 @@ public class SettingsRepository
     private final static String rememberMeKey = "rememberMeKey";
     private final static String clubName = "clubName";
     private final static String initSetup = "initSetup";
+    private final static String customUserFields = "customUserFields";
+    //The seperator used on the customer user field
+    private final static String customUserFieldsSeperator = ",";
 
     private boolean changed;
     private boolean databaseChanged;
@@ -302,6 +310,63 @@ public class SettingsRepository
             changed = true;
             loadSettings().setProperty(initSetup, initSetupFlag? "true": "false");
         }
+    }
+
+    public List<String> getCustomUserFields()
+    {
+        try
+        {
+            String customUserFieldString = loadSettings().getProperty(customUserFields);
+            if(customUserFieldString != null && !customUserFieldString.isEmpty())
+            {
+                return Arrays.asList(customUserFieldString.split(customUserFieldsSeperator));
+            } else
+            {
+                logger.debug("Unable to load custom user fields, because they are empty/null");
+                return null;
+            }
+        } catch (IOException e)
+        {
+            logger.debug("Unable to load custom user fields, because an IOException occurred: " + e.getMessage());
+            return null;
+        }
+    }
+
+    public void setCustomUserFields(List<String> customUserFieldsList) throws IOException
+    {
+        String customUserFieldsString;
+        if(customUserFieldsList == null || customUserFieldsList.isEmpty())
+        {
+            customUserFieldsString = "";
+        } else if(customUserFieldsList.parallelStream().anyMatch(entry -> entry.contains(customUserFieldsSeperator)))
+        {
+            throw new IOException("Unable to save custom user fields, because at least one entry contains a non-allowed char (" + customUserFieldsSeperator + ")");
+        } else
+        {
+            //Only allowing distinct and trimmed keys
+            customUserFieldsString = customUserFieldsList.parallelStream().distinct().map(entry -> entry.trim()).collect(Collectors.joining(customUserFieldsSeperator));
+        }
+
+        if (!customUserFieldsString.equals(loadSettings().getProperty(customUserFields)))
+        {
+            changed = true;
+            loadSettings().setProperty(customUserFields, customUserFieldsString);
+        }
+    }
+
+    public void addCustomUserField(String newUserField) throws IOException
+    {
+        if(newUserField.contains(customUserFieldsSeperator))
+        {
+            throw new IOException("Unable to save custom user fields, because it contains a non-allowed char (" + customUserFieldsSeperator + ")");
+        }
+        List<String> customField = getCustomUserFields();
+        if(customField == null)
+        {
+            customField = new ArrayList<>();
+        }
+        customField.add(newUserField.trim());
+        setCustomUserFields(customField);
     }
 
     public void saveSettings(User currentUser) throws IOException

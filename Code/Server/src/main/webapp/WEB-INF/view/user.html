@@ -176,17 +176,14 @@
                                     <p class="help-block">Choose all divisions, the user is part of</p>
                                 </div>
 
-                                <div class="privateInformation privateUserInformation">
-                                    <div class="row text-center col-sm-12" >Private Information</div>
-                                </div>
-                                <div class="addPrivateInformation col-sm-9 col-sm-offset-3 privateUserInformation">
-                                    <a id="addPrivateInformationButton">Add private information</a>
-                                </div>
-                                <div class="publicInformation">
-                                    <div class="row text-center col-sm-12" >Public Information</div>
-                                </div>
-                                <div class="addPublicInformation col-sm-9 col-sm-offset-3">
-                                    <a id="addPublicInformationButton">Add public information</a>
+                                <hr/>
+
+                                <div class="customUserFields privateUserInformation">
+                                    <label>Custom user fields</label>
+                                    <hr id="customUserFieldsSeparator" class="hr-small"/>
+                                    <div id="customUserFieldsLoading" class="center-block heartbeat" />
+                                    <span id="customUserFieldsError" class="hidden">Unable to load custom user fields</span>
+                                    <span id="customUserFieldsEmpty">There are no custom user fields specified</span>
                                 </div>
 
                                 <hr/>

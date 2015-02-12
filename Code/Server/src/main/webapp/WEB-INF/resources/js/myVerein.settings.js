@@ -8,7 +8,9 @@
 var settingsSubmitButton,
     clubLogoDeleteButton,
     currentAdminSelectize,
-    settingsFormBootstrapValidator;
+    settingsFormBootstrapValidator,
+    newCustomUserField,
+    previousCreatedCustomUserFields;
 
 function disableSettings() {
     //Disable the complete form
@@ -29,6 +31,10 @@ function disableSettings() {
 function resetSettingsForm() {
 
     settingsFormBootstrapValidator.find('input').prop("disabled", false);
+
+    $('.customUserField').remove();
+    previousCreatedCustomUserFields = [];
+
     $('#clubLogoButton').removeClass('btn-disabled');
 
     settingsSubmitButton.enable();
@@ -62,6 +68,42 @@ function clearPasswords() {
     $('#currentAdminPassword').val("");
 }
 
+function addCustomUserFieldSettings(name){
+    name = name.trim();
+    if(!(~$.inArray(name, previousCreatedCustomUserFields)) && name) {
+        previousCreatedCustomUserFields.push(name);
+
+        var newCustomUserField = '<div class="customUserField">' +
+            '<input name="cuf_' + name + '" value="' + name + '" class="form-control" type="text"  />' +
+            '<div class="checkbox">' +
+            '<label>' +
+            '<input type="checkbox" name="delete' + name + '" class="delete"> Delete custom field (' + name + ')</input>' +
+            '</label>' +
+            '</div>' +
+            '<div class="checkbox">' +
+            '<label>' +
+            '<input type="checkbox" name="deleteContent' + name + '" class="deleteContent" disabled="disabled"> Also delete content of field (' + name + ') within user profiles</input>' +
+            '</label>' +
+            '</div>' +
+            '<hr class="hr-small"/>' +
+            '</div>';
+
+        //Inserting HTML on top of the current field and catching new DOM element
+        var newCustomUserFieldSet = $(newCustomUserField).insertBefore($('#newCustomUserField'));
+
+        //Assigning listener for checkbox
+        var currentDeleteContent = newCustomUserFieldSet.find($('.deleteContent'));
+        newCustomUserFieldSet.find($('.delete')).change(function () {
+            if ($(this).is(':checked')) {
+                currentDeleteContent.prop("disabled", false);
+            } else {
+                currentDeleteContent.prop("disabled", true);
+                currentDeleteContent.prop("checked", false);
+            }
+        });
+    }
+}
+
 function loadSettings() {
     resetSettingsForm();
     settingsSubmitButton.startAnimation();
@@ -87,15 +129,21 @@ function loadSettings() {
                 } else {
                     $('#clubLogoDelete').addClass("hidden");
                 }
+
+                settings.customUserFields.split(",").forEach(function(entry){
+                    addCustomUserFieldSettings(entry);
+                })
             }
             currentAdminSelectize[0].selectize.addItem(settings.currentAdmin.email);
             $('#locale').val(locale);
-            settingsSubmitButton.stopAnimation(1);
+            settingsSubmitButton.stopAnimation(1, function(button) {
+                button.enable();
+            });
         } else {
-            settingsSubmitButton.stopAnimation(-1);
+            settingsSubmitButton.stopAnimation(-1, function(button) {
+                button.enable();
+            });
         }
-        //Todo: Why is that needed?
-        settingsSubmitButton.enable();
     })
 }
 
@@ -129,7 +177,7 @@ function loadSettingsPage(){
                         if(locale != $('#locale').val()) {
                             window.location.replace("/");
                         }
-                        clearPasswords();
+                        loadSettings();
                     },
                     cache: false,
                     contentType: false,
@@ -164,6 +212,27 @@ function loadSettingsPage(){
     $('#clubLogo').change(function() {
         $('#clubLogoLabel').text($('#clubLogo').val());
     });
+
+    if(!newCustomUserField) {
+        (newCustomUserField = $("#newCustomUserField")).keydown(function(e){
+            if (e.keyCode == 13) {
+                e.preventDefault(); //Preventing enter on keydown
+            }
+        }).keyup(function (e) {
+            //But loading new entry on keyup (since keeping enter pressed would fire the event multiple times)
+            if (e.keyCode == 13) {
+                if(newCustomUserField.val().length > 0) {
+                    addCustomUserFieldSettings(newCustomUserField.val());
+                    newCustomUserField.val('');
+                }
+            }
+        }).blur(function () {
+            if (newCustomUserField.val().length > 0) {
+                addCustomUserFieldSettings(newCustomUserField.val());
+                newCustomUserField.val('');
+            }
+        });
+    }
 
     if (!(currentAdminSelectize = $('#currentAdmin'))[0].selectize) {
         //Enabling selection of super admin user from existing user

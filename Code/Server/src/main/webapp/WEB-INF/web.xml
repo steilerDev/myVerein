@@ -46,6 +46,7 @@
     <!-- Renaming & securing session cookie (During development the secure feature is disabled, because the local server does not use secured connections yet) -->
     <!-- Todo: change security level -->
     <session-config>
+        <session-timeout>60</session-timeout>
         <cookie-config>
             <name>myVereinSessionCookie</name>
             <!--secure>true</secure-->

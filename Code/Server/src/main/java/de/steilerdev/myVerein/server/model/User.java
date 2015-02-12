@@ -19,8 +19,6 @@ package de.steilerdev.myVerein.server.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
 import de.steilerdev.myVerein.server.controller.DivisionManagementController;
 import de.steilerdev.myVerein.server.security.PasswordEncoder;
 import de.steilerdev.myVerein.server.security.UserAuthenticationService;
@@ -37,10 +35,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.keygen.KeyGenerators;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public class User implements UserDetails
 {
@@ -79,9 +74,7 @@ public class User implements UserDetails
     private String salt;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private HashMap<String,String> privateInformation;
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private HashMap<String,String> publicInformation;
+    private Map<String,String> customUserField;
 
     @DBRef
     @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -138,17 +131,16 @@ public class User implements UserDetails
 
     public User(String firstName, String lastName, String email, String password)
     {
-        this(firstName, lastName, email, password, null, null);
+        this(firstName, lastName, email, password, null);
         updateMembershipStatus();
     }
 
-    public User(String firstName, String lastName, String email, String password, HashMap<String,String> privateInformation, HashMap<String,String> publicInformation)
+    public User(String firstName, String lastName, String email, String password, HashMap<String,String> customUserField)
     {
         this.email = email;
         this.firstName = firstName;
         this.lastName = lastName;
-        this.privateInformation = privateInformation;
-        this.publicInformation = publicInformation;
+        this.customUserField = customUserField;
         setPassword(password);
         updateMembershipStatus();
     }
@@ -255,42 +247,55 @@ public class User implements UserDetails
         this.password = passwordEncoder.encodePassword(password, salt);
     }
 
-    public void addPrivateInformation(String key, String value)
+    public void addCustomUserField(String key, String value)
     {
-        if (privateInformation == null)
+        addCustomUserField(key, value, true);
+    }
+
+    /**
+     * This function adds a custom user field to the user
+     * @param key The key of the custom field
+     * @param value The value of the custom field
+     * @param overwrite The flag, indicating if an existing value should be overwritten (true) or not
+     */
+    public void addCustomUserField(String key, String value, boolean overwrite)
+    {
+        if (customUserField == null)
         {
-            privateInformation = new HashMap<>();
-        }
-        privateInformation.put(key, value);
-    }
-
-    public HashMap<String, String> getPrivateInformation()
-    {
-        return privateInformation;
-    }
-
-    public void setPrivateInformation(HashMap<String, String> privateInformation)
-    {
-        this.privateInformation = privateInformation;
-    }
-
-    public void addPublicInformation(String key, String value)
-    {
-        if (publicInformation == null)
+            customUserField = new HashMap<>();
+            customUserField.put(key, value);
+        }else if(overwrite || !customUserField.keySet().contains(key))
         {
-            publicInformation = new HashMap<>();
+            customUserField.put(key, value);
         }
-        publicInformation.put(key, value);
     }
 
-    public HashMap<String, String> getPublicInformation()
+    public void removeCustomUserField(String key)
     {
-        return publicInformation;
+        if(customUserField != null)
+        {
+            customUserField.remove(key);
+        }
     }
 
-    public void setPublicInformation(HashMap<String, String> publicInformation)
+    public void renameCustomUserField(String oldKey, String newKey)
     {
-        this.publicInformation = publicInformation;
+        if(customUserField != null && customUserField.get(oldKey) != null)
+        {
+            logger.debug("Moving " + customUserField.get(oldKey) + " from " + oldKey + " to " + newKey);
+            customUserField.put(newKey, customUserField.get(oldKey));
+            customUserField.remove(oldKey);
+        }
+    }
+
+    public Map<String, String> getCustomUserField()
+    {
+        return customUserField;
+    }
+
+    public void setCustomUserField(Map<String, String> customUserField)
+    {
+        this.customUserField = customUserField;
     }
 
     public List<Division> getDivisions()
@@ -528,8 +533,7 @@ public class User implements UserDetails
      */
     public void removeEverythingExceptEmailAndName()
     {
-        privateInformation = null;
-        publicInformation = null;
+        customUserField = null;
         divisions = null;
 
         activeSince = null;
@@ -554,7 +558,7 @@ public class User implements UserDetails
 
     public void removePrivateInformation()
     {
-        privateInformation = null;
+        customUserField = null;
         bic = null;
         iban = null;
         birthday = null;

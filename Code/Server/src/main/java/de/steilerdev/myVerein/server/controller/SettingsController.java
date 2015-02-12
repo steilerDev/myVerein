@@ -23,6 +23,10 @@ import de.steilerdev.myVerein.server.security.PasswordEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoOperations;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -34,9 +38,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.ConstraintViolationException;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
+import java.util.stream.Collectors;
 
 //Todo: Enable deletion of logo
 
@@ -47,6 +50,9 @@ import java.util.Properties;
 @RequestMapping("/settings")
 public class SettingsController
 {
+    @Autowired
+    private MongoTemplate mongoTemplate;
+
     @Autowired
     private PasswordEncoder passwordEncoder;
 
@@ -125,6 +131,7 @@ public class SettingsController
                                                              @RequestParam(required = false) String databasePassword,
                                                              @RequestParam(required = false) String databaseCollection,
                                                              @RequestParam(required = false) String rememberMeTokenKey,
+                                                             @RequestParam Map<String, String> parameters,
                                                              @RequestParam String currentAdminPassword,
                                                              @CurrentUser User currentUser)
     {
@@ -223,6 +230,60 @@ public class SettingsController
                         settingsRepository.setRememberMeKey(rememberMeTokenKey);
                     }
 
+                    //Reducing parameters to custom user field parameters only and the value of the input
+                    List<String> reducedValues = parameters.keySet().parallelStream()
+                            .filter(key -> key.startsWith("cuf_") && !parameters.get(key).trim().isEmpty())
+                            .map(key -> key.substring(4)) //Reducing the key to the initial 'name' value, used to create the fields by jQuery
+                            .collect(Collectors.toList());
+
+                    //Analysing the values and checking, if
+                    if(!reducedValues.isEmpty())
+                    {
+                        ArrayList<String> customUserFieldValues = new ArrayList<>();
+                        reducedValues.parallelStream().forEach(key -> {
+                            if(parameters.get("delete" + key) != null)
+                            {
+                                logger.warn("Deleting custom user field " + key);
+                                if(parameters.get("deleteContent" + key) != null)
+                                {
+                                    logger.warn("Deleting content of custom user field " + key + " on every user object");
+                                    List<User> user = mongoTemplate.find(new Query(Criteria.where("customUserField." + key).exists(true)), User.class);
+                                    user.parallelStream().forEach(thisUser -> {
+                                        thisUser.removeCustomUserField(key);
+                                        try
+                                        {
+                                            userRepository.save(thisUser);
+                                        } catch (ConstraintViolationException e)
+                                        {
+                                            logger.warn("A database constraint was violated while trying to save the user " + thisUser.getEmail() + ": " + e.getMessage());
+                                        }
+                                    });
+                                }
+                            } else
+                            {
+                                String value = parameters.get("cuf_" + key).trim();
+                                if(!key.equals(value) && settingsRepository.getCustomUserFields().contains(key)) //The key was renamed
+                                {
+                                    logger.debug("The custom user field " + key + " changed to " + value);
+                                    List<User> user = mongoTemplate.find(new Query(Criteria.where("customUserField." + key).exists(true)), User.class);
+                                    user.parallelStream().forEach(thisUser -> {
+                                        thisUser.renameCustomUserField(key, value);
+                                        try
+                                        {
+                                            userRepository.save(thisUser);
+                                        } catch (ConstraintViolationException e)
+                                        {
+                                            logger.warn("A database constraint was violated while trying to save the user " + thisUser.getEmail() + ": " + e.getMessage());
+                                        }
+                                    });
+                                }
+                                logger.debug("Adding " + value + " as custom user field");
+                                customUserFieldValues.add(value);
+                            }
+                        });
+                        settingsRepository.setCustomUserFields(customUserFieldValues);
+                    }
+
                     logger.debug("Saving updated settings file.");
                     settingsRepository.saveSettings(currentUser);
                 } catch (IOException e)
@@ -285,6 +346,19 @@ public class SettingsController
             gridFSRepository.deleteCurrentClubLogo();
             logger.debug("Successfully delete the club logo");
             return new ResponseEntity<>("Successfully delete the club logo", HttpStatus.OK);
+        }
+    }
+
+    @RequestMapping(value = "/getCustomUserFields", produces = "application/json", method = RequestMethod.GET)
+    public @ResponseBody ResponseEntity<List<String>> getCustomUserFields()
+    {
+        List<String> customUserFields = settingsRepository.getCustomUserFields();
+        if(customUserFields != null)
+        {
+            return new ResponseEntity<>(customUserFields, HttpStatus.OK);
+        } else
+        {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

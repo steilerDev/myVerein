@@ -16,10 +16,7 @@
  */
 package de.steilerdev.myVerein.server.controller;
 
-import de.steilerdev.myVerein.server.model.Division;
-import de.steilerdev.myVerein.server.model.DivisionRepository;
-import de.steilerdev.myVerein.server.model.User;
-import de.steilerdev.myVerein.server.model.UserRepository;
+import de.steilerdev.myVerein.server.model.*;
 import de.steilerdev.myVerein.server.security.CurrentUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +36,7 @@ import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * This controller is processing all requests associated with the user management.
@@ -54,6 +52,9 @@ public class UserManagementController
 
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    SettingsRepository settingsRepository;
 
     /**
      * This function saves the user, according to the parameters posted through this request.
@@ -255,40 +256,11 @@ public class UserManagementController
             }
         }
 
-        parameters.keySet().parallelStream().forEach(key -> {
-            String normalizedKey;
-            if (key.startsWith("_old."))
-            {
-                normalizedKey = key.substring(5);
-                if (normalizedKey.startsWith("privateInformation"))
-                {
-                    normalizedKey = normalizedKey.substring(18);
-                    newUserObject.addPrivateInformation(normalizedKey, parameters.get(key));
-                } else if (normalizedKey.startsWith("publicInformation"))
-                {
-                    normalizedKey = normalizedKey.substring(17);
-                    newUserObject.addPublicInformation(normalizedKey, parameters.get(key));
-                } else
-                {
-                    logger.warn("Unrecognized custom field (" + key + ").");
-                }
-            } else if (key.startsWith("_new.") && key.endsWith("_key"))
-            {
-                normalizedKey = key.substring(5);
-                if (normalizedKey.startsWith("privateInformation"))
-                {
-                    String value = key.replace("_key", "_value");
-                    newUserObject.addPrivateInformation(parameters.get(key), parameters.get(value));
-                } else if (normalizedKey.startsWith("publicInformation"))
-                {
-                    String value = key.replace("_key", "_value");
-                    newUserObject.addPublicInformation(parameters.get(key), parameters.get(value));
-                } else
-                {
-                    logger.warn("Unrecognized custom field (" + key + ").");
-                }
-            }
-        });
+
+        //Parsing & setting custom user fields
+        newUserObject.setCustomUserField(parameters.keySet().parallelStream()
+                .filter(key -> key.startsWith("cuf_") && !parameters.get(key).trim().isEmpty()) //Filtering all custom user fields, which are not empty
+                .collect(Collectors.toMap(key -> key.substring(4), key -> parameters.get(key).trim())));
 
         /*
 
@@ -340,6 +312,11 @@ public class UserManagementController
         } else
         {
             searchedUser.setAdministrationNotAllowedMessage(null);
+            //Adding all custom user fields to the object
+            if(settingsRepository.getCustomUserFields() != null)
+            {
+                settingsRepository.getCustomUserFields().stream().forEach(fieldKey -> searchedUser.addCustomUserField(fieldKey, "", false));
+            }
         }
 
         if(searchedUser.getDivisions() != null)
