@@ -168,7 +168,7 @@ public class EventManagementController
                 {
                     selectedEvent.getInvitedDivision().parallelStream().forEach(division -> division.setAdminUser(null));
                 }
-                if(selectedEvent.getEventAdmin().getDivisions() != null)
+                if(selectedEvent.getEventAdmin() != null && selectedEvent.getEventAdmin().getDivisions() != null)
                 {
                     selectedEvent.getEventAdmin().getDivisions().parallelStream().forEach(division -> division.setAdminUser(null));
                 }
