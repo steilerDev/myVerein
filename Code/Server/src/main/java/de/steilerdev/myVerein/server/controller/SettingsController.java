@@ -247,17 +247,20 @@ public class SettingsController
                                 if(parameters.get("deleteContent" + key) != null)
                                 {
                                     logger.warn("Deleting content of custom user field " + key + " on every user object");
-                                    List<User> user = mongoTemplate.find(new Query(Criteria.where("customUserField." + key).exists(true)), User.class);
-                                    user.parallelStream().forEach(thisUser -> {
-                                        thisUser.removeCustomUserField(key);
-                                        try
-                                        {
-                                            userRepository.save(thisUser);
-                                        } catch (ConstraintViolationException e)
-                                        {
-                                            logger.warn("A database constraint was violated while trying to save the user " + thisUser.getEmail() + ": " + e.getMessage());
-                                        }
-                                    });
+                                    List<User> user = mongoTemplate.find(new Query(Criteria.where("customUserField." + User.escapeCustomUserKey(key)).exists(true)), User.class);
+                                    if(user != null && !user.isEmpty())
+                                    {
+                                        user.parallelStream().forEach(thisUser -> {
+                                            thisUser.removeCustomUserField(key);
+                                            try
+                                            {
+                                                userRepository.save(thisUser);
+                                            } catch (ConstraintViolationException e)
+                                            {
+                                                logger.warn("A database constraint was violated while trying to save the user " + thisUser.getEmail() + ": " + e.getMessage());
+                                            }
+                                        });
+                                    }
                                 }
                             } else
                             {
@@ -265,17 +268,20 @@ public class SettingsController
                                 if(!key.equals(value) && settingsRepository.getCustomUserFields().contains(key)) //The key was renamed
                                 {
                                     logger.debug("The custom user field " + key + " changed to " + value);
-                                    List<User> user = mongoTemplate.find(new Query(Criteria.where("customUserField." + key).exists(true)), User.class);
-                                    user.parallelStream().forEach(thisUser -> {
-                                        thisUser.renameCustomUserField(key, value);
-                                        try
-                                        {
-                                            userRepository.save(thisUser);
-                                        } catch (ConstraintViolationException e)
-                                        {
-                                            logger.warn("A database constraint was violated while trying to save the user " + thisUser.getEmail() + ": " + e.getMessage());
-                                        }
-                                    });
+                                    List<User> user = mongoTemplate.find(new Query(Criteria.where("customUserField." + User.escapeCustomUserKey(key)).exists(true)), User.class);
+                                    if(user != null && !user.isEmpty())
+                                    {
+                                        user.parallelStream().forEach(thisUser -> {
+                                            thisUser.renameCustomUserField(key, value);
+                                            try
+                                            {
+                                                userRepository.save(thisUser);
+                                            } catch (ConstraintViolationException e)
+                                            {
+                                                logger.warn("A database constraint was violated while trying to save the user " + thisUser.getEmail() + ": " + e.getMessage());
+                                            }
+                                        });
+                                    }
                                 }
                                 logger.debug("Adding " + value + " as custom user field");
                                 customUserFieldValues.add(value);

@@ -36,6 +36,7 @@ import org.springframework.security.crypto.keygen.KeyGenerators;
 
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class User implements UserDetails
 {
@@ -247,6 +248,11 @@ public class User implements UserDetails
         this.password = passwordEncoder.encodePassword(password, salt);
     }
 
+    /**
+     * This function adds a custom user field and overwrites the existing value.
+     * @param key The unescaped key of the field.
+     * @param value The value of the field.
+     */
     public void addCustomUserField(String key, String value)
     {
         addCustomUserField(key, value, true);
@@ -254,48 +260,80 @@ public class User implements UserDetails
 
     /**
      * This function adds a custom user field to the user
-     * @param key The key of the custom field
+     * @param key The unescaped key of the custom field
      * @param value The value of the custom field
      * @param overwrite The flag, indicating if an existing value should be overwritten (true) or not
      */
     public void addCustomUserField(String key, String value, boolean overwrite)
     {
+        key = escapeCustomUserKey(key);
         if (customUserField == null)
         {
             customUserField = new HashMap<>();
+            //Escaping a dot for the key is needed
             customUserField.put(key, value);
         }else if(overwrite || !customUserField.keySet().contains(key))
         {
+            //Escaping a dot for the key is needed
             customUserField.put(key, value);
         }
     }
 
+    /**
+     * This function removes a custom user field specified by the key.
+     * @param key The unescaped key of the custom user field.
+     */
     public void removeCustomUserField(String key)
     {
         if(customUserField != null)
         {
-            customUserField.remove(key);
+            customUserField.remove(escapeCustomUserKey(key));
         }
     }
 
+    /**
+     * This function renames a custom user field.
+     * @param oldKey The unescaped old key.
+     * @param newKey The unescaped new key.
+     */
     public void renameCustomUserField(String oldKey, String newKey)
     {
-        if(customUserField != null && customUserField.get(oldKey) != null)
+        if(customUserField != null && customUserField.get(escapeCustomUserKey(oldKey)) != null)
         {
-            logger.debug("Moving " + customUserField.get(oldKey) + " from " + oldKey + " to " + newKey);
-            customUserField.put(newKey, customUserField.get(oldKey));
-            customUserField.remove(oldKey);
+            logger.debug("Moving " + customUserField.get(escapeCustomUserKey(oldKey)) + " from " + oldKey + " to " + newKey);
+            customUserField.put(escapeCustomUserKey(newKey), customUserField.get(escapeCustomUserKey(oldKey)));
+            customUserField.remove(escapeCustomUserKey(oldKey));
         }
     }
 
+    /**
+     * This function returns the unescaped map of custom user fields
+     * @return The unescaped custom user field map
+     */
     public Map<String, String> getCustomUserField()
     {
-        return customUserField;
+        if(customUserField != null)
+        {
+            //Returning a map, containing unescaped characters
+            return customUserField.keySet().parallelStream().collect(Collectors.toMap(User::unEscapeCustomUserKey, customUserField::get));
+        } else
+        {
+            return null;
+        }
     }
 
+    public void unEscapeCustomUserField()
+    {
+        customUserField = getCustomUserField();
+    }
+
+    /**
+     * This function sets the custom user fields and escapes the key field.
+     * @param customUserField The new custom user field map.
+     */
     public void setCustomUserField(Map<String, String> customUserField)
     {
-        this.customUserField = customUserField;
+        this.customUserField = customUserField.keySet().parallelStream().collect(Collectors.toMap(User::escapeCustomUserKey, customUserField::get));
     }
 
     public List<Division> getDivisions()
@@ -666,6 +704,24 @@ public class User implements UserDetails
     @Override
     public int hashCode()
     {
-        return email != null? 0: email.hashCode();
+        return email == null? 0: email.hashCode();
+    }
+
+    public static String escapeCustomUserKey(String source)
+    {
+        if(source.contains("."))
+        {
+            source = source.replace(".", "[dot]");
+        }
+        return source;
+    }
+
+    public static String unEscapeCustomUserKey(String source)
+    {
+        if(source.contains("[dot]"))
+        {
+            source = source.replace("[dot]", ".");
+        }
+        return source;
     }
 }
