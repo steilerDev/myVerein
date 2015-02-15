@@ -1,6 +1,6 @@
 /**
  * Document   : myVerein.settings
- * Description:
+ * Description: This JavaScript file contains all methods needed by the settings page.
  * Copyright  : (c) 2015 Frank Steiler <frank@steilerdev.de>
  * License    : GNU General Public License v2.0
  */
@@ -73,6 +73,7 @@ function addCustomUserFieldSettings(name){
     if(!(~$.inArray(name, previousCreatedCustomUserFields)) && name) {
         previousCreatedCustomUserFields.push(name);
 
+        //Todo: Internationalize
         var newCustomUserField = '<div class="customUserField">' +
             '<input name="cuf_' + name + '" value="' + name + '" class="form-control" type="text"  />' +
             '<div class="checkbox">' +
@@ -107,44 +108,44 @@ function addCustomUserFieldSettings(name){
 function loadSettings() {
     resetSettingsForm();
     settingsSubmitButton.startAnimation();
-    //Sending JSON request with the division name as parameter to get the division details
-    $.getJSON("/settings", function (settings) {
-        if(settings)
-        {
-            if(settings.administrationNotAllowedMessage) {
+    $.ajax({
+        url: '/settings',
+        type: 'GET',
+        error: function (response) {
+            settingsSubmitButton.stopAnimation(-1, function(button){
+                button.disable();
+            });
+            //console.log(response.responseText);
+        },
+        success: function (response) {
+            if(response.administrationNotAllowedMessage) {
                 disableSettings();
                 $('#currentAdminLabel').removeClass("hidden");
-                showMessage(settings.administrationNotAllowedMessage, 'warning', 'icon_error-triangle_alt');
+                showMessage(response.administrationNotAllowedMessage, 'warning', 'icon_error-triangle_alt');
             } else {
                 $('#superAdminLabel').removeClass("hidden");
-                $('#databaseHost').val(settings.dbHost);
-                $('#databasePort').val(settings.dbPort);
-                $('#databaseUser').val(settings.dbUser);
-                $('#databasePassword').val(settings.dbPassword);
-                $('#databaseCollection').val(settings.dbName);
-                $('#rememberMeTokenKey').val(settings.rememberMeKey);
-                $('#clubName').val(settings.clubName);
-                if(settings.clubLogoAvailable) {
+                $('#databaseHost').val(response.dbHost);
+                $('#databasePort').val(response.dbPort);
+                $('#databaseUser').val(response.dbUser);
+                $('#databasePassword').val(response.dbPassword);
+                $('#databaseCollection').val(response.dbName);
+                $('#rememberMeTokenKey').val(response.rememberMeKey);
+                $('#clubName').val(response.clubName);
+                if(response.clubLogoAvailable) {
                     $('#clubLogoDelete').removeClass("hidden");
                 } else {
                     $('#clubLogoDelete').addClass("hidden");
                 }
 
-                settings.customUserFields.split(",").forEach(function(entry){
+                response.customUserFields.split(",").forEach(function(entry){
                     addCustomUserFieldSettings(entry);
                 })
             }
-            currentAdminSelectize[0].selectize.addItem(settings.currentAdmin.email);
+            currentAdminSelectize[0].selectize.addItem(response.currentAdmin.email);
             $('#locale').val(locale);
-            settingsSubmitButton.stopAnimation(1, function(button) {
-                button.enable();
-            });
-        } else {
-            settingsSubmitButton.stopAnimation(-1, function(button) {
-                button.enable();
-            });
+            settingsSubmitButton.stopAnimation(1);
         }
-    })
+    });
 }
 
 function loadSettingsPage(){
@@ -193,8 +194,8 @@ function loadSettingsPage(){
             e.preventDefault();
             clubLogoDeleteButton.startAnimation();
             $.ajax({
-                url: '/settings/deleteClubLogo',
-                type: 'POST',
+                url: '/content/clubLogo',
+                type: 'DELETE',
                 error: function (response) {
                     clubLogoDeleteButton.stopAnimation(-1);
                     showMessage(response.responseText, 'error', 'icon_error-triangle_alt');
@@ -240,8 +241,8 @@ function loadSettingsPage(){
             persist: false,
             createOnBlur: true,
             create: false, //Not allowing the creation of user specific items
-            hideSelected: true, //If an option is allready in the list it is hidden
-            preload: true, //Loading data immidiately (if division is loaded without loading the available user, the added user gets removed because selectize thinks he is not valid)
+            hideSelected: true, //If an option is already in the list it is hidden
+            preload: true, //Loading data immediately (if division is loaded without loading the available user, the added user gets removed because selectize thinks he is not valid)
             valueField: 'email',
             labelField: 'email',
             searchField: 'email',
@@ -257,7 +258,7 @@ function loadSettingsPage(){
             },
             load: function (query, callback) {
                 $.ajax({
-                    url: '/user/getUser',
+                    url: '/user',
                     type: 'GET',
                     data: {
                         term: query
@@ -278,7 +279,7 @@ function loadSettingsPage(){
     {
         currentAdminSelectize[0].selectize.load(function (callback) {
             $.ajax({
-                url: '/user/getUser',
+                url: '/user',
                 type: 'GET',
                 error: function () {
                     callback();

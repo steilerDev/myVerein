@@ -1,6 +1,6 @@
 /**
  * Document   : myVerein.init.js
- * Description:
+ * Description: This JavaScript file contains all methods needed by the init page.
  * Copyright  : (c) 2015 Frank Steiler <frank@steilerdev.de>
  * License    : GNU General Public License v2.0
  */

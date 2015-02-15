@@ -1,6 +1,6 @@
 /**
  * Document   : myVerein.division.js
- * Description: The JavaScript used by the DivisionManagement page. The file includes jqTree.
+ * Description: This JavaScript file contains all methods needed by the division page. A minified version of jqTree is included
  * Copyright  : (c) 2014 Frank Steiler <frank@steilerdev.de>
  * License    : GNU General Public License v2.0
  */
@@ -55,34 +55,47 @@ function loadDivision(name, newDivision) {
     resetDivisionForm();
     divisionSubmitButton.startAnimation();
     //Sending JSON request with the division name as parameter to get the division details
-    $.getJSON("/division/getDivision", {name: name}, function (division) {
-        resetDivisionForm();
+    $.ajax({
+        url: '/division',
+        type: 'GET',
+        data: {
+            name: name
+        },
+        error: function () {
+            divisionSubmitButton.stopAnimation(-1, function(button){
+                button.disable();
+            });
+            disableDivisionForm();
+        },
+        success: function (response) {
+            resetDivisionForm();
 
-        $('#oldName').val(division.name);
+            $('#oldName').val(response.name);
 
-        var name = $('#name');
-        name.focus();
+            var name = $('#name');
+            name.focus();
 
-        if(newDivision)
-        {
-            $('#newDivisionHeading').removeClass('hidden');
-        } else
-        {
-            name.val(division.name);
-            $('#description').val(division.desc);
-            $('#oldDivisionHeading').removeClass('hidden');
-            $('#oldDivisionHeadingName').text('<' + division.name + '>');
+            if(newDivision)
+            {
+                $('#newDivisionHeading').removeClass('hidden');
+            } else
+            {
+                name.val(response.name);
+                $('#description').val(response.desc);
+                $('#oldDivisionHeading').removeClass('hidden');
+                $('#oldDivisionHeadingName').text('<' + response.name + '>');
 
-            if (division.adminUser) {
-                adminSelectize[0].selectize.addItem(division.adminUser.email);
+                if (response.adminUser) {
+                    adminSelectize[0].selectize.addItem(response.adminUser.email);
+                }
             }
+
+            $('#initDivisionHeading').addClass('hidden');
+            $('#divisionDelete').removeClass('hidden');
+
+            divisionSubmitButton.stopAnimation(1);
         }
-
-        $('#initDivisionHeading').addClass('hidden');
-        $('#divisionDelete').removeClass('hidden');
-
-        divisionSubmitButton.stopAnimation(0);
-    })
+    });
 }
 
 function loadTree() {
@@ -90,7 +103,7 @@ function loadTree() {
     //Loading tree through ajax
     divisionTree.tree(
         'loadDataFromUrl',
-        '/division/getDivisionTree', //URL
+        '/division/divisionTree', //URL
         null, //Replace existing tree
         function() {
             $('#division-tree-loading').removeClass('heartbeat'); //Stop loading animation when successful
@@ -149,7 +162,7 @@ function loadDivisionPage() {
             'tree.move',
             function (event) {
                 $.ajax({
-                    url: '/division/updateDivisionTree',
+                    url: '/division/divisionTree',
                     type: 'POST',
                     data: {
                         moved_node: event.move_info.moved_node.name,
@@ -162,7 +175,7 @@ function loadDivisionPage() {
                         loadTree()
                     },
                     success: function (response) {
-                        //console.log(response.responseText);
+                        //console.log(response);
                     }
                 });
             }
@@ -192,7 +205,7 @@ function loadDivisionPage() {
             },
             load: function (query, callback) {
                 $.ajax({
-                    url: '/user/getUser',
+                    url: '/user',
                     type: 'GET',
                     data: {
                         term: query
@@ -211,7 +224,7 @@ function loadDivisionPage() {
         //Update entries within selectize list
         adminSelectize[0].selectize.load(function (callback) {
             $.ajax({
-                url: '/user/getUser',
+                url: '/user',
                 type: 'GET',
                 error: function () {
                     callback();
@@ -226,7 +239,7 @@ function loadDivisionPage() {
     if (!(divisionFormBootstrapValidator = $('#divisionForm')).data('bootstrapValidator')) {
         //Enable bootstrap validator
         divisionFormBootstrapValidator.bootstrapValidator() //The constrains are configured within the HTML
-            .on('success.form.bv', function (e) { //The submition function
+            .on('success.form.bv', function (e) { //The submit function
                 // Prevent form submission
                 e.preventDefault();
                 //Starting button animation
@@ -243,6 +256,7 @@ function loadDivisionPage() {
                     success: function (response) {
                         divisionSubmitButton.stopAnimation(1);
                         showMessage(response, 'success', 'icon_check');
+                        $('#oldName').val($('#name').val()); //If the name changed and the division is not reloaded the oldName needs to be resetted
                         loadTree();
                     }
                 });
@@ -261,17 +275,17 @@ function loadDivisionPage() {
             e.preventDefault();
             divisionDeleteButton.startAnimation();
             $.ajax({
-                url: '/division/deleteDivision',
-                type: 'POST',
-                data: {
-                    divisionName: $('#oldName').val()
-                },
+                url: '/division?divisionName=' + $('#oldName').val(), //Workaround since DELETE request needs to be identified by the URI only and jQuery is not attaching the data to the URI, which leads to a Spring error.
+                type: 'DELETE',
+                //data: {
+                //    divisionName: $('#oldName').val()
+                //},
                 error: function (response) {
                     divisionDeleteButton.stopAnimation(-1);
                     showMessage(response.responseText, 'error', 'icon_error-triangle_alt');
                 },
                 success: function (response) {
-                    divisionDeleteButton.stopAnimation(0, function(button){
+                    divisionDeleteButton.stopAnimation(1, function(button){
                         classie.add(button.el, 'hidden');
                     });
                     showMessage(response, 'success', 'icon_check');
@@ -286,9 +300,11 @@ function loadDivisionPage() {
     $('#addDivision').click(function(e){
         divisionSubmitButton.startAnimation();
         $.ajax({
-            url: '/division/new',
+            url: '/division',
             type: 'POST',
-            //data: {},
+            data: {
+                'new': true
+            },
             error: function(response) {
                 loadTree();
                 resetDivisionForm();
@@ -296,7 +312,8 @@ function loadDivisionPage() {
                 showMessage(response.responseText, 'error', 'icon_error-triangle_alt');
             },
             success: function(response) {
-                //Seperating response message and name of the new division
+                divisionSubmitButton.stopAnimation(1);
+                //Separating response message and name of the new division
                 var splitResponse = response.split("||");
                 loadDivision(splitResponse[1], true);
                 loadTree();

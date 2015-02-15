@@ -31,9 +31,6 @@ import java.util.Map;
 @RequestMapping("/")
 public class IndexController
 {
-    //A global time zone variable,should be defined later using settings
-    public static final String timeZone = "";
-
     @Autowired
     private MongoTemplate mongoTemplate;
 
@@ -52,60 +49,79 @@ public class IndexController
     private static Logger logger = LoggerFactory.getLogger(IndexController.class);
 
     /**
-     * This request mapping is processing the request to view the application page.
-     *
-     * @return The path to the view for the index page.
+     * This request mapping is processing the request to view the application page and retrieves the club name.
+     * @param model The model, handed over to the template engine rendering the view.
+     * @return The path to the view for the index page, together with the club name as parameter.
      */
     @RequestMapping(method = RequestMethod.GET)
     public String startApplication(Model model)
     {
-        model.addAttribute("clubName", settingsRepository.getClubName());
+        logger.trace("Gathering club name for index page.");
+        String clubName = settingsRepository.getClubName();
+        if(clubName == null || clubName.isEmpty())
+        {
+            logger.warn("Unable to retrieve club name, or club name is empty. Using default name.");
+            clubName = "myVerein";
+        }
+        model.addAttribute("clubName", clubName);
+        logger.info("Returning index view.");
         return "index";
     }
 
     /**
-     * This request mapping is processing the request to view the login page.
+     *
      * @return The path to the view for the login page.
+     */
+
+    /**
+     * This request mapping is processing the request to view the login page. If the initial flag is set within the settings file, the initial configuration page is returned.
+     * @param error This parameter is present if a login error occurred.
+     * @param logout This parameter is present if a user logged out of the application and got redirected to this page.
+     * @param cookieTheft This parameter is present if a cookieTheft exception was thrown, which means that the rememberMeCookie of the user might have been compromised.
+     * @param model The model, handed over to the template engine rendering the view.
+     * @return The path to the view for the login or initial configuration page.
      */
     @RequestMapping(value = "login", method = RequestMethod.GET)
     public String login(@RequestParam(required = false) String error, @RequestParam(required = false) String logout, @RequestParam(required = false) String cookieTheft, Model model)
     {
         //createDatabaseExample();
-
-//        System.err.println(settingsRepository.getDatabaseHost());
-//        System.err.println(settingsRepository.getDatabasePort());
-//        System.err.println(settingsRepository.getDatabaseName());
-//        try
-//        {
-//            System.err.println(mongoTemplate.getDb().getCollectionNames());
-//        } catch (Exception e)
-//        {
-//            System.err.println("DB not available");
-//        }
-
+        logger.trace("Getting login page.");
         if (settingsRepository.isInitSetup())
         {
             logger.warn("Starting initial setup.");
             return "init";
         } else
         {
-            model.addAttribute("clubName", settingsRepository.getClubName());
+            String clubName = settingsRepository.getClubName();
+            if(clubName == null || clubName.isEmpty())
+            {
+                logger.warn("Unable to retrieve club name, or club name is empty. Using default name.");
+                clubName = "myVerein";
+            }
+            model.addAttribute("clubName", clubName);
             if (error != null)
             {
                 logger.warn("An error occurred during log in");
             }
             if (logout != null)
             {
-                logger.debug("A user successfully logged out");
+                logger.debug("An user successfully logged out");
             }
             if (cookieTheft != null)
             {
                 logger.error("A possible cookie theft was observed!");
             }
+            logger.info("Returning login view");
             return "login";
         }
     }
 
+    /**
+     * This process mapping is used for error handling and is presented if the application server encountered an uncaught exception.
+     * @param noDB If a database timeout exception was thrown this parameter is present.
+     * @param pageNotFound If a 404 or 405 HTTP response code would have been send to the user this parameter is present.
+     * @return The path to the view for the error page.
+     */
     @RequestMapping(value = "error", method = RequestMethod.GET)
     public String error(@RequestParam(required = false) String noDB, @RequestParam(required = false) String pageNotFound)
     {
@@ -125,7 +141,6 @@ public class IndexController
     /**
      * Dummy method for a work around to disable application flooding by IntelliJ. See
      * https://youtrack.jetbrains.com/issue/IDEA-135196
-     *
      * @return OK
      */
     @RequestMapping(method = RequestMethod.HEAD, value = "*")
@@ -237,6 +252,9 @@ public class IndexController
         eventRepository.save(event4);
     }
 
+    /**
+     * This funciton is resetting the complete database.
+     */
     private void resetDatabase()
     {
         new Thread(() -> {

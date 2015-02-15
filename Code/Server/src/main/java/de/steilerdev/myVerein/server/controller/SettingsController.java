@@ -41,10 +41,8 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-//Todo: Enable deletion of logo
-
 /**
- * This class handles all requests done through the settings page
+ * This class handles all requests done through the settings page.
  */
 @Controller
 @RequestMapping("/settings")
@@ -71,12 +69,14 @@ public class SettingsController
     private static Logger logger = LoggerFactory.getLogger(SettingsController.class);
 
     /**
-     * This request mapping is processing the request to get the current settings of the system.
-     * @return The path to the view for the index page.
+     * This function is gathering the current settings of the application. The function is invoked by GETting the URI /settings.
+     * @param currentUser The currently logged in user.
+     * @return An HTTP response with a status code. If an error occurred a error code is returned, otherwise the map of all available settings is returned.
      */
     @RequestMapping(method = RequestMethod.GET, produces = "application/json")
     public @ResponseBody ResponseEntity<Map<String, Object>> loadSettings(@CurrentUser User currentUser)
     {
+        logger.trace("Starting to load settings for " + currentUser.getEmail());
         Map<String, Object> settings;
         if(!currentUser.isAdmin())
         {
@@ -84,12 +84,12 @@ public class SettingsController
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         } else if(!currentUser.isSuperAdmin())
         {
-            logger.info("A non-superadmin is accessing the settings");
+            logger.info("A non-superadmin (" + currentUser.getEmail() + ") is accessing the settings");
             settings = new HashMap<>();
             settings.put("administrationNotAllowedMessage", "You are not the super admin, and therefore you cannot adjust system settings.");
         } else
         {
-            logger.debug("Loading settings for " + currentUser.getEmail());
+            logger.debug("Loading settings for super admin " + currentUser.getEmail());
             try
             {
                 if((settings = (Map<String,Object>) settingsRepository.loadSettings().clone()) == null)
@@ -111,13 +111,28 @@ public class SettingsController
 
         currentUser.removeEverythingExceptEmailAndName();
         settings.put("currentAdmin", currentUser);
-
+        logger.info("Finished loading settings for " + currentUser.getEmail());
         return new ResponseEntity<>(settings, HttpStatus.OK);
     }
 
     /**
-     * This request mapping is processing the request to get the current settings of the system.
-     * @return The path to the view for the index page.
+     * This function is saving the settings for the system durable. In case the database connection changed, the system is restarted. The function is invoked by POSTing the parameters to the URI /settings.
+     * NOTE: At the moment the restarting of the application is not working correctly. To apply changed database settings the application needs to be redeployed manually from the management interface.
+     * @param currentAdmin If the logged in user is a super admin, this field specifies the new super admin. If the logged in user is a normal admin, this field needs to contain his email.
+     * @param adminPasswordNew The new password for the currently logged in admin.
+     * @param adminPasswordNewRe The retyped new password for the currently logged in admin.
+     * @param clubName The club name.
+     * @param clubLogo The club logo. If this parameter is present the former club logo is going to be replaced.
+     * @param databaseHost The hostname of the used MongoDB server.
+     * @param databasePort The port of the used MongoDB server.
+     * @param databaseUser The username, used to authenticate against the MongoDB server.
+     * @param databasePassword The password, used to authenticate against the MongoDB server.
+     * @param databaseCollection The name of the database collection, where the data of this system is stored in.
+     * @param rememberMeTokenKey The phrase used to secure the remember me cookies.
+     * @param parameters The complete map of all parameters, containing the custom user fields.
+     * @param currentAdminPassword The password of the currently logged in user, used to authenticate the changes.
+     * @param currentUser The currently logged in user.
+     * @return An HTTP response with a status code. If an error occurred an error message is bundled into the response, otherwise a success message is available.
      */
     @RequestMapping(method = RequestMethod.POST)
     public @ResponseBody ResponseEntity<String> saveSettings(@RequestParam(required = false) String currentAdmin,
@@ -135,6 +150,7 @@ public class SettingsController
                                                              @RequestParam String currentAdminPassword,
                                                              @CurrentUser User currentUser)
     {
+        logger.trace("Starting to save settings by " + currentUser.getEmail());
         if(!passwordEncoder.isPasswordValid(currentUser.getPassword(), currentAdminPassword, currentUser.getSalt()))
         {
             logger.warn("The stated password of user " + currentUser.getEmail() + " is invalid");
@@ -143,26 +159,28 @@ public class SettingsController
         {
             if(currentUser.isSuperAdmin())
             {
-                logger.debug("The user is a super admin");
+                logger.debug("The user (" + currentUser.getEmail() + ") is a super admin");
                 if(currentAdmin != null && !currentAdmin.equals(currentUser.getEmail()))
                 {
-                    logger.warn("The super admin user is changing.");
+                    logger.warn("The super admin user is changing to " + currentAdmin);
                     Division rootDivision = divisionRepository.findByName(settingsRepository.getClubName());
                     if(rootDivision == null)
                     {
-                        logger.warn("Unable to find root division.");
+                        logger.warn("Unable to find root division " + settingsRepository.getClubName());
                         return new ResponseEntity<>("Unable to find root division", HttpStatus.INTERNAL_SERVER_ERROR);
                     }
 
                     User newSuperAdmin = userRepository.findByEmail(currentAdmin);
                     if(newSuperAdmin == null)
                     {
-                        logger.warn("Unable to find new super admin.");
+                        logger.warn("Unable to find new super admin " + currentAdmin);
                         return new ResponseEntity<>("Unable to find new super admin", HttpStatus.INTERNAL_SERVER_ERROR);
                     }
 
+                    logger.debug("Saving new super admin");
                     rootDivision.setAdminUser(newSuperAdmin);
                     divisionRepository.save(rootDivision);
+                    logger.info("Successfully saved " + currentAdmin + " as new super admin");
                 }
                 try
                 {
@@ -230,15 +248,18 @@ public class SettingsController
                         settingsRepository.setRememberMeKey(rememberMeTokenKey);
                     }
 
+                    logger.debug("Gathering all custom user fields");
                     //Reducing parameters to custom user field parameters only and the value of the input
                     List<String> reducedValues = parameters.keySet().parallelStream()
                             .filter(key -> key.startsWith("cuf_") && !parameters.get(key).trim().isEmpty())
+                            .distinct() //Only allowing distinct keys
                             .map(key -> key.substring(4)) //Reducing the key to the initial 'name' value, used to create the fields by jQuery
                             .collect(Collectors.toList());
 
                     //Analysing the values and checking, if
                     if(!reducedValues.isEmpty())
                     {
+                        logger.debug("There are custom user fields available");
                         ArrayList<String> customUserFieldValues = new ArrayList<>();
                         reducedValues.parallelStream().forEach(key -> {
                             if(parameters.get("delete" + key) != null)
@@ -254,10 +275,11 @@ public class SettingsController
                                             thisUser.removeCustomUserField(key);
                                             try
                                             {
+                                                logger.trace("Deleting custom user field content " + key + " for user " + thisUser.getEmail());
                                                 userRepository.save(thisUser);
                                             } catch (ConstraintViolationException e)
                                             {
-                                                logger.warn("A database constraint was violated while trying to save the user " + thisUser.getEmail() + ": " + e.getMessage());
+                                                logger.warn("A database constraint was violated while trying to delete the custom user field " + key + " for user " + thisUser.getEmail() + ": " + e.getMessage());
                                             }
                                         });
                                     }
@@ -275,10 +297,11 @@ public class SettingsController
                                             thisUser.renameCustomUserField(key, value);
                                             try
                                             {
+                                                logger.trace("Renaming custom user field " + key + " to " + value + " for user " + thisUser.getEmail());
                                                 userRepository.save(thisUser);
                                             } catch (ConstraintViolationException e)
                                             {
-                                                logger.warn("A database constraint was violated while trying to save the user " + thisUser.getEmail() + ": " + e.getMessage());
+                                                logger.warn("A database constraint was violated while trying to rename the custom user field " + key + " for user " + thisUser.getEmail() + ": " + e.getMessage());
                                             }
                                         });
                                     }
@@ -290,8 +313,9 @@ public class SettingsController
                         settingsRepository.setCustomUserFields(customUserFieldValues);
                     }
 
-                    logger.debug("Saving updated settings file.");
+                    logger.debug("Saving updated settings file");
                     settingsRepository.saveSettings(currentUser);
+                    logger.info("Successfully saved updated settings file");
                 } catch (IOException e)
                 {
                     logger.warn("Unable to update settings file: " + e.getMessage());
@@ -302,14 +326,14 @@ public class SettingsController
                 logger.debug("The user is an admin");
                 if(currentAdmin != null && !currentAdmin.equals(currentUser.getEmail()))
                 {
-                    logger.warn("The current user differs from the stated user.");
+                    logger.warn("The current user differs from the stated user");
                     return new ResponseEntity<>("The current user differs from the stated user", HttpStatus.BAD_REQUEST);
                 }
             }
 
             if(adminPasswordNew != null && adminPasswordNewRe != null && !adminPasswordNew.isEmpty() && !adminPasswordNewRe.isEmpty())
             {
-                logger.debug(currentUser.getEmail() + " wants to change his password.");
+                logger.info(currentUser.getEmail() + " wants to change his password.");
                 if(!adminPasswordNew.equals(adminPasswordNewRe))
                 {
                     logger.warn("The stated passwords did not match");
@@ -321,49 +345,39 @@ public class SettingsController
                     {
                         logger.debug("Saving new user password.");
                         userRepository.save(currentUser);
+                        logger.info("Successfully saved new user password");
                     } catch (ConstraintViolationException e)
                     {
-                        logger.warn("A database constraint was violated while saving the user.");
+                        logger.warn("A database constraint was violated while saving the user: " + e.getMessage());
                         return new ResponseEntity<>("A database constraint was violated while saving the user.", HttpStatus.BAD_REQUEST);
                     }
                 }
             }
         } else
         {
-            logger.warn("A user who is not an admin" + currentUser.getEmail() + " tries to change the settings ");
+            logger.warn("A user who is not an admin (" + currentUser.getEmail() + ") tries to change the settings ");
             return new ResponseEntity<>("You are not allowed to change these settings", HttpStatus.FORBIDDEN);
         }
+        logger.info("Successfully updated all settings");
         return new ResponseEntity<>("Successfully updated settings", HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/deleteClubLogo", method = RequestMethod.POST)
-    public @ResponseBody ResponseEntity<String> deleteClubLogo(@CurrentUser User currentUser)
-    {
-        if(!currentUser.isSuperAdmin())
-        {
-            logger.warn("A non-super admin tries to delete the club logo: " + currentUser.getEmail());
-            return new ResponseEntity<>("You are not allowed to perform this action", HttpStatus.FORBIDDEN);
-        } else if(gridFSRepository.findClubLogo() == null)
-        {
-            logger.warn("Unable to delete club logo, because it is not available");
-            return  new ResponseEntity<>("No club logo there to delete", HttpStatus.BAD_REQUEST);
-        } else
-        {
-            gridFSRepository.deleteCurrentClubLogo();
-            logger.debug("Successfully delete the club logo");
-            return new ResponseEntity<>("Successfully delete the club logo", HttpStatus.OK);
-        }
-    }
-
-    @RequestMapping(value = "/getCustomUserFields", produces = "application/json", method = RequestMethod.GET)
+    /**
+     * This function gathers all defined custom user fields. The function is invoked by GETting the URI /settings/customUserFields.
+     * @return An HTTP response with a status code. If an error occurred an error error code is returned, otherwise a success code together with the list of all custom user fields is returned.
+     */
+    @RequestMapping(value = "customUserFields", produces = "application/json", method = RequestMethod.GET)
     public @ResponseBody ResponseEntity<List<String>> getCustomUserFields()
     {
+        logger.trace("Gathering custom user fields");
         List<String> customUserFields = settingsRepository.getCustomUserFields();
         if(customUserFields != null)
         {
+            logger.debug("Returning custom user fields");
             return new ResponseEntity<>(customUserFields, HttpStatus.OK);
         } else
         {
+            logger.warn("Unable to gather custom user fields");
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

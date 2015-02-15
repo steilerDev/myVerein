@@ -317,13 +317,18 @@ public class SettingsRepository
         try
         {
             String customUserFieldString = loadSettings().getProperty(customUserFields);
-            if(customUserFieldString != null && !customUserFieldString.isEmpty())
+            if(customUserFieldString == null)
             {
-                return Arrays.asList(customUserFieldString.split(customUserFieldsSeperator));
+                logger.warn("Unable to load custom user fields, because they are null");
+                return null;
+            } else if(customUserFieldString.isEmpty())
+            {
+                logger.debug("Custom user fields are empty, returning empty list");
+                return new ArrayList<>();
             } else
             {
-                logger.debug("Unable to load custom user fields, because they are empty/null");
-                return null;
+                logger.info("Custom user fields are non-empty, returning appropriate list");
+                return Arrays.asList(customUserFieldString.split(customUserFieldsSeperator));
             }
         } catch (IOException e)
         {

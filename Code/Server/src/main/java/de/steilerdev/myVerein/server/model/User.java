@@ -333,7 +333,13 @@ public class User implements UserDetails
      */
     public void setCustomUserField(Map<String, String> customUserField)
     {
-        this.customUserField = customUserField.keySet().parallelStream().collect(Collectors.toMap(User::escapeCustomUserKey, customUserField::get));
+        if(customUserField != null)
+        {
+            this.customUserField = customUserField.keySet().parallelStream().collect(Collectors.toMap(User::escapeCustomUserKey, customUserField::get));
+        } else
+        {
+            this.customUserField = null;
+        }
     }
 
     public List<Division> getDivisions()

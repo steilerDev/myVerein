@@ -1,6 +1,6 @@
 /**
  * Document   : myVerein.event.js
- * Description:
+ * Description: This JavaScript file contains all methods needed by the event page. A mimified version of underscore.js, bootstrap timepicker, clndr and GMaps is included.
  * Copyright  : (c) 2015 Frank Steiler <frank@steilerdev.de>
  * License    : GNU General Public License v2.0
  */
@@ -163,12 +163,18 @@ function loadOccupiedDates(date)
         date.add(date.utcOffset(), 'm');
     }
     $("#event-calendar-loading").addClass('heartbeat');
-    $.getJSON("/event/getEventsOfMonth",
-        {
+    $.ajax({
+        url: '/event/month',
+        type: 'GET',
+        data: {
             'month': date._d.getMonth() + 1, //Month is starting at 0
             'year': date._d.getFullYear()
-        } ,
-        function (data) {
+        },
+        error: function (response) {
+            //console.log(response.responseText);
+            $("#event-calendar-loading").removeClass('heartbeat');
+        },
+        success: function (data) {
             if(data && data.length) {
                 var events = [];
                 $.each(data, function (index, object) {
@@ -181,7 +187,7 @@ function loadOccupiedDates(date)
             }
             $("#event-calendar-loading").removeClass('heartbeat');
         }
-    );
+    });
 }
 
 function loadDate(dateString)
@@ -191,11 +197,18 @@ function loadDate(dateString)
     calendar.removeEvents(function(event){
         return event.title != pseudoEventName;
     });
-    $.getJSON("/event/getEventsOfDate",
-        {
+
+    $.ajax({
+        url: '/event/date',
+        type: 'GET',
+        data: {
             date: dateString
         },
-        function (data) {
+        error: function (response) {
+            //console.log(response.responseText);
+            $("#event-calendar-loading").removeClass('heartbeat');
+        },
+        success: function (data) {
             if(data && data.length) {
                 var events = [];
                 $.each(data, function (index, object) {
@@ -223,74 +236,77 @@ function loadDate(dateString)
             }
             $("#event-calendar-loading").removeClass('heartbeat');
         }
-    );
+    });
 }
 
 function loadEvent(eventID) {
     eventSubmitButton.startAnimation();
-    $.getJSON("/event/getEvent",
-        {
+    $.ajax({
+        url: '/event',
+        type: 'GET',
+        data: {
             id: eventID
         },
-        function(event) {
-            if(event) {
-                resetEventForm();
-                var startDateTime = localDateTimeToString(event.startDateTime),
-                    endDateTime = localDateTimeToString(event.endDateTime);
-                $('#eventFlag').val(event.id);
-                $('#eventName').val(event.name);
-                $('#eventDescription').val(event.description);
-                $('#startDate').val(moment(startDateTime).format('DD/MM/YYYY'));
-                $('#startTime').val(moment(startDateTime).format('HH:mm'));
-                $('#endDate').val(moment(endDateTime).format('DD/MM/YYYY'));
-                $('#endTime').val(moment(endDateTime).format('HH:mm'));
+        error: function (response) {
+            //console.log(response.responseText);
+            eventSubmitButton.stopAnimation(-1);
+        },
+        success: function (event) {
+            resetEventForm();
+            var startDateTime = localDateTimeToString(event.startDateTime),
+                endDateTime = localDateTimeToString(event.endDateTime);
+            $('#eventFlag').val(event.id);
+            $('#eventName').val(event.name);
+            $('#eventDescription').val(event.description);
+            $('#startDate').val(moment(startDateTime).format('DD/MM/YYYY'));
+            $('#startTime').val(moment(startDateTime).format('HH:mm'));
+            $('#endDate').val(moment(endDateTime).format('DD/MM/YYYY'));
+            $('#endTime').val(moment(endDateTime).format('HH:mm'));
 
-                if(event.location)
+            if(event.location)
+            {
+                $('#location').val(event.location);
+                if(!event.locationLat && !event.locationLng)
                 {
-                    $('#location').val(event.location);
-                    if(!event.locationLat && !event.locationLng)
-                    {
-                        updateMapUsingLocationField();
-                    }
-                }
-
-                if(event.locationLat && event.locationLng)
-                {
-                    updateMapUsingLatLng(event.locationLat, event.locationLng);
-                } else
-                {
-                    $('#locationLat').val('');
-                    $('#locationLng').val('');
-                }
-
-                $('#newEventHeading').addClass("hidden");
-                $('#oldEventHeading').removeClass("hidden");
-                $('#oldEventHeadingName').text('<' + event.name + '>');
-
-                $('#oldEventButton').removeClass("hidden");
-                $('#eventDelete').removeClass('hidden');
-
-                //Fill division list
-                if (event.invitedDivision) {
-                    $.each(event.invitedDivision, function (index, division) {
-                        invitedDivisionsSelectize[0].selectize.addItem(division.name);
-                    });
-                }
-
-                if(event.administrationNotAllowedMessage)
-                {
-                    disableEventForm();
-                    showMessage(event.administrationNotAllowedMessage, 'warning', 'icon_error-triangle_alt');
-                    eventSubmitButton.stopAnimation(1, function(button) {
-                        button.disable();
-                    });
-                } else {
-                    eventSubmitButton.stopAnimation(1, function(button) {
-                        button.enable();
-                    });
+                    updateMapUsingLocationField();
                 }
             }
-        });
+
+            if(event.locationLat && event.locationLng)
+            {
+                updateMapUsingLatLng(event.locationLat, event.locationLng);
+            } else
+            {
+                $('#locationLat').val('');
+                $('#locationLng').val('');
+            }
+
+            $('#newEventHeading').addClass("hidden");
+            $('#oldEventHeading').removeClass("hidden");
+            $('#oldEventHeadingName').text('<' + event.name + '>');
+
+            $('#oldEventButton').removeClass("hidden");
+            $('#eventDelete').removeClass('hidden');
+
+            //Fill division list
+            if (event.invitedDivision) {
+                $.each(event.invitedDivision, function (index, division) {
+                    invitedDivisionsSelectize[0].selectize.addItem(division.name);
+                });
+            }
+
+            if(event.administrationNotAllowedMessage)
+            {
+                disableEventForm();
+                showMessage(event.administrationNotAllowedMessage, 'warning', 'icon_error-triangle_alt');
+                eventSubmitButton.stopAnimation(1, function(button) {
+                    button.disable();
+                });
+            } else {
+                eventSubmitButton.stopAnimation(1);
+            }
+        }
+    });
 }
 
 //Disabling the user form, if a user is not allowed to manipulate the user
@@ -351,7 +367,6 @@ function updateMapUsingLatLng(lat, lng)
 }
 
 function loadEventPage() {
-
     if(!calendar) {
         calendar = $('#calendar').clndr({
             template: myVereinCLNDR,
@@ -378,18 +393,6 @@ function loadEventPage() {
             },
             adjacentDaysChangeMonth: true,
             forceSixRows: true
-        });
-
-        // bind the calendar to the left and right arrow keys
-        $(document).keydown(function (e) {
-            if (e.keyCode == 37) {
-                // left arrow
-                calendar.back();
-            }
-            if (e.keyCode == 39) {
-                // right arrow
-                calendar.forward();
-            }
         });
     }
 
@@ -465,7 +468,7 @@ function loadEventPage() {
             searchField: 'name',
             load: function (query, callback) {
                 $.ajax({
-                    url: '/division/getDivision',
+                    url: '/division',
                     type: 'GET',
                     data: {
                         term: query
@@ -484,7 +487,7 @@ function loadEventPage() {
         //Update entries within selectize list
         invitedDivisionsSelectize[0].selectize.load(function (callback) {
             $.ajax({
-                url: '/division/getDivision',
+                url: '/division',
                 type: 'GET',
                 error: function () {
                     callback();
@@ -516,10 +519,11 @@ function loadEventPage() {
                                 showMessage(response.responseText, 'error', 'icon_error-triangle_alt');
                             },
                             success: function (response) {
-                                eventSubmitButton.stopAnimation(0);
-                                showMessage(response, 'success', 'icon_check');
-                                loadNewEvent();
+                                eventSubmitButton.stopAnimation(1);
+                                var splitResponse = response.split("||");
+                                loadEvent(splitResponse[1]);
                                 loadOccupiedDates(calendar.month);
+                                showMessage(splitResponse[0], 'success', 'icon_check');
                             }
                         });
                     });
@@ -537,18 +541,19 @@ function loadEventPage() {
             e.preventDefault();
             eventDeleteButton.startAnimation();
             $.ajax({
-                url: '/event/deleteEvent',
-                type: 'POST',
-                data: {
-                    id: $('#eventFlag').val()
-                },
+                url: '/event?id=' + $('#eventFlag').val(), //Workaround since DELETE request needs to be identified by the URI only and jQuery is not attaching the data to the URI, which leads to a Spring error.
+                type: 'DELETE',
+                //data: {
+                //    id: $('#eventFlag').val()
+                //},
                 error: function (response) {
                     eventDeleteButton.stopAnimation(-1);
                     showMessage(response.responseText, 'error', 'icon_error-triangle_alt');
                 },
                 success: function (response) {
-                    eventDeleteButton.stopAnimation(0, function(button) {
+                    eventDeleteButton.stopAnimation(1, function(button) {
                         classie.add(button.el, 'hidden');
+                        button.enable();
                     });
                     showMessage(response, 'success', 'icon_check');
                     loadNewEvent(true);

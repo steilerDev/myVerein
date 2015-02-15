@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -35,6 +36,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -55,18 +57,18 @@ public class EventManagementController
     private static Logger logger = LoggerFactory.getLogger(EventManagementController.class);
 
     /**
-     * This function gathers all dates where an event takes place within a specific month and year.
+     * This function gathers all dates where an event takes place within a specific month and year. The function is invoked by GETting the URI /event/month and specifying the month and year via the request parameters.
      * @param month The selected month.
      * @param year The selected year.
-     * @return A list of dates, during the month, that contain an event.
+     * @return An HTTP response with a status code. If the function succeeds, a list of dates, during the month, that contain an event, is returned, otherwise an error code is returned.
      */
-    @RequestMapping(value = "getEventsOfMonth", produces = "application/json")
-    public @ResponseBody List<LocalDate> getEventDatesOfMonth(@RequestParam String month,
-                                                              @RequestParam String year)
+    @RequestMapping(value = "month", produces = "application/json", method = RequestMethod.GET)
+    public @ResponseBody ResponseEntity<List<LocalDate>> getEventDatesOfMonth(@RequestParam String month,
+                                                                              @RequestParam String year)
     {
+        logger.trace("Gathering events of month " + month + " and year " + year);
         ArrayList<LocalDate> dates = new ArrayList<>();
         int monthInt, yearInt;
-        logger.debug("Gathering events of month " + month + " and year " + year);
         try
         {
             monthInt = Integer.parseInt(month);
@@ -74,7 +76,7 @@ public class EventManagementController
         } catch (NumberFormatException e)
         {
             logger.warn("Unable to parse month or year.");
-            return null;
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         //Getting all single date events
         dates.addAll(eventRepository.findEventsByStartDateMonthAndStartDateYearAndMultiDate(monthInt, yearInt, false).parallelStream().map(event -> event.getStartDateTime().toLocalDate()).collect(Collectors.toList()));
@@ -93,18 +95,26 @@ public class EventManagementController
                             dates.add(event.getEndDateTime().toLocalDate()); //Finally adding the last date
                         });
 
-        return dates.stream().distinct().collect(Collectors.toList()); //Returning an optimized set of events
+        if(dates.isEmpty())
+        {
+            logger.warn("Returning empty dates list of " + month + "/" + year);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        } else
+        {
+            logger.debug("Returning dates list " + month + "/" + year);
+            return new ResponseEntity<>(dates.stream().distinct().collect(Collectors.toList()), HttpStatus.OK); //Returning an optimized set of events
+        }
     }
 
     /**
-     * Returns all events, that are taking place on a specified date. The date needs to be formatted according to the following pattern: YYYY/MM/DD
-     * @param date The selected date
-     * @return A list of events meeting the stated requirements.
+     * Returns all events, that are taking place on a specified date. The date parameter needs to be formatted according to the following pattern: YYYY/MM/DD. This function is invoked by GETting the URI /event/date
+     * @param date The selected date, correctly formatted (YYYY/MM/DD)
+     * @return An HTTP response with a status code. If the function succeeds, a list of events is returned, otherwise an error code is returned.
      */
-    @RequestMapping(value = "getEventsOfDate", produces = "application/json")
-    public @ResponseBody List<Event> getEventsOfDate(@RequestParam String date)
+    @RequestMapping(value = "date", produces = "application/json", method = RequestMethod.GET)
+    public @ResponseBody ResponseEntity<List<Event>> getEventsOfDate(@RequestParam String date)
     {
-        logger.debug("Getting events of date " + date);
+        logger.trace("Getting events of date " + date);
         LocalDate dateObject;
         ArrayList<Event> eventsOfDay = new ArrayList<>();
         try
@@ -114,7 +124,7 @@ public class EventManagementController
         } catch (DateTimeParseException e)
         {
             logger.warn("Unable to parse date: " + date + ": " + e.toString());
-            return null;
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
         eventsOfDay.addAll(eventRepository.findEventsByStartDateDayOfMonthAndStartDateMonthAndStartDateYearAndMultiDate(dateObject.getDayOfMonth(), dateObject.getMonthValue(), dateObject.getYear(), false));
@@ -126,44 +136,55 @@ public class EventManagementController
                 .filter(event -> event.getStartDate().isEqual(dateObject) || event.getEndDate().isEqual(dateObject) || (event.getEndDate().isAfter(dateObject) && event.getStartDate().isBefore(dateObject))) //Filter all multi date events that do not span over the date
                 .collect(Collectors.toList()));
 
-        eventsOfDay.stream().forEach(event -> {
-            event.setInvitedDivision(null);
-            event.setLocation(null);
-            event.setDescription(null);
-            event.setEventAdmin(null);
-        });
+        if(eventsOfDay.isEmpty())
+        {
+            logger.warn("The events list of " + date + " is empty");
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        } else
+        {
+            eventsOfDay.stream().forEach(event -> {
+                event.setInvitedDivision(null);
+                event.setLocation(null);
+                event.setDescription(null);
+                event.setEventAdmin(null);
+            });
 
-        logger.debug("Returning " + eventsOfDay.size() + " events.");
-        return eventsOfDay;
+            logger.debug("Returning " + eventsOfDay.size() + " events for " + date);
+            return new ResponseEntity<>(eventsOfDay, HttpStatus.OK);
+        }
     }
 
     /**
-     * Returns a specific event based on its id.
-     * @param id The id of the selected event
-     * @return The event.
+     * Returns a specific event based on its id. The function is invoked by GETting the URI the URI /event.
+     * @param id The id of the selected event.
+     * @param currentUser The currently logged in user.
+     * @return An HTTP response with a status code. If the function succeeds, the event is returned, otherwise an error code is returned.
      */
-    @RequestMapping(value = "getEvent", produces = "application/json")
-    public @ResponseBody Event getEvent(@RequestParam String id, @CurrentUser User currentUser)
+    @RequestMapping(produces = "application/json", method = RequestMethod.GET)
+    public @ResponseBody ResponseEntity<Event> getEvent(@RequestParam String id, @CurrentUser User currentUser)
     {
+        logger.trace("Getting the event for ID " + id);
         if(id.isEmpty())
         {
             logger.warn("The ID can not be empty.");
-            return null;
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } else
         {
             Event selectedEvent = eventRepository.findEventById(id);
             if (selectedEvent == null)
             {
-                logger.warn("Unable to load specified element.");
-                return null;
+                logger.warn("Unable to find specified event.");
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             } else
             {
                 if (!currentUser.isAllowedToAdministrate(selectedEvent))
                 {
+                    logger.debug("The current user " + currentUser.getEmail() + " is not allowed to edit the event " + id);
                     selectedEvent.setAdministrationNotAllowedMessage("You are not allowed to modify this event, since you did not create it.");
                 }
 
                 //Preventing data loop
+                logger.debug("Clearing admin user for divisions within request");
                 if(selectedEvent.getInvitedDivision() != null)
                 {
                     selectedEvent.getInvitedDivision().parallelStream().forEach(division -> division.setAdminUser(null));
@@ -172,13 +193,26 @@ public class EventManagementController
                 {
                     selectedEvent.getEventAdmin().getDivisions().parallelStream().forEach(division -> division.setAdminUser(null));
                 }
-                return selectedEvent;
+                return new ResponseEntity<>(selectedEvent, HttpStatus.OK);
             }
         }
     }
 
     /**
-     * Saves an event
+     * This function saves an event. The function is invoked by POSTint the parameters to the URI /event.
+     * @param eventFlag This flag either stores the ID of the event, or true, if a new event is created.
+     * @param eventName The name of the event.
+     * @param eventDescription The description of the event.
+     * @param startDate The start date, formatted according to the pattern d/MM/y, defined within the Java 8 DateTimeFormatter.
+     * @param startTime The start time, formatted according to the pattern H:m, defined within the Java 8 DateTimeFormatter.
+     * @param endDate The end date, formatted according to the pattern d/MM/y, defined within the Java 8 DateTimeFormatter.
+     * @param endTime The end time, formatted according to the pattern H:m, defined within the Java 8 DateTimeFormatter.
+     * @param location The name of the location of the event.
+     * @param locationLat The latitude of the location of the event.
+     * @param locationLng The longitude of the location of the event.
+     * @param invitedDivisions A comma seperated list of invited divisions.
+     * @param currentUser The currently logged in user.
+     * @return An HTTP response with a status code. If an error occurred an error message is bundled into the response, otherwise a success message is available. If the event gets created successfully, the new id is returned within the response, separated by '||' from the response.
      */
     @RequestMapping(method = RequestMethod.POST)
     public @ResponseBody ResponseEntity<String> saveEvent(@RequestParam String eventFlag,
@@ -194,18 +228,20 @@ public class EventManagementController
                                                           @RequestParam String invitedDivisions,
                                                           @CurrentUser User currentUser)
     {
+        //Todo: Maybe return an JSON map instead of a String, which is seperating the event id by two bars
+        logger.trace("Saving event for " + currentUser.getEmail());
         Event event;
         if(eventFlag.isEmpty())
         {
-            logger.warn("The event flag is not allowed to be empty.");
+            logger.warn("The event flag is empty.");
             return new ResponseEntity<>("The event flag is not allowed to be empty", HttpStatus.BAD_REQUEST);
         } else if(eventFlag.equals("true"))
         {
-            logger.debug("A new event is created.");
+            logger.debug("A new event is created, by " + currentUser.getEmail());
             event = new Event();
         } else
         {
-            logger.debug("An existing event is altered.");
+            logger.debug("The event with id " + eventFlag + " is altered by " + currentUser.getEmail());
             event = eventRepository.findEventById(eventFlag);
             if(event == null)
             {
@@ -223,7 +259,7 @@ public class EventManagementController
 
         if(startDate.isEmpty() || startTime.isEmpty() || endDate.isEmpty() || endTime.isEmpty())
         {
-            logger.warn("The date and times defining the event are not allowed to be empty.");
+            logger.warn("The date and times defining the event (ID " + eventFlag + ") are not allowed to be empty.");
             return new ResponseEntity<>("The date and times defining the event are not allowed to be empty", HttpStatus.BAD_REQUEST);
         } else
         {
@@ -298,20 +334,25 @@ public class EventManagementController
         try
         {
             eventRepository.save(event);
+            logger.info("Successfully saved event " + eventFlag);
+            return new ResponseEntity<>("Successfully saved the event||" + event.getId(), HttpStatus.OK);
         } catch (ConstraintViolationException e)
         {
             logger.warn("A database constraint was violated while saving the event " + eventFlag);
             return new ResponseEntity<>("A database constraint was violated while saving the event.", HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>("Successfully saved the event", HttpStatus.OK);
     }
 
     /**
-     * Deletes an event
+     * This function deletes an event, specified by the event ID. The function is invoked by DELETEing the URI /event.
+     * @param id The ID of the event, that should be deleted.
+     * @param currentUser The currently logged in user.
+     * @return An HTTP response with a status code. If an error occurred an error message is bundled into the response, otherwise a success message is available
      */
-    @RequestMapping(method = RequestMethod.POST, value = "deleteEvent")
-    public @ResponseBody ResponseEntity<String> saveEvent(@RequestParam String id, @CurrentUser User currentUser)
+    @RequestMapping(method = RequestMethod.DELETE)
+    public @ResponseBody ResponseEntity<String> deleteEvent(@RequestParam String id, @CurrentUser User currentUser)
     {
+        logger.trace("Deleting event with id " + id);
         if(id.isEmpty())
         {
             logger.warn("The id of an event is not allowed to be empty.");
@@ -322,7 +363,7 @@ public class EventManagementController
 
         if(event == null)
         {
-            logger.warn("Unable to find the selected event");
+            logger.warn("Unable to find the selected event with id " + id);
             return new ResponseEntity<>("Unable to find the selected event", HttpStatus.BAD_REQUEST);
         } else if(!currentUser.isAllowedToAdministrate(event))
         {
@@ -333,6 +374,7 @@ public class EventManagementController
             try
             {
                 eventRepository.delete(event);
+                logger.info("Successfully delete the selected event");
                 return new ResponseEntity<>("Successfully deleted selected event", HttpStatus.OK);
             } catch (IllegalArgumentException e)
             {

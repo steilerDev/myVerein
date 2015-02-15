@@ -28,6 +28,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.io.IOException;
@@ -42,12 +43,6 @@ public class InitController
     private SettingsRepository settingsRepository;
 
     @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private DivisionRepository divisionRepository;
-
-    @Autowired
     private ReloadableResourceBundleMessageSource messageSource;
 
     @Autowired
@@ -57,12 +52,21 @@ public class InitController
     private List<MongoCredential> mongoCredential = null;
     private String databaseName = null;
 
-    private boolean succesfullyStoredDataInDatabase = false;
-    private boolean successfullyReloadedApplicationContext = false;
-
     private static Logger logger = LoggerFactory.getLogger(InitController.class);
 
-    @RequestMapping(value = "settings")
+    /**
+     * This function is temporarily saving the general settings during the initial setup. The values are stored permanently after calling the initSuperAdmin function. This function is invoked by POSTing the parameters to the URI /init/settings.
+     * @param clubName The name of the club.
+     * @param databaseHost The hostname of the MongoDB server (Default localhost).
+     * @param databasePort The port of the MongoDB server (Default 27017).
+     * @param databaseUser The user used to authenticate against the MongoDB server (may be empty if not needed).
+     * @param databasePassword The password used to authenticate against the MongoDB server (may be empty if not needed).
+     * @param databaseCollection The name of the database collection (Default myVerein).
+     * @param rememberMeTokenKey A secret key used to secure the remember me cookies.
+     * @param locale The current locale of the user.
+     * @return An HTTP response with a status code. If an error occurred an error message is bundled into the response, otherwise a success message is available.
+     */
+    @RequestMapping(value = "settings", method = RequestMethod.POST)
     public ResponseEntity<String> initSettings(@RequestParam String clubName,
                                                @RequestParam String databaseHost,
                                                @RequestParam String databasePort,
@@ -72,7 +76,7 @@ public class InitController
                                                @RequestParam String rememberMeTokenKey,
                                                Locale locale)
     {
-        logger.debug("Starting initial configuration");
+        logger.trace("Starting initial settings configuration");
         if(!settingsRepository.isInitSetup())
         {
             logger.warn("An initial setup API was used, even though the system is already configured.");
@@ -100,7 +104,7 @@ public class InitController
                     databasePortInt = Integer.parseInt(databasePort);
                 } catch (NumberFormatException e)
                 {
-                    logger.warn("The database port seems not to be a number " + databasePort);
+                    logger.warn("The database port does not seem to be a number " + databasePort + ", " + e.getMessage());
                     return new ResponseEntity<>(messageSource.getMessage("init.message.settings.dbPortNoNumber", null, "The database port needs to be a number", locale), HttpStatus.BAD_REQUEST);
                 }
             }
@@ -118,7 +122,7 @@ public class InitController
 
             try
             {
-                logger.debug("Temporarily storing information");
+                logger.debug("Temporarily storing settings information");
                 settingsRepository.setClubName(clubName);
                 settingsRepository.setDatabaseHost(databaseHost);
                 settingsRepository.setDatabasePort(databasePort);
@@ -132,11 +136,23 @@ public class InitController
                 logger.warn("Unable to save settings.");
                 return new ResponseEntity<>(messageSource.getMessage("init.message.settings.savingSettingsError", null, "Unable to save settings, please try again", locale), HttpStatus.INTERNAL_SERVER_ERROR);
             }
+            logger.info("Successfully stored and validated settings information");
             return new ResponseEntity<>(messageSource.getMessage("init.message.settings.savingSettingsSuccess", null, "Successfully saved settings", locale), HttpStatus.OK);
         }
     }
 
-    @RequestMapping(value = "superAdmin")
+    /**
+     * This function is creating the initial super admin, as well as the root division. On top of that it stores all information durable, as well as restarts the application. The function is invoked by POSTing the parameters to the URI /init/superAdmin.
+     * NOTE: At the moment the restarting of the application is not working correctly. To apply changed database settings the application needs to be redeployed manually from the management interface.
+     * @param firstName The first name of the new super admin.
+     * @param lastName The last name of the new super admin.
+     * @param email The email of the new super admin.
+     * @param password The password of the new super admin.
+     * @param passwordRe The retyped password of the new super admin.
+     * @param locale The current locale of the user.
+     * @return An HTTP response with a status code. If an error occurred an error message is bundled into the response, otherwise a success message is available.
+     */
+    @RequestMapping(value = "superAdmin", method = RequestMethod.POST)
     public ResponseEntity<String> initSuperAdmin(@RequestParam String firstName,
                                                  @RequestParam String lastName,
                                                  @RequestParam String email,
@@ -144,6 +160,7 @@ public class InitController
                                                  @RequestParam String passwordRe,
                                                  Locale locale)
     {
+        logger.trace("Starting initial admin configuration");
         if(!settingsRepository.isInitSetup())
         {
             logger.warn("An initial setup API was used, even though the system is already configured.");
@@ -174,11 +191,11 @@ public class InitController
                 settingsRepository.setInitSetup(false);
             } catch (IOException e)
             {
-                logger.warn("Unable to save settings.");
+                logger.warn("Unable to un-set initial configuration flag within settings.");
                 return new ResponseEntity<>(messageSource.getMessage("init.message.admin.savingSettingsError", null, "Unable to save settings, please try again", locale), HttpStatus.INTERNAL_SERVER_ERROR);
             }
 
-            logger.debug("Everything in place, now the settings are stored durable.");
+            logger.info("Everything in place, now the settings are stored durable.");
 
             if(!savingUserAndDivision(superAdmin, rootDivision))
             {
@@ -190,41 +207,51 @@ public class InitController
                 return new ResponseEntity<>(messageSource.getMessage("init.message.admin.savingSettingsError", null, "Unable to save settings, please try again", locale), HttpStatus.INTERNAL_SERVER_ERROR);
             } else
             {
-                logger.debug("Successfully saved new admin, settings and restarted application context.");
+                logger.info("Successfully saved new admin, settings and restarted application context.");
                 return new ResponseEntity<>(messageSource.getMessage("init.message.admin.success", null, "Successfully saved the new super admin, updated all settings and restarted the application. Refresh this page and start using myVerein.", locale) , HttpStatus.OK);
             }
         }
     }
 
+    /**
+     * This function is validating the provided information of the MongoDB server, by establishing a test connection.
+     * @param databaseHost The hostname of the MongoDB server.
+     * @param databasePort The port of the MongoDB server.
+     * @param databaseUser The user used to authenticate against the MongoDB server (may be empty if not needed).
+     * @param databasePassword The password used to authenticate against the MongoDB server (may be empty if not needed).
+     * @param databaseCollection The name of the database collection.
+     * @return True if the connection was successfully established, false otherwise.
+     */
     private boolean mongoIsAvailable(String databaseHost, int databasePort, String databaseUser, String databasePassword, String databaseCollection)
     {
-        logger.debug("Creating mongo client to test connection");
+        logger.trace("Testing MongoDB connection");
 
-        //Creating credentials
         if(!databaseUser.isEmpty() && !databasePassword.isEmpty())
         {
+            logger.debug("Credentials have been provided");
             mongoCredential = Arrays.asList(MongoCredential.createMongoCRCredential(databaseUser, databaseCollection, databasePassword.toCharArray()));
         }
 
-        //Creating server address
         try
         {
+            logger.debug("Creating server address");
             mongoAddress = new ServerAddress(databaseHost, databasePort);
         } catch (UnknownHostException e)
         {
-            logger.warn("Unable to resolve mongoDB host: " + e.getMessage());
+            logger.warn("Unable to resolve server host: " + e.getMessage());
             return false;
         }
 
-        //Creating and testing mongo client
+        logger.debug("Creating mongo client");
         MongoClient mongoClient = new MongoClient(mongoAddress, mongoCredential);
         try
         {
             //Checking if connection REALLY works
+            logger.debug("Establishing connection now.");
             List<String> databases = mongoClient.getDatabaseNames();
             if(databases == null)
             {
-                logger.warn("The list of databases is null");
+                logger.warn("The returned list of databases is null");
                 return false;
             } else if(databases.isEmpty())
             {
@@ -232,7 +259,7 @@ public class InitController
                 return true;
             } else
             {
-                logger.debug("The database connection seems okay.");
+                logger.debug("The database connection seems okay");
                 return true;
             }
         } catch (MongoException e)
@@ -243,18 +270,26 @@ public class InitController
         {
             if(mongoClient != null)
             {
+                logger.debug("Closing mongo client");
                 mongoClient.close();
             }
         }
     }
 
+    /**
+     * This function is establishing a connection to the new database and storing the new super user as well as the new root division. To correctly execute this function the {@link #mongoIsAvailable} function should be called first.
+     * @param user The new super admin.
+     * @param division The new root division.
+     * @return True if the operation was successfully, false otherwise.
+     */
     private boolean savingUserAndDivision(User user, Division division)
     {
         if(mongoAddress != null && databaseName != null && !databaseName.isEmpty())
         {
+            logger.trace("Saving user and division using new MongoDB connection");
+
             MongoClient mongoClient = new MongoClient(mongoAddress, mongoCredential);
 
-            logger.debug("Saving user using new MongoDB connection");
             DB mongoDB = mongoClient.getDB(databaseName);
             if (mongoClient.getDatabaseNames().contains(databaseName))
             {
@@ -274,10 +309,11 @@ public class InitController
                 divisionObject.put("_class", division.getClass().getCanonicalName());
                 mongoDB.getCollection(division.getClass().getSimpleName().toLowerCase()).insert(divisionObject);
 
+                logger.info("Successfully saved root division and super admin");
                 return true;
             } catch (MongoException e)
             {
-                logger.warn("Unable to store object in database");
+                logger.warn("Unable to store root division and super admin in database");
                 return false;
             } finally
             {
@@ -288,17 +324,24 @@ public class InitController
             }
         } else
         {
-            logger.warn("Unable to save user, because the new MongoDB connection is not available");
+            logger.warn("Unable to save super admin and new root division, because the new MongoDB connection is not available");
             return false;
         }
     }
 
+    /**
+     * This function is permanently storing the new information within the settings file.
+     * @param currentUser The currently logged in user.
+     * @return True if the operation was successfully, false otherwise.
+     */
     private boolean savingSettings(User currentUser)
     {
+        logger.trace("Permanently saving settings and restarting context afterwards if necessary");
         try
         {
             //This call is restarting the application.
             settingsRepository.saveSettings(currentUser);
+            logger.info("Successfully saved settings and restarted context.");
             return true;
         } catch (BeansException | IllegalStateException | MongoException e)
         {
@@ -306,7 +349,7 @@ public class InitController
             return false;
         } catch (IOException e)
         {
-            logger.warn("Unable to save settings");
+            logger.warn("Unable to save settings: " + e.getMessage());
             return false;
         }
     }

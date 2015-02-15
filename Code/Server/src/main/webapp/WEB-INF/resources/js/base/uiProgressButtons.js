@@ -139,6 +139,9 @@
                         //Automatically hides error buttons
                         if(callback) {
                             callback(self);
+                        } else
+                        {
+                            self.enable();
                         }
                     }, self.options.statusTime );
                 }
