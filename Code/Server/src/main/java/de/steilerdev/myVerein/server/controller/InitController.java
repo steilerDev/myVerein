@@ -17,7 +17,9 @@
 package de.steilerdev.myVerein.server.controller;
 
 import com.mongodb.*;
-import de.steilerdev.myVerein.server.model.*;
+import de.steilerdev.myVerein.server.model.Division;
+import de.steilerdev.myVerein.server.model.SettingsRepository;
+import de.steilerdev.myVerein.server.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -33,7 +35,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
 
 @Controller
 @RequestMapping("/init")

@@ -38,6 +38,9 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * This object is representing an entity within the user's collection of the MongoDB and is used by Spring Security as UserDetails implementation. On top of that the class is providing several useful helper methods.
+ */
 public class User implements UserDetails
 {
     @Transient
@@ -128,6 +131,12 @@ public class User implements UserDetails
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String administrationNotAllowedMessage;
 
+    /*
+
+    Standard function (Constructor and getter/setter)
+
+     */
+
     public User() {}
 
     public User(String firstName, String lastName, String email, String password)
@@ -144,62 +153,6 @@ public class User implements UserDetails
         this.customUserField = customUserField;
         setPassword(password);
         updateMembershipStatus();
-    }
-
-    @Override
-    public String toString()
-    {
-        return String.format("User[Email=%s, firstName=%s, lastName=%s]", email, firstName, lastName);
-    }
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities()
-    {
-        return authorities;
-    }
-
-    public void setAuthorities(Collection<? extends GrantedAuthority> authorities)
-    {
-        this.authorities = authorities;
-    }
-
-    /**
-     * Returns the username (Email address) of the selected user.
-     * @return The username (Email address) of the user.
-     */
-    @JsonIgnore
-    @Override
-    public String getUsername()
-    {
-        return email;
-    }
-
-    @JsonIgnore
-    @Override
-    public boolean isAccountNonExpired()
-    {
-        return true;
-    }
-
-    @JsonIgnore
-    @Override
-    public boolean isAccountNonLocked()
-    {
-        return true;
-    }
-
-    @JsonIgnore
-    @Override
-    public boolean isCredentialsNonExpired()
-    {
-        return true;
-    }
-
-    @JsonIgnore
-    @Override
-    public boolean isEnabled()
-    {
-        return true;
     }
 
     public String getFirstName()
@@ -238,7 +191,7 @@ public class User implements UserDetails
     }
 
     /**
-     * Setting the password. The password is automatically hashed and the salt is randomly generated.
+     * Setting the password. The password is automatically hashed and the salt is randomly re-generated.
      * @param password The new plain text password.
      */
     public void setPassword(String password)
@@ -525,8 +478,90 @@ public class User implements UserDetails
         this.membershipStatus = membershipStatus;
     }
 
+    /*
+
+        Spring security functions
+
+     */
+
     /**
-     * This function checks the stated dates of a user and sets the current membership status accordingly.
+     * Function needed by Spring Security's {@link org.springframework.security.core.userdetails.UserDetails UserDetails}.
+     * @return The list of GrantedAuthorities of the user.
+     */
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities()
+    {
+        return authorities;
+    }
+
+    public void setAuthorities(Collection<? extends GrantedAuthority> authorities)
+    {
+        this.authorities = authorities;
+    }
+
+    /**
+     * Function needed by Spring Security's {@link org.springframework.security.core.userdetails.UserDetails UserDetails}.
+     * @return The email of the user.
+     */
+    @JsonIgnore
+    @Override
+    public String getUsername()
+    {
+        return email;
+    }
+
+    /**
+     * Function needed by Spring Security's {@link org.springframework.security.core.userdetails.UserDetails UserDetails}.
+     * @return Always true at the moment.
+     */
+    @JsonIgnore
+    @Override
+    public boolean isAccountNonExpired()
+    {
+        return true;
+    }
+
+    /**
+     * Function needed by Spring Security's {@link org.springframework.security.core.userdetails.UserDetails UserDetails}.
+     * @return Always true at the moment.
+     */
+    @JsonIgnore
+    @Override
+    public boolean isAccountNonLocked()
+    {
+        return true;
+    }
+
+    /**
+     * Function needed by Spring Security's {@link org.springframework.security.core.userdetails.UserDetails UserDetails}.
+     * @return Always true at the moment.
+     */
+    @JsonIgnore
+    @Override
+    public boolean isCredentialsNonExpired()
+    {
+        return true;
+    }
+
+    /**
+     * Function needed by Spring Security's {@link org.springframework.security.core.userdetails.UserDetails UserDetails}.
+     * @return Always true at the moment.
+     */
+    @JsonIgnore
+    @Override
+    public boolean isEnabled()
+    {
+        return true;
+    }
+
+    /*
+
+        Helper functions needed by the application
+
+     */
+
+    /**
+     * This function checks the stated dates of a user and sets the current membership status accordingly. This function is invoked, as soon as one of the dates is changed.
      */
     public void updateMembershipStatus()
     {
@@ -600,6 +635,9 @@ public class User implements UserDetails
         administrationNotAllowedMessage = null;
     }
 
+    /**
+     * This function removes all private information (information only the administrator of the user is allowed to see)
+     */
     public void removePrivateInformation()
     {
         customUserField = null;
@@ -613,7 +651,7 @@ public class User implements UserDetails
     }
 
     /**
-     * This function checks if the current user is allowed to modify a specified event. He is allowed to do this if he is either the creator or the superadmin.
+     * This function checks if the current user is allowed to modify a specified event. The user is allowed to modify the event, if he is either the creator of the event or the superadmin.
      * @param event The selected event.
      * @return True if the user is allowed, false otherwise.
      */
@@ -629,7 +667,7 @@ public class User implements UserDetails
     }
 
     /**
-     * This function checks if the user is allowed to administrate (view private information and change user details) the selected user.
+     * This function checks if the user is allowed to administrate (view private information and change user details) the selected user. The user is allowed to administrate the user, if he is the super admin, or if he is administrating a division, the user is part of.
      * @param selectedUser The selected user.
      * @param divisionRepository The division repository used to retrieve all divisions information, due to a problem of injecting the resource within the user object.
      * @return True if the user is allowed, false otherwise.
@@ -656,7 +694,7 @@ public class User implements UserDetails
     }
 
     /**
-     * This function checks if the user is allowed to administrate a selected division.
+     * This function checks if the user is allowed to administrate a selected division. The user is allowed to administrate the division, if he is the super admin, or administrating the division or a parent division.
      * @param division The selected division.
      * @param divisionRepository The division repository used to retrieve all divisions information, due to a problem of injecting the resource within the user object.
      * @return True if the user is allowed, false otherwise.
@@ -689,8 +727,8 @@ public class User implements UserDetails
     }
 
     /**
-     * This function checks if the user is an administrator
-     * @return
+     * This function checks if the user is an administrator. The user is an administrator, if he is administrating at least one division.
+     * @return Tue if the user is an administrator, false otherwise.
      */
     @JsonIgnore
     public boolean isAdmin()
@@ -699,6 +737,46 @@ public class User implements UserDetails
                authorities.parallelStream()
                     .anyMatch(authority -> authority.getAuthority().equals(UserAuthenticationService.AuthorityRoles.ADMIN.toString()) ||
                                         authority.getAuthority().equals(UserAuthenticationService.AuthorityRoles.SUPERADMIN.toString()));
+    }
+
+    /**
+     * This function escapes non allowed characters within the key of a custom user field.
+     * @param source The key of a custom user field.
+     * @return The escaped key of a custom user field.
+     */
+    public static String escapeCustomUserKey(String source)
+    {
+        if(source.contains("."))
+        {
+            source = source.replace(".", "[dot]");
+        }
+        return source;
+    }
+
+    /**
+     * This function un-escapes non allowed characters within the escaped key of a custom user field.
+     * @param source The escaped key of a custom user field.
+     * @return The un-escaped key of a custom user field.
+     */
+    public static String unEscapeCustomUserKey(String source)
+    {
+        if(source.contains("[dot]"))
+        {
+            source = source.replace("[dot]", ".");
+        }
+        return source;
+    }
+
+    /*
+
+        Overwritten Java Object functions
+
+     */
+
+    @Override
+    public String toString()
+    {
+        return String.format("User[Email=%s, firstName=%s, lastName=%s]", email, firstName, lastName);
     }
 
     @Override
@@ -711,23 +789,5 @@ public class User implements UserDetails
     public int hashCode()
     {
         return email == null? 0: email.hashCode();
-    }
-
-    public static String escapeCustomUserKey(String source)
-    {
-        if(source.contains("."))
-        {
-            source = source.replace(".", "[dot]");
-        }
-        return source;
-    }
-
-    public static String unEscapeCustomUserKey(String source)
-    {
-        if(source.contains("[dot]"))
-        {
-            source = source.replace("[dot]", ".");
-        }
-        return source;
     }
 }

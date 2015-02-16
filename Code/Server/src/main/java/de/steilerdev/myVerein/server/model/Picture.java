@@ -24,6 +24,9 @@ import javax.validation.constraints.NotNull;
 import java.net.URI;
 import java.util.List;
 
+/**
+ * This object is representing an entity within the picture's collection of the MongoDB.
+ */
 public class Picture
 {
     @Id

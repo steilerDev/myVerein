@@ -16,7 +16,6 @@
  */
 package de.steilerdev.myVerein.server.security;
 
-import de.steilerdev.myVerein.server.model.Division;
 import de.steilerdev.myVerein.server.model.DivisionRepository;
 import de.steilerdev.myVerein.server.model.User;
 import de.steilerdev.myVerein.server.model.UserRepository;
@@ -30,8 +29,10 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.ArrayList;
-import java.util.List;
 
+/**
+ * This class is implementing Spring's UserDetailsService to support the {@link de.steilerdev.myVerein.server.model.User User} object as authentication principal.
+ */
 public class UserAuthenticationService implements UserDetailsService
 {
     public enum AuthorityRoles {
@@ -92,29 +93,27 @@ public class UserAuthenticationService implements UserDetailsService
     }
 
     /**
-     * Check the user authorities. If the user administrates a division he gets the user role "ROLE_ADMIN",
-     * if he administrates the root division node he gets the role "ROLE_SUPERADMIN" and "ROLE_ADMIN", otherwise he is "ROLE_USER"
+     * Checks and returns the user authorities. The authorities are assigned according to the {@link de.steilerdev.myVerein.server.security.UserAuthenticationService.AuthorityRoles AuthorityRoles} enum.
      * @param user The user, whose authorities need to be checked.
      * @return A list of the roles of the user.
      */
     private ArrayList<GrantedAuthority> getUserAuthorities(User user)
     {
-        logger.debug("Checking user role");
+        logger.trace("Checking user' granted authorities");
         ArrayList<GrantedAuthority> authorities = new ArrayList<>();
-        List<Division> administratedDiv = divisionRepository.findByAdminUser(user);
-        if(administratedDiv.isEmpty())
-        {
-            logger.debug("Authenticated user is " + AuthorityRoles.USER.toString());
-            authorities.add(new SimpleGrantedAuthority(AuthorityRoles.USER.toString()));
-        } else
+        if(user.isAdmin())
         {
             logger.debug("Authenticated user is " + AuthorityRoles.ADMIN.toString());
             authorities.add(new SimpleGrantedAuthority(AuthorityRoles.ADMIN.toString()));
-            if(administratedDiv.stream().anyMatch(div -> div.getParent() == null))
+            if(user.isSuperAdmin())
             {
                 logger.debug("Authenticated user is " + AuthorityRoles.SUPERADMIN.toString());
                 authorities.add(new SimpleGrantedAuthority(AuthorityRoles.SUPERADMIN.toString()));
             }
+        } else
+        {
+            logger.debug("Authenticated user is " + AuthorityRoles.USER.toString());
+            authorities.add(new SimpleGrantedAuthority(AuthorityRoles.USER.toString()));
         }
         return authorities;
     }

@@ -21,13 +21,16 @@ import org.springframework.data.mongodb.core.mapping.DBRef;
 
 import javax.validation.constraints.NotNull;
 
+/**
+ * This object is representing an entity within the event response's collection of the MongoDB.
+ */
 public class EventResponse
 {
     public enum Answer
     {
         ACCEPT,
         DECLINE,
-        TENTATIVE;
+        TENTATIVE
     }
 
     @Id

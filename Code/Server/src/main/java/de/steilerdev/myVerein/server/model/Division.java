@@ -18,28 +18,23 @@ package de.steilerdev.myVerein.server.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
 import org.hibernate.validator.constraints.NotBlank;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
-import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
-import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-
+/**
+ * This object is representing an entity within the division's collection of the MongoDB. On top of that the class is providing several useful helper methods.
+ */
 public class Division
 {
     @Id
-    private String id;
-
-    @Indexed
     @NotBlank
     private String name;
 
@@ -117,24 +112,16 @@ public class Division
         return parent;
     }
 
-    public String getId()
-    {
-        return id;
-    }
-
-    public void setId(String id)
-    {
-        this.id = id;
-    }
-
     /**
      * This function updates the parent and the ancestors.
      * @param parent The new parent.
      */
     public void setParent(Division parent)
     {
+        logger.trace("Changing parent for " + this.name);
         if(parent != null)
         {
+            logger.debug("Updating ancestors for " + this.name);
             List<Division> ancestor;
             if (parent.getAncestors() == null)
             {
@@ -149,8 +136,12 @@ public class Division
             this.ancestors = ancestor;
         }
         this.parent = parent;
+        logger.info("Successfully updated parent and ancestors of " + this.name);
     }
 
+    /**
+     * @return The ancestor of this object. The function never returns null, but an empty list, if there are no ancestors defined.
+     */
     public List<Division> getAncestors()
     {
         if(ancestors == null)
@@ -163,11 +154,7 @@ public class Division
     public void addAncestor(Division ancestor)
     {
         logger.debug("Adding ancestor " + ancestor.getName() + " to " + this.name);
-        if(ancestors == null)
-        {
-            ancestors = new ArrayList<>();
-        }
-        ancestors.add(ancestor);
+        this.getAncestors().add(ancestor);
     }
 
     public void setAncestors(List<Division> ancestors)
@@ -183,12 +170,12 @@ public class Division
     @Override
     public boolean equals(Object obj)
     {
-        return obj != null && obj instanceof Division && this.id != null && this.id.equals(((Division) obj).getId());
+        return obj != null && obj instanceof Division && this.name != null && this.name.equals(((Division) obj).getName());
     }
 
     @Override
     public int hashCode()
     {
-        return id == null? 0: id.hashCode();
+        return name == null? 0: name.hashCode();
     }
 }

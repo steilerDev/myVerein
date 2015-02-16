@@ -21,6 +21,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+/**
+ * This interface is used to query the database for specific event object. The repository is implemented during runtime by SpringData through the @Repository annotation.
+ */
 @Repository
 public interface EventRepository extends MongoRepository<Event, String> {
 
@@ -30,6 +33,4 @@ public interface EventRepository extends MongoRepository<Event, String> {
     public List<Event> findEventsByStartDateDayOfMonthAndStartDateMonthAndStartDateYearAndMultiDate(int startDateDayOfMonth, int startDateMonth, int startDateYear, boolean multiDate);
 
     public Event findEventById(String id);
-//    public List<Event> findEventsByStartDateDateAndStartDateMonthAndStartDateYear(int startDateDate, int startDateMonth, int startDateYear);
-//    public List<Event> findEvents
 }

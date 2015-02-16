@@ -31,6 +31,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This object is representing an entity within the division's collection of the MongoDB. On top of that the class is providing several useful helper methods.
+ */
 public class Event
 {
     @Id
@@ -73,6 +76,7 @@ public class Event
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private LocalDate endDate;
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private boolean multiDate;
 
     @Transient
@@ -260,12 +264,25 @@ public class Event
         this.lastChanged = lastChanged;
     }
 
+    /**
+     * @return The LocalDateTime object of the start date of the event. The object is computed using the current startDate integers.
+     */
     public LocalDateTime getStartDateTime()
     {
-        startDateTime = LocalDateTime.of(startDateYear, startDateMonth, startDateDayOfMonth, startDateHour, startDateMinute);
+        if(startDateYear == 0 && startDateMonth == 0 && startDateDayOfMonth == 0 && startDateHour == 0 && startDateMinute == 0)
+        {
+            startDateTime = null;
+        } else
+        {
+            startDateTime = LocalDateTime.of(startDateYear, startDateMonth, startDateDayOfMonth, startDateHour, startDateMinute);
+        }
         return startDateTime;
     }
 
+    /**
+     * This function is setting the start date time and updates the startDate integers
+     * @param startDateTime The new start date time.
+     */
     public void setStartDateTime(LocalDateTime startDateTime)
     {
         this.startDateTime = startDateTime;
@@ -276,15 +293,35 @@ public class Event
             startDateDayOfMonth = startDateTime.getDayOfMonth();
             startDateHour = startDateTime.getHour();
             startDateMinute = startDateTime.getMinute();
+        } else
+        {
+            startDateYear = 0;
+            startDateMonth = 0;
+            startDateDayOfMonth = 0;
+            startDateHour = 0;
+            startDateMinute = 0;
         }
     }
 
+    /**
+     * @return The LocalDateTime object of the end date of the event. The object is computed using the current endDat integers.
+     */
     public LocalDateTime getEndDateTime()
     {
-        endDateTime = LocalDateTime.of(endDateYear, endDateMonth, endDateDayOfMonth, endDateHour, endDateMinute);
+        if(endDateYear == 0 && endDateMonth == 0 && endDateDayOfMonth == 0 && endDateHour == 0 && endDateMinute == 0)
+        {
+            endDateTime = null;
+        } else
+        {
+            endDateTime = LocalDateTime.of(endDateYear, endDateMonth, endDateDayOfMonth, endDateHour, endDateMinute);
+        }
         return endDateTime;
     }
 
+    /**
+     * This function is setting the end date time and updates the endDate integers
+     * @param endDateTime The new start date time.
+     */
     public void setEndDateTime(LocalDateTime endDateTime)
     {
         this.endDateTime = endDateTime;
@@ -295,6 +332,13 @@ public class Event
             endDateDayOfMonth = endDateTime.getDayOfMonth();
             endDateHour = endDateTime.getHour();
             endDateMinute = endDateTime.getMinute();
+        } else
+        {
+            endDateYear = 0;
+            endDateMonth = 0;
+            endDateDayOfMonth = 0;
+            endDateHour = 0;
+            endDateMinute = 0;
         }
     }
 

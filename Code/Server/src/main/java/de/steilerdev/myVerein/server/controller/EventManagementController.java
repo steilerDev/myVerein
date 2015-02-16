@@ -24,7 +24,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -36,7 +35,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -228,7 +226,7 @@ public class EventManagementController
                                                           @RequestParam String invitedDivisions,
                                                           @CurrentUser User currentUser)
     {
-        //Todo: Maybe return an JSON map instead of a String, which is seperating the event id by two bars
+        //Todo: Maybe return an JSON map instead of a String, which is separating the event id by two bars
         logger.trace("Saving event for " + currentUser.getEmail());
         Event event;
         if(eventFlag.isEmpty())

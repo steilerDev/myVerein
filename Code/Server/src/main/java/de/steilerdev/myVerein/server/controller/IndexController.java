@@ -1,16 +1,11 @@
 package de.steilerdev.myVerein.server.controller;
 
-import com.mongodb.DB;
-import com.mongodb.MongoException;
 import com.mongodb.MongoTimeoutException;
 import de.steilerdev.myVerein.server.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.MongoDbFactory;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;

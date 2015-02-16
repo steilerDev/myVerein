@@ -158,7 +158,7 @@ public class DivisionManagementController
     @RequestMapping(method = RequestMethod.POST, params = "new")
     public @ResponseBody ResponseEntity<String> createDivision(@RequestParam("new") String newFlag, @CurrentUser User currentUser)
     {
-        //Todo: Maybe return an JSON map instead of a String, which is seperating the new division name by two bars
+        //Todo: Maybe return an JSON map instead of a String, which is separating the new division name by two bars
         logger.trace("Creating a new empty division");
         List<Division> administratedDivisions = getOptimizedSetOfAdministratedDivisions(currentUser);
         Division newDivision;

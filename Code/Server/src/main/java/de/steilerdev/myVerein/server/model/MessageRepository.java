@@ -21,6 +21,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+/**
+ * This interface is used to query the database for specific message object. The repository is implemented during runtime by SpringData through the @Repository annotation.
+ */
 @Repository
 public interface MessageRepository extends MongoRepository<Message, String> {
 

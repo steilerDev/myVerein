@@ -21,7 +21,7 @@ import org.springframework.security.web.bind.annotation.AuthenticationPrincipal;
 import java.lang.annotation.*;
 
 /**
- * Annotation interface for @UserInterface, replacing @AuthenticationPrincipal
+ * Annotation interface for @CurrentUser, replacing @AuthenticationPrincipal
  */
 @Target({ElementType.PARAMETER, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)

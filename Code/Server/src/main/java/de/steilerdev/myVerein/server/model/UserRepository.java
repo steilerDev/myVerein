@@ -16,19 +16,19 @@
  */
 package de.steilerdev.myVerein.server.model;
 
-import com.mongodb.DB;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+/**
+ * This repository is used to store and retrieve user from the MongoDB. The repository is implemented during runtime by SpringData through the @Repository annotation.
+ */
 @Repository
 public interface UserRepository extends MongoRepository<User, String> {
 
-    public User findByFirstName(String firstName);
     public User findByEmail(String email);
-    public List<User> findByLastName(String lastName);
 
     @Query(value="{}", fields="{ 'firstName' : 1, 'lastName' : 1, 'email' : 1 }")
     public List<User> findAllEmailAndName();

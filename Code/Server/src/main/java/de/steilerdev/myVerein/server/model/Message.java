@@ -19,11 +19,13 @@ package de.steilerdev.myVerein.server.model;
 import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.NotNull;
-import java.util.Date;
+import java.time.LocalDateTime;
 
+/**
+ * This object is representing an entity within the messages' collection of the MongoDB.
+ */
 public class Message
 {
     @Id
@@ -33,8 +35,7 @@ public class Message
     private String content;
 
     @NotNull
-    @DateTimeFormat(iso= DateTimeFormat.ISO.DATE)
-    private Date timestamp;
+    private LocalDateTime timestamp;
 
     @DBRef
     @NotNull
@@ -50,7 +51,7 @@ public class Message
 
     public Message() {}
 
-    public Message(String content, Date timestamp, User sender, User receiver, Division group)
+    public Message(String content, LocalDateTime timestamp, User sender, User receiver, Division group)
     {
         this.content = content;
         this.timestamp = timestamp;
@@ -79,12 +80,12 @@ public class Message
         this.content = content;
     }
 
-    public Date getTimestamp()
+    public LocalDateTime getTimestamp()
     {
         return timestamp;
     }
 
-    public void setTimestamp(Date timestamp)
+    public void setTimestamp(LocalDateTime timestamp)
     {
         this.timestamp = timestamp;
     }

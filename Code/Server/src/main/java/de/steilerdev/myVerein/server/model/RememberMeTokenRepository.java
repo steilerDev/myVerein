@@ -22,7 +22,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 /**
- * This repository is used to store and retrieve tokens for the remember me functionality
+ * This repository is used to store and retrieve tokens for the remember me functionality. The repository is implemented during runtime by SpringData through the @Repository annotation.
  */
 @Repository
 public interface RememberMeTokenRepository extends MongoRepository<RememberMeToken, String>

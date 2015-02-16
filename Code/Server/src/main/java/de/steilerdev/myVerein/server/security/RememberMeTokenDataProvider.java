@@ -36,7 +36,7 @@ public class RememberMeTokenDataProvider implements PersistentTokenRepository
     RememberMeTokenRepository rememberMeTokenRepository;
 
     private static Logger logger = LoggerFactory.getLogger(RememberMeTokenRepository.class);
-
+    
     @Override
     public void createNewToken(PersistentRememberMeToken persistentRememberMeToken)
     {
