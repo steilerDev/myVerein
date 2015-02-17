@@ -35,7 +35,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.validation.ConstraintViolationException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -59,7 +61,7 @@ public class DivisionManagementController
     private static final String newDivisionName = "New division";
 
     /**
-     * This function is saving changes on an exisiting division. If the division needs to be created see {@link createDivision}. This function is invoked by POSTing the parameters to the URI /division.
+     * This function is saving changes on an exisiting division. If the division needs to be created see {@link de.steilerdev.myVerein.server.controller.DivisionManagementController#createDivision}. This function is invoked by POSTing the parameters to the URI /division.
      * @param name The new name of the division.
      * @param oldName The old name of the division (might be equal to new name)
      * @param description The description of the division (may be empty)
@@ -153,19 +155,20 @@ public class DivisionManagementController
      * This function is creating a new division and chooses the name based on the new division name and an integer, depending how many unnamed division exist. This function is invoked, by POSTing to the URI /division together with a "new" non-empty parameter.
      * @param newFlag The non-empty parameter indicating the creation of a new empty division.
      * @param currentUser The currently logged in user.
-     * @return An HTTP response with a status code. If an error occurred an error message is bundled into the response, otherwise a success message is available. If the division gets created successfully, the new name is returned within the response, separated by '||' from the response.
+     * @return An HTTP response with a status code together with a JSON map object, containing an 'errorMessage', or a 'successMessage' respectively. If the operation was successful the name of the new division is accessible via 'newDivisionName'.
      */
-    @RequestMapping(method = RequestMethod.POST, params = "new")
-    public @ResponseBody ResponseEntity<String> createDivision(@RequestParam("new") String newFlag, @CurrentUser User currentUser)
+    @RequestMapping(method = RequestMethod.POST, params = "new", produces = "application/json")
+    public @ResponseBody ResponseEntity<Map<String, String>> createDivision(@RequestParam("new") String newFlag, @CurrentUser User currentUser)
     {
-        //Todo: Maybe return an JSON map instead of a String, which is separating the new division name by two bars
         logger.trace("Creating a new empty division");
+        Map<String, String> responseMap = new HashMap<>();
         List<Division> administratedDivisions = getOptimizedSetOfAdministratedDivisions(currentUser);
         Division newDivision;
         if(newFlag.isEmpty())
         {
             logger.warn("The new flag is not allowed to be empty");
-            return new ResponseEntity<>("The new flag parameter is not allowed to be empty", HttpStatus.BAD_REQUEST);
+            responseMap.put("errorMessage", "The new flag parameter is not allowed to be empty");
+            return new ResponseEntity<>(responseMap, HttpStatus.BAD_REQUEST);
         } else if(administratedDivisions != null && administratedDivisions.size() > 0)
         {
             String newName = newDivisionName;
@@ -184,16 +187,20 @@ public class DivisionManagementController
             {
                 divisionRepository.save(newDivision);
                 logger.info("The new division was successfully created with name " + newName);
-                return new ResponseEntity<>("The new division was successfully created||" + newName, HttpStatus.OK);
+                responseMap.put("successMessage", "The new division was successfully created");
+                responseMap.put("newDivisionName", newName);
+                return new ResponseEntity<>(responseMap, HttpStatus.OK);
             } catch (ConstraintViolationException e)
             {
                 logger.warn("A database constraint was violated while saving the division: " + e.getMessage());
-                return new ResponseEntity<>("A database constraint was violated while saving the division.", HttpStatus.BAD_REQUEST);
+                responseMap.put("errorMessage", "A database constraint was violated while saving the division.");
+                return new ResponseEntity<>(responseMap, HttpStatus.BAD_REQUEST);
             }
         } else
         {
             logger.warn("User " + currentUser.getEmail() + " is not allowed to create a new division");
-            return new ResponseEntity<>("You are not allowed to create a new division", HttpStatus.FORBIDDEN);
+            responseMap.put("errorMessage", "You are not allowed to create a new division");
+            return new ResponseEntity<>(responseMap, HttpStatus.FORBIDDEN);
         }
     }
 

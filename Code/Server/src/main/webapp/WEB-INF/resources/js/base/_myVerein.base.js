@@ -9,7 +9,7 @@ function showMessage (message, level, icon) {
 	// create the notification
     var notification = new NotificationFx({
         wrapper : document.querySelector('.content-current'),
-        message : '<span class="icon ' + icon + '"></span><p>' + message + '.</p>',
+        message : '<span class="icon ' + icon + '"></span><p>' + message + '</p>',
         layout : 'attached',
         effect : 'bouncyflip',
         ttl : 7000,

@@ -9,7 +9,7 @@
 
     <properties>
         <server.id>myVereinRemoteServer</server.id>
-        <server.url>http://it14-myverein.dhbw-stuttgart.de</server.url>
+        <server.url>http://it14-myverein.dhbw-stuttgart.de:8080</server.url>
         <!--server.id>myVereinLocalServer</server.id>
         <server.url>http://localhost:8080</server.url-->
 
@@ -43,8 +43,10 @@
         <!-- JavaX servlet -->
         <javax.servlet.version>3.0.1</javax.servlet.version>
 
-        <!-- Maven minify plugin -->
-        <minify.version>1.7.4</minify.version>
+        <!-- Maven compiler, maven tomcat and maven minify plugins used during build -->
+        <maven.compiler.version>3.2</maven.compiler.version>
+        <maven.tomcat.version>2.2</maven.tomcat.version>
+        <maven.minify.version>1.7.4</maven.minify.version>
     </properties>
 
     <dependencies>
@@ -191,12 +193,12 @@
     </dependencies>
 
     <build>
-        <finalName>${name}</finalName>
+        <finalName>${project.name}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.tomcat.maven</groupId>
                 <artifactId>tomcat7-maven-plugin</artifactId>
-                <version>2.2</version>
+                <version>${maven.tomcat.version}</version>
                 <configuration>
                     <path>/</path>
                     <update>true</update>
@@ -206,6 +208,7 @@
             </plugin>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven.compiler.version}</version>
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
@@ -214,7 +217,7 @@
             <plugin>
                 <groupId>com.samaxes.maven</groupId>
                 <artifactId>minify-maven-plugin</artifactId>
-                <version>${minify.version}</version>
+                <version>${maven.minify.version}</version>
                 <executions>
 
                     <!-- This execution goal minifies the css and js used by the index and login page-->

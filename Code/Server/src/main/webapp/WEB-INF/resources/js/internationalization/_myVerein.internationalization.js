@@ -14,10 +14,10 @@ function getLocalizedString(stringIdentifier)
                     return "Die GoogleMaps API konnte nicht geladen werden, die Karte wird deshalb deaktiviert";
                     break;
                 case "en":
-                    return "Unable to reach GoogleMaps API, disabling map.";
+                    return "Unable to reach GoogleMaps API, disabling map";
                     break;
                 default :
-                    return "Unable to reach GoogleMaps API, disabling map.";
+                    return "Unable to reach GoogleMaps API, disabling map";
                     break;
             }
             break;

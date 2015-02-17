@@ -35,7 +35,9 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -208,12 +210,12 @@ public class EventManagementController
      * @param location The name of the location of the event.
      * @param locationLat The latitude of the location of the event.
      * @param locationLng The longitude of the location of the event.
-     * @param invitedDivisions A comma seperated list of invited divisions.
+     * @param invitedDivisions A comma separated list of invited divisions.
      * @param currentUser The currently logged in user.
-     * @return An HTTP response with a status code. If an error occurred an error message is bundled into the response, otherwise a success message is available. If the event gets created successfully, the new id is returned within the response, separated by '||' from the response.
+     * @return An HTTP response with a status code together with a JSON map object, containing an 'errorMessage', or a 'successMessage' respectively. If the operation was successful the id of the event is accessible via 'eventID'.
      */
-    @RequestMapping(method = RequestMethod.POST)
-    public @ResponseBody ResponseEntity<String> saveEvent(@RequestParam String eventFlag,
+    @RequestMapping(method = RequestMethod.POST, produces = "application/json")
+    public @ResponseBody ResponseEntity<Map<String, String>> saveEvent(@RequestParam String eventFlag,
                                                           @RequestParam String eventName,
                                                           @RequestParam String eventDescription,
                                                           @RequestParam String startDate,
@@ -226,13 +228,14 @@ public class EventManagementController
                                                           @RequestParam String invitedDivisions,
                                                           @CurrentUser User currentUser)
     {
-        //Todo: Maybe return an JSON map instead of a String, which is separating the event id by two bars
         logger.trace("Saving event for " + currentUser.getEmail());
+        Map<String, String> responseMap = new HashMap<>();
         Event event;
         if(eventFlag.isEmpty())
         {
-            logger.warn("The event flag is empty.");
-            return new ResponseEntity<>("The event flag is not allowed to be empty", HttpStatus.BAD_REQUEST);
+            logger.warn("The event flag is empty");
+            responseMap.put("errorMessage", "The event flag is not allowed to be empty");
+            return new ResponseEntity<>(responseMap, HttpStatus.BAD_REQUEST);
         } else if(eventFlag.equals("true"))
         {
             logger.debug("A new event is created, by " + currentUser.getEmail());
@@ -244,11 +247,13 @@ public class EventManagementController
             if(event == null)
             {
                 logger.warn("Unable to find the specified event with id " + eventFlag);
-                return new ResponseEntity<>("Unable to find the specified event", HttpStatus.BAD_REQUEST);
+                responseMap.put("errorMessage", "Unable to find the specified event");
+                return new ResponseEntity<>(responseMap, HttpStatus.BAD_REQUEST);
             } else if(!currentUser.isAllowedToAdministrate(event))
             {
                 logger.warn("The current user " + currentUser.getEmail() + " is not allowed to alter the selected event " + eventFlag);
-                return new ResponseEntity<>("You are not allowed to edit the selected event", HttpStatus.FORBIDDEN);
+                responseMap.put("errorMessage", "You are not allowed to edit the selected event");
+                return new ResponseEntity<>(responseMap, HttpStatus.FORBIDDEN);
             }
         }
 
@@ -258,7 +263,8 @@ public class EventManagementController
         if(startDate.isEmpty() || startTime.isEmpty() || endDate.isEmpty() || endTime.isEmpty())
         {
             logger.warn("The date and times defining the event (ID " + eventFlag + ") are not allowed to be empty.");
-            return new ResponseEntity<>("The date and times defining the event are not allowed to be empty", HttpStatus.BAD_REQUEST);
+            responseMap.put("errorMessage", "The date and times defining the event are not allowed to be empty");
+            return new ResponseEntity<>(responseMap, HttpStatus.BAD_REQUEST);
         } else
         {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/MM/y'T'H:m");
@@ -268,7 +274,8 @@ public class EventManagementController
             } catch (DateTimeParseException e)
             {
                 logger.warn("Unrecognized date format " + startDate + "T" + startTime);
-                return new ResponseEntity<>("Unrecognized date or time format within start time", HttpStatus.BAD_REQUEST);
+                responseMap.put("errorMessage", "Unrecognized date or time format within start time");
+                return new ResponseEntity<>(responseMap, HttpStatus.BAD_REQUEST);
             }
 
             try
@@ -277,7 +284,8 @@ public class EventManagementController
             } catch (DateTimeParseException e)
             {
                 logger.warn("Unrecognized date format " + endDate + "T" + endTime);
-                return new ResponseEntity<>("Unrecognized date or time format within end time", HttpStatus.BAD_REQUEST);
+                responseMap.put("errorMessage", "Unrecognized date or time format within end time");
+                return new ResponseEntity<>(responseMap, HttpStatus.BAD_REQUEST);
             }
         }
 
@@ -291,7 +299,8 @@ public class EventManagementController
             } catch (NumberFormatException e)
             {
                 logger.warn("Unable to paste lat " + locationLat);
-                return new ResponseEntity<>("Unable to parse latitude coordinate", HttpStatus.BAD_REQUEST);
+                responseMap.put("errorMessage", "Unable to parse latitude coordinate");
+                return new ResponseEntity<>(responseMap, HttpStatus.BAD_REQUEST);
             }
         }
 
@@ -303,7 +312,8 @@ public class EventManagementController
             } catch (NumberFormatException e)
             {
                 logger.warn("Unable to paste lng " + locationLng);
-                return new ResponseEntity<>("Unable to parse longitude coordinate", HttpStatus.BAD_REQUEST);
+                responseMap.put("errorMessage", "Unable to parse longitude coordinate");
+                return new ResponseEntity<>(responseMap, HttpStatus.BAD_REQUEST);
             }
         }
 
@@ -317,7 +327,8 @@ public class EventManagementController
                 if (div == null)
                 {
                     logger.warn("Unrecognized division (" + division + ")");
-                    return new ResponseEntity<>("Division " + division + " does not exist", HttpStatus.BAD_REQUEST);
+                    responseMap.put("errorMessage", "Division " + division + " does not exist");
+                    return new ResponseEntity<>(responseMap, HttpStatus.BAD_REQUEST);
                 }
                 event.addDivision(div);
             }
@@ -333,11 +344,14 @@ public class EventManagementController
         {
             eventRepository.save(event);
             logger.info("Successfully saved event " + eventFlag);
-            return new ResponseEntity<>("Successfully saved the event||" + event.getId(), HttpStatus.OK);
+            responseMap.put("successMessage", "Successfully saved the event");
+            responseMap.put("eventID", event.getId());
+            return new ResponseEntity<>(responseMap, HttpStatus.OK);
         } catch (ConstraintViolationException e)
         {
             logger.warn("A database constraint was violated while saving the event " + eventFlag);
-            return new ResponseEntity<>("A database constraint was violated while saving the event.", HttpStatus.BAD_REQUEST);
+            responseMap.put("errorMessage", "A database constraint was violated while saving the event");
+            return new ResponseEntity<>(responseMap, HttpStatus.BAD_REQUEST);
         }
     }
 

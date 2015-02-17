@@ -32,7 +32,7 @@
         <bean class="org.springframework.web.context.support.ServletContextAttributeExporter">
             <property name="attributes">
                 <map>
-                    <entry key="developmentMode" value="false" />
+                    <entry key="developmentMode" value="true" />
                 </map>
             </property>
         </bean>

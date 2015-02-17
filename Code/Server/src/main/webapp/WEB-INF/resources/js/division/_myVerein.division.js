@@ -309,17 +309,16 @@ function loadDivisionPage() {
                 loadTree();
                 resetDivisionForm();
                 divisionSubmitButton.stopAnimation(-1);
-                showMessage(response.responseText, 'error', 'icon_error-triangle_alt');
+                showMessage(response.responseJSON.errorMessage, 'error', 'icon_error-triangle_alt');
             },
             success: function(response) {
                 divisionSubmitButton.stopAnimation(1);
                 //Separating response message and name of the new division
-                var splitResponse = response.split("||");
-                loadDivision(splitResponse[1], true);
+                loadDivision(response.newDivisionName, true);
                 loadTree(function(){
-                    divisionTree.tree('selectNode', divisionTree.tree('getNodeByName', splitResponse[1]));
+                    divisionTree.tree('selectNode', divisionTree.tree('getNodeByName', response.newDivisionName));
                 });
-                showMessage(splitResponse[0], 'success', 'icon_check');
+                showMessage(response.successMessage, 'success', 'icon_check');
             }
         });
     });

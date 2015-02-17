@@ -502,14 +502,13 @@ function loadEventPage() {
                             data: $(e.target).serialize(),
                             error: function (response) {
                                 eventSubmitButton.stopAnimation(-1);
-                                showMessage(response.responseText, 'error', 'icon_error-triangle_alt');
+                                showMessage(response.responseJSON.errorMessage, 'error', 'icon_error-triangle_alt');
                             },
                             success: function (response) {
                                 eventSubmitButton.stopAnimation(1);
-                                var splitResponse = response.split("||");
-                                loadEvent(splitResponse[1]);
+                                loadEvent(response.eventID);
                                 loadOccupiedDates(calendar.month);
-                                showMessage(splitResponse[0], 'success', 'icon_check');
+                                showMessage(response.successMessage, 'success', 'icon_check');
                             }
                         });
                     });
