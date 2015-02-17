@@ -9,7 +9,9 @@
 
     <properties>
         <server.id>myVereinRemoteServer</server.id>
-        <!--server.id>myVereinLocalServer</server.id-->
+        <server.url>http://it14-myverein.dhbw-stuttgart.de</server.url>
+        <!--server.id>myVereinLocalServer</server.id>
+        <server.url>http://localhost:8080</server.url-->
 
         <java.version>1.8</java.version>
 
@@ -199,6 +201,7 @@
                     <path>/</path>
                     <update>true</update>
                     <server>${server.id}</server>
+                    <url>${server.url}/manager/text</url>
                 </configuration>
             </plugin>
             <plugin>

@@ -366,7 +366,6 @@ function loadEventPage() {
                 },
                 onMonthChange: function(month) { //Every time the month is changed, the occupied dates need to be gathered
                     loadOccupiedDates(month);
-                    resetEventForm();
                 }
             },
             ready: function() { //Initially the current month needs to be loaded

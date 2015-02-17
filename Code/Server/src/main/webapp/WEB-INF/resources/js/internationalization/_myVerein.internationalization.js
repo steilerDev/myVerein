@@ -37,13 +37,13 @@ function getLocalizedString(stringIdentifier)
         case "deleteCustomFieldContent":
             switch(locale) {
                 case "de":
-                    return "L\u00f6sche zus\u00e4tzlich alle gespeicherten Werte";
+                    return "L\u00f6sche zus\u00e4tzlich alle gespeicherten Werte innerhalb der Nutzerprofile";
                     break;
                 case "en":
-                    return "Also delete content of field";
+                    return "Also delete content of field within user profiles";
                     break;
                 default :
-                    return "Also delete content of field";
+                    return "Also delete content of field within user profiles";
                     break;
             }
             break;

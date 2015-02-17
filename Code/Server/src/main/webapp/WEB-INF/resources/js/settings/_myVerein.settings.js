@@ -82,7 +82,7 @@ function addCustomUserFieldSettings(name){
             '</div>' +
             '<div class="checkbox">' +
             '<label>' +
-            '<input type="checkbox" name="deleteContent' + name + '" class="deleteContent" disabled="disabled"> ' + getLocalizedString("deleteCustomFieldContent") + ' (' + name + ') within user profiles</input>' +
+            '<input type="checkbox" name="deleteContent' + name + '" class="deleteContent" disabled="disabled"> ' + getLocalizedString("deleteCustomFieldContent") + '</input>' +
             '</label>' +
             '</div>' +
             '<hr class="hr-small"/>' +

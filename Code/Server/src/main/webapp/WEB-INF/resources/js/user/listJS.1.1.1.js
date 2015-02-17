@@ -5,7 +5,6 @@
      *
      * @param {String} path
      * @return {Object} exports
-     * @api public
      */
 
     function require(path, parent, orig) {
@@ -63,7 +62,6 @@
      *
      * @param {String} path
      * @return {String} path or null
-     * @api private
      */
 
     require.resolve = function(path) {
@@ -90,7 +88,6 @@
      * @param {String} curr
      * @param {String} path
      * @return {String}
-     * @api private
      */
 
     require.normalize = function(curr, path) {
@@ -117,7 +114,6 @@
      *
      * @param {String} path
      * @param {Function} definition
-     * @api private
      */
 
     require.register = function(path, definition) {
@@ -129,7 +125,6 @@
      *
      * @param {String} from
      * @param {String} to
-     * @api private
      */
 
     require.alias = function(from, to) {
@@ -144,7 +139,6 @@
      *
      * @param {String} parent
      * @return {Function}
-     * @api private
      */
 
     require.relative = function(parent) {
@@ -224,7 +218,6 @@
          *
          * @param {Element} el
          * @return {ClassList}
-         * @api public
          */
 
         module.exports = function(el){
@@ -235,7 +228,6 @@
          * Initialize a new ClassList for `el`.
          *
          * @param {Element} el
-         * @api private
          */
 
         function ClassList(el) {
@@ -249,7 +241,6 @@
          *
          * @param {String} name
          * @return {ClassList}
-         * @api public
          */
 
         ClassList.prototype.add = function(name){
@@ -274,7 +265,6 @@
          *
          * @param {String|RegExp} name
          * @return {ClassList}
-         * @api public
          */
 
         ClassList.prototype.remove = function(name){
@@ -301,7 +291,6 @@
          *
          * @param {RegExp} re
          * @return {ClassList}
-         * @api private
          */
 
         ClassList.prototype.removeMatching = function(re){
@@ -323,7 +312,6 @@
          * @param {String} name
          * @param {Boolean} force
          * @return {ClassList}
-         * @api public
          */
 
         ClassList.prototype.toggle = function(name, force){
@@ -361,7 +349,6 @@
          * Return an array of classes.
          *
          * @return {Array}
-         * @api public
          */
 
         ClassList.prototype.array = function(){
@@ -376,7 +363,6 @@
          *
          * @param {String} name
          * @return {ClassList}
-         * @api public
          */
 
         ClassList.prototype.has =
@@ -426,7 +412,6 @@
          * @param {Function} fn
          * @param {Boolean} capture
          * @return {Function}
-         * @api public
          */
 
         exports.bind = function(el, type, fn, capture){
@@ -442,7 +427,6 @@
          * @param {Function} fn
          * @param {Boolean} capture
          * @return {Function}
-         * @api public
          */
 
         exports.unbind = function(el, type, fn, capture){
@@ -457,7 +441,6 @@
          *
          * @param {Array | Mixed} collection An `Array` or array-like object to convert e.g. `arguments` or `NodeList`
          * @return {Array} Naive conversion of `collection` to a new `Array`.
-         * @api public
          */
 
         module.exports = function toArray(collection) {
@@ -495,7 +478,6 @@
          * @param {String} type
          * @param {Function} fn
          * @param {Boolean} capture
-         * @api public
          */
 
         exports.bind = function(el, type, fn, capture){
@@ -512,7 +494,6 @@
          * @param {String} type
          * @param {Function} fn
          * @param {Boolean} capture
-         * @api public
          */
 
         exports.unbind = function(el, type, fn, capture){
@@ -531,8 +512,6 @@
          *
          * @param {String} className
          * @param {Element} container
-         * @param {Boolean} single
-         * @api public
          */
 
         module.exports = (function() {
@@ -585,7 +564,6 @@
          *
          * @param {Element} el
          * @param {String} attr
-         * @api public
          */
 
         module.exports = function(el, attr) {
@@ -685,7 +663,6 @@
          *
          * @param {Mixed} val
          * @return {String}
-         * @api public
          */
 
         module.exports = function(val){
