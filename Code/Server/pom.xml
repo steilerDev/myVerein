@@ -8,7 +8,8 @@
     <name>myVerein_Server</name>
 
     <properties>
-        <server.host>http://it14-myVerein.dhbw-stuttgart.de</server.host>
+        <server.id>myVereinRemoteServer</server.id>
+        <!--server.id>myVereinLocalServer</server.id-->
 
         <java.version>1.8</java.version>
 
@@ -39,6 +40,9 @@
 
         <!-- JavaX servlet -->
         <javax.servlet.version>3.0.1</javax.servlet.version>
+
+        <!-- Maven minify plugin -->
+        <minify.version>1.7.4</minify.version>
     </properties>
 
     <dependencies>
@@ -194,8 +198,7 @@
                 <configuration>
                     <path>/</path>
                     <update>true</update>
-                    <server>myVereinServer</server>
-                    <url>${server.host}/manager/text</url>
+                    <server>${server.id}</server>
                 </configuration>
             </plugin>
             <plugin>
@@ -204,6 +207,138 @@
                     <source>${java.version}</source>
                     <target>${java.version}</target>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>com.samaxes.maven</groupId>
+                <artifactId>minify-maven-plugin</artifactId>
+                <version>${minify.version}</version>
+                <executions>
+
+                    <!-- This execution goal minifies the css and js used by the index and login page-->
+                    <execution>
+                        <id>minify-index</id>
+                        <phase>package</phase><!-- When omitted defaults to 'process-resources' -->
+                        <configuration>
+                            <charset>UTF-8</charset>
+
+                            <cssSourceDir>WEB-INF/resources/css</cssSourceDir>
+                            <cssSourceFiles>
+                                <cssSourceFile>base/magic-bootstrap.1.0.0.css</cssSourceFile>
+                                <cssSourceFile>base/bootstrap-validator.0.5.3.css</cssSourceFile>
+                                <cssSourceFile>base/cbpFWTabs.1.0.0.css</cssSourceFile>
+                                <cssSourceFile>base/datepicker.3.0.css</cssSourceFile>
+                                <cssSourceFile>base/elegant-icons.1.0.0.css</cssSourceFile>
+                                <cssSourceFile>base/jquery-ui.1.11.2.css</cssSourceFile>
+                                <cssSourceFile>base/notificationFx.1.0.0.css</cssSourceFile>
+                                <cssSourceFile>base/selectize-core.0.11.2.css</cssSourceFile>
+                                <cssSourceFile>base/selectize-bootstrap.0.11.2.css</cssSourceFile>
+                                <cssSourceFile>base/uiProgressButtons.1.0.0.css</cssSourceFile>
+                                <cssSourceFile>division/jqtree.1.0.0.css</cssSourceFile>
+                                <cssSourceFile>event/bootstrap-timepicker.0.2.5.css</cssSourceFile>
+                                <cssSourceFile>event/clndr.1.2.7.css</cssSourceFile>
+                                <cssSourceFile>base/_myVerein.base.css</cssSourceFile>
+                                <cssSourceFile>login/_myVerein.login.css</cssSourceFile>
+                            </cssSourceFiles>
+                            <cssFinalFile>myVerein.css</cssFinalFile>
+
+                            <jsSourceDir>WEB-INF/resources/js</jsSourceDir>
+                            <jsSourceFiles>
+                                <jsSourceFile>base/jquery.2.1.1.js</jsSourceFile>
+                                <jsSourceFile>base/jquery-cookie.1.4.1.js</jsSourceFile>
+                                <jsSourceFile>base/jquery-ui.1.11.2.js</jsSourceFile>
+                                <jsSourceFile>base/bootstrap.3.3.1.js</jsSourceFile>
+                                <jsSourceFile>index/moment-with-locales.2.9.0.js</jsSourceFile>
+                                <jsSourceFile>event/underscore.1.7.0.js</jsSourceFile>
+                                <jsSourceFile>base/modernizr.2.8.3.js</jsSourceFile>
+                                <jsSourceFile>base/classie.1.0.1.js</jsSourceFile>
+                                <jsSourceFile>base/bootstrap-datepicker.1.4.0.js</jsSourceFile>
+                                <jsSourceFile>internationalization/bootstrap-datepicker-locales/bootstrap-datepicker.de.js</jsSourceFile>
+                                <jsSourceFile>base/bootstrap-validator.0.5.3.js</jsSourceFile>
+                                <jsSourceFile>base/cbpFWTabs.1.0.0.js</jsSourceFile>
+                                <jsSourceFile>base/notificationFx.1.0.0.js</jsSourceFile>
+                                <jsSourceFile>base/selectize.0.12.0.js</jsSourceFile>
+                                <jsSourceFile>base/uiProgressButtons.1.0.0.js</jsSourceFile>
+                                <jsSourceFile>division/jqTree.1.0.0.js</jsSourceFile>
+                                <jsSourceFile>event/bootstrap-timepicker.0.2.5.js</jsSourceFile>
+                                <jsSourceFile>event/clndr.1.2.7.js</jsSourceFile>
+                                <jsSourceFile>event/gmaps.0.4.16.js</jsSourceFile>
+                                <jsSourceFile>user/listJS.1.1.1.js</jsSourceFile>
+                                <jsSourceFile>user/listJS-fuzzysearch.0.1.0.js</jsSourceFile>
+                                <jsSourceFile>index/_myVerein.index.js</jsSourceFile>
+                                <jsSourceFile>internationalization/_myVerein.internationalization.js</jsSourceFile>
+                                <jsSourceFile>base/_myVerein.base.js</jsSourceFile>
+                                <jsSourceFile>user/_myVerein.user.js</jsSourceFile>
+                                <jsSourceFile>settings/_myVerein.settings.js</jsSourceFile>
+                                <jsSourceFile>event/_myVerein.event.js</jsSourceFile>
+                                <jsSourceFile>division/_myVerein.division.js</jsSourceFile>
+                            </jsSourceFiles>
+                            <jsFinalFile>myVerein.js</jsFinalFile>
+                            <jsEngine>CLOSURE</jsEngine>
+                            <closureLanguage>ECMASCRIPT5</closureLanguage>
+                        </configuration>
+                        <goals>
+                            <goal>minify</goal>
+                        </goals>
+                    </execution>
+
+                    <!-- This execution goal minifies the css used by the error page-->
+                    <execution>
+                        <id>minify-error</id>
+                        <phase>package</phase><!-- When omitted defaults to 'process-resources' -->
+                        <configuration>
+                            <charset>UTF-8</charset>
+
+                            <cssSourceDir>WEB-INF/resources/css</cssSourceDir>
+                            <cssSourceFiles>
+                                <cssSourceFile>base/magic-bootstrap.1.0.0.css</cssSourceFile>
+                                <cssSourceFile>base/elegant-icons.1.0.0.css</cssSourceFile>
+                                <cssSourceFile>base/_myVerein.base.css</cssSourceFile>
+                            </cssSourceFiles>
+                            <cssFinalFile>myVerein.error.css</cssFinalFile>
+
+                        </configuration>
+                        <goals>
+                            <goal>minify</goal>
+                        </goals>
+                    </execution>
+
+                    <!-- This execution goal minifies the css and js used by the init page-->
+                    <execution>
+                        <id>minify-init</id>
+                        <phase>package</phase><!-- When omitted defaults to 'process-resources' -->
+                        <configuration>
+                            <charset>UTF-8</charset>
+
+                            <cssSourceDir>WEB-INF/resources/css</cssSourceDir>
+                            <cssSourceFiles>
+                                <cssSourceFile>base/magic-bootstrap.1.0.0.css</cssSourceFile>
+                                <cssSourceFile>base/elegant-icons.1.0.0.css</cssSourceFile>
+                                <cssSourceFile>base/notificationFx.1.0.0.css</cssSourceFile>
+                                <cssSourceFile>base/uiProgressButtons.1.0.0.css</cssSourceFile>
+                                <cssSourceFile>base/_myVerein.base.css</cssSourceFile>
+                                <cssSourceFile>init/_myVerein.init.css</cssSourceFile>
+                            </cssSourceFiles>
+                            <cssFinalFile>myVerein.init.css</cssFinalFile>
+
+                            <jsSourceDir>WEB-INF/resources/js</jsSourceDir>
+                            <jsSourceFiles>
+                                <jsSourceFile>base/jquery.2.1.1.js</jsSourceFile>
+                                <jsSourceFile>base/bootstrap.3.3.1.js</jsSourceFile>
+                                <jsSourceFile>base/classie.1.0.1.js</jsSourceFile>
+                                <jsSourceFile>base/notificationFx.1.0.0.js</jsSourceFile>
+                                <jsSourceFile>base/uiProgressButtons.1.0.0.js</jsSourceFile>
+                                <jsSourceFile>base/_myVerein.base.js</jsSourceFile>
+                                <jsSourceFile>init/_myVerein.init.js</jsSourceFile>
+                            </jsSourceFiles>
+                            <jsFinalFile>myVerein.init.js</jsFinalFile>
+                            <jsEngine>CLOSURE</jsEngine>
+                            <closureLanguage>ECMASCRIPT5</closureLanguage>
+                        </configuration>
+                        <goals>
+                            <goal>minify</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

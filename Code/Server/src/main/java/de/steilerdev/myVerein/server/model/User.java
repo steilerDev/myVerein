@@ -64,6 +64,8 @@ public class User implements UserDetails
     private String lastName;
 
     @Id
+    private String id;
+
     @Indexed
     @NotBlank
     @Email
@@ -153,6 +155,16 @@ public class User implements UserDetails
         this.customUserField = customUserField;
         setPassword(password);
         updateMembershipStatus();
+    }
+
+    public String getId()
+    {
+        return id;
+    }
+
+    public void setId(String id)
+    {
+        this.id = id;
     }
 
     public String getFirstName()
@@ -782,12 +794,12 @@ public class User implements UserDetails
     @Override
     public boolean equals(Object obj)
     {
-        return obj != null && obj instanceof User && this.email != null && this.email.equals(((User) obj).getEmail());
+        return obj != null && obj instanceof User && this.id != null && this.id.equals(((User) obj).getId());
     }
 
     @Override
     public int hashCode()
     {
-        return email == null? 0: email.hashCode();
+        return id == null? 0: id.hashCode();
     }
 }

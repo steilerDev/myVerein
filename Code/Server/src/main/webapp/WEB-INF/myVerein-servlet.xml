@@ -20,7 +20,7 @@
        <!-- Thymeleaf (Template engine, JSP replacement) configuration -->
        <import resource="configuration/thymeleaf-config.xml" />
 
-       <!-- Internationalization configuration, defining MessageSource etc. -->
+       <!-- Internationalization configuration, defining MessageSource etc -->
        <import resource="configuration/internationalization-config.xml" />
 
        <!-- Content negotiation (Serving JSON instead of html, when JSON is requested) -->
@@ -28,5 +28,13 @@
 
         <!-- Java Spring Security configuration -->
         <import resource="configuration/security-config.xml" />
+
+        <bean class="org.springframework.web.context.support.ServletContextAttributeExporter">
+            <property name="attributes">
+                <map>
+                    <entry key="developmentMode" value="true" />
+                </map>
+            </property>
+        </bean>
 
 </beans>

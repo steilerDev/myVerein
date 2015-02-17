@@ -13,7 +13,7 @@ var settingsSubmitButton,
     previousCreatedCustomUserFields;
 
 function disableSettings() {
-    //Disable the complete form
+    //Disable the complete formllll
     settingsFormBootstrapValidator.find('input').prop("disabled", true);
     $('#clubLogoButton').addClass('btn-disabled');
     currentAdminSelectize[0].selectize.disable();
@@ -73,17 +73,16 @@ function addCustomUserFieldSettings(name){
     if(!(~$.inArray(name, previousCreatedCustomUserFields)) && name) {
         previousCreatedCustomUserFields.push(name);
 
-        //Todo: Internationalize
         var newCustomUserField = '<div class="customUserField">' +
             '<input name="cuf_' + name + '" value="' + name + '" class="form-control" type="text"  />' +
             '<div class="checkbox">' +
             '<label>' +
-            '<input type="checkbox" name="delete' + name + '" class="delete"> Delete custom field (' + name + ')</input>' +
+            '<input type="checkbox" name="delete' + name + '" class="delete"> ' + getLocalizedString("deleteCustomField") + ' (' + name + ')</input>' +
             '</label>' +
             '</div>' +
             '<div class="checkbox">' +
             '<label>' +
-            '<input type="checkbox" name="deleteContent' + name + '" class="deleteContent" disabled="disabled"> Also delete content of field (' + name + ') within user profiles</input>' +
+            '<input type="checkbox" name="deleteContent' + name + '" class="deleteContent" disabled="disabled"> ' + getLocalizedString("deleteCustomFieldContent") + ' (' + name + ') within user profiles</input>' +
             '</label>' +
             '</div>' +
             '<hr class="hr-small"/>' +

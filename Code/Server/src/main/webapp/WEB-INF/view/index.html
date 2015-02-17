@@ -29,28 +29,59 @@
         <meta name="msapplication-config" content="/resources/icon/browserconfig.xml"/>
         <meta name="theme-color" content="#ffffff"/>
 
-		<link th:href="@{/resources/css/tabs.css}" href="../resources/css/tabs.css" rel="stylesheet" type="text/css" />
-		<link th:href="@{/resources/css/jquery-ui.min.css}" href="../resources/css/jquery-ui.min.css" rel="stylesheet" type="text/css" />
-		<link th:href="@{/resources/css/magic-bootstrap.css}" href="../resources/css/magic-bootstrap.css" rel="stylesheet" type="text/css" />
-		<link th:href="@{/resources/css/button.css}" href="../resources/css/button.css" rel="stylesheet" type="text/css" />
-		<link th:href="@{/resources/css/myVerein.css}" href="../resources/css/myVerein.css" rel="stylesheet" type="text/css" />
-		<link th:href="@{/resources/css/jqtree.css}" href="../resources/css/jqtree.css" rel="stylesheet" type="text/css" />
-		<link th:href="@{/resources/css/selectize-core.css}" href="../resources/css/selectize-core.css" rel="stylesheet" type="text/css" />
-		<link th:href="@{/resources/css/selectize-bootstrap.css}" href="../resources/css/selectize-bootstrap.css" rel="stylesheet" type="text/css" />
-		<link th:href="@{/resources/css/notification.css}" href="../resources/css/notification.css" rel="stylesheet" type="text/css" />
-		<link th:href="@{/resources/css/icons.css}" href="../resources/css/icons.css" rel="stylesheet" type="text/css" />
-		<link th:href="@{/resources/css/bootstrap-validator.css}" href="../resources/css/bootstrap-validator.css" rel="stylesheet" type="text/css" />
-		<link th:href="@{/resources/css/datepicker3.css}" href="../resources/css/datepicker3.css" rel="stylesheet" type="text/css" />
-		<link th:href="@{/resources/css/clndr.css}" href="../resources/css/clndr.css" rel="stylesheet" type="text/css" />
-		<link th:href="@{/resources/css/bootstrap-timepicker.css}" href="../resources/css/bootstrap-timepicker.css" rel="stylesheet" type="text/css" />
+        <script th:src="@{http://maps.google.com/maps/api/js?sensor=true}" src="http://maps.google.com/maps/api/js?sensor=true" type="application/javascript" />
 
-		<script th:src="@{/resources/js/myVerein.base.js}" src="../resources/js/myVerein.base.js" type="application/javascript" />
-		<script th:src="@{/resources/js/myVerein.division.js}" src="../resources/js/myVerein.division.js" type="application/javascript" />
-		<script th:src="@{/resources/js/myVerein.user.js}" src="../resources/js/myVerein.user.js" type="application/javascript" />
-		<script th:src="@{/resources/js/myVerein.index.js}" src="../resources/js/myVerein.index.js" type="application/javascript" />
-		<script th:src="@{http://maps.google.com/maps/api/js?sensor=true}" src="http://maps.google.com/maps/api/js?sensor=true" type="application/javascript" />
-		<script th:src="@{/resources/js/myVerein.event.js}" src="../resources/js/myVerein.event.js" type="application/javascript" />
-        <script th:src="@{/resources/js/myVerein.settings.js}" src="../resources/js/myVerein.settings.js" type="application/javascript" />
+        <th:block th:if="${application.developmentMode}">
+            <link th:href="@{/resources/css/base/magic-bootstrap.1.0.0.css}" href="../resources/css/base/magic-bootstrap.1.0.0.css" rel="stylesheet" type="text/css" />
+            <link th:href="@{/resources/css/base/bootstrap-validator.0.5.3.css}" href="../resources/css/base/bootstrap-validator.0.5.3.css" rel="stylesheet" type="text/css" />
+            <link th:href="@{/resources/css/base/cbpFWTabs.1.0.0.css}" href="../resources/css/base/cbpFWTabs.1.0.0.css" rel="stylesheet" type="text/css" />
+            <link th:href="@{/resources/css/base/datepicker.3.0.css}" href="../resources/css/base/datepicker.3.0.css" rel="stylesheet" type="text/css" />
+            <link th:href="@{/resources/css/base/elegant-icons.1.0.0.css}" href="../resources/css/base/elegant-icons.1.0.0.css" rel="stylesheet" type="text/css" />
+            <link th:href="@{/resources/css/base/jquery-ui.1.11.2.css}" href="../resources/css/base/jquery-ui.1.11.2.css" rel="stylesheet" type="text/css" />
+            <link th:href="@{/resources/css/base/notificationFx.1.0.0.css}" href="../resources/css/base/notificationFx.1.0.0.css" rel="stylesheet" type="text/css" />
+            <link th:href="@{/resources/css/base/selectize-core.0.11.2.css}" href="../resources/css/base/selectize-core.0.11.2.css" rel="stylesheet" type="text/css" />
+            <link th:href="@{/resources/css/base/selectize-bootstrap.0.11.2.css}" href="../resources/css/base/selectize-bootstrap.0.11.2.css" rel="stylesheet" type="text/css" />
+            <link th:href="@{/resources/css/base/uiProgressButtons.1.0.0.css}" href="../resources/css/base/uiProgressButtons.1.0.0.css" rel="stylesheet" type="text/css" />
+            <link th:href="@{/resources/css/division/jqtree.1.0.0.css}" href="../resources/css/division/jqtree.1.0.0.css" rel="stylesheet" type="text/css" />
+            <link th:href="@{/resources/css/event/bootstrap-timepicker.0.2.5.css}" href="../resources/css/event/bootstrap-timepicker.0.2.5.css" rel="stylesheet" type="text/css" />
+            <link th:href="@{/resources/css/event/clndr.1.2.7.css}" href="../resources/css/event/clndr.1.2.7.css" rel="stylesheet" type="text/css" />
+            <link th:href="@{/resources/css/base/_myVerein.base.css}" href="../resources/css/base/_myVerein.base.css" rel="stylesheet" type="text/css" />
+            <link th:href="@{/resources/css/login/_myVerein.login.css}" href="../resources/css/login/_myVerein.login.css" rel="stylesheet" type="text/css" />
+
+            <script th:src="@{/resources/js/base/jquery.2.1.1.js}" src="../resources/js/base/jquery.2.1.1.js" type="application/javascript" />
+            <script th:src="@{/resources/js/base/jquery-cookie.1.4.1.js}" src="../resources/js/base/jquery-cookie.1.4.1.js" type="application/javascript" />
+            <script th:src="@{/resources/js/base/jquery-ui.1.11.2.js}" src="../resources/js/base/jquery-ui.1.11.2.js" type="application/javascript" />
+            <script th:src="@{/resources/js/base/bootstrap.3.3.1.js}" src="../resources/js/base/bootstrap.3.3.1.js" type="application/javascript" />
+            <script th:src="@{/resources/js/index/moment-with-locales.2.9.0.js}" src="../resources/js/index/moment-with-locales.2.9.0.js" type="application/javascript" />
+            <script th:src="@{/resources/js/event/underscore.1.7.0.js}" src="../resources/js/event/underscore.1.7.0.js" type="application/javascript" />
+            <script th:src="@{/resources/js/base/modernizr.2.8.3.js}" src="../resources/js/base/modernizr.2.8.3.js" type="application/javascript" />
+            <script th:src="@{/resources/js/base/classie.1.0.1.js}" src="../resources/js/base/classie.1.0.1.js" type="application/javascript" />
+            <script th:src="@{/resources/js/base/bootstrap-datepicker.1.4.0.js}" src="../resources/js/base/bootstrap-datepicker.1.4.0.js" type="application/javascript" />
+            <script th:src="@{/resources/js/internationalization/bootstrap-datepicker-locales/bootstrap-datepicker.de.js}" src="../resources/js/internationalization/bootstrap-datepicker-locales/bootstrap-datepicker.de.js" type="application/javascript" />
+            <script th:src="@{/resources/js/base/bootstrap-validator.0.5.3.js}" src="../resources/js/base/bootstrap-validator.0.5.3.js" type="application/javascript" />
+            <script th:src="@{/resources/js/base/cbpFWTabs.1.0.0.js}" src="../resources/js/base/cbpFWTabs.1.0.0.js" type="application/javascript" />
+            <script th:src="@{/resources/js/base/notificationFx.1.0.0.js}" src="../resources/js/base/notificationFX.1.0.0.js" type="application/javascript" />
+            <script th:src="@{/resources/js/base/selectize.0.12.0.js}" src="../resources/js/base/selectize.0.12.0.js" type="application/javascript" />
+            <script th:src="@{/resources/js/base/uiProgressButtons.1.0.0.js}" src="../resources/js/base/uiProgressButtons.1.0.0.js" type="application/javascript" />
+            <script th:src="@{/resources/js/division/jqTree.1.0.0.js}" src="../resources/js/division/jqTree.1.0.0.js" type="application/javascript" />
+            <script th:src="@{/resources/js/event/bootstrap-timepicker.0.2.5.js}" src="../resources/js/event/bootstrap-timepicker.0.2.5.js" type="application/javascript" />
+            <script th:src="@{/resources/js/event/clndr.1.2.7.js}" src="../resources/js/event/clndr.1.2.7.js" type="application/javascript" />
+            <script th:src="@{/resources/js/event/gmaps.0.4.16.js}" src="../resources/js/event/gmaps.0.4.16.js" type="application/javascript" />
+            <script th:src="@{/resources/js/user/listJS.1.1.1.js}" src="../resources/js/user/listJS.1.1.1.js" type="application/javascript" />
+            <script th:src="@{/resources/js/user/listJS-fuzzysearch.0.1.0.js}" src="../resources/js/user/listJS-fuzzysearch.0.1.0.js" type="application/javascript" />
+            <script th:src="@{/resources/js/index/_myVerein.index.js}" src="../resources/js/index/_myVerein.index.js" type="application/javascript" />
+            <script th:src="@{/resources/js/internationalization/_myVerein.internationalization.js}" src="../resources/js/internationalization/_myVerein.internationalization.js" type="application/javascript" />
+            <script th:src="@{/resources/js/base/_myVerein.base.js}" src="../resources/js/base/_myVerein.base.js" type="application/javascript" />
+            <script th:src="@{/resources/js/user/_myVerein.user.js}" src="../resources/js/user/_myVerein.user.js" type="application/javascript" />
+            <script th:src="@{/resources/js/settings/_myVerein.settings.js}" src="../resources/js/settings/_myVerein.settings.js" type="application/javascript" />
+            <script th:src="@{/resources/js/event/_myVerein.event.js}" src="../resources/js/event/_myVerein.event.js" type="application/javascript" />
+            <script th:src="@{/resources/js/division/_myVerein.division.js}" src="../resources/js/division/_myVerein.division.js" type="application/javascript" />
+        </th:block>
+        <th:block th:unless="${application.developmentMode}">
+            <link th:href="@{/resources/css/myVerein.min.css}" href="../resources/css/myVerein.init.min.css" rel="stylesheet" type="text/css" />
+
+            <script th:src="@{/resources/js/myVerein.min.js}" src="../resources/js/myVerein.init.min.js" type="application/javascript" />
+        </th:block>
 
 	</head>
 

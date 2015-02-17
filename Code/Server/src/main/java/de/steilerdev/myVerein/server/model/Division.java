@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 
 import java.util.ArrayList;
@@ -35,6 +36,9 @@ import java.util.stream.Collectors;
 public class Division
 {
     @Id
+    private String id;
+
+    @Indexed
     @NotBlank
     private String name;
 
@@ -76,6 +80,15 @@ public class Division
         this.setParent(parent);
     }
 
+    public String getId()
+    {
+        return id;
+    }
+
+    public void setId(String id)
+    {
+        this.id = id;
+    }
 
     public String getName()
     {
@@ -170,12 +183,12 @@ public class Division
     @Override
     public boolean equals(Object obj)
     {
-        return obj != null && obj instanceof Division && this.name != null && this.name.equals(((Division) obj).getName());
+        return obj != null && obj instanceof Division && this.id != null && this.id.equals(((Division) obj).getId());
     }
 
     @Override
     public int hashCode()
     {
-        return name == null? 0: name.hashCode();
+        return id == null? 0: id.hashCode();
     }
 }

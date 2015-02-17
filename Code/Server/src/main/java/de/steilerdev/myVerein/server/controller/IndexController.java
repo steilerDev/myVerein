@@ -248,7 +248,7 @@ public class IndexController
     }
 
     /**
-     * This funciton is resetting the complete database.
+     * This function is resetting the complete database.
      */
     private void resetDatabase()
     {
@@ -256,7 +256,8 @@ public class IndexController
             try
             {
                 logger.debug("Trying to drop the current collection.");
-                mongoTemplate.getDb().getCollection(settingsRepository.getDatabaseName()).drop();
+                mongoTemplate.getDb().dropDatabase();
+                logger.debug("Successfully dropped current collection");
             } catch (MongoTimeoutException e)
             {
                 logger.debug("Unable to drop database, because the database is not available.");

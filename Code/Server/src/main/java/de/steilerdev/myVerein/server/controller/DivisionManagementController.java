@@ -59,7 +59,7 @@ public class DivisionManagementController
     private static final String newDivisionName = "New division";
 
     /**
-     * This function is saving changes on an exisiting division. If the division needs to be created see {@link createDivision()}. This function is invoked by POSTing the parameters to the URI /division.
+     * This function is saving changes on an exisiting division. If the division needs to be created see {@link createDivision}. This function is invoked by POSTing the parameters to the URI /division.
      * @param name The new name of the division.
      * @param oldName The old name of the division (might be equal to new name)
      * @param description The description of the division (may be empty)
@@ -498,6 +498,7 @@ public class DivisionManagementController
     {
         private String label;
 
+
         @JsonInclude(JsonInclude.Include.NON_NULL)
         private List<TreeNode> children;
 
@@ -510,7 +511,7 @@ public class DivisionManagementController
         {
             if(this.children == null)
             {
-                this.children = new ArrayList<TreeNode>();
+                this.children = new ArrayList<>();
             }
             this.children.add(children);
         }
@@ -524,6 +525,7 @@ public class DivisionManagementController
         {
             this.label = label;
         }
+
 
         public List<TreeNode> getChildren()
         {

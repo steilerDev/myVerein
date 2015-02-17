@@ -28,21 +28,26 @@
         <meta name="msapplication-config" content="/resources/icon/browserconfig.xml"/>
         <meta name="theme-color" content="#ffffff"/>
 
-        <link th:href="@{/resources/css/tabs.css}" href="../resources/css/tabs.css" rel="stylesheet" type="text/css" />
-        <link th:href="@{/resources/css/jquery-ui.min.css}" href="../resources/css/jquery-ui.min.css" rel="stylesheet" type="text/css" />
-        <link th:href="@{/resources/css/magic-bootstrap.css}" href="../resources/css/magic-bootstrap.css" rel="stylesheet" type="text/css" />
-        <link th:href="@{/resources/css/button.css}" href="../resources/css/button.css" rel="stylesheet" type="text/css" />
-        <link th:href="@{/resources/css/myVerein.css}" href="../resources/css/myVerein.css" rel="stylesheet" type="text/css" />
-        <link th:href="@{/resources/css/jqtree.css}" href="../resources/css/jqtree.css" rel="stylesheet" type="text/css" />
-        <link th:href="@{/resources/css/selectize-core.css}" href="../resources/css/selectize-core.css" rel="stylesheet" type="text/css" />
-        <link th:href="@{/resources/css/selectize-bootstrap.css}" href="../resources/css/selectize-bootstrap.css" rel="stylesheet" type="text/css" />
-        <link th:href="@{/resources/css/notification.css}" href="../resources/css/notification.css" rel="stylesheet" type="text/css" />
-        <link th:href="@{/resources/css/icons.css}" href="../resources/css/icons.css" rel="stylesheet" type="text/css" />
-        <link th:href="@{/resources/css/bootstrap-validator.css}" href="../resources/css/bootstrap-validator.css" rel="stylesheet" type="text/css" />
-        <link th:href="@{/resources/css/datepicker3.css}" href="../resources/css/datepicker3.css" rel="stylesheet" type="text/css" />
-        <link th:href="@{/resources/css/clndr.css}" href="../resources/css/clndr.css" rel="stylesheet" type="text/css" />
-        <link th:href="@{/resources/css/bootstrap-timepicker.css}" href="../resources/css/bootstrap-timepicker.css" rel="stylesheet" type="text/css" />
-        <link th:href="@{/resources/css/login.css}" href="../resources/css/login.css" rel="stylesheet" type="text/css" />
+        <th:block th:if="${application.developmentMode}">
+            <link th:href="@{/resources/css/base/magic-bootstrap.1.0.0.css}" href="../resources/css/base/magic-bootstrap.1.0.0.css" rel="stylesheet" type="text/css" />
+            <link th:href="@{/resources/css/base/bootstrap-validator.0.5.3.css}" href="../resources/css/base/bootstrap-validator.0.5.3.css" rel="stylesheet" type="text/css" />
+            <link th:href="@{/resources/css/base/cbpFWTabs.1.0.0.css}" href="../resources/css/base/cbpFWTabs.1.0.0.css" rel="stylesheet" type="text/css" />
+            <link th:href="@{/resources/css/base/datepicker.3.0.css}" href="../resources/css/base/datepicker.3.0.css" rel="stylesheet" type="text/css" />
+            <link th:href="@{/resources/css/base/elegant-icons.1.0.0.css}" href="../resources/css/base/elegant-icons.1.0.0.css" rel="stylesheet" type="text/css" />
+            <link th:href="@{/resources/css/base/jquery-ui.1.11.2.css}" href="../resources/css/base/jquery-ui.1.11.2.css" rel="stylesheet" type="text/css" />
+            <link th:href="@{/resources/css/base/notificationFx.1.0.0.css}" href="../resources/css/base/notificationFx.1.0.0.css" rel="stylesheet" type="text/css" />
+            <link th:href="@{/resources/css/base/selectize-core.0.11.2.css}" href="../resources/css/base/selectize-core.0.11.2.css" rel="stylesheet" type="text/css" />
+            <link th:href="@{/resources/css/base/selectize-bootstrap.0.11.2.css}" href="../resources/css/base/selectize-bootstrap.0.11.2.css" rel="stylesheet" type="text/css" />
+            <link th:href="@{/resources/css/base/uiProgressButtons.1.0.0.css}" href="../resources/css/base/uiProgressButtons.1.0.0.css" rel="stylesheet" type="text/css" />
+            <link th:href="@{/resources/css/division/jqtree.1.0.0.css}" href="../resources/css/division/jqtree.1.0.0.css" rel="stylesheet" type="text/css" />
+            <link th:href="@{/resources/css/event/bootstrap-timepicker.0.2.5.css}" href="../resources/css/event/bootstrap-timepicker.0.2.5.css" rel="stylesheet" type="text/css" />
+            <link th:href="@{/resources/css/event/clndr.1.2.7.css}" href="../resources/css/event/clndr.1.2.7.css" rel="stylesheet" type="text/css" />
+            <link th:href="@{/resources/css/base/_myVerein.base.css}" href="../resources/css/base/_myVerein.base.css" rel="stylesheet" type="text/css" />
+            <link th:href="@{/resources/css/login/_myVerein.login.css}" href="../resources/css/login/_myVerein.login.css" rel="stylesheet" type="text/css" />
+        </th:block>
+        <th:block th:unless="${application.developmentMode}">
+            <link th:href="@{/resources/css/myVerein.min.css}" href="../resources/css/myVerein.init.min.css" rel="stylesheet" type="text/css" />
+        </th:block>
 
     </head>
     <body>

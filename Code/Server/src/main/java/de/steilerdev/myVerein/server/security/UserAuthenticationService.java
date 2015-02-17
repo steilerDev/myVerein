@@ -16,6 +16,7 @@
  */
 package de.steilerdev.myVerein.server.security;
 
+import de.steilerdev.myVerein.server.model.Division;
 import de.steilerdev.myVerein.server.model.DivisionRepository;
 import de.steilerdev.myVerein.server.model.User;
 import de.steilerdev.myVerein.server.model.UserRepository;
@@ -29,6 +30,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class is implementing Spring's UserDetailsService to support the {@link de.steilerdev.myVerein.server.model.User User} object as authentication principal.
@@ -101,19 +103,20 @@ public class UserAuthenticationService implements UserDetailsService
     {
         logger.trace("Checking user' granted authorities");
         ArrayList<GrantedAuthority> authorities = new ArrayList<>();
-        if(user.isAdmin())
+        List<Division> administratedDiv = divisionRepository.findByAdminUser(user);
+        if(administratedDiv.isEmpty())
+        {
+            logger.debug("Authenticated user is " + AuthorityRoles.USER.toString());
+            authorities.add(new SimpleGrantedAuthority(AuthorityRoles.USER.toString()));
+        } else
         {
             logger.debug("Authenticated user is " + AuthorityRoles.ADMIN.toString());
             authorities.add(new SimpleGrantedAuthority(AuthorityRoles.ADMIN.toString()));
-            if(user.isSuperAdmin())
+            if(administratedDiv.stream().anyMatch(div -> div.getParent() == null))
             {
                 logger.debug("Authenticated user is " + AuthorityRoles.SUPERADMIN.toString());
                 authorities.add(new SimpleGrantedAuthority(AuthorityRoles.SUPERADMIN.toString()));
             }
-        } else
-        {
-            logger.debug("Authenticated user is " + AuthorityRoles.USER.toString());
-            authorities.add(new SimpleGrantedAuthority(AuthorityRoles.USER.toString()));
         }
         return authorities;
     }

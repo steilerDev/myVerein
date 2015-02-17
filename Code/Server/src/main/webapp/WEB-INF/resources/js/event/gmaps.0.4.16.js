@@ -11,7 +11,7 @@
 }(this, function() {
 
 /*!
- * GMaps.js v0.4.16
+ * GMaps.js v0.4.16, Adjustments by Frank Steiler (c) 2015
  * http://hpneo.github.com/gmaps/
  *
  * Copyright 2014, Gustavo Leon

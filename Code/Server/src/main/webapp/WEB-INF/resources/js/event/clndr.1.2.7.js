@@ -447,7 +447,6 @@
 
   Clndr.prototype.render = function() {
     // get rid of the previous set of calendar parts.
-    // TODO: figure out if this is the right way to ensure proper garbage collection?
     this.calendarContainer.children().remove();
     // get an array of days and blank spaces
     var days = this.createDaysObject(this.month);
@@ -612,7 +611,7 @@
   }
 
   // the click handlers in bindEvents need a context, so these are wrappers
-  // to the actual functions. Todo: better way to handle this?
+  // to the actual functions.
   Clndr.prototype.forwardAction = function(event) {
     var self = event.data.context;
     self.forwardActionWithContext(self);
