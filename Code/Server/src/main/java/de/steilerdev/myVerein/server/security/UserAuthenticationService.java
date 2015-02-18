@@ -103,21 +103,17 @@ public class UserAuthenticationService implements UserDetailsService
     {
         logger.trace("Checking user' granted authorities");
         ArrayList<GrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(new SimpleGrantedAuthority(AuthorityRoles.USER.toString()));
         List<Division> administratedDiv = divisionRepository.findByAdminUser(user);
-        if(administratedDiv.isEmpty())
+        if(!administratedDiv.isEmpty())
         {
-            logger.debug("Authenticated user is " + AuthorityRoles.USER.toString());
-            authorities.add(new SimpleGrantedAuthority(AuthorityRoles.USER.toString()));
-        } else
-        {
-            logger.debug("Authenticated user is " + AuthorityRoles.ADMIN.toString());
             authorities.add(new SimpleGrantedAuthority(AuthorityRoles.ADMIN.toString()));
             if(administratedDiv.stream().anyMatch(div -> div.getParent() == null))
             {
-                logger.debug("Authenticated user is " + AuthorityRoles.SUPERADMIN.toString());
                 authorities.add(new SimpleGrantedAuthority(AuthorityRoles.SUPERADMIN.toString()));
             }
         }
+        logger.info("User " + user.getEmail() + " is " + authorities);
         return authorities;
     }
 }

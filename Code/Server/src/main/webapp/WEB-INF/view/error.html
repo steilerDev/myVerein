@@ -39,13 +39,17 @@
 
 </head>
 <body>
-    <div class="errorBox">
-        <div class="alert alert-danger">
-            <h2 th:if="${param.pageNotFound != null}">404 - Page not found</h2>
-            <h2 th:unless="${param.pageNotFound != null}">An internal error occurred</h2>
-            <span th:if="${param.noDB != null}">Unable to access database, consult your system administrator</span>
-            <span th:if="${param.pageNotFound != null}">The requested resource is not available</span>
-            <span th:unless="${param.noDB != null || param.pageNotFound != null}">The error occurred unexpected, please <a href="/">try again</a> and consult your system administrator if the error persists</span>
+    <div class="container">
+        <div class="col-sm-8 col-sm-offset-2">
+            <div class="errorBox verticalCentered">
+                <div class="alert alert-danger">
+                    <h2 th:if="${param.pageNotFound != null}">404 - Page not found</h2>
+                    <h2 th:unless="${param.pageNotFound != null}">An internal error occurred</h2>
+                    <span th:if="${param.noDB != null}">Unable to access database, consult your system administrator</span>
+                    <span th:if="${param.pageNotFound != null}">The requested resource is not available</span>
+                    <span th:unless="${param.noDB != null || param.pageNotFound != null}">The error occurred unexpected, please <a href="/">try again</a> and consult your system administrator if the error persists</span>
+                </div>
+            </div>
         </div>
     </div>
 </body>

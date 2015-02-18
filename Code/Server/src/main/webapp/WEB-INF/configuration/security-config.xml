@@ -7,8 +7,32 @@
                                    http://www.springframework.org/schema/security
                                    http://www.springframework.org/schema/security/spring-security.xsd">
 
-       <!-- Defining pages that are secured through Spring security -->
-       <http auto-config="false"  use-expressions="true" access-denied-page="/login?accessdenied">
+        <!-- REST API specially secured -->
+        <http auto-config="false" use-expressions="true" pattern="/rest/**" entry-point-ref="restAuthenticationEntryPoint">
+            <intercept-url pattern="/rest/login" access="permitAll" />
+            <intercept-url pattern="/rest/logout" access="permitAll" />
+            <intercept-url pattern="/rest/**" access="hasRole('ROLE_USER')"/>
+
+            <form-login authentication-success-handler-ref="restSuccessHandler"
+                        authentication-failure-handler-ref="restFailureHandler"
+                        username-parameter="username"
+                        password-parameter="password"
+                        login-processing-url="/rest/login"/>
+
+            <remember-me services-ref="rememberMeServices" />
+
+            <logout logout-url="/rest/logout" />
+        </http>
+
+        <beans:bean id="restSuccessHandler"
+                    class="de.steilerdev.myVerein.server.security.rest.RestAuthenticationSuccessHandler"/>
+        <beans:bean id="restFailureHandler"
+                    class="org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler"/>
+        <beans:bean id="restAuthenticationEntryPoint"
+                    class="de.steilerdev.myVerein.server.security.rest.RestAuthenticationEntryPoint"/>
+
+        <!-- Web pages secured through the standard implementation of spring security -->
+        <http auto-config="false"  use-expressions="true" access-denied-page="/login?accessdenied">
             <intercept-url pattern="/login" access="permitAll" />
             <intercept-url pattern="/logout" access="permitAll" />
             <intercept-url pattern="/error" access="permitAll" />
@@ -29,7 +53,7 @@
                     delete-cookies="myVereinSessionCookie" />
 
             <remember-me services-ref="rememberMeServices" />
-       </http>
+        </http>
 
         <!-- Remember me configuration -->
         <beans:bean id="rememberMeServices" class="org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices">
@@ -43,30 +67,33 @@
             <!-- Todo: enable secure cookie -->
             <!--beans:property name="useSecureCookie" value="true" /-->
         </beans:bean>
-
+        <!-- Permanently storing remember me tokens within the database -->
         <beans:bean id="tokenDataProvider" class="de.steilerdev.myVerein.server.security.RememberMeTokenDataProvider" />
 
         <!-- Authentication configuration -->
-       <authentication-manager>
+        <authentication-manager>
               <!--  Plain text authentication without database as a fall back solution if a password got lost, or the system compromised -->
               <authentication-provider>
                      <user-service properties="classpath:myVereinUser.properties" />
               </authentication-provider>
+              <!-- Authentication against database -->
               <authentication-provider user-service-ref="userAuthenticationService">
                      <password-encoder ref="passwordEncoder">
                             <salt-source user-property="salt" />
                      </password-encoder>
               </authentication-provider>
               <authentication-provider ref="rememberMeAuthenticationService"/>
-       </authentication-manager>
+        </authentication-manager>
 
         <!-- Password encoder with SHA-512 hashing method and 1000 iterations using 8byte salting -->
-       <beans:bean id="passwordEncoder" class="de.steilerdev.myVerein.server.security.PasswordEncoder" />
+        <beans:bean id="passwordEncoder"
+                    class="de.steilerdev.myVerein.server.security.PasswordEncoder" />
 
-       <beans:bean id="userAuthenticationService" class="de.steilerdev.myVerein.server.security.UserAuthenticationService" />
+        <beans:bean id="userAuthenticationService"
+                    class="de.steilerdev.myVerein.server.security.UserAuthenticationService" />
 
-        <beans:bean id="rememberMeAuthenticationService" class="org.springframework.security.authentication.RememberMeAuthenticationProvider">
+        <beans:bean id="rememberMeAuthenticationService"
+                    class="org.springframework.security.authentication.RememberMeAuthenticationProvider">
             <beans:constructor-arg value="${rememberMeKey}"/>
         </beans:bean>
-
 </beans:beans>
