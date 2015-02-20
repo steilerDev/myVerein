@@ -15,7 +15,7 @@
         <http auto-config="false" use-expressions="true" pattern="/api/**" entry-point-ref="restAuthenticationEntryPoint">
             <intercept-url pattern="/api/login" access="permitAll" />
             <intercept-url pattern="/api/logout" access="permitAll" />
-            <intercept-url pattern="/api/admin/init/**" access="permitAll" />
+            <intercept-url pattern="/api/init/**" access="permitAll" />
             <intercept-url pattern="/api/user/**" access="hasRole('ROLE_USER')"/>
             <intercept-url pattern="/api/**" access="hasRole('ROLE_ADMIN')"/>
 

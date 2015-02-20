@@ -30,7 +30,7 @@ $(document).ready(function() {
 
                //Send the serialized form
                 $.ajax({
-                    url: '/api/admin/init/superAdmin',
+                    url: '/api/init/superAdmin',
                     type: 'POST',
                     data: $(e.target).serialize(),
                     error: function (response) {
@@ -54,7 +54,7 @@ $(document).ready(function() {
                 initSettingsButton.startAnimation();
                 //Send the serialized form
                 $.ajax({
-                    url: '/api/admin/init/settings',
+                    url: '/api/init/settings',
                     type: 'POST',
                     data: $(e.target).serialize(),
                     //Todo: Maybe later everywhere

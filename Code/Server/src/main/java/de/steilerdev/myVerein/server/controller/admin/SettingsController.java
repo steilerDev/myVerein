@@ -365,7 +365,7 @@ public class SettingsController
     }
 
     /**
-     * This function gathers all defined custom user fields. The function is invoked by GETting the URI /api/admin/settings/customUserFields.
+     * This function gathers all defined custom user fields. The function is invoked by GETting the URI /apic/admin/settings/customUserFields.
      * @return An HTTP response with a status code. If an error occurred an error error code is returned, otherwise a success code together with the list of all custom user fields is returned.
      */
     @RequestMapping(value = "customUserFields", produces = "application/json", method = RequestMethod.GET)

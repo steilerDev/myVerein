@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.steilerdev.myVerein.server.controller.admin;
+package de.steilerdev.myVerein.server.controller.init;
 
 import com.mongodb.*;
 import de.steilerdev.myVerein.server.model.Division;
@@ -41,7 +41,7 @@ import java.util.List;
 import java.util.Locale;
 
 @Controller
-@RequestMapping("/api/admin/init")
+@RequestMapping("/api/init")
 public class InitController
 {
     @Autowired

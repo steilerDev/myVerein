@@ -78,7 +78,6 @@ public class UserManagementController
      * @param userFlag If it is a new user, the user flag is "true", otherwise it is holding the identifier (email) of the user, in case it changed.
      * @param parameters The complete map of all parameters, containing the custom user fields.
      * @param currentUser The currently logged in user.
-     * @param locale The current locale of the user.
      * @return An HTTP response with a status code. If an error occurred an error message is bundled into the response, otherwise a success message is available.
      */
     @RequestMapping(method = RequestMethod.POST)
@@ -101,8 +100,7 @@ public class UserManagementController
                                                  @RequestParam String divisions,
                                                  @RequestParam String userFlag,
                                                  @RequestParam Map<String, String> parameters,
-                                                 @CurrentUser User currentUser,
-                                                 Locale locale)
+                                                 @CurrentUser User currentUser)
     {
         logger.trace("Starting to save a user.");
         User newUserObject;
