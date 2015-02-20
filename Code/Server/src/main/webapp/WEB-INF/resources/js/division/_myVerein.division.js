@@ -52,7 +52,7 @@ function loadDivision(name, newDivision) {
     divisionSubmitButton.startAnimation();
     //Sending JSON request with the division name as parameter to get the division details
     $.ajax({
-        url: '/division',
+        url: '/api/admin/division',
         type: 'GET',
         data: {
             name: name
@@ -99,7 +99,7 @@ function loadTree(callback) {
     //Loading tree through ajax
     divisionTree.tree(
         'loadDataFromUrl',
-        '/division/divisionTree', //URL
+        '/api/admin/division/divisionTree', //URL
         null, //Replace existing tree
         function() {
             $('#division-tree-loading').removeClass('heartbeat'); //Stop loading animation when successful
@@ -162,7 +162,7 @@ function loadDivisionPage() {
             'tree.move',
             function (event) {
                 $.ajax({
-                    url: '/division/divisionTree',
+                    url: '/api/admin/division/divisionTree',
                     type: 'POST',
                     data: {
                         moved_node: event.move_info.moved_node.name,
@@ -205,7 +205,7 @@ function loadDivisionPage() {
             },
             load: function (query, callback) {
                 $.ajax({
-                    url: '/user',
+                    url: '/api/admin/user',
                     type: 'GET',
                     data: {
                         term: query
@@ -222,9 +222,10 @@ function loadDivisionPage() {
     } else
     {
         //Update entries within selectize list
+        adminSelectize[0].selectize.clearOptions();
         adminSelectize[0].selectize.load(function (callback) {
             $.ajax({
-                url: '/user',
+                url: '/api/admin/user',
                 type: 'GET',
                 error: function () {
                     callback();
@@ -246,7 +247,7 @@ function loadDivisionPage() {
                 divisionSubmitButton.startAnimation();
                 //Send the serialized form
                 $.ajax({
-                    url: '/division',
+                    url: '/api/admin/division',
                     type: 'POST',
                     data: $(e.target).serialize(),
                     error: function (response) {
@@ -275,7 +276,7 @@ function loadDivisionPage() {
             e.preventDefault();
             divisionDeleteButton.startAnimation();
             $.ajax({
-                url: '/division?divisionName=' + $('#oldName').val(), //Workaround since DELETE request needs to be identified by the URI only and jQuery is not attaching the data to the URI, which leads to a Spring error.
+                url: '/api/admin/division?divisionName=' + $('#oldName').val(), //Workaround since DELETE request needs to be identified by the URI only and jQuery is not attaching the data to the URI, which leads to a Spring error.
                 type: 'DELETE',
                 //data: {
                 //    divisionName: $('#oldName').val()
@@ -300,7 +301,7 @@ function loadDivisionPage() {
     $('#addDivision').click(function(e){
         divisionSubmitButton.startAnimation();
         $.ajax({
-            url: '/division',
+            url: '/api/admin/division',
             type: 'POST',
             data: {
                 'new': true

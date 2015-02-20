@@ -94,7 +94,7 @@ function loadUser(email) {
     userSubmitButton.startAnimation();
     //Sending JSON request with the email as parameter to get the user details
     $.ajax({
-        url: '/user',
+        url: '/api/admin/user',
         type: 'GET',
         data: {
             email: email
@@ -217,7 +217,7 @@ function loadNewUser(doNotHideDeleteButton) {
     $('#customUserFieldsEmpty').addClass('hidden');
     $('#customUserFieldsLoading').addClass('heartbeat');
     $.ajax({
-        url: '/settings/customUserFields',
+        url: '/api/admin/settings/customUserFields',
         type: 'GET',
         error: function (response) {
             //console.log(response.responseText);
@@ -243,7 +243,7 @@ function loadUserList() {
     $("#user-list-loading").addClass('heartbeat');
     //Loading user list through ajax request
     $.ajax({
-        url: '/user',
+        url: '/api/admin/user',
         type: 'GET',
         error: function (response) {
             $("#user-list-loading").removeClass('heartbeat');
@@ -271,7 +271,7 @@ function loadUserPage() {
             searchField: 'name',
             load: function (query, callback) {
                 $.ajax({
-                    url: '/division',
+                    url: '/api/admin/division',
                     type: 'GET',
                     data: {
                         term: query
@@ -288,9 +288,10 @@ function loadUserPage() {
     } else
     {
         //Update entries within selectize list
+        userDivisionsSelectize[0].selectize.clearOptions();
         userDivisionsSelectize[0].selectize.load(function (callback) {
             $.ajax({
-                url: '/division',
+                url: '/api/admin/division',
                 type: 'GET',
                 error: function () {
                     callback();
@@ -334,7 +335,7 @@ function loadUserPage() {
                 userSubmitButton.startAnimation();
                 //Send the serialized form
                 $.ajax({
-                    url: '/user',
+                    url: '/api/admin/user',
                     type: 'POST',
                     data: $(e.target).serialize(),
                     error: function (response) {
@@ -363,7 +364,7 @@ function loadUserPage() {
             e.preventDefault();
             userDeleteButton.startAnimation();
             $.ajax({
-                url: '/user?email=' + $('#userFlag').val(), //Workaround since DELETE request needs to be identified by the URI only and jQuery is not attaching the data to the URI, which leads to a Spring error.
+                url: '/api/admin/user?email=' + $('#userFlag').val(), //Workaround since DELETE request needs to be identified by the URI only and jQuery is not attaching the data to the URI, which leads to a Spring error.
                 type: 'DELETE',
                 //data: {
                 //    email: $('#userFlag').val()

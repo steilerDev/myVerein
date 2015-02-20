@@ -108,7 +108,7 @@ function loadSettings() {
     resetSettingsForm();
     settingsSubmitButton.startAnimation();
     $.ajax({
-        url: '/settings',
+        url: '/api/admin/settings',
         type: 'GET',
         error: function (response) {
             settingsSubmitButton.stopAnimation(-1, function(button){
@@ -163,7 +163,7 @@ function loadSettingsPage(){
                 settingsSubmitButton.startAnimation();
                 //Send the serialized form
                 $.ajax({
-                    url: '/settings',
+                    url: '/api/admin/settings',
                     type: 'POST',
                     data: new FormData(settingsFormBootstrapValidator[0]),
                     error: function (response) {
@@ -257,7 +257,7 @@ function loadSettingsPage(){
             },
             load: function (query, callback) {
                 $.ajax({
-                    url: '/user',
+                    url: '/api/admin/user',
                     type: 'GET',
                     data: {
                         term: query
@@ -276,9 +276,10 @@ function loadSettingsPage(){
         });
     } else
     {
+        currentAdminSelectize[0].selectize.clearOptions();
         currentAdminSelectize[0].selectize.load(function (callback) {
             $.ajax({
-                url: '/user',
+                url: '/api/admin/user',
                 type: 'GET',
                 error: function () {
                     callback();

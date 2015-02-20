@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.steilerdev.myVerein.server.controller;
+package de.steilerdev.myVerein.server.controller.admin;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import de.steilerdev.myVerein.server.model.Division;
@@ -44,7 +44,7 @@ import java.util.stream.Collectors;
  * This controller is processing all requests associated with the division management.
  */
 @Controller
-@RequestMapping("/division")
+@RequestMapping("/api/admin/division")
 public class DivisionManagementController
 {
     @Autowired
@@ -61,7 +61,7 @@ public class DivisionManagementController
     private static final String newDivisionName = "New division";
 
     /**
-     * This function is saving changes on an exisiting division. If the division needs to be created see {@link de.steilerdev.myVerein.server.controller.DivisionManagementController#createDivision}. This function is invoked by POSTing the parameters to the URI /division.
+     * This function is saving changes on an exisiting division. If the division needs to be created see {@link DivisionManagementController#createDivision}. This function is invoked by POSTing the parameters to the URI /api/admin/division.
      * @param name The new name of the division.
      * @param oldName The old name of the division (might be equal to new name)
      * @param description The description of the division (may be empty)
@@ -152,7 +152,7 @@ public class DivisionManagementController
     }
 
     /**
-     * This function is creating a new division and chooses the name based on the new division name and an integer, depending how many unnamed division exist. This function is invoked, by POSTing to the URI /division together with a "new" non-empty parameter.
+     * This function is creating a new division and chooses the name based on the new division name and an integer, depending how many unnamed division exist. This function is invoked, by POSTing to the URI /api/admin/division together with a "new" non-empty parameter.
      * @param newFlag The non-empty parameter indicating the creation of a new empty division.
      * @param currentUser The currently logged in user.
      * @return An HTTP response with a status code together with a JSON map object, containing an 'errorMessage', or a 'successMessage' respectively. If the operation was successful the name of the new division is accessible via 'newDivisionName'.
@@ -205,7 +205,7 @@ public class DivisionManagementController
     }
 
     /**
-     * This function is deleting the stated division. The function is invoked, by DELETEing the parameter to the URI /division/deleteDivision
+     * This function is deleting the stated division. The function is invoked, by DELETEing the parameter to the URI /api/admin/division
      * @param divisionName The name of the division that needs to be deleted.
      * @param currentUser The currently logged in user.
      * @return An HTTP response with a status code. If an error occurred an error message is bundled into the response, otherwise a success message is available.
@@ -239,7 +239,7 @@ public class DivisionManagementController
     }
 
     /**
-     * This function gathers the names of all available divisions and returns them. The function is invoked by GETting the URI /division
+     * This function gathers the names of all available divisions and returns them. The function is invoked by GETting the URI /api/admin/division
      * @param term A term, that is required to be part of the division name.
      * @return An HTTP response with a status code, together with the JSON list-object of all divisions, or only an error code if an error occurred.
      */
@@ -269,7 +269,7 @@ public class DivisionManagementController
     }
 
     /**
-     * This function returns a single division as JSON object, where the administrator's fields are reduced to his name and email. The function is invoked by GETting the URI /division using the parameter name.
+     * This function returns a single division as JSON object, where the administrator's fields are reduced to his name and email. The function is invoked by GETting the URI /api/admin/division using the parameter name.
      * @param name The name of the division.
      * @return An HTTP response with a status code, together with the JSON object of the divisions, or only an error code if an error occurred.
      */
@@ -299,7 +299,7 @@ public class DivisionManagementController
     }
 
     /**
-     * This controller is invoked as soon as an administrator is changing the layout of the division tree. The function is invoked, by POSTing the parameters to the URI /division/divisionTree
+     * This controller is invoked as soon as an administrator is changing the layout of the division tree. The function is invoked, by POSTing the parameters to the URI /api/admin/division/divisionTree
      * @param moved_node The name of the node that has been moved.
      * @param target_node The name of the node, where the moved_node got moved to.
      * @param position The relation the moved_node is positioned to the target_node.
@@ -359,7 +359,7 @@ public class DivisionManagementController
     }
 
     /**
-     * This function gathers the complete division tree that the user is administrating. The function is invoked by GETting the URI /division/divisionTree.
+     * This function gathers the complete division tree that the user is administrating. The function is invoked by GETting the URI /api/admin/division/divisionTree.
      * @param currentUser The currently logged in user.
      * @return An HTTP response with a status code. In case of success a list of tree nodes, that represent the division tree, are bundled with the status code, otherwise just the error code is returned.
      */
@@ -485,7 +485,7 @@ public class DivisionManagementController
     {
         if(unoptimizedSetOfDivisions == null || unoptimizedSetOfDivisions.isEmpty())
         {
-            logger.warn("Trying to optimize set of divisions, but unoptmized set is either null or empty");
+            logger.warn("Trying to optimize set of divisions, but unoptimized set is either null or empty");
             return null;
         } else
         {

@@ -7,50 +7,58 @@
                                    http://www.springframework.org/schema/security
                                    http://www.springframework.org/schema/security/spring-security.xsd">
 
-        <!-- REST API specially secured -->
-        <http auto-config="false" use-expressions="true" pattern="/rest/**" entry-point-ref="restAuthenticationEntryPoint">
-            <intercept-url pattern="/rest/login" access="permitAll" />
-            <intercept-url pattern="/rest/logout" access="permitAll" />
-            <intercept-url pattern="/rest/**" access="hasRole('ROLE_USER')"/>
+        <!-- Unsecured content -->
+        <http pattern="/resources/**" security="none" /> <!-- Static content (JS/CSS/etc.) -->
+        <http pattern="/content/**" security="none" /> <!-- Variable content served by controller -->
 
-            <form-login authentication-success-handler-ref="restSuccessHandler"
-                        authentication-failure-handler-ref="restFailureHandler"
+        <!-- REST API specially secured, to comply with REST standards -->
+        <http auto-config="false" use-expressions="true" pattern="/api/**" entry-point-ref="restAuthenticationEntryPoint">
+            <intercept-url pattern="/api/login" access="permitAll" />
+            <intercept-url pattern="/api/logout" access="permitAll" />
+            <intercept-url pattern="/api/admin/init/**" access="permitAll" />
+            <intercept-url pattern="/api/user/**" access="hasRole('ROLE_USER')"/>
+            <intercept-url pattern="/api/**" access="hasRole('ROLE_ADMIN')"/>
+
+            <form-login authentication-success-handler-ref="restAuthenticationSuccessHandler"
+                        authentication-failure-handler-ref="restAuthenticationFailureHandler"
                         username-parameter="username"
                         password-parameter="password"
-                        login-processing-url="/rest/login"/>
+                        login-processing-url="/api/login"/>
 
             <remember-me services-ref="rememberMeServices" />
 
-            <logout logout-url="/rest/logout" />
+            <logout logout-url="/api/logout"
+                    invalidate-session="true"
+                    success-handler-ref="restLogoutSuccessHandler" />
         </http>
 
-        <beans:bean id="restSuccessHandler"
+        <beans:bean id="restAuthenticationSuccessHandler"
                     class="de.steilerdev.myVerein.server.security.rest.RestAuthenticationSuccessHandler"/>
-        <beans:bean id="restFailureHandler"
-                    class="org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler"/>
+        <beans:bean id="restAuthenticationFailureHandler"
+                    class="de.steilerdev.myVerein.server.security.rest.RestAuthenticationFailureHandler"/>
+        <beans:bean id="restLogoutSuccessHandler"
+                    class="de.steilerdev.myVerein.server.security.rest.RestLogoutSuccessHandler"/>
         <beans:bean id="restAuthenticationEntryPoint"
                     class="de.steilerdev.myVerein.server.security.rest.RestAuthenticationEntryPoint"/>
 
         <!-- Web pages secured through the standard implementation of spring security -->
-        <http auto-config="false"  use-expressions="true" access-denied-page="/login?accessdenied">
+        <http auto-config="false" use-expressions="true" access-denied-page="/login?accessdenied">
             <intercept-url pattern="/login" access="permitAll" />
             <intercept-url pattern="/logout" access="permitAll" />
             <intercept-url pattern="/error" access="permitAll" />
-            <intercept-url pattern="/resources/**" access="permitAll" /> <!-- Static content -->
-            <intercept-url pattern="/content/**" access="permitAll" /> <!-- Variable content served by controller -->
-            <intercept-url pattern="/init/**" access="permitAll" />
             <intercept-url pattern="/**" access="hasRole('ROLE_ADMIN')" />
 
-           <form-login login-page="/login"
-                       default-target-url="/"
-                       username-parameter="username"
-                       password-parameter="password"
-                       authentication-failure-url="/login?error"
-                       login-processing-url="/login_check"/>
+            <form-login login-page="/login"
+                        default-target-url="/"
+                        username-parameter="username"
+                        password-parameter="password"
+                        authentication-failure-url="/login?error"
+                        login-processing-url="/login_check"/>
 
             <logout logout-url="/logout"
                     logout-success-url="/login?logout"
-                    delete-cookies="myVereinSessionCookie" />
+                    delete-cookies="myVereinSessionCookie"
+                    invalidate-session="true" />
 
             <remember-me services-ref="rememberMeServices" />
         </http>

@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.steilerdev.myVerein.server.controller;
+package de.steilerdev.myVerein.server.controller.admin;
 
 import com.mongodb.*;
 import de.steilerdev.myVerein.server.model.Division;
@@ -41,7 +41,7 @@ import java.util.List;
 import java.util.Locale;
 
 @Controller
-@RequestMapping("/init")
+@RequestMapping("/api/admin/init")
 public class InitController
 {
     @Autowired
@@ -60,7 +60,7 @@ public class InitController
     private static Logger logger = LoggerFactory.getLogger(InitController.class);
 
     /**
-     * This function is temporarily saving the general settings during the initial setup. The values are stored permanently after calling the initSuperAdmin function. This function is invoked by POSTing the parameters to the URI /init/settings.
+     * This function is temporarily saving the general settings during the initial setup. The values are stored permanently after calling the initSuperAdmin function. This function is invoked by POSTing the parameters to the URI /api/init/settings.
      * @param clubName The name of the club.
      * @param databaseHost The hostname of the MongoDB server (Default localhost).
      * @param databasePort The port of the MongoDB server (Default 27017).
@@ -147,7 +147,7 @@ public class InitController
     }
 
     /**
-     * This function is creating the initial super admin, as well as the root division. On top of that it stores all information durable, as well as restarts the application. The function is invoked by POSTing the parameters to the URI /init/superAdmin.
+     * This function is creating the initial super admin, as well as the root division. On top of that it stores all information durable, as well as restarts the application. The function is invoked by POSTing the parameters to the URI /api/init/superAdmin.
      * NOTE: At the moment the restarting of the application is not working correctly. To apply changed database settings the application needs to be redeployed manually from the management interface.
      * @param firstName The first name of the new super admin.
      * @param lastName The last name of the new super admin.

@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.steilerdev.myVerein.server.controller;
+package de.steilerdev.myVerein.server.controller.admin;
 
 import de.steilerdev.myVerein.server.model.*;
 import de.steilerdev.myVerein.server.security.CurrentUser;
@@ -45,7 +45,7 @@ import java.util.stream.Stream;
  * This controller is processing all requests associated with the event management.
  */
 @Controller
-@RequestMapping("/event")
+@RequestMapping("/api/admin/event")
 public class EventManagementController
 {
     @Autowired
@@ -57,7 +57,7 @@ public class EventManagementController
     private static Logger logger = LoggerFactory.getLogger(EventManagementController.class);
 
     /**
-     * This function gathers all dates where an event takes place within a specific month and year. The function is invoked by GETting the URI /event/month and specifying the month and year via the request parameters.
+     * This function gathers all dates where an event takes place within a specific month and year. The function is invoked by GETting the URI /api/admin/event/month and specifying the month and year via the request parameters.
      * @param month The selected month.
      * @param year The selected year.
      * @return An HTTP response with a status code. If the function succeeds, a list of dates, during the month, that contain an event, is returned, otherwise an error code is returned.
@@ -107,7 +107,7 @@ public class EventManagementController
     }
 
     /**
-     * Returns all events, that are taking place on a specified date. The date parameter needs to be formatted according to the following pattern: YYYY/MM/DD. This function is invoked by GETting the URI /event/date
+     * Returns all events, that are taking place on a specified date. The date parameter needs to be formatted according to the following pattern: YYYY/MM/DD. This function is invoked by GETting the URI /api/admin/event/date
      * @param date The selected date, correctly formatted (YYYY/MM/DD)
      * @return An HTTP response with a status code. If the function succeeds, a list of events is returned, otherwise an error code is returned.
      */
@@ -155,7 +155,7 @@ public class EventManagementController
     }
 
     /**
-     * Returns a specific event based on its id. The function is invoked by GETting the URI the URI /event.
+     * Returns a specific event based on its id. The function is invoked by GETting the URI the URI /api/admin/event.
      * @param id The id of the selected event.
      * @param currentUser The currently logged in user.
      * @return An HTTP response with a status code. If the function succeeds, the event is returned, otherwise an error code is returned.
@@ -199,7 +199,7 @@ public class EventManagementController
     }
 
     /**
-     * This function saves an event. The function is invoked by POSTint the parameters to the URI /event.
+     * This function saves an event. The function is invoked by POSTint the parameters to the URI /api/admin/event.
      * @param eventFlag This flag either stores the ID of the event, or true, if a new event is created.
      * @param eventName The name of the event.
      * @param eventDescription The description of the event.
@@ -356,7 +356,7 @@ public class EventManagementController
     }
 
     /**
-     * This function deletes an event, specified by the event ID. The function is invoked by DELETEing the URI /event.
+     * This function deletes an event, specified by the event ID. The function is invoked by DELETEing the URI /api/admin/event.
      * @param id The ID of the event, that should be deleted.
      * @param currentUser The currently logged in user.
      * @return An HTTP response with a status code. If an error occurred an error message is bundled into the response, otherwise a success message is available

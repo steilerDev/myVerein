@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.steilerdev.myVerein.server.controller;
+package de.steilerdev.myVerein.server.controller.admin;
 
 import de.steilerdev.myVerein.server.model.*;
 import de.steilerdev.myVerein.server.security.CurrentUser;
@@ -42,7 +42,7 @@ import java.util.stream.Collectors;
  * This controller is processing all requests associated with the user management.
  */
 @Controller
-@RequestMapping("/user")
+@RequestMapping("/api/admin/user")
 public class UserManagementController
 {
     private static Logger logger = LoggerFactory.getLogger(UserManagementController.class);
@@ -57,7 +57,7 @@ public class UserManagementController
     SettingsRepository settingsRepository;
 
     /**
-     * If a modification on a division needs to be stored durable, this function is invoked by POSTing the parameters to the URI /user.
+     * If a modification on a division needs to be stored durable, this function is invoked by POSTing the parameters to the URI /api/admin/user.
      * @param firstName The first name of the user.
      * @param lastName The last name of the user.
      * @param email The email (unique identifier) of the user.
@@ -311,7 +311,7 @@ public class UserManagementController
     }
 
     /**
-     * This function gathers all users. The function is invoked by GETting the URI /user.
+     * This function gathers all users. The function is invoked by GETting the URI /api/admin/user.
      * @param term If this parameter is present, only users who are matching the term within their email, first or last name are returned.
      * @return An HTTP response with a status code, together with the JSON list-object of all users (matching the term, if present), or only an error code if an error occurred.
      */
@@ -341,7 +341,7 @@ public class UserManagementController
     }
 
     /**
-     * This function returns a single user as JSON object, respecting the privacy of the user, by only returning information the current user is allowed to see. The function is invoked by GETting the URI /user using the parameter email.
+     * This function returns a single user as JSON object, respecting the privacy of the user, by only returning information the current user is allowed to see. The function is invoked by GETting the URI /api/admin/user using the parameter email.
      * @param email The email of the user.
      * @param currentUser The currently logged in user.
      * @return An HTTP response with a status code, together with the JSON object of the user, or only an error code if an error occurred.
@@ -388,7 +388,7 @@ public class UserManagementController
     }
 
     /**
-     * This function is deleting a user, defined by his email. The function is invoked by DELETEing the URI /user.
+     * This function is deleting a user, defined by his email. The function is invoked by DELETEing the URI /api/admin/user.
      * @param email The email of the user, who needs to be deleted.
      * @param currentUser The currently logged in user.
      * @return An HTTP response with a status code. If an error occurred an error message is bundled into the response, otherwise a success message is available.

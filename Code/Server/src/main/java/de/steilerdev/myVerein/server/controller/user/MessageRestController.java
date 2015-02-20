@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.steilerdev.myVerein.server.controller.rest;
+package de.steilerdev.myVerein.server.controller.user;
 
 import de.steilerdev.myVerein.server.model.Message;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.time.LocalDateTime;
 
 @RestController
-@RequestMapping("/rest/message")
+@RequestMapping("/api/user/message")
 public class MessageRestController
 {
     @RequestMapping(produces = "application/json", method = RequestMethod.GET)

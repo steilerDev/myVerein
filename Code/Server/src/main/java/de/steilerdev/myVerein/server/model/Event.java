@@ -18,7 +18,7 @@ package de.steilerdev.myVerein.server.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import de.steilerdev.myVerein.server.controller.DivisionManagementController;
+import de.steilerdev.myVerein.server.controller.admin.DivisionManagementController;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.data.annotation.Id;

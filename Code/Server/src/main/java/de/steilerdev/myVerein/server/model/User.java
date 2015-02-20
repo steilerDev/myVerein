@@ -19,7 +19,7 @@ package de.steilerdev.myVerein.server.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import de.steilerdev.myVerein.server.controller.DivisionManagementController;
+import de.steilerdev.myVerein.server.controller.admin.DivisionManagementController;
 import de.steilerdev.myVerein.server.security.PasswordEncoder;
 import de.steilerdev.myVerein.server.security.UserAuthenticationService;
 import org.hibernate.validator.constraints.Email;

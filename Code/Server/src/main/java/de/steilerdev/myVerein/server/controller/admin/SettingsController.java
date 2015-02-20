@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.steilerdev.myVerein.server.controller;
+package de.steilerdev.myVerein.server.controller.admin;
 
 import com.mongodb.MongoException;
 import de.steilerdev.myVerein.server.model.*;
@@ -47,7 +47,7 @@ import java.util.stream.Collectors;
  * This class handles all requests done through the settings page.
  */
 @Controller
-@RequestMapping("/settings")
+@RequestMapping("/api/admin/settings")
 public class SettingsController
 {
     @Autowired
@@ -71,7 +71,7 @@ public class SettingsController
     private static Logger logger = LoggerFactory.getLogger(SettingsController.class);
 
     /**
-     * This function is gathering the current settings of the application. The function is invoked by GETting the URI /settings.
+     * This function is gathering the current settings of the application. The function is invoked by GETting the URI /api/admin/settings.
      * @param currentUser The currently logged in user.
      * @return An HTTP response with a status code. If an error occurred a error code is returned, otherwise the map of all available settings is returned.
      */
@@ -118,7 +118,7 @@ public class SettingsController
     }
 
     /**
-     * This function is saving the settings for the system durable. In case the database connection changed, the system is restarted. The function is invoked by POSTing the parameters to the URI /settings.
+     * This function is saving the settings for the system durable. In case the database connection changed, the system is restarted. The function is invoked by POSTing the parameters to the URI /api/admin/settings.
      * NOTE: At the moment the restarting of the application is not working correctly. To apply changed database settings the application needs to be redeployed manually from the management interface.
      * @param currentAdmin If the logged in user is a super admin, this field specifies the new super admin. If the logged in user is a normal admin, this field needs to contain his email.
      * @param adminPasswordNew The new password for the currently logged in admin.
@@ -365,7 +365,7 @@ public class SettingsController
     }
 
     /**
-     * This function gathers all defined custom user fields. The function is invoked by GETting the URI /settings/customUserFields.
+     * This function gathers all defined custom user fields. The function is invoked by GETting the URI /api/admin/settings/customUserFields.
      * @return An HTTP response with a status code. If an error occurred an error error code is returned, otherwise a success code together with the list of all custom user fields is returned.
      */
     @RequestMapping(value = "customUserFields", produces = "application/json", method = RequestMethod.GET)

@@ -17,21 +17,21 @@
 package de.steilerdev.myVerein.server.security.rest;
 
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint
+public class RestAuthenticationFailureHandler extends SimpleUrlAuthenticationFailureHandler
 {
     @Override
-    public void commence( HttpServletRequest request, HttpServletResponse response,
-                          AuthenticationException authException ) throws IOException
+    public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException
     {
         if(!response.isCommitted())
         {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Authentication failed: " + exception.getMessage());
         }
     }
 }

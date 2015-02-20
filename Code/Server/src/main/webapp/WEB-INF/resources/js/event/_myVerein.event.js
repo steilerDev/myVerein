@@ -152,7 +152,7 @@ function loadOccupiedDates(date)
     }
     $("#event-calendar-loading").addClass('heartbeat');
     $.ajax({
-        url: '/event/month',
+        url: '/api/admin/event/month',
         type: 'GET',
         data: {
             'month': date._d.getMonth() + 1, //Month is starting at 0
@@ -187,7 +187,7 @@ function loadDate(dateString)
     });
 
     $.ajax({
-        url: '/event/date',
+        url: '/api/admin/event/date',
         type: 'GET',
         data: {
             date: dateString
@@ -230,7 +230,7 @@ function loadDate(dateString)
 function loadEvent(eventID) {
     eventSubmitButton.startAnimation();
     $.ajax({
-        url: '/event',
+        url: '/api/admin/event',
         type: 'GET',
         data: {
             id: eventID
@@ -454,7 +454,7 @@ function loadEventPage() {
             searchField: 'name',
             load: function (query, callback) {
                 $.ajax({
-                    url: '/division',
+                    url: '/api/admin/division',
                     type: 'GET',
                     data: {
                         term: query
@@ -471,9 +471,10 @@ function loadEventPage() {
     } else
     {
         //Update entries within selectize list
+        invitedDivisionsSelectize[0].selectize.clearOptions();
         invitedDivisionsSelectize[0].selectize.load(function (callback) {
             $.ajax({
-                url: '/division',
+                url: '/api/admin/division',
                 type: 'GET',
                 error: function () {
                     callback();
@@ -497,7 +498,7 @@ function loadEventPage() {
                         eventSubmitButton.startAnimation();
                         //Send the serialized form
                         $.ajax({
-                            url: '/event',
+                            url: '/api/admin/event',
                             type: 'POST',
                             data: $(e.target).serialize(),
                             error: function (response) {
@@ -526,7 +527,7 @@ function loadEventPage() {
             e.preventDefault();
             eventDeleteButton.startAnimation();
             $.ajax({
-                url: '/event?id=' + $('#eventFlag').val(), //Workaround since DELETE request needs to be identified by the URI only and jQuery is not attaching the data to the URI, which leads to a Spring error.
+                url: '/api/admin/event?id=' + $('#eventFlag').val(), //Workaround since DELETE request needs to be identified by the URI only and jQuery is not attaching the data to the URI, which leads to a Spring error.
                 type: 'DELETE',
                 //data: {
                 //    id: $('#eventFlag').val()
