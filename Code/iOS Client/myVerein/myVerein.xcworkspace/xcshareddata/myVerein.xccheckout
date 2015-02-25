@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>1F44B208-E1EB-4DD3-B259-F29BD28800C2</string>
+	<key>IDESourceControlProjectName</key>
+	<string>myVerein</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>0E6F444ECE841B29366C504A06B28583EA1012C3</key>
+		<string>ssh://it-macmini.dhbw-stuttgart.de:29418/myVerein/app.git</string>
+		<key>C03C9E8E8D82C8884B78E9658E0C06C01CE7ACE4</key>
+		<string>https://github.com/steilerDev/myVerein.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>iOS Client/myVerein/myVerein.xcworkspace</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>0E6F444ECE841B29366C504A06B28583EA1012C3</key>
+		<string>../../..</string>
+		<key>C03C9E8E8D82C8884B78E9658E0C06C01CE7ACE4</key>
+		<string>../../../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>ssh://it-macmini.dhbw-stuttgart.de:29418/myVerein/app.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>111</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>0E6F444ECE841B29366C504A06B28583EA1012C3</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>C03C9E8E8D82C8884B78E9658E0C06C01CE7ACE4</string>
+			<key>IDESourceControlWCCName</key>
+			<string></string>
+		</dict>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>0E6F444ECE841B29366C504A06B28583EA1012C3</string>
+			<key>IDESourceControlWCCName</key>
+			<string>Code</string>
+		</dict>
+	</array>
+</dict>
+</plist>
