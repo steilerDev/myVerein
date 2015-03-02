@@ -23,6 +23,8 @@ The project's timeline is aiming to release a final version of the product by mi
 
 ## Used technologies
 This project is going to use several frameworks and third-party products. The development is currently considering the use of the following products:
+
+### Server
 * Datastore: [mongoDB](http://www.mongodb.org) licensed under a [GNU AGPL v3.0](http://www.gnu.org/licenses/agpl-3.0.html) and an [Apache License v2.0](http://www.apache.org/licenses/LICENSE-2.0)
 * MVC Framework: [spring](http://spring.io) licensed under an [Apache License v2.0](http://www.apache.org/licenses/LICENSE-2.0)
 * Template Engine: [thymeleaf](http://www.thymeleaf.org) licensed under an [Apache License v2.0](http://www.thymeleaf.org/license.html) 
@@ -40,5 +42,12 @@ This project is going to use several frameworks and third-party products. The de
 * Logging Framework: [Log4j](http://logging.apache.org/log4j/2.x/) licensed under an [Apache License v2.0](http://logging.apache.org/log4j/2.x/license.html) and [slf4j](http://www.slf4j.org) licensed under a [MIT License](http://www.slf4j.org/license.html)
 * Dependency management: [Maven](http://maven.apache.org) licensed under an [Apache License v2.0](http://www.apache.org/licenses/)
 * Testing: [jUnit](http://junit.org) licensed under an [Eclipse Public License v1.0](http://opensource.org/licenses/eclipse-1.0.html)
+
+### iOS Client
+* Dependency management: [CocoaPods](http://cocoapods.org) licensed under a [MIT license](https://github.com/CocoaPods/CocoaPods/blob/master/LICENSE)
+* Animations: [Facebook Pop](https://github.com/facebook/pop) licensed under a [BSD license](https://github.com/facebook/pop/blob/master/LICENSE)
+* Data management: [SwiftyUserDefaults](https://github.com/radex/SwiftyUserDefaults/) licensed under a [MIT license](https://github.com/radex/SwiftyUserDefaults/blob/master/LICENSE), [Locksmith](https://github.com/matthewpalmer/Locksmith) licensed under a [MIT license](https://github.com/matthewpalmer/Locksmith/blob/master/LICENSE) 
+* Password management: [1Password Password Management Extension](https://github.com/AgileBits/onepassword-app-extension) licensed under a [MIT license](https://github.com/AgileBits/onepassword-app-extension/blob/master/LICENSE.txt)
+* Networking: [AFNetworking](http://afnetworking.com) licensed under a [MIT license](http://opensource.org/licenses/mit-license)
 
 If you have any feedback, feature request, or you are a society's IT administrator and want your club to be among the first one to use this product, feel free to [contact me](mailto:frank@steilerdev.de).

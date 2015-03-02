@@ -1,10 +1,42 @@
 PODS:
+  - 1PasswordExtension (1.0.9)
+  - AFNetworking (2.5.1):
+    - AFNetworking/NSURLConnection (= 2.5.1)
+    - AFNetworking/NSURLSession (= 2.5.1)
+    - AFNetworking/Reachability (= 2.5.1)
+    - AFNetworking/Security (= 2.5.1)
+    - AFNetworking/Serialization (= 2.5.1)
+    - AFNetworking/UIKit (= 2.5.1)
+  - AFNetworking/NSURLConnection (2.5.1):
+    - AFNetworking/Reachability
+    - AFNetworking/Security
+    - AFNetworking/Serialization
+  - AFNetworking/NSURLSession (2.5.1):
+    - AFNetworking/Reachability
+    - AFNetworking/Security
+    - AFNetworking/Serialization
+  - AFNetworking/Reachability (2.5.1)
+  - AFNetworking/Security (2.5.1)
+  - AFNetworking/Serialization (2.5.1)
+  - AFNetworking/UIKit (2.5.1):
+    - AFNetworking/NSURLConnection
+    - AFNetworking/NSURLSession
+  - Locksmith (1.2.0)
   - pop (1.0.7)
+  - SwiftyUserDefaults (1.0.0)
 
 DEPENDENCIES:
+  - 1PasswordExtension (~> 1.0.0)
+  - AFNetworking (~> 2.0)
+  - Locksmith
   - pop (~> 1.0)
+  - SwiftyUserDefaults
 
 SPEC CHECKSUMS:
+  1PasswordExtension: 40e5bfe30487e9c11b92dc81f4cb3e47abdf5a58
+  AFNetworking: 8bee59492a6ff15d69130efa4d0dc67e0094a52a
+  Locksmith: 15a873e266beceb1b81476e0f50a1e1cba103a6f
   pop: 2f14a1ea61339767af9e66741b418c831b3844df
+  SwiftyUserDefaults: c13a0c5a00d03da70d68ac7b05dbea548c64d87b
 
-COCOAPODS: 0.36.0.beta.2
+COCOAPODS: 0.36.0.rc.1
