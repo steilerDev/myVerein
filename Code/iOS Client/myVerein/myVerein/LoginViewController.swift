@@ -15,22 +15,25 @@ import _1PasswordExtension
 
 class LoginViewController: UIViewController, UITextFieldDelegate, POPAnimationDelegate {
 
-    private struct constantValues {
+    private struct LoginViewControllerConstantValues {
         static let loginBoxAnimationKey = "moveLoginBoxAnimation"
         static let wrongPasswordAnimationKey = "shakePassword"
+        static let segueToMainApplication = "showMainApplicationSegue"
     }
     
-    @IBOutlet weak var loginBox: UIView! {
-        didSet {
-            initialLoginPosition = loginBox.center.y
-        }
-    }
+    @IBOutlet weak var loginBox: UIView!
     @IBOutlet weak var usernameTextField: UITextField!
     @IBOutlet weak var passwordTextField: UITextField!
     @IBOutlet weak var hostTextField: UITextField!
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
+    @IBOutlet weak var topConstraintForLoginBox: NSLayoutConstraint!
     
-    private var initialLoginPosition: CGFloat?
+    private var initialLoginPosition: CGPoint?
+    
+    private lazy var newVariableTopConstraint: NSLayoutConstraint = {
+        return NSLayoutConstraint(item: self.loginBox, attribute: .CenterY, relatedBy: .Equal, toItem: self.view, attribute: .Top, multiplier: 1, constant: 0)
+    }()
+
     
     // MARK: - UITextFieldDelegate methods
     
@@ -94,7 +97,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate, POPAnimationDe
             }
             //Adjusting hostname to meet required format
             if !hostname.hasPrefix("http") {
-                hostname = "https://" + hostname
+                hostname = "http://" + hostname
             }
             if hostname.hasSuffix("/") {
                 hostname.removeAtIndex(advance(hostname.startIndex, count(hostname) - 1))
@@ -144,6 +147,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate, POPAnimationDe
                                 dispatch_async(dispatch_get_main_queue()) {
                                     self.activityIndicator.stopAnimating()
                                 }
+                                self.performSegueWithIdentifier(LoginViewControllerConstantValues.segueToMainApplication, sender: self)
                             } else {
                                 println("Credentials invalid")
                                 self.animateInvalidLogin()
@@ -173,7 +177,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate, POPAnimationDe
         shake.velocity = 3000
         
         dispatch_async(dispatch_get_main_queue()) {
-            self.loginBox.pop_addAnimation(shake, forKey: constantValues.wrongPasswordAnimationKey)
+            self.loginBox.pop_addAnimation(shake, forKey: LoginViewControllerConstantValues.wrongPasswordAnimationKey)
             self.activityIndicator.stopAnimating()
         }
         usernameTextField.becomeFirstResponder()
@@ -205,23 +209,32 @@ class LoginViewController: UIViewController, UITextFieldDelegate, POPAnimationDe
     
     /// This function is invoked when the notification center fires the keyboard did hide notification
     func moveLoginBoxDown() {
-        if let yPosition = initialLoginPosition {
-            moveLoginBox(yPosition)
-        }
+        moveLoginBox(nil)
     }
     
     /// This function is moving the login box to the parameter value using a pop spring animation
-    private func moveLoginBox(toValue: CGFloat) {
-        if loginBox.center.y != toValue {
-            var moveAnimation = POPSpringAnimation(propertyNamed: kPOPLayerPositionY)
-            moveAnimation.springBounciness = 15
-            moveAnimation.springSpeed = 15
-            moveAnimation.toValue = toValue
-            moveAnimation.delegate = self
-            moveAnimation.removedOnCompletion = true
-            moveAnimation.name = constantValues.loginBoxAnimationKey
-            loginBox.pop_addAnimation(moveAnimation, forKey: constantValues.loginBoxAnimationKey)
-        }
+    private func moveLoginBox(toValue: CGFloat?) {
+        view.removeConstraint(topConstraintForLoginBox)
+        
+        var newCenter = CGPoint()
+        newCenter.x = view.center.x
+        
+        newCenter.y = toValue ?? initialLoginPosition?.y ?? (loginBox.frame.size.height/2) + 24 //Use either the to value or the initial value, default should never be used
+        
+        var moveAnimation = POPSpringAnimation(propertyNamed: kPOPViewCenter)
+        moveAnimation.springBounciness = 15
+        moveAnimation.springSpeed = 15
+        moveAnimation.toValue = NSValue(CGPoint: newCenter)
+        moveAnimation.delegate = self
+        moveAnimation.name = LoginViewControllerConstantValues.loginBoxAnimationKey
+        loginBox.pop_addAnimation(moveAnimation, forKey: LoginViewControllerConstantValues.loginBoxAnimationKey)
+    }
+    
+    func pop_animationDidReachToValue(anim: POPAnimation!) {
+        view.removeConstraint(newVariableTopConstraint)
+        newVariableTopConstraint.constant = loginBox.center.y
+        println(newVariableTopConstraint.constant)
+        view.addConstraint(newVariableTopConstraint)
     }
     
     // MARK: - ViewController Lifecycle
@@ -234,6 +247,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate, POPAnimationDe
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "moveLoginBoxUp:", name: UIKeyboardDidShowNotification, object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "moveLoginBoxDown", name: UIKeyboardDidHideNotification, object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "moveLoginBoxDown", name: UIKeyboardWillHideNotification, object: nil)
+        initialLoginPosition = loginBox.center
         validateCurrentLogin()
     }
 }
