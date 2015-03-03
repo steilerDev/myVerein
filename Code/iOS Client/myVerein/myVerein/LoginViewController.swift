@@ -11,7 +11,7 @@ import pop
 import AFNetworking
 import SwiftyUserDefaults
 import Locksmith
-import _1PasswordExtension
+import OnePasswordExtension
 
 class LoginViewController: UIViewController, UITextFieldDelegate, POPAnimationDelegate {
 
@@ -72,7 +72,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate, POPAnimationDe
                             println("Unable to get required fields")
                         }
                     } else {
-                        if (error.code != AppExtensionErrorCodeCancelledByUser) {
+                        if (error.code != Int(AppExtensionErrorCodeCancelledByUser)) {
                             println("Unable to load password for URLString \(urlString)")
                         } else {
                             println("Cancelled by user")
@@ -80,7 +80,13 @@ class LoginViewController: UIViewController, UITextFieldDelegate, POPAnimationDe
                     }
             }
         } else {
-            // TODO: Show alert informing about password manager
+            var alert = UIAlertController(title: "No password manager found", message: "To use this extension you need to install a password manager, supporting iOS 8 extensions, like 1Password", preferredStyle: .Alert)
+            alert.addAction(UIAlertAction(title: "Okay", style: .Cancel, handler: { (action) -> Void in }))
+            alert.addAction(UIAlertAction(title: "Learn more", style: .Default, handler: { (action) -> Void in
+                UIApplication.sharedApplication().openURL(NSURL(string: Constants.passwordManagerURL)!)
+            }))
+            presentViewController(alert, animated: true, completion: nil)
+            
             println("Unable to find any password manager")
         }
     }
@@ -103,7 +109,11 @@ class LoginViewController: UIViewController, UITextFieldDelegate, POPAnimationDe
                 hostname.removeAtIndex(advance(hostname.startIndex, count(hostname) - 1))
             }
             
-            Locksmith.saveData([Constants.keychainUsernameField: username, Constants.keychainPasswordField: password, Constants.keychainDomainField: hostname], forUserAccount: Constants.userAccount)
+            if Locksmith.loadDataForUserAccount(Constants.userAccount).0?.count > 0 {
+                Locksmith.updateData([Constants.keychainUsernameField: username, Constants.keychainPasswordField: password, Constants.keychainDomainField: hostname], forUserAccount: Constants.userAccount)
+            } else {
+                Locksmith.saveData([Constants.keychainUsernameField: username, Constants.keychainPasswordField: password, Constants.keychainDomainField: hostname], forUserAccount: Constants.userAccount)
+            }
             
             validateCurrentLogin()
         } else {
@@ -123,43 +133,47 @@ class LoginViewController: UIViewController, UITextFieldDelegate, POPAnimationDe
             println("Keychain dictionary is empty")
             activityIndicator.stopAnimating()
         } else if let keychainDictionary = dictionary as? [String: String] {
-            if let username = keychainDictionary[Constants.keychainUsernameField], password = keychainDictionary[Constants.keychainPasswordField], domain = keychainDictionary[Constants.keychainDomainField] {
-     
+            if let username = keychainDictionary[Constants.keychainUsernameField],
+                password = keychainDictionary[Constants.keychainPasswordField],
+                domain = keychainDictionary[Constants.keychainDomainField]
+            {
                 // Update UI
                 usernameTextField.text = username
                 passwordTextField.text = password
                 hostTextField.text = domain
                 
-                // Create request
-                let manager = AFHTTPRequestOperationManager()
-                let parameters = ["username": username,
-                    "password": password,
-                    "rememberMe": "on"]
-                
-                manager.POST(domain + Constants.API.login,
-                    parameters: parameters,
-                    success:
-                    {
-                        requestOperation, response in
+                if let sessionManager = NetworkingSessionFactory.instance() {
+                    println(sessionManager.securityPolicy.pinnedCertificates.count)
+                    
+                    // Execute request
+                    let parameters = ["username": username,
+                        "password": password,
+                        "rememberMe": "on"]
+                    
+                    sessionManager.POST(NSURL(string: Constants.API.login, relativeToURL: sessionManager.baseURL)?.absoluteString,
+                        parameters: parameters,
+                        success:
+                        {
+                            dataTask, response in
                             println("Successfully logged in")
-                            if(requestOperation.response.statusCode == 200) {
-                                println("Credentials valid")
-                                dispatch_async(dispatch_get_main_queue()) {
-                                    self.activityIndicator.stopAnimating()
-                                }
-                                self.performSegueWithIdentifier(LoginViewControllerConstantValues.segueToMainApplication, sender: self)
-                            } else {
-                                println("Credentials invalid")
-                                self.animateInvalidLogin()
+                            dispatch_async(dispatch_get_main_queue()) {
+                                self.activityIndicator.stopAnimating()
                             }
-                    },
-                    failure:
-                    {
-                        requestOperation, error in
-                            println("Unable to log in")
+                            //self.performSegueWithIdentifier(LoginViewControllerConstantValues.segueToMainApplication, sender: self)
+                        },
+                        failure:
+                        {
+                            dataTask, error in
+                            println("Unable to log in: \(error)")
                             self.animateInvalidLogin()
-                    }
-                )
+                            NetworkingSessionFactory.invalidateInstance()
+                        }
+                    )
+                } else {
+                    println("Nope")
+                    animateInvalidLogin()
+                }
+                
             } else {
                 println("Unable to retrieve required fields")
                 animateInvalidLogin()
@@ -176,11 +190,15 @@ class LoginViewController: UIViewController, UITextFieldDelegate, POPAnimationDe
         shake.springBounciness = 20
         shake.velocity = 3000
         
-        dispatch_async(dispatch_get_main_queue()) {
-            self.loginBox.pop_addAnimation(shake, forKey: LoginViewControllerConstantValues.wrongPasswordAnimationKey)
-            self.activityIndicator.stopAnimating()
+        
+        if(usernameTextField.isFirstResponder() || passwordTextField.isFirstResponder() || hostTextField.isFirstResponder()) {
+            dispatch_async(dispatch_get_main_queue()) {
+                self.loginBox.pop_addAnimation(shake, forKey: LoginViewControllerConstantValues.wrongPasswordAnimationKey)
+            }
+        } else {
+            usernameTextField.becomeFirstResponder()
         }
-        usernameTextField.becomeFirstResponder()
+        dispatch_async(dispatch_get_main_queue()) { self.activityIndicator.stopAnimating() }
     }
     
     // MARK: - Text field animation and keyboard management
@@ -233,7 +251,6 @@ class LoginViewController: UIViewController, UITextFieldDelegate, POPAnimationDe
     func pop_animationDidReachToValue(anim: POPAnimation!) {
         view.removeConstraint(newVariableTopConstraint)
         newVariableTopConstraint.constant = loginBox.center.y
-        println(newVariableTopConstraint.constant)
         view.addConstraint(newVariableTopConstraint)
     }
     

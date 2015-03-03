@@ -16,6 +16,8 @@ struct Constants {
     static let keychainPasswordField = "myVereinPassword"
     static let keychainDomainField = "myVereinDomain"
     
+    static let passwordManagerURL = "https://agilebits.com/onepassword"
+    
     struct API {
         static let login = "/api/login"
     }

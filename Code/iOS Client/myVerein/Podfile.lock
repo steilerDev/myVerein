@@ -1,5 +1,5 @@
 PODS:
-  - 1PasswordExtension (1.0.9)
+  - 1PasswordExtension (1.1.2)
   - AFNetworking (2.5.1):
     - AFNetworking/NSURLConnection (= 2.5.1)
     - AFNetworking/NSURLSession (= 2.5.1)
@@ -21,20 +21,36 @@ PODS:
   - AFNetworking/UIKit (2.5.1):
     - AFNetworking/NSURLConnection
     - AFNetworking/NSURLSession
+  - JSQMessagesViewController (6.1.3):
+    - JSQSystemSoundPlayer (~> 2.0.1)
+  - JSQSystemSoundPlayer (2.0.1)
   - Locksmith (1.2.0)
   - pop (1.0.7)
   - SwiftyUserDefaults (1.0.0)
 
 DEPENDENCIES:
-  - 1PasswordExtension (~> 1.0.0)
+  - 1PasswordExtension (from `https://github.com/AgileBits/onepassword-app-extension.git`, branch `bugfix/added-compatibility-for-cocoaPods-0.36`)
   - AFNetworking (~> 2.0)
+  - JSQMessagesViewController
   - Locksmith
   - pop (~> 1.0)
   - SwiftyUserDefaults
 
+EXTERNAL SOURCES:
+  1PasswordExtension:
+    :branch: bugfix/added-compatibility-for-cocoaPods-0.36
+    :git: https://github.com/AgileBits/onepassword-app-extension.git
+
+CHECKOUT OPTIONS:
+  1PasswordExtension:
+    :commit: cac887ac8ed557e4fbbcd6607a53c8ec2ae34669
+    :git: https://github.com/AgileBits/onepassword-app-extension.git
+
 SPEC CHECKSUMS:
-  1PasswordExtension: 40e5bfe30487e9c11b92dc81f4cb3e47abdf5a58
+  1PasswordExtension: b13c2217ee5c05464d9b2ae29a81b324b7ce451b
   AFNetworking: 8bee59492a6ff15d69130efa4d0dc67e0094a52a
+  JSQMessagesViewController: e93a288a9662d4519c95a28a8c0eec10beae1bfc
+  JSQSystemSoundPlayer: 55528c699a283aae2220d3ae7b8b527d2ecef4b4
   Locksmith: 15a873e266beceb1b81476e0f50a1e1cba103a6f
   pop: 2f14a1ea61339767af9e66741b418c831b3844df
   SwiftyUserDefaults: c13a0c5a00d03da70d68ac7b05dbea548c64d87b

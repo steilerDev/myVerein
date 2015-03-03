@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3012715A1AA5C83C00C23AEF /* NetworkingSessionFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 301271591AA5C83C00C23AEF /* NetworkingSessionFactory.swift */; };
 		3020CBA51A9E1289005AAEEF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3020CBA41A9E1289005AAEEF /* AppDelegate.swift */; };
 		3020CBA71A9E1289005AAEEF /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3020CBA61A9E1289005AAEEF /* LoginViewController.swift */; };
 		3020CBAA1A9E1289005AAEEF /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3020CBA81A9E1289005AAEEF /* Main.storyboard */; };
@@ -14,6 +15,7 @@
 		3020CBAF1A9E1289005AAEEF /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3020CBAD1A9E1289005AAEEF /* LaunchScreen.xib */; };
 		3020CBBB1A9E128A005AAEEF /* myVereinTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3020CBBA1A9E128A005AAEEF /* myVereinTests.swift */; };
 		30621E0D1A9F6AD7002797F5 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30621E0C1A9F6AD7002797F5 /* Constants.swift */; };
+		30BAFEE51AA52828000D18EF /* ca-cert.cer in Resources */ = {isa = PBXBuildFile; fileRef = 30BAFEE11AA518EA000D18EF /* ca-cert.cer */; };
 		669D9154C16CB2C002A6D28F /* Pods.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FE0498950F9A959DC502856B /* Pods.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 /* End PBXBuildFile section */
 
@@ -28,6 +30,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		301271591AA5C83C00C23AEF /* NetworkingSessionFactory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkingSessionFactory.swift; sourceTree = "<group>"; };
 		3020CB9F1A9E1289005AAEEF /* myVerein.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = myVerein.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3020CBA31A9E1289005AAEEF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		3020CBA41A9E1289005AAEEF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -38,8 +41,8 @@
 		3020CBB41A9E128A005AAEEF /* myVereinTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = myVereinTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		3020CBB91A9E128A005AAEEF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		3020CBBA1A9E128A005AAEEF /* myVereinTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = myVereinTests.swift; sourceTree = "<group>"; };
-		3053BA6F1AA20F2A00875338 /* myVerein-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "myVerein-Bridging-Header.h"; sourceTree = "<group>"; };
 		30621E0C1A9F6AD7002797F5 /* Constants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
+		30BAFEE11AA518EA000D18EF /* ca-cert.cer */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ca-cert.cer"; sourceTree = "<group>"; };
 		38F4A086C692F4A87191BB5C /* Pods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.release.xcconfig; path = "Pods/Target Support Files/Pods/Pods.release.xcconfig"; sourceTree = "<group>"; };
 		5DA33B30AC9FFB66D2664039 /* Pods.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.debug.xcconfig; path = "Pods/Target Support Files/Pods/Pods.debug.xcconfig"; sourceTree = "<group>"; };
 		FE0498950F9A959DC502856B /* Pods.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -81,6 +84,23 @@
 			name = Pods;
 			sourceTree = "<group>";
 		};
+		3012715B1AA5C85500C23AEF /* Networking */ = {
+			isa = PBXGroup;
+			children = (
+				30BAFEE11AA518EA000D18EF /* ca-cert.cer */,
+				301271591AA5C83C00C23AEF /* NetworkingSessionFactory.swift */,
+			);
+			name = Networking;
+			sourceTree = "<group>";
+		};
+		3012715C1AA5C86400C23AEF /* ViewController */ = {
+			isa = PBXGroup;
+			children = (
+				3020CBA61A9E1289005AAEEF /* LoginViewController.swift */,
+			);
+			name = ViewController;
+			sourceTree = "<group>";
+		};
 		3020CB961A9E1289005AAEEF = {
 			isa = PBXGroup;
 			children = (
@@ -104,10 +124,11 @@
 		3020CBA11A9E1289005AAEEF /* myVerein */ = {
 			isa = PBXGroup;
 			children = (
-				3020CBA61A9E1289005AAEEF /* LoginViewController.swift */,
+				3012715C1AA5C86400C23AEF /* ViewController */,
+				3012715B1AA5C85500C23AEF /* Networking */,
 				3020CBA81A9E1289005AAEEF /* Main.storyboard */,
-				3020CBA21A9E1289005AAEEF /* Supporting Files */,
 				30621E0C1A9F6AD7002797F5 /* Constants.swift */,
+				3020CBA21A9E1289005AAEEF /* Supporting Files */,
 			);
 			path = myVerein;
 			sourceTree = "<group>";
@@ -118,7 +139,6 @@
 				3020CBA41A9E1289005AAEEF /* AppDelegate.swift */,
 				3020CBAD1A9E1289005AAEEF /* LaunchScreen.xib */,
 				3020CBAB1A9E1289005AAEEF /* Images.xcassets */,
-				3053BA6F1AA20F2A00875338 /* myVerein-Bridging-Header.h */,
 				3020CBA31A9E1289005AAEEF /* Info.plist */,
 			);
 			name = "Supporting Files";
@@ -225,6 +245,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				30BAFEE51AA52828000D18EF /* ca-cert.cer in Resources */,
 				3020CBAA1A9E1289005AAEEF /* Main.storyboard in Resources */,
 				3020CBAF1A9E1289005AAEEF /* LaunchScreen.xib in Resources */,
 				3020CBAC1A9E1289005AAEEF /* Images.xcassets in Resources */,
@@ -294,6 +315,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				3020CBA71A9E1289005AAEEF /* LoginViewController.swift in Sources */,
+				3012715A1AA5C83C00C23AEF /* NetworkingSessionFactory.swift in Sources */,
 				3020CBA51A9E1289005AAEEF /* AppDelegate.swift in Sources */,
 				30621E0D1A9F6AD7002797F5 /* Constants.swift in Sources */,
 			);
@@ -428,7 +450,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 8.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_OBJC_BRIDGING_HEADER = "myVerein/myVerein-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "";
 			};
 			name = Debug;
 		};
@@ -442,7 +464,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 8.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_OBJC_BRIDGING_HEADER = "myVerein/myVerein-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "";
 			};
 			name = Release;
 		};
