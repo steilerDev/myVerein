@@ -13,27 +13,36 @@ import Locksmith
 
 class NetworkingSessionFactory {
     
-    private static var sharedSession: AFHTTPSessionManager?
+    private static var sharedSessionManager: AFHTTPSessionManager?
     
-    /// This
-    static func instance() -> AFHTTPSessionManager? {
-        if sharedSession == nil {
-            if let baseUrlString = (Locksmith.loadDataForUserAccount(Constants.userAccount).0 as? [String: String])?[Constants.keychainDomainField],
-                baseUrl = NSURL(string: baseUrlString),
-                certificatePath = NSBundle.mainBundle().pathForResource("ca-cert", ofType: "cer"),
-                certificate = NSData(contentsOfFile: certificatePath)
-            {
-                sharedSession = AFHTTPSessionManager(baseURL: baseUrl)
-                sharedSession?.securityPolicy = AFSecurityPolicy(pinningMode: .Certificate)
-                
-                sharedSession?.securityPolicy.allowInvalidCertificates = true
-                sharedSession?.securityPolicy.pinnedCertificates = [certificate]
-            }
+    /// Struct containing String constants only used by this class
+    private struct NetworkingConstants {
+        private struct Certificate {
+            static let Name = "ca-cert"
+            static let Type = "cer"
         }
-        return sharedSession
     }
     
+    /// This function returns the shared session manager used within the whole system. The object is lazily created
+    static func instance() -> AFHTTPSessionManager? {
+        if sharedSessionManager == nil {
+            if let baseUrlString = (Locksmith.loadDataForUserAccount(GlobalConstants.Keychain.UserAccount).0 as? [String: String])?[GlobalConstants.Keychain.Domain],
+                baseUrl = NSURL(string: baseUrlString),
+                certificatePath = NSBundle.mainBundle().pathForResource(NetworkingConstants.Certificate.Name, ofType: NetworkingConstants.Certificate.Type),
+                certificate = NSData(contentsOfFile: certificatePath)
+            {
+                sharedSessionManager = AFHTTPSessionManager(baseURL: baseUrl)
+                sharedSessionManager?.securityPolicy = AFSecurityPolicy(pinningMode: .Certificate)
+                
+                sharedSessionManager?.securityPolicy.allowInvalidCertificates = true
+                sharedSessionManager?.securityPolicy.pinnedCertificates = [certificate]
+            }
+        }
+        return sharedSessionManager
+    }
+    
+    /// This function invalidates the current instance of the session manager
     static func invalidateInstance() {
-        sharedSession = nil
+        sharedSessionManager = nil
     }
 }

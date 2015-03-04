@@ -15,10 +15,13 @@ import OnePasswordExtension
 
 class LoginViewController: UIViewController, UITextFieldDelegate, POPAnimationDelegate {
 
-    private struct LoginViewControllerConstantValues {
-        static let loginBoxAnimationKey = "moveLoginBoxAnimation"
-        static let wrongPasswordAnimationKey = "shakePassword"
-        static let segueToMainApplication = "showMainApplicationSegue"
+    /// Struct containing String constants only used by this class
+    private struct LoginViewControllerConstants {
+        static let LoginBoxAnimationKey = "moveLoginBoxAnimation"
+        static let WrongPasswordAnimationKey = "shakePassword"
+        static let SegueToMainApplication = "showMainApplicationSegue"
+        
+        static let PasswordManagerURL = "https://agilebits.com/onepassword"
     }
     
     @IBOutlet weak var loginBox: UIView!
@@ -27,6 +30,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate, POPAnimationDe
     @IBOutlet weak var hostTextField: UITextField!
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     @IBOutlet weak var topConstraintForLoginBox: NSLayoutConstraint!
+    @IBOutlet weak var loginButton: UIButton!
     
     private var initialLoginPosition: CGPoint?
     
@@ -83,7 +87,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate, POPAnimationDe
             var alert = UIAlertController(title: "No password manager found", message: "To use this extension you need to install a password manager, supporting iOS 8 extensions, like 1Password", preferredStyle: .Alert)
             alert.addAction(UIAlertAction(title: "Okay", style: .Cancel, handler: { (action) -> Void in }))
             alert.addAction(UIAlertAction(title: "Learn more", style: .Default, handler: { (action) -> Void in
-                UIApplication.sharedApplication().openURL(NSURL(string: Constants.passwordManagerURL)!)
+                UIApplication.sharedApplication().openURL(NSURL(string: LoginViewControllerConstants.PasswordManagerURL)!)
             }))
             presentViewController(alert, animated: true, completion: nil)
             
@@ -109,10 +113,10 @@ class LoginViewController: UIViewController, UITextFieldDelegate, POPAnimationDe
                 hostname.removeAtIndex(advance(hostname.startIndex, count(hostname) - 1))
             }
             
-            if Locksmith.loadDataForUserAccount(Constants.userAccount).0?.count > 0 {
-                Locksmith.updateData([Constants.keychainUsernameField: username, Constants.keychainPasswordField: password, Constants.keychainDomainField: hostname], forUserAccount: Constants.userAccount)
+            if Locksmith.loadDataForUserAccount(GlobalConstants.Keychain.UserAccount).0?.count > 0 {
+                Locksmith.updateData([GlobalConstants.Keychain.Username: username, GlobalConstants.Keychain.Password: password, GlobalConstants.Keychain.Domain: hostname], forUserAccount: GlobalConstants.Keychain.UserAccount)
             } else {
-                Locksmith.saveData([Constants.keychainUsernameField: username, Constants.keychainPasswordField: password, Constants.keychainDomainField: hostname], forUserAccount: Constants.userAccount)
+                Locksmith.saveData([GlobalConstants.Keychain.Username: username, GlobalConstants.Keychain.Password: password, GlobalConstants.Keychain.Domain: hostname], forUserAccount: GlobalConstants.Keychain.UserAccount)
             }
             
             validateCurrentLogin()
@@ -124,8 +128,13 @@ class LoginViewController: UIViewController, UITextFieldDelegate, POPAnimationDe
     // This function uses the keychain to try and log into the system
     func validateCurrentLogin() {
         activityIndicator.startAnimating()
+        dismissKeyboard()
+        usernameTextField.enabled = false
+        passwordTextField.enabled = false
+        hostTextField.enabled = false
+        loginButton.enabled = false
         
-        let (dictionary, error) = Locksmith.loadDataForUserAccount(Constants.userAccount)
+        let (dictionary, error) = Locksmith.loadDataForUserAccount(GlobalConstants.Keychain.UserAccount)
         if let currentError = error {
             println("An error occured while loading keychain data")
             activityIndicator.stopAnimating()
@@ -133,9 +142,9 @@ class LoginViewController: UIViewController, UITextFieldDelegate, POPAnimationDe
             println("Keychain dictionary is empty")
             activityIndicator.stopAnimating()
         } else if let keychainDictionary = dictionary as? [String: String] {
-            if let username = keychainDictionary[Constants.keychainUsernameField],
-                password = keychainDictionary[Constants.keychainPasswordField],
-                domain = keychainDictionary[Constants.keychainDomainField]
+            if let username = keychainDictionary[GlobalConstants.Keychain.Username],
+                password = keychainDictionary[GlobalConstants.Keychain.Password],
+                domain = keychainDictionary[GlobalConstants.Keychain.Domain]
             {
                 // Update UI
                 usernameTextField.text = username
@@ -150,7 +159,9 @@ class LoginViewController: UIViewController, UITextFieldDelegate, POPAnimationDe
                         "password": password,
                         "rememberMe": "on"]
                     
-                    sessionManager.POST(NSURL(string: Constants.API.login, relativeToURL: sessionManager.baseURL)?.absoluteString,
+                    
+                    
+                    sessionManager.POST(NSURL(string: GlobalConstants.API.Login, relativeToURL: sessionManager.baseURL)?.absoluteString,
                         parameters: parameters,
                         success:
                         {
@@ -159,7 +170,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate, POPAnimationDe
                             dispatch_async(dispatch_get_main_queue()) {
                                 self.activityIndicator.stopAnimating()
                             }
-                            //self.performSegueWithIdentifier(LoginViewControllerConstantValues.segueToMainApplication, sender: self)
+                            self.performSegueWithIdentifier(LoginViewControllerConstants.SegueToMainApplication, sender: self)
                         },
                         failure:
                         {
@@ -185,6 +196,11 @@ class LoginViewController: UIViewController, UITextFieldDelegate, POPAnimationDe
     }
     
     private func animateInvalidLogin() {
+        usernameTextField.enabled = true
+        passwordTextField.enabled = true
+        hostTextField.enabled = true
+        loginButton.enabled = true
+        
         // Create animation in case of log-in failure
         let shake = POPSpringAnimation(propertyNamed: kPOPLayerPositionX)
         shake.springBounciness = 20
@@ -193,7 +209,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate, POPAnimationDe
         
         if(usernameTextField.isFirstResponder() || passwordTextField.isFirstResponder() || hostTextField.isFirstResponder()) {
             dispatch_async(dispatch_get_main_queue()) {
-                self.loginBox.pop_addAnimation(shake, forKey: LoginViewControllerConstantValues.wrongPasswordAnimationKey)
+                self.loginBox.pop_addAnimation(shake, forKey: LoginViewControllerConstants.WrongPasswordAnimationKey)
             }
         } else {
             usernameTextField.becomeFirstResponder()
@@ -203,8 +219,12 @@ class LoginViewController: UIViewController, UITextFieldDelegate, POPAnimationDe
     
     // MARK: - Text field animation and keyboard management
     
+    @IBAction func recogniseTap(sender: UITapGestureRecognizer) {
+        dismissKeyboard()
+    }
+    
     /// This function is invoked, as soon as a touch outside the field was recognized. The keyboard is dismissed by calling resignFirstResponder on the currently edited textfield.
-    func dismissKeyboard(gesture: UITapGestureRecognizer) {
+    func dismissKeyboard() {
         if usernameTextField.editing {
             usernameTextField.resignFirstResponder()
         } else if passwordTextField.editing {
@@ -240,12 +260,12 @@ class LoginViewController: UIViewController, UITextFieldDelegate, POPAnimationDe
         newCenter.y = toValue ?? initialLoginPosition?.y ?? (loginBox.frame.size.height/2) + 24 //Use either the to value or the initial value, default should never be used
         
         var moveAnimation = POPSpringAnimation(propertyNamed: kPOPViewCenter)
-        moveAnimation.springBounciness = 15
-        moveAnimation.springSpeed = 15
+        moveAnimation.springBounciness = 10
+        moveAnimation.springSpeed = 10
         moveAnimation.toValue = NSValue(CGPoint: newCenter)
         moveAnimation.delegate = self
-        moveAnimation.name = LoginViewControllerConstantValues.loginBoxAnimationKey
-        loginBox.pop_addAnimation(moveAnimation, forKey: LoginViewControllerConstantValues.loginBoxAnimationKey)
+        moveAnimation.name = LoginViewControllerConstants.LoginBoxAnimationKey
+        loginBox.pop_addAnimation(moveAnimation, forKey: LoginViewControllerConstants.LoginBoxAnimationKey)
     }
     
     func pop_animationDidReachToValue(anim: POPAnimation!) {
@@ -259,7 +279,6 @@ class LoginViewController: UIViewController, UITextFieldDelegate, POPAnimationDe
     /// The function registers gesture recognizer dismissing the keyboard
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: "dismissKeyboard:"))
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "moveLoginBoxUp:", name: UIKeyboardWillShowNotification, object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "moveLoginBoxUp:", name: UIKeyboardDidShowNotification, object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "moveLoginBoxDown", name: UIKeyboardDidHideNotification, object: nil)

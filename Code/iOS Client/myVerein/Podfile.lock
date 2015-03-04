@@ -26,24 +26,28 @@ PODS:
   - JSQSystemSoundPlayer (2.0.1)
   - Locksmith (1.2.0)
   - pop (1.0.7)
+  - RKNotificationHub (1.0.4)
   - SwiftyUserDefaults (1.0.0)
+  - UIImageView-Letters (1.0)
 
 DEPENDENCIES:
-  - 1PasswordExtension (from `https://github.com/AgileBits/onepassword-app-extension.git`, branch `bugfix/added-compatibility-for-cocoaPods-0.36`)
+  - 1PasswordExtension (from `https://github.com/AgileBits/onepassword-app-extension.git`, branch `master`)
   - AFNetworking (~> 2.0)
   - JSQMessagesViewController
   - Locksmith
   - pop (~> 1.0)
+  - RKNotificationHub
   - SwiftyUserDefaults
+  - UIImageView-Letters
 
 EXTERNAL SOURCES:
   1PasswordExtension:
-    :branch: bugfix/added-compatibility-for-cocoaPods-0.36
+    :branch: master
     :git: https://github.com/AgileBits/onepassword-app-extension.git
 
 CHECKOUT OPTIONS:
   1PasswordExtension:
-    :commit: cac887ac8ed557e4fbbcd6607a53c8ec2ae34669
+    :commit: 032794256ba1c3ae5645a8a2e4a5fa8ef1af5aaa
     :git: https://github.com/AgileBits/onepassword-app-extension.git
 
 SPEC CHECKSUMS:
@@ -53,6 +57,8 @@ SPEC CHECKSUMS:
   JSQSystemSoundPlayer: 55528c699a283aae2220d3ae7b8b527d2ecef4b4
   Locksmith: 15a873e266beceb1b81476e0f50a1e1cba103a6f
   pop: 2f14a1ea61339767af9e66741b418c831b3844df
+  RKNotificationHub: 04a08446faa30b801b7f227392e0ade6d4b9b9d0
   SwiftyUserDefaults: c13a0c5a00d03da70d68ac7b05dbea548c64d87b
+  UIImageView-Letters: 9f21bca067a6cf8651e104c3b1c9253bc98c9071
 
 COCOAPODS: 0.36.0.rc.1
