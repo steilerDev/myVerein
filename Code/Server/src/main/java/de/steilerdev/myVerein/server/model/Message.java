@@ -22,12 +22,48 @@ import org.springframework.data.mongodb.core.mapping.DBRef;
 
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * This object is representing an entity within the messages' collection of the MongoDB.
  */
 public class Message
 {
+    /**
+     * This enum is representing the status of a message sent to a specific receiver.
+     */
+    public enum MessageStatus {
+        /**
+         * This status is assigned to a message which is stored on the server but not delivered to the client yet
+         */
+        PENDING {
+            @Override
+            public String toString() {
+                return "PENDING";
+            }
+        },
+        /**
+         * This status is assigned to a message which is delivered to the client
+         */
+        DELIVERED {
+            @Override
+            public String toString() {
+                return "DELIVERED";
+            }
+        },
+        /**
+         * This status is assigned to a message which is read by the client
+         */
+        READ {
+            @Override
+            public String toString() {
+                return "READ";
+            }
+        }
+    }
+
     @Id
     private String id;
 
@@ -37,13 +73,12 @@ public class Message
     @NotNull
     private LocalDateTime timestamp;
 
-    @DBRef
     @NotNull
-    private User sender;
+    private Map<String, MessageStatus> receiver;
 
     @DBRef
     @NotNull
-    private User receiver;
+    private User sender;
 
     @DBRef
     @NotNull
@@ -51,13 +86,18 @@ public class Message
 
     public Message() {}
 
-    public Message(String content, LocalDateTime timestamp, User sender, User receiver, Division group)
+    public Message(String content, LocalDateTime timestamp, User sender, List<User> receivers, Division group)
     {
         this.content = content;
         this.timestamp = timestamp;
         this.sender = sender;
-        this.receiver = receiver;
         this.group = group;
+
+        this.receiver = new HashMap<>();
+        for(User user: receivers)
+        {
+            this.receiver.put(user.getId(), MessageStatus.PENDING);
+        }
     }
 
     public String getId()
@@ -100,12 +140,12 @@ public class Message
         this.sender = sender;
     }
 
-    public User getReceiver()
+    public Map<String, MessageStatus> getReceiver()
     {
         return receiver;
     }
 
-    public void setReceiver(User receiver)
+    public void setReceiver(Map<String, MessageStatus> receiver)
     {
         this.receiver = receiver;
     }
@@ -118,5 +158,33 @@ public class Message
     public void setGroup(Division group)
     {
         this.group = group;
+    }
+
+    public void setDelivered(User user)
+    {
+        receiver.put(user.getId(), MessageStatus.DELIVERED);
+    }
+
+    public void setRead(User user)
+    {
+        receiver.put(user.getId(), MessageStatus.READ);
+    }
+
+    public void setReceivingUser(User... users)
+    {
+        receiver = new HashMap<>();
+        for(User user: users)
+        {
+            receiver.put(user.getId(), MessageStatus.PENDING);
+        }
+    }
+
+    /**
+     * {@link de.steilerdev.myVerein.server.model.MessageRepository#findAllByPrefixedReceiverIDAndMessageStatus} needs a receiver id, prefixed with "receiver.", because a custom query with a fixed prefix is not working. This function creates this prefixed receiver id.
+     * @param user The user, which needs to be prefixed.
+     * @return The prefixed user ID.
+     */
+    public static String receiverIDForUser(User user) {
+        return user == null? null: "receiver." + user.getId();
     }
 }

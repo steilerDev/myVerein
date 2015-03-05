@@ -5,6 +5,7 @@ import de.steilerdev.myVerein.server.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cglib.core.Local;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +18,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * This controller is processing all general requests.
@@ -40,6 +45,9 @@ public class IndexController
 
     @Autowired
     private SettingsRepository settingsRepository;
+
+    @Autowired
+    private MessageRepository messageRepository;
 
     private static Logger logger = LoggerFactory.getLogger(IndexController.class);
 
@@ -245,6 +253,12 @@ public class IndexController
         eventRepository.save(event2);
         eventRepository.save(event3);
         eventRepository.save(event4);
+
+        List<User> receiverList = new ArrayList<>();
+        receiverList.add(user1);
+        receiverList.add(user2);
+        Message message1 = new Message("Hello world", LocalDateTime.now(), user1, receiverList, div1);
+        messageRepository.save(message1);
     }
 
     /**

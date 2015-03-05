@@ -17,6 +17,7 @@
 package de.steilerdev.myVerein.server.model;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -27,6 +28,6 @@ import java.util.List;
 @Repository
 public interface MessageRepository extends MongoRepository<Message, String> {
 
-    public List<Message> findByReceiver(User receiver);
-
+    @Query(value = "{?0 : ?1 }")
+    public List<Message> findAllByPrefixedReceiverIDAndMessageStatus(String receiverID, Message.MessageStatus messageStatus);
 }

@@ -16,23 +16,89 @@
  */
 package de.steilerdev.myVerein.server.controller.user;
 
-import de.steilerdev.myVerein.server.model.Message;
+import de.steilerdev.myVerein.server.model.*;
+import de.steilerdev.myVerein.server.security.CurrentUser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/user/message")
 public class MessageRestController
 {
+    private static Logger logger = LoggerFactory.getLogger(MessageRestController.class);
+
+    @Autowired
+    private MessageRepository messageRepository;
+
+    @Autowired
+    private DivisionRepository divisionRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
     @RequestMapping(produces = "application/json", method = RequestMethod.GET)
-    public Message getMessage()
+    public ResponseEntity<List<Message>> getUnreadMessages(@CurrentUser User currentUser)
     {
-        Message message = new Message();
-        message.setContent("Hello world");
-        message.setTimestamp(LocalDateTime.now());
-        return message;
+        logger.trace("[Current User " + currentUser.getEmail() + "] Getting unread messages of " + currentUser.getEmail());
+        List<Message> undeliveredMessages = messageRepository.findAllByPrefixedReceiverIDAndMessageStatus(Message.receiverIDForUser(currentUser), Message.MessageStatus.PENDING);
+        if (undeliveredMessages == null)
+        {
+            logger.debug("[Current User " + currentUser.getEmail() + "] Unable to find any undelivered messages");
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        } else
+        {
+            undeliveredMessages.parallelStream().forEach(message -> message.setDelivered(currentUser));
+            try
+            {
+                messageRepository.save(undeliveredMessages);
+                logger.info("[Current User " + currentUser.getEmail() + "] Returning undelivered messages for " + currentUser.getEmail());
+                return new ResponseEntity<>(undeliveredMessages, HttpStatus.OK);
+            } catch (IllegalArgumentException e)
+            {
+                logger.warn("[Current User " + currentUser.getEmail() + "] Unable to save messages for " + currentUser.getEmail() + ": " + e.getMessage());
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        }
+    }
+
+    @RequestMapping(produces = "application/json", method = RequestMethod.POST)
+    public ResponseEntity<String> sendMessage(@CurrentUser User currentUser, @RequestParam String division, @RequestParam String content)
+    {
+        Division receivingDivision;
+        if(division.isEmpty() || content.isEmpty())
+        {
+            logger.warn("[Current User " + currentUser.getEmail() + "] Required parameters for sending message missing");
+            return new ResponseEntity<>("Required parameter missing", HttpStatus.BAD_REQUEST);
+        } else if ((receivingDivision = divisionRepository.findByName(division)) == null)
+        {
+            logger.warn("[Current User " + currentUser.getEmail() + "] Unable to find receiving division " + division);
+            return new ResponseEntity<>("Unable to find receiving division", HttpStatus.INTERNAL_SERVER_ERROR);
+        } else
+        {
+
+            List<User> receivingUser = userRepository.findAllByDivisionInDivisions(receivingDivision);
+
+            if (receivingUser.isEmpty())
+            {
+                logger.warn("[Current User " + currentUser.getEmail() + "] Empty receiver list");
+                return new ResponseEntity<>("Empty receiver list", HttpStatus.BAD_REQUEST);
+            } else
+            {
+                Message message = new Message(content, LocalDateTime.now(), currentUser, receivingUser, receivingDivision);
+                messageRepository.save(message);
+                logger.info("[Current User " + currentUser.getEmail() + "] Successfully saved message");
+                return new ResponseEntity<>("Successfully saved message", HttpStatus.OK);
+            }
+        }
     }
 }
