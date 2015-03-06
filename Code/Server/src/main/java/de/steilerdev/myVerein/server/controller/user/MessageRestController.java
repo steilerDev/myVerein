@@ -60,7 +60,8 @@ public class MessageRestController
             undeliveredMessages.parallelStream().forEach(message -> message.setDelivered(currentUser));
             try
             {
-                messageRepository.save(undeliveredMessages);
+                //messageRepository.save(undeliveredMessages);
+                undeliveredMessages.parallelStream().forEach(message -> message.prepareForSending());
                 logger.info("[Current User " + currentUser.getEmail() + "] Returning undelivered messages for " + currentUser.getEmail());
                 return new ResponseEntity<>(undeliveredMessages, HttpStatus.OK);
             } catch (IllegalArgumentException e)

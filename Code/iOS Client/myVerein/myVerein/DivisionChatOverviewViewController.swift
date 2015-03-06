@@ -65,7 +65,6 @@ class DivisionChatOverviewViewController: UICollectionViewController {
 
     override func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
         var selectedCell = collectionView.cellForItemAtIndexPath(indexPath) as? DivisionChatCell
-        println("Selected cell")
         selectedCell?.notificationCount++
     }
     

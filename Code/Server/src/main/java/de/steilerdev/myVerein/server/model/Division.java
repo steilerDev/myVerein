@@ -175,6 +175,12 @@ public class Division
         this.ancestors = ancestors;
     }
 
+    public void removeEverythingExceptName()
+    {
+        adminUser = null;
+        desc = null;
+    }
+
     /**
      * Comparing two objects of the division class according to their name. Overwritten to be able to use the contains() method of java.util.List.
      * @param obj The object compared to the current object.

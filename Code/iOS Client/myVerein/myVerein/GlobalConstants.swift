@@ -10,15 +10,10 @@ import Foundation
 
 /// Struct containing String constants used by the whole project
 struct GlobalConstants {
-    
     struct Keychain {
         static let UserAccount = "myVereinUserAccount"
         static let Username = "myVereinUsername"
         static let Password = "myVereinPassword"
         static let Domain = "myVereinDomain"
-    }
-    
-    struct API {
-        static let Login = "/api/login"
     }
 }

@@ -11,6 +11,7 @@ import Foundation
 import AFNetworking
 import Locksmith
 
+/// This class is used to manage the shared HTTPSession.
 class NetworkingSessionFactory {
     
     private static var sharedSessionManager: AFHTTPSessionManager?
@@ -36,6 +37,8 @@ class NetworkingSessionFactory {
                 
                 sharedSessionManager?.securityPolicy.allowInvalidCertificates = true
                 sharedSessionManager?.securityPolicy.pinnedCertificates = [certificate]
+                
+                sharedSessionManager?.responseSerializer = AFJSONResponseSerializer()
             }
         }
         return sharedSessionManager
@@ -43,6 +46,7 @@ class NetworkingSessionFactory {
     
     /// This function invalidates the current instance of the session manager
     static func invalidateInstance() {
+        sharedSessionManager?.invalidateSessionCancelingTasks(true)
         sharedSessionManager = nil
     }
 }

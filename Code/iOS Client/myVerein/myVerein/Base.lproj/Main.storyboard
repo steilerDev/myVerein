@@ -185,7 +185,7 @@
                         <viewControllerLayoutGuide type="bottom" id="H6o-GO-hLc"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="NC2-qi-Fus">
-                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="551"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                     </view>
@@ -269,19 +269,20 @@
             </objects>
             <point key="canvasLocation" x="2058" y="90"/>
         </scene>
-        <!--Tab Bar Controller-->
+        <!--Menu Controller-->
         <scene sceneID="DcL-gZ-hnU">
             <objects>
-                <tabBarController id="anG-Qv-Hwh" sceneMemberID="viewController">
+                <tabBarController id="anG-Qv-Hwh" customClass="MenuController" customModule="myVerein" customModuleProvider="target" sceneMemberID="viewController">
                     <nil key="simulatedBottomBarMetrics"/>
-                    <tabBar key="tabBar" contentMode="scaleToFill" id="bE8-SZ-oKk">
+                    <tabBar key="tabBar" contentMode="scaleToFill" translucent="NO" id="bE8-SZ-oKk">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="49"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <color key="tintColor" red="0.074509803920000006" green="0.80392156859999997" blue="0.47058823529999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     </tabBar>
                     <connections>
-                        <segue destination="a28-zv-3eW" kind="relationship" relationship="viewControllers" id="PaL-xs-W2Y"/>
+                        <outlet property="tabBar" destination="bE8-SZ-oKk" id="0A7-ux-aO6"/>
                         <segue destination="Tl6-AJ-nRN" kind="relationship" relationship="viewControllers" id="CBb-Bb-Lhx"/>
+                        <segue destination="a28-zv-3eW" kind="relationship" relationship="viewControllers" id="V4Q-Wf-3uJ"/>
                     </connections>
                 </tabBarController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="BaR-XS-Ch4" userLabel="First Responder" sceneMemberID="firstResponder"/>

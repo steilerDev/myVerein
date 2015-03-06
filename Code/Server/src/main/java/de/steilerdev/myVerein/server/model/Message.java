@@ -16,6 +16,7 @@
  */
 package de.steilerdev.myVerein.server.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
@@ -74,6 +75,7 @@ public class Message
     private LocalDateTime timestamp;
 
     @NotNull
+    @JsonIgnore
     private Map<String, MessageStatus> receiver;
 
     @DBRef
@@ -177,6 +179,12 @@ public class Message
         {
             receiver.put(user.getId(), MessageStatus.PENDING);
         }
+    }
+
+    public void prepareForSending()
+    {
+        sender.removeEverythingExceptEmailAndName();
+        group.removeEverythingExceptName();
     }
 
     /**

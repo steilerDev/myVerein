@@ -13,6 +13,8 @@ import SwiftyUserDefaults
 import Locksmith
 import OnePasswordExtension
 
+import CoreData
+
 class LoginViewController: UIViewController, UITextFieldDelegate, POPAnimationDelegate {
 
     /// Struct containing String constants only used by this class
@@ -142,53 +144,29 @@ class LoginViewController: UIViewController, UITextFieldDelegate, POPAnimationDe
             println("Keychain dictionary is empty")
             activityIndicator.stopAnimating()
         } else if let keychainDictionary = dictionary as? [String: String] {
-            if let username = keychainDictionary[GlobalConstants.Keychain.Username],
-                password = keychainDictionary[GlobalConstants.Keychain.Password],
-                domain = keychainDictionary[GlobalConstants.Keychain.Domain]
-            {
-                // Update UI
+            if let username = keychainDictionary[GlobalConstants.Keychain.Username] {
                 usernameTextField.text = username
-                passwordTextField.text = password
-                hostTextField.text = domain
-                
-                if let sessionManager = NetworkingSessionFactory.instance() {
-                    println(sessionManager.securityPolicy.pinnedCertificates.count)
-                    
-                    // Execute request
-                    let parameters = ["username": username,
-                        "password": password,
-                        "rememberMe": "on"]
-                    
-                    
-                    
-                    sessionManager.POST(NSURL(string: GlobalConstants.API.Login, relativeToURL: sessionManager.baseURL)?.absoluteString,
-                        parameters: parameters,
-                        success:
-                        {
-                            dataTask, response in
-                            println("Successfully logged in")
-                            dispatch_async(dispatch_get_main_queue()) {
-                                self.activityIndicator.stopAnimating()
-                            }
-                            self.performSegueWithIdentifier(LoginViewControllerConstants.SegueToMainApplication, sender: self)
-                        },
-                        failure:
-                        {
-                            dataTask, error in
-                            println("Unable to log in: \(error)")
-                            self.animateInvalidLogin()
-                            NetworkingSessionFactory.invalidateInstance()
-                        }
-                    )
-                } else {
-                    println("Nope")
-                    animateInvalidLogin()
-                }
-                
-            } else {
-                println("Unable to retrieve required fields")
-                animateInvalidLogin()
             }
+            if let password = keychainDictionary[GlobalConstants.Keychain.Password] {
+                passwordTextField.text = password
+            }
+            if let domain = keychainDictionary[GlobalConstants.Keychain.Domain]
+            {
+                hostTextField.text = domain
+            }
+            
+            NetworkingAction.loginAction(
+                {
+                    self.performSegueWithIdentifier(LoginViewControllerConstants.SegueToMainApplication, sender: self)
+                    self.activityIndicator.stopAnimating()
+                },
+                failure:
+                {
+                    error in
+                    self.animateInvalidLogin()
+                    self.activityIndicator.stopAnimating()
+                }
+            )
         } else {
             println("Unable to load keychain items")
             animateInvalidLogin()
@@ -208,13 +186,11 @@ class LoginViewController: UIViewController, UITextFieldDelegate, POPAnimationDe
         
         
         if(usernameTextField.isFirstResponder() || passwordTextField.isFirstResponder() || hostTextField.isFirstResponder()) {
-            dispatch_async(dispatch_get_main_queue()) {
-                self.loginBox.pop_addAnimation(shake, forKey: LoginViewControllerConstants.WrongPasswordAnimationKey)
-            }
+            loginBox.pop_addAnimation(shake, forKey: LoginViewControllerConstants.WrongPasswordAnimationKey)
         } else {
             usernameTextField.becomeFirstResponder()
         }
-        dispatch_async(dispatch_get_main_queue()) { self.activityIndicator.stopAnimating() }
+        activityIndicator.stopAnimating()
     }
     
     // MARK: - Text field animation and keyboard management

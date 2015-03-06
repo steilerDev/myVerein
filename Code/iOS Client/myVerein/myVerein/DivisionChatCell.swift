@@ -32,11 +32,17 @@ class DivisionChatCell: UICollectionViewCell {
     
     var lastUser: String? {
         didSet {
-            divisionImageView.setImageWithString(lastUser!, color: UIColor(hex: 0x999999))
+            divisionImageView.setImageWithString(lastUser!, color: UIColor(hex: 0x3AD18C))
+            divisionImageView.layer.borderWidth = 2
+            divisionImageView.layer.borderColor = UIColor(hex: 0x13CD78).CGColor
             divisionImageView.layer.cornerRadius = divisionImageView.layer.bounds.size.width/2
             divisionImageView.layer.masksToBounds = true
+            // If this attribute is not set a bunch of auto layout warnings will appear
+            divisionImageView.superview?.superview?.setTranslatesAutoresizingMaskIntoConstraints(false)
         }
     }
+    
+    
 }
 
 extension UIColor {

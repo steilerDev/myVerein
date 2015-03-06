@@ -87,7 +87,7 @@ public class IndexController
     @RequestMapping(value = "login", method = RequestMethod.GET)
     public String login(@RequestParam(required = false) String error, @RequestParam(required = false) String logout, @RequestParam(required = false) String cookieTheft, Model model)
     {
-        //createDatabaseExample();
+        createDatabaseExample();
         logger.trace("Getting login page.");
         if (settingsRepository.isInitSetup())
         {
