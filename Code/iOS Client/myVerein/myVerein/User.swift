@@ -11,7 +11,7 @@ import CoreData
 
 class User: NSManagedObject {
 
-    @NSManaged var birthday: NSTimeInterval
+    @NSManaged var birthday: NSDate
     @NSManaged var city: String
     @NSManaged var country: String
     @NSManaged var email: String
@@ -23,8 +23,9 @@ class User: NSManagedObject {
     @NSManaged var street: String
     @NSManaged var streetNumber: String
     @NSManaged var zipCode: String
-    @NSManaged var division: NSSet
+    @NSManaged var lastSynced: NSDate
     @NSManaged var administratedDivision: NSSet
+    @NSManaged var division: NSSet
     @NSManaged var sendMessages: NSSet
 
 }

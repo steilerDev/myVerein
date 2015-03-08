@@ -3,6 +3,7 @@
     <entity name="Division" representedClassName="Division" syncable="YES">
         <attribute name="desc" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="id" attributeType="String" indexed="YES" syncable="YES"/>
+        <attribute name="lastSynced" optional="YES" attributeType="Date" syncable="YES"/>
         <attribute name="name" attributeType="String" syncable="YES"/>
         <relationship name="admin" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="User" inverseName="administratedDivision" inverseEntity="User" syncable="YES"/>
         <relationship name="chatMessages" optional="YES" toMany="YES" deletionRule="Deny" destinationEntity="Message" inverseName="division" inverseEntity="Message" syncable="YES"/>
@@ -25,6 +26,7 @@
         <attribute name="gender" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="id" attributeType="String" indexed="YES" syncable="YES"/>
         <attribute name="lastName" attributeType="String" syncable="YES"/>
+        <attribute name="lastSynced" optional="YES" attributeType="Date" syncable="YES"/>
         <attribute name="membershipStatuts" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="street" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="streetNumber" optional="YES" attributeType="String" syncable="YES"/>
@@ -34,8 +36,8 @@
         <relationship name="sendMessages" optional="YES" toMany="YES" deletionRule="Deny" destinationEntity="Message" inverseName="sender" inverseEntity="Message" syncable="YES"/>
     </entity>
     <elements>
-        <element name="Division" positionX="0" positionY="108" width="128" height="133"/>
+        <element name="Division" positionX="0" positionY="108" width="128" height="150"/>
         <element name="Message" positionX="-650" positionY="-234" width="128" height="133"/>
-        <element name="User" positionX="-794" positionY="81" width="128" height="268"/>
+        <element name="User" positionX="-794" positionY="81" width="128" height="285"/>
     </elements>
 </model>

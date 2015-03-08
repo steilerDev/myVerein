@@ -112,7 +112,8 @@ class NetworkingAction {
     
     /// This function is used to handle a failure during a request. If the failure is due to the fact that the user was not logged in the function is going to try to log the user in. In case of a successfully log in, the initial function is executed again. The retry count is tracking how often the request tried to re-log in, to prevent an infinite loop, in case of a forbidden resource.
     private class func handleRequestFailure(error: NSError, sender: ((AnyObject) -> (), (NSError) -> (), Int) -> (), retryCount: Int, initialSuccess: (AnyObject) -> (), initialFailure: (NSError) -> ()) {
-        if error.code == 401 {
+        if error.code == 401 ||
+            error.code == -1011 {
             if retryCount < maxLoginRetries {
                 println("Error occured because user was not logged in")
                 let newCount = retryCount + 1
@@ -124,6 +125,7 @@ class NetworkingAction {
                 initialFailure(MVError.createError(.MVMaximumLoginRetriesReached))
             }
         } else {
+            println("Error was of different kind: \(error)")
             dispatch_async(dispatch_get_main_queue()) {
                 initialFailure(error)
             }

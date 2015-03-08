@@ -14,7 +14,7 @@ class Message: NSManagedObject {
     @NSManaged var content: String
     @NSManaged var id: String
     @NSManaged var read: Bool
-    @NSManaged var timestamp: NSTimeInterval
+    @NSManaged var timestamp: NSDate
     @NSManaged var division: Division
     @NSManaged var sender: User
 

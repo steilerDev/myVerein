@@ -17,9 +17,6 @@
 		302BE8C21AA642EB001D0FE7 /* DivisionChatCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 302BE8C11AA642EB001D0FE7 /* DivisionChatCell.swift */; };
 		302BE8C41AA64599001D0FE7 /* DivisionChatOverviewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 302BE8C31AA64599001D0FE7 /* DivisionChatOverviewViewController.swift */; };
 		304C577F1AACA3CC00B221D7 /* MVSecurity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 304C577E1AACA3CC00B221D7 /* MVSecurity.swift */; };
-		304C578A1AACB63800B221D7 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 304C57891AACB63800B221D7 /* User.swift */; };
-		304C578C1AACB63900B221D7 /* Message.swift in Sources */ = {isa = PBXBuildFile; fileRef = 304C578B1AACB63900B221D7 /* Message.swift */; };
-		304C578E1AACB63900B221D7 /* Division.swift in Sources */ = {isa = PBXBuildFile; fileRef = 304C578D1AACB63900B221D7 /* Division.swift */; };
 		306FD7321AAA356000719B82 /* NetworkingHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 306FD7311AAA356000719B82 /* NetworkingHelper.swift */; };
 		306FD7341AAB0F4400719B82 /* MVError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 306FD7331AAB0F4400719B82 /* MVError.swift */; };
 		30916FFB1AA8B9D0004D30D1 /* MenuController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30916FFA1AA8B9D0004D30D1 /* MenuController.swift */; };
@@ -27,6 +24,12 @@
 		309170341AA8D2B4004D30D1 /* MessageRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 309170331AA8D2B4004D30D1 /* MessageRepository.swift */; };
 		30A4F7D91AA97D400064EA2C /* NetworkingAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30A4F7D81AA97D400064EA2C /* NetworkingAction.swift */; };
 		30BAFEE51AA52828000D18EF /* ca-cert.cer in Resources */ = {isa = PBXBuildFile; fileRef = 30BAFEE11AA518EA000D18EF /* ca-cert.cer */; };
+		30FB44BB1AACC088003E4512 /* DivisionRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30FB44BA1AACC088003E4512 /* DivisionRepository.swift */; };
+		30FB44BD1AACC096003E4512 /* UserRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30FB44BC1AACC096003E4512 /* UserRepository.swift */; };
+		30FB44C11AACD819003E4512 /* TimestampParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30FB44C01AACD819003E4512 /* TimestampParser.swift */; };
+		30FB44C31AACD897003E4512 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30FB44C21AACD897003E4512 /* User.swift */; };
+		30FB44C51AACD898003E4512 /* Message.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30FB44C41AACD898003E4512 /* Message.swift */; };
+		30FB44C71AACD898003E4512 /* Division.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30FB44C61AACD898003E4512 /* Division.swift */; };
 		669D9154C16CB2C002A6D28F /* Pods.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FE0498950F9A959DC502856B /* Pods.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 /* End PBXBuildFile section */
 
@@ -55,9 +58,6 @@
 		302BE8C11AA642EB001D0FE7 /* DivisionChatCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DivisionChatCell.swift; sourceTree = "<group>"; };
 		302BE8C31AA64599001D0FE7 /* DivisionChatOverviewViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DivisionChatOverviewViewController.swift; sourceTree = "<group>"; };
 		304C577E1AACA3CC00B221D7 /* MVSecurity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MVSecurity.swift; sourceTree = "<group>"; };
-		304C57891AACB63800B221D7 /* User.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
-		304C578B1AACB63900B221D7 /* Message.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Message.swift; sourceTree = "<group>"; };
-		304C578D1AACB63900B221D7 /* Division.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Division.swift; sourceTree = "<group>"; };
 		306FD7311AAA356000719B82 /* NetworkingHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkingHelper.swift; sourceTree = "<group>"; };
 		306FD7331AAB0F4400719B82 /* MVError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MVError.swift; sourceTree = "<group>"; };
 		30916FFA1AA8B9D0004D30D1 /* MenuController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MenuController.swift; sourceTree = "<group>"; };
@@ -65,6 +65,12 @@
 		309170331AA8D2B4004D30D1 /* MessageRepository.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MessageRepository.swift; sourceTree = "<group>"; };
 		30A4F7D81AA97D400064EA2C /* NetworkingAction.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkingAction.swift; sourceTree = "<group>"; };
 		30BAFEE11AA518EA000D18EF /* ca-cert.cer */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ca-cert.cer"; sourceTree = "<group>"; };
+		30FB44BA1AACC088003E4512 /* DivisionRepository.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DivisionRepository.swift; sourceTree = "<group>"; };
+		30FB44BC1AACC096003E4512 /* UserRepository.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserRepository.swift; sourceTree = "<group>"; };
+		30FB44C01AACD819003E4512 /* TimestampParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TimestampParser.swift; sourceTree = "<group>"; };
+		30FB44C21AACD897003E4512 /* User.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
+		30FB44C41AACD898003E4512 /* Message.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Message.swift; sourceTree = "<group>"; };
+		30FB44C61AACD898003E4512 /* Division.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Division.swift; sourceTree = "<group>"; };
 		38F4A086C692F4A87191BB5C /* Pods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.release.xcconfig; path = "Pods/Target Support Files/Pods/Pods.release.xcconfig"; sourceTree = "<group>"; };
 		5DA33B30AC9FFB66D2664039 /* Pods.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.debug.xcconfig; path = "Pods/Target Support Files/Pods/Pods.debug.xcconfig"; sourceTree = "<group>"; };
 		FE0498950F9A959DC502856B /* Pods.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -109,10 +115,10 @@
 		3012715B1AA5C85500C23AEF /* Networking */ = {
 			isa = PBXGroup;
 			children = (
-				30BAFEE11AA518EA000D18EF /* ca-cert.cer */,
 				301271591AA5C83C00C23AEF /* NetworkingSessionFactory.swift */,
 				30A4F7D81AA97D400064EA2C /* NetworkingAction.swift */,
 				306FD7311AAA356000719B82 /* NetworkingHelper.swift */,
+				30FB44C01AACD819003E4512 /* TimestampParser.swift */,
 			);
 			name = Networking;
 			sourceTree = "<group>";
@@ -150,12 +156,12 @@
 		3020CBA11A9E1289005AAEEF /* myVerein */ = {
 			isa = PBXGroup;
 			children = (
-				304C57801AACA3D200B221D7 /* Security */,
-				309170321AA8C7E4004D30D1 /* Model */,
 				3012715C1AA5C86400C23AEF /* ViewController */,
+				309170321AA8C7E4004D30D1 /* Model */,
 				3012715B1AA5C85500C23AEF /* Networking */,
-				3020CBA81A9E1289005AAEEF /* Main.storyboard */,
-				306FD7331AAB0F4400719B82 /* MVError.swift */,
+				30FB44BF1AACD212003E4512 /* View */,
+				30FB44BE1AACD203003E4512 /* Error */,
+				304C57801AACA3D200B221D7 /* Security */,
 				3020CBA21A9E1289005AAEEF /* Supporting Files */,
 			);
 			path = myVerein;
@@ -164,10 +170,10 @@
 		3020CBA21A9E1289005AAEEF /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				30BAFEE11AA518EA000D18EF /* ca-cert.cer */,
 				3020CBA41A9E1289005AAEEF /* AppDelegate.swift */,
 				3020CBAB1A9E1289005AAEEF /* Images.xcassets */,
 				3091702D1AA8C097004D30D1 /* myVereinModel.xcdatamodeld */,
-				3020CBAD1A9E1289005AAEEF /* LaunchScreen.xib */,
 				3020CBA31A9E1289005AAEEF /* Info.plist */,
 			);
 			name = "Supporting Files";
@@ -218,12 +224,31 @@
 		309170321AA8C7E4004D30D1 /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				304C578D1AACB63900B221D7 /* Division.swift */,
-				304C578B1AACB63900B221D7 /* Message.swift */,
-				304C57891AACB63800B221D7 /* User.swift */,
+				30FB44C61AACD898003E4512 /* Division.swift */,
+				30FB44C41AACD898003E4512 /* Message.swift */,
+				30FB44C21AACD897003E4512 /* User.swift */,
+				30FB44BA1AACC088003E4512 /* DivisionRepository.swift */,
 				309170331AA8D2B4004D30D1 /* MessageRepository.swift */,
+				30FB44BC1AACC096003E4512 /* UserRepository.swift */,
 			);
 			name = Model;
+			sourceTree = "<group>";
+		};
+		30FB44BE1AACD203003E4512 /* Error */ = {
+			isa = PBXGroup;
+			children = (
+				306FD7331AAB0F4400719B82 /* MVError.swift */,
+			);
+			name = Error;
+			sourceTree = "<group>";
+		};
+		30FB44BF1AACD212003E4512 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				3020CBA81A9E1289005AAEEF /* Main.storyboard */,
+				3020CBAD1A9E1289005AAEEF /* LaunchScreen.xib */,
+			);
+			name = View;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -381,19 +406,22 @@
 			files = (
 				3020CBA71A9E1289005AAEEF /* LoginViewController.swift in Sources */,
 				30A4F7D91AA97D400064EA2C /* NetworkingAction.swift in Sources */,
-				304C578E1AACB63900B221D7 /* Division.swift in Sources */,
+				30FB44C71AACD898003E4512 /* Division.swift in Sources */,
+				30FB44C51AACD898003E4512 /* Message.swift in Sources */,
 				30916FFB1AA8B9D0004D30D1 /* MenuController.swift in Sources */,
 				3091702F1AA8C097004D30D1 /* myVereinModel.xcdatamodeld in Sources */,
 				302BE8C41AA64599001D0FE7 /* DivisionChatOverviewViewController.swift in Sources */,
+				30FB44BD1AACC096003E4512 /* UserRepository.swift in Sources */,
 				304C577F1AACA3CC00B221D7 /* MVSecurity.swift in Sources */,
 				309170341AA8D2B4004D30D1 /* MessageRepository.swift in Sources */,
-				304C578A1AACB63800B221D7 /* User.swift in Sources */,
+				30FB44BB1AACC088003E4512 /* DivisionRepository.swift in Sources */,
 				302BE8C21AA642EB001D0FE7 /* DivisionChatCell.swift in Sources */,
 				3012715A1AA5C83C00C23AEF /* NetworkingSessionFactory.swift in Sources */,
 				306FD7321AAA356000719B82 /* NetworkingHelper.swift in Sources */,
-				304C578C1AACB63900B221D7 /* Message.swift in Sources */,
+				30FB44C31AACD897003E4512 /* User.swift in Sources */,
 				306FD7341AAB0F4400719B82 /* MVError.swift in Sources */,
 				3020CBA51A9E1289005AAEEF /* AppDelegate.swift in Sources */,
+				30FB44C11AACD819003E4512 /* TimestampParser.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -14,6 +14,7 @@ class Division: NSManagedObject {
     @NSManaged var desc: String
     @NSManaged var id: String
     @NSManaged var name: String
+    @NSManaged var lastSynced: NSDate
     @NSManaged var admin: User
     @NSManaged var chatMessages: NSSet
     @NSManaged var enrolledUser: NSSet

@@ -17,9 +17,16 @@ class NetworkingHelper {
         NetworkingAction.messageSyncAction(
             {
                 response in
-                println("=================")
-                println(response)
-                println("=================")
+                if let responseArray = response as? Array<AnyObject> {
+                    let messageRepository = MessageRepository()
+                    let (messages, error) = messageRepository.createMessage(responseArray)
+                    if messages == nil && error != nil {
+                        println("Unable to sync messages \(error?.localizedDescription)")
+                    } else {
+                        messageRepository.save()
+                        println("Successfully saved messages: \(messages!)")
+                    }
+                }
             },
             failure:
             {
