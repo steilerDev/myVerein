@@ -16,11 +16,14 @@
 		3020CBBB1A9E128A005AAEEF /* myVereinTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3020CBBA1A9E128A005AAEEF /* myVereinTests.swift */; };
 		302BE8C21AA642EB001D0FE7 /* DivisionChatCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 302BE8C11AA642EB001D0FE7 /* DivisionChatCell.swift */; };
 		302BE8C41AA64599001D0FE7 /* DivisionChatOverviewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 302BE8C31AA64599001D0FE7 /* DivisionChatOverviewViewController.swift */; };
-		30621E0D1A9F6AD7002797F5 /* GlobalConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30621E0C1A9F6AD7002797F5 /* GlobalConstants.swift */; };
+		304C577F1AACA3CC00B221D7 /* MVSecurity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 304C577E1AACA3CC00B221D7 /* MVSecurity.swift */; };
+		304C578A1AACB63800B221D7 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 304C57891AACB63800B221D7 /* User.swift */; };
+		304C578C1AACB63900B221D7 /* Message.swift in Sources */ = {isa = PBXBuildFile; fileRef = 304C578B1AACB63900B221D7 /* Message.swift */; };
+		304C578E1AACB63900B221D7 /* Division.swift in Sources */ = {isa = PBXBuildFile; fileRef = 304C578D1AACB63900B221D7 /* Division.swift */; };
 		306FD7321AAA356000719B82 /* NetworkingHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 306FD7311AAA356000719B82 /* NetworkingHelper.swift */; };
+		306FD7341AAB0F4400719B82 /* MVError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 306FD7331AAB0F4400719B82 /* MVError.swift */; };
 		30916FFB1AA8B9D0004D30D1 /* MenuController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30916FFA1AA8B9D0004D30D1 /* MenuController.swift */; };
 		3091702F1AA8C097004D30D1 /* myVereinModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 3091702D1AA8C097004D30D1 /* myVereinModel.xcdatamodeld */; };
-		309170311AA8C7B6004D30D1 /* Message.swift in Sources */ = {isa = PBXBuildFile; fileRef = 309170301AA8C7B6004D30D1 /* Message.swift */; };
 		309170341AA8D2B4004D30D1 /* MessageRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 309170331AA8D2B4004D30D1 /* MessageRepository.swift */; };
 		30A4F7D91AA97D400064EA2C /* NetworkingAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30A4F7D81AA97D400064EA2C /* NetworkingAction.swift */; };
 		30BAFEE51AA52828000D18EF /* ca-cert.cer in Resources */ = {isa = PBXBuildFile; fileRef = 30BAFEE11AA518EA000D18EF /* ca-cert.cer */; };
@@ -51,11 +54,14 @@
 		3020CBBA1A9E128A005AAEEF /* myVereinTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = myVereinTests.swift; sourceTree = "<group>"; };
 		302BE8C11AA642EB001D0FE7 /* DivisionChatCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DivisionChatCell.swift; sourceTree = "<group>"; };
 		302BE8C31AA64599001D0FE7 /* DivisionChatOverviewViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DivisionChatOverviewViewController.swift; sourceTree = "<group>"; };
-		30621E0C1A9F6AD7002797F5 /* GlobalConstants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GlobalConstants.swift; sourceTree = "<group>"; };
+		304C577E1AACA3CC00B221D7 /* MVSecurity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MVSecurity.swift; sourceTree = "<group>"; };
+		304C57891AACB63800B221D7 /* User.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
+		304C578B1AACB63900B221D7 /* Message.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Message.swift; sourceTree = "<group>"; };
+		304C578D1AACB63900B221D7 /* Division.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Division.swift; sourceTree = "<group>"; };
 		306FD7311AAA356000719B82 /* NetworkingHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkingHelper.swift; sourceTree = "<group>"; };
+		306FD7331AAB0F4400719B82 /* MVError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MVError.swift; sourceTree = "<group>"; };
 		30916FFA1AA8B9D0004D30D1 /* MenuController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MenuController.swift; sourceTree = "<group>"; };
 		3091702E1AA8C097004D30D1 /* myVereinModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = myVereinModel.xcdatamodel; sourceTree = "<group>"; };
-		309170301AA8C7B6004D30D1 /* Message.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Message.swift; sourceTree = "<group>"; };
 		309170331AA8D2B4004D30D1 /* MessageRepository.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MessageRepository.swift; sourceTree = "<group>"; };
 		30A4F7D81AA97D400064EA2C /* NetworkingAction.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkingAction.swift; sourceTree = "<group>"; };
 		30BAFEE11AA518EA000D18EF /* ca-cert.cer */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ca-cert.cer"; sourceTree = "<group>"; };
@@ -144,11 +150,12 @@
 		3020CBA11A9E1289005AAEEF /* myVerein */ = {
 			isa = PBXGroup;
 			children = (
+				304C57801AACA3D200B221D7 /* Security */,
 				309170321AA8C7E4004D30D1 /* Model */,
 				3012715C1AA5C86400C23AEF /* ViewController */,
 				3012715B1AA5C85500C23AEF /* Networking */,
 				3020CBA81A9E1289005AAEEF /* Main.storyboard */,
-				30621E0C1A9F6AD7002797F5 /* GlobalConstants.swift */,
+				306FD7331AAB0F4400719B82 /* MVError.swift */,
 				3020CBA21A9E1289005AAEEF /* Supporting Files */,
 			);
 			path = myVerein;
@@ -183,6 +190,14 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
+		304C57801AACA3D200B221D7 /* Security */ = {
+			isa = PBXGroup;
+			children = (
+				304C577E1AACA3CC00B221D7 /* MVSecurity.swift */,
+			);
+			name = Security;
+			sourceTree = "<group>";
+		};
 		30916FF81AA79F0A004D30D1 /* Login */ = {
 			isa = PBXGroup;
 			children = (
@@ -203,7 +218,9 @@
 		309170321AA8C7E4004D30D1 /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				309170301AA8C7B6004D30D1 /* Message.swift */,
+				304C578D1AACB63900B221D7 /* Division.swift */,
+				304C578B1AACB63900B221D7 /* Message.swift */,
+				304C57891AACB63800B221D7 /* User.swift */,
 				309170331AA8D2B4004D30D1 /* MessageRepository.swift */,
 			);
 			name = Model;
@@ -364,16 +381,19 @@
 			files = (
 				3020CBA71A9E1289005AAEEF /* LoginViewController.swift in Sources */,
 				30A4F7D91AA97D400064EA2C /* NetworkingAction.swift in Sources */,
+				304C578E1AACB63900B221D7 /* Division.swift in Sources */,
 				30916FFB1AA8B9D0004D30D1 /* MenuController.swift in Sources */,
 				3091702F1AA8C097004D30D1 /* myVereinModel.xcdatamodeld in Sources */,
-				309170311AA8C7B6004D30D1 /* Message.swift in Sources */,
 				302BE8C41AA64599001D0FE7 /* DivisionChatOverviewViewController.swift in Sources */,
+				304C577F1AACA3CC00B221D7 /* MVSecurity.swift in Sources */,
 				309170341AA8D2B4004D30D1 /* MessageRepository.swift in Sources */,
+				304C578A1AACB63800B221D7 /* User.swift in Sources */,
 				302BE8C21AA642EB001D0FE7 /* DivisionChatCell.swift in Sources */,
 				3012715A1AA5C83C00C23AEF /* NetworkingSessionFactory.swift in Sources */,
 				306FD7321AAA356000719B82 /* NetworkingHelper.swift in Sources */,
+				304C578C1AACB63900B221D7 /* Message.swift in Sources */,
+				306FD7341AAB0F4400719B82 /* MVError.swift in Sources */,
 				3020CBA51A9E1289005AAEEF /* AppDelegate.swift in Sources */,
-				30621E0D1A9F6AD7002797F5 /* GlobalConstants.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

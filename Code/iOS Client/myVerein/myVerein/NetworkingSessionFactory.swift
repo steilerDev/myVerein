@@ -27,7 +27,7 @@ class NetworkingSessionFactory {
     /// This function returns the shared session manager used within the whole system. The object is lazily created
     static func instance() -> AFHTTPSessionManager? {
         if sharedSessionManager == nil {
-            if let baseUrlString = (Locksmith.loadDataForUserAccount(GlobalConstants.Keychain.UserAccount).0 as? [String: String])?[GlobalConstants.Keychain.Domain],
+            if let baseUrlString = MVSecurity.instance().currentKeychain().domain,
                 baseUrl = NSURL(string: baseUrlString),
                 certificatePath = NSBundle.mainBundle().pathForResource(NetworkingConstants.Certificate.Name, ofType: NetworkingConstants.Certificate.Type),
                 certificate = NSData(contentsOfFile: certificatePath)

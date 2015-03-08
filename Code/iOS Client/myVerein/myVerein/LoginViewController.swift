@@ -115,12 +115,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate, POPAnimationDe
                 hostname.removeAtIndex(advance(hostname.startIndex, count(hostname) - 1))
             }
             
-            if Locksmith.loadDataForUserAccount(GlobalConstants.Keychain.UserAccount).0?.count > 0 {
-                Locksmith.updateData([GlobalConstants.Keychain.Username: username, GlobalConstants.Keychain.Password: password, GlobalConstants.Keychain.Domain: hostname], forUserAccount: GlobalConstants.Keychain.UserAccount)
-            } else {
-                Locksmith.saveData([GlobalConstants.Keychain.Username: username, GlobalConstants.Keychain.Password: password, GlobalConstants.Keychain.Domain: hostname], forUserAccount: GlobalConstants.Keychain.UserAccount)
-            }
-            
+            MVSecurity.instance().updateKeychain(username, newPassword: password, newDomain: hostname)            
             validateCurrentLogin()
         } else {
             animateInvalidLogin()
@@ -136,25 +131,15 @@ class LoginViewController: UIViewController, UITextFieldDelegate, POPAnimationDe
         hostTextField.enabled = false
         loginButton.enabled = false
         
-        let (dictionary, error) = Locksmith.loadDataForUserAccount(GlobalConstants.Keychain.UserAccount)
-        if let currentError = error {
-            println("An error occured while loading keychain data")
-            activityIndicator.stopAnimating()
-        } else if dictionary?.count == 0 {
-            println("Keychain dictionary is empty")
-            activityIndicator.stopAnimating()
-        } else if let keychainDictionary = dictionary as? [String: String] {
-            if let username = keychainDictionary[GlobalConstants.Keychain.Username] {
-                usernameTextField.text = username
-            }
-            if let password = keychainDictionary[GlobalConstants.Keychain.Password] {
-                passwordTextField.text = password
-            }
-            if let domain = keychainDictionary[GlobalConstants.Keychain.Domain]
-            {
-                hostTextField.text = domain
-            }
-            
+        let (currentUsername, currentPassword, currentDomain) = MVSecurity.instance().currentKeychain()
+        
+        if let username = currentUsername,
+                password = currentPassword,
+                domain = currentDomain {
+            usernameTextField.text = username
+            passwordTextField.text = password
+            hostTextField.text = domain
+                    
             NetworkingAction.loginAction(
                 {
                     self.performSegueWithIdentifier(LoginViewControllerConstants.SegueToMainApplication, sender: self)
@@ -164,12 +149,15 @@ class LoginViewController: UIViewController, UITextFieldDelegate, POPAnimationDe
                 {
                     error in
                     self.animateInvalidLogin()
-                    self.activityIndicator.stopAnimating()
                 }
             )
         } else {
-            println("Unable to load keychain items")
+            println(MVError.createError(MVErrorCodes.MVKeychainEmptyError))
             animateInvalidLogin()
+            
+            usernameTextField.text = nil
+            passwordTextField.text = nil
+            hostTextField.text = nil
         }
     }
     

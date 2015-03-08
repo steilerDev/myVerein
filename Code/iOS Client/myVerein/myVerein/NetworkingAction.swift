@@ -23,28 +23,17 @@ class NetworkingAction {
     // MARK: - Login
     
     /// This function tries to log the user into the system using the stored credentials within the keychain. The callbacks are guaranteed to be executed on the main queue.
-    class func loginAction(success: () -> (), failure: (NSError?) -> ()) {
-        let (dictionary, error) = Locksmith.loadDataForUserAccount(GlobalConstants.Keychain.UserAccount)
-        if let currentError = error {
-            println("An error occured while loading keychain data")
-            failure(currentError)
-        } else if dictionary?.count == 0 {
-            println("Keychain dictionary is empty")
-            failure(nil)
-        } else if let keychainDictionary = dictionary as? [String: String] {
-            if let username = keychainDictionary[GlobalConstants.Keychain.Username],
-                password = keychainDictionary[GlobalConstants.Keychain.Password]
-                where !password.isEmpty
-            {
-                loginAction(username, password: password, success: success, failure: failure)
-            } else {
-                failure(nil)
-            }
+    class func loginAction(success: () -> (), failure: (NSError) -> ()) {
+        let (currentUsername, currentPassword, _) = MVSecurity.instance().currentKeychain()
+        if let username = currentUsername, password = currentPassword where !password.isEmpty && !username.isEmpty {
+            loginAction(username, password: password, success: success, failure: failure)
+        } else {
+            failure(MVError.createError(.MVSessionLoadingError))
         }
     }
     
     /// This function tries to log the user into the system using the provided credentials. The callbacks are guaranteed to be executed on the main queue.
-    class func loginAction(username: String, password: String, success: () -> (), failure: (NSError?) -> ()) {
+    class func loginAction(username: String, password: String, success: () -> (), failure: (NSError) -> ()) {
         if let session = NetworkingSessionFactory.instance() {
 
             let parameters = ["username": username,
@@ -55,7 +44,7 @@ class NetworkingAction {
                 parameters: parameters,
                 success:
                 {
-                    dataTask, response in
+                    _, _ in
                     println("Successfully logged in")
                     // Executing success callback on main queue
                     dispatch_async(dispatch_get_main_queue()) {
@@ -64,17 +53,8 @@ class NetworkingAction {
                 },
                 failure:
                 {
-                    dataTask, error in
+                    _, error in
                     println("Unable to log in: \(error.localizedDescription)")
-                    
-                    // If the request returns a 401 status code this means that the credentials are wrong, concluding the stored password is deleted.
-                    if error.code == 401 {
-                        if Locksmith.loadDataForUserAccount(GlobalConstants.Keychain.UserAccount).0?.count > 0 {
-                            if let host = session.baseURL.host {
-                                Locksmith.updateData([GlobalConstants.Keychain.Username: username, GlobalConstants.Keychain.Domain: host], forUserAccount: GlobalConstants.Keychain.UserAccount)
-                            }
-                        }
-                    }
                     
                     // Invaliating the session in case the user changes the domain
                     NetworkingSessionFactory.invalidateInstance()
@@ -88,7 +68,7 @@ class NetworkingAction {
         } else {
             println("Unable to get networking session")
             dispatch_async(dispatch_get_main_queue()) {
-                failure(nil)
+                failure(MVError.createError(MVErrorCodes.MVSessionLoadingError))
             }
         }
     }
@@ -102,7 +82,7 @@ class NetworkingAction {
     }
     
     /// This function is the private call for the messageSync function, containing a retry counter, needed by the failure handler.
-    private class func messageSyncAction(success: (AnyObject) -> (), failure: (NSError?) -> (), retryCount: Int) {
+    private class func messageSyncAction(success: (AnyObject) -> (), failure: (NSError) -> (), retryCount: Int) {
         if let session = NetworkingSessionFactory.instance() {
             session.GET(NSURL(string: NetworkingConstants.Message, relativeToURL: session.baseURL)?.absoluteString,
                 parameters: nil,
@@ -123,7 +103,7 @@ class NetworkingAction {
             )
         } else {
             dispatch_async(dispatch_get_main_queue()) {
-                failure(nil)
+                failure(MVError.createError(.MVSessionLoadingError))
             }
         }
     }
@@ -131,7 +111,7 @@ class NetworkingAction {
     // MARK: - Internal functions
     
     /// This function is used to handle a failure during a request. If the failure is due to the fact that the user was not logged in the function is going to try to log the user in. In case of a successfully log in, the initial function is executed again. The retry count is tracking how often the request tried to re-log in, to prevent an infinite loop, in case of a forbidden resource.
-    private class func handleRequestFailure(error: NSError, sender: ((AnyObject) -> (), (NSError?) -> (), Int) -> (), retryCount: Int, initialSuccess: (AnyObject) -> (), initialFailure: (NSError?) -> ()) {
+    private class func handleRequestFailure(error: NSError, sender: ((AnyObject) -> (), (NSError) -> (), Int) -> (), retryCount: Int, initialSuccess: (AnyObject) -> (), initialFailure: (NSError) -> ()) {
         if error.code == 401 {
             if retryCount < maxLoginRetries {
                 println("Error occured because user was not logged in")
@@ -141,6 +121,7 @@ class NetworkingAction {
             } else {
                 println("Reached maximum amount of log in retries")
                 // TODO: Implement showing of log in screen
+                initialFailure(MVError.createError(.MVMaximumLoginRetriesReached))
             }
         } else {
             dispatch_async(dispatch_get_main_queue()) {

@@ -24,7 +24,7 @@ class NetworkingHelper {
             failure:
             {
                 error in
-                println("Unable to sync messages: \(error!)")
+                println("Unable to sync messages: \(error?.localizedDescription)")
             }
         )
     }

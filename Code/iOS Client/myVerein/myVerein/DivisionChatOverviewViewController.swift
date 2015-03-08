@@ -11,7 +11,7 @@ import UIKit
 
 class DivisionChatOverviewViewController: UICollectionViewController {
 
-    var user = ["John Doe", "Frank Steiler", "Peter Enis", "Luke Skywalker", "Tammo Schwindt", "John Doe", "Frank Steiler", "Peter Enis", "Luke Skywalker", "Tammo Schwindt"]
+    var user = ["Rugby 1st team", "Soccer", "Soccer 2nd team", "Soccer 1st team"]
     
     let reuseIdentifier = "ChatCell"
     
