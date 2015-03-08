@@ -40,6 +40,7 @@ public class Division
 
     @Indexed
     @NotBlank
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String name;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -175,10 +176,11 @@ public class Division
         this.ancestors = ancestors;
     }
 
-    public void removeEverythingExceptName()
+    public void removeEverythingExceptId()
     {
         adminUser = null;
         desc = null;
+        name = null;
     }
 
     /**

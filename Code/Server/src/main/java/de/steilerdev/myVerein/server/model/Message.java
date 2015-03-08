@@ -183,8 +183,8 @@ public class Message
 
     public void prepareForSending()
     {
-        sender.removeEverythingExceptEmailAndName();
-        group.removeEverythingExceptName();
+        sender.removeEverythingExceptId();
+        group.removeEverythingExceptId();
     }
 
     /**

@@ -59,8 +59,10 @@ public class User implements UserDetails
     }
 
     @NotBlank
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String firstName;
     @NotBlank
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String lastName;
 
     @Id
@@ -69,6 +71,7 @@ public class User implements UserDetails
     @Indexed
     @NotBlank
     @Email
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String email;
 
     @JsonIgnore
@@ -617,6 +620,14 @@ public class User implements UserDetails
                 membershipStatus = null;
             }
         }
+    }
+
+    public void removeEverythingExceptId()
+    {
+        removeEverythingExceptEmailAndName();
+        firstName = null;
+        lastName = null;
+        email = null;
     }
 
     /**
