@@ -799,7 +799,7 @@ public class User implements UserDetails
     @Override
     public String toString()
     {
-        return String.format("User[Email=%s, firstName=%s, lastName=%s]", email, firstName, lastName);
+        return email;
     }
 
     @Override

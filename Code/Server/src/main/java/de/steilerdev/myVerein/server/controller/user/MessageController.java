@@ -31,11 +31,14 @@ import org.springframework.web.bind.annotation.RestController;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * This class handles all messages send and received by a user.
+ */
 @RestController
 @RequestMapping("/api/user/message")
-public class MessageRestController
+public class MessageController
 {
-    private static Logger logger = LoggerFactory.getLogger(MessageRestController.class);
+    private static Logger logger = LoggerFactory.getLogger(MessageController.class);
 
     @Autowired
     private MessageRepository messageRepository;
@@ -46,14 +49,19 @@ public class MessageRestController
     @Autowired
     private UserRepository userRepository;
 
+    /**
+     * This function retrieves all unread messages of a user. The function is invoked bu GETting the URI /api/user/message.
+     * @param currentUser The currently logged in user.
+     * @return An HTTP response with a status code, together with the JSON list-object of all unread messages, or only an error code if an error occurred.
+     */
     @RequestMapping(produces = "application/json", method = RequestMethod.GET)
     public ResponseEntity<List<Message>> getUnreadMessages(@CurrentUser User currentUser)
     {
-        logger.trace("[Current User " + currentUser.getEmail() + "] Getting unread messages of " + currentUser.getEmail());
+        logger.trace("[" + currentUser + "] Getting unread messages");
         List<Message> undeliveredMessages = messageRepository.findAllByPrefixedReceiverIDAndMessageStatus(Message.receiverIDForUser(currentUser), Message.MessageStatus.PENDING);
         if (undeliveredMessages == null)
         {
-            logger.debug("[Current User " + currentUser.getEmail() + "] Unable to find any undelivered messages");
+            logger.debug("[" + currentUser + "] Unable to find any undelivered messages");
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         } else
         {
@@ -61,28 +69,36 @@ public class MessageRestController
             try
             {
                 //messageRepository.save(undeliveredMessages);
-                undeliveredMessages.parallelStream().forEach(message -> message.prepareForSending());
-                logger.info("[Current User " + currentUser.getEmail() + "] Returning undelivered messages for " + currentUser.getEmail());
+                undeliveredMessages.parallelStream().forEach(Message::prepareForSending);
+                logger.info("[" + currentUser + "] Returning undelivered messages for " + currentUser.getEmail());
                 return new ResponseEntity<>(undeliveredMessages, HttpStatus.OK);
             } catch (IllegalArgumentException e)
             {
-                logger.warn("[Current User " + currentUser.getEmail() + "] Unable to save messages for " + currentUser.getEmail() + ": " + e.getMessage());
+                logger.warn("[" + currentUser + "] Unable to save messages for " + currentUser.getEmail() + ": " + e.getMessage());
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
     }
 
+    /**
+     * This function sends a message to a specific group chat. The function is invoked by POSTing to the URI /api/user/message.
+     * @param currentUser The currently logged in user.
+     * @param division The name of the division where the message is send to.
+     * @param content The content of the message.
+     * @return An HTTP response with a status code. If an error occurred an error message is bundled into the response, otherwise a success message is available.
+     */
     @RequestMapping(produces = "application/json", method = RequestMethod.POST)
     public ResponseEntity<String> sendMessage(@CurrentUser User currentUser, @RequestParam String division, @RequestParam String content)
     {
+        logger.trace("[" + currentUser + "] Sending message to " + division);
         Division receivingDivision;
         if(division.isEmpty() || content.isEmpty())
         {
-            logger.warn("[Current User " + currentUser.getEmail() + "] Required parameters for sending message missing");
+            logger.warn("[" + currentUser + "] Required parameters for sending message missing");
             return new ResponseEntity<>("Required parameter missing", HttpStatus.BAD_REQUEST);
         } else if ((receivingDivision = divisionRepository.findByName(division)) == null)
         {
-            logger.warn("[Current User " + currentUser.getEmail() + "] Unable to find receiving division " + division);
+            logger.warn("[" + currentUser + "] Unable to find receiving division " + division);
             return new ResponseEntity<>("Unable to find receiving division", HttpStatus.INTERNAL_SERVER_ERROR);
         } else
         {
@@ -91,13 +107,13 @@ public class MessageRestController
 
             if (receivingUser.isEmpty())
             {
-                logger.warn("[Current User " + currentUser.getEmail() + "] Empty receiver list");
+                logger.warn("[" + currentUser + "] Empty receiver list");
                 return new ResponseEntity<>("Empty receiver list", HttpStatus.BAD_REQUEST);
             } else
             {
                 Message message = new Message(content, LocalDateTime.now(), currentUser, receivingUser, receivingDivision);
                 messageRepository.save(message);
-                logger.info("[Current User " + currentUser.getEmail() + "] Successfully saved message");
+                logger.info("[" + currentUser + "] Successfully saved message");
                 return new ResponseEntity<>("Successfully saved message", HttpStatus.OK);
             }
         }

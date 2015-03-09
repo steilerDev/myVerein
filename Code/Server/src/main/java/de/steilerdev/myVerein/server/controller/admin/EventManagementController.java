@@ -24,10 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.ConstraintViolationException;
 import java.time.LocalDate;
@@ -44,7 +41,7 @@ import java.util.stream.Stream;
 /**
  * This controller is processing all requests associated with the event management.
  */
-@Controller
+@RestController
 @RequestMapping("/api/admin/event")
 public class EventManagementController
 {
@@ -63,10 +60,11 @@ public class EventManagementController
      * @return An HTTP response with a status code. If the function succeeds, a list of dates, during the month, that contain an event, is returned, otherwise an error code is returned.
      */
     @RequestMapping(value = "month", produces = "application/json", method = RequestMethod.GET)
-    public @ResponseBody ResponseEntity<List<LocalDate>> getEventDatesOfMonth(@RequestParam String month,
-                                                                              @RequestParam String year)
+    public ResponseEntity<List<LocalDate>> getEventDatesOfMonth(@RequestParam String month,
+                                                                @RequestParam String year,
+                                                                @CurrentUser User currentUser)
     {
-        logger.trace("Gathering events of month " + month + " and year " + year);
+        logger.trace("[" + currentUser + "] Gathering events of month " + month + " and year " + year);
         ArrayList<LocalDate> dates = new ArrayList<>();
         int monthInt, yearInt;
         try
@@ -75,7 +73,7 @@ public class EventManagementController
             yearInt = Integer.parseInt(year);
         } catch (NumberFormatException e)
         {
-            logger.warn("Unable to parse month or year.");
+            logger.warn("[" + currentUser + "] Unable to parse month or year.");
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         //Getting all single date events
@@ -97,11 +95,11 @@ public class EventManagementController
 
         if(dates.isEmpty())
         {
-            logger.warn("Returning empty dates list of " + month + "/" + year);
+            logger.warn("[" + currentUser + "] Returning empty dates list of " + month + "/" + year);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         } else
         {
-            logger.debug("Returning dates list " + month + "/" + year);
+            logger.debug("[" + currentUser + "] Returning dates list " + month + "/" + year);
             return new ResponseEntity<>(dates.stream().distinct().collect(Collectors.toList()), HttpStatus.OK); //Returning an optimized set of events
         }
     }
@@ -112,18 +110,18 @@ public class EventManagementController
      * @return An HTTP response with a status code. If the function succeeds, a list of events is returned, otherwise an error code is returned.
      */
     @RequestMapping(value = "date", produces = "application/json", method = RequestMethod.GET)
-    public @ResponseBody ResponseEntity<List<Event>> getEventsOfDate(@RequestParam String date)
+    public ResponseEntity<List<Event>> getEventsOfDate(@RequestParam String date, @CurrentUser User currentUser)
     {
-        logger.trace("Getting events of date " + date);
+        logger.trace("[" + currentUser + "] Getting events of date " + date);
         LocalDate dateObject;
         ArrayList<Event> eventsOfDay = new ArrayList<>();
         try
         {
             dateObject = LocalDate.parse(date, DateTimeFormatter.ISO_LOCAL_DATE);
-            logger.debug("Converted to date object: " + dateObject.toString());
+            logger.debug("[" + currentUser + "] Converted to date object: " + dateObject.toString());
         } catch (DateTimeParseException e)
         {
-            logger.warn("Unable to parse date: " + date + ": " + e.toString());
+            logger.warn("[" + currentUser + "] Unable to parse date: " + date + ": " + e.toString());
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
@@ -138,7 +136,7 @@ public class EventManagementController
 
         if(eventsOfDay.isEmpty())
         {
-            logger.warn("The events list of " + date + " is empty");
+            logger.warn("[" + currentUser + "] The events list of " + date + " is empty");
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         } else
         {
@@ -149,7 +147,7 @@ public class EventManagementController
                 event.setEventAdmin(null);
             });
 
-            logger.debug("Returning " + eventsOfDay.size() + " events for " + date);
+            logger.debug("[" + currentUser + "] Returning " + eventsOfDay.size() + " events for " + date);
             return new ResponseEntity<>(eventsOfDay, HttpStatus.OK);
         }
     }
@@ -161,30 +159,30 @@ public class EventManagementController
      * @return An HTTP response with a status code. If the function succeeds, the event is returned, otherwise an error code is returned.
      */
     @RequestMapping(produces = "application/json", method = RequestMethod.GET)
-    public @ResponseBody ResponseEntity<Event> getEvent(@RequestParam String id, @CurrentUser User currentUser)
+    public ResponseEntity<Event> getEvent(@RequestParam String id, @CurrentUser User currentUser)
     {
-        logger.trace("Getting the event for ID " + id);
+        logger.trace("[" + currentUser + "] Getting the event for ID " + id);
         if(id.isEmpty())
         {
-            logger.warn("The ID can not be empty.");
+            logger.warn("[" + currentUser + "] The ID can not be empty.");
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } else
         {
             Event selectedEvent = eventRepository.findEventById(id);
             if (selectedEvent == null)
             {
-                logger.warn("Unable to find specified event.");
+                logger.warn("[" + currentUser + "] Unable to find specified event.");
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             } else
             {
                 if (!currentUser.isAllowedToAdministrate(selectedEvent))
                 {
-                    logger.debug("The current user " + currentUser.getEmail() + " is not allowed to edit the event " + id);
+                    logger.debug("[" + currentUser + "] The user is not allowed to edit the event " + id);
                     selectedEvent.setAdministrationNotAllowedMessage("You are not allowed to modify this event, since you did not create it.");
                 }
 
                 //Preventing data loop
-                logger.debug("Clearing admin user for divisions within request");
+                logger.debug("[" + currentUser + "] Clearing admin user for divisions within request");
                 if(selectedEvent.getInvitedDivision() != null)
                 {
                     selectedEvent.getInvitedDivision().parallelStream().forEach(division -> division.setAdminUser(null));
@@ -215,7 +213,7 @@ public class EventManagementController
      * @return An HTTP response with a status code together with a JSON map object, containing an 'errorMessage', or a 'successMessage' respectively. If the operation was successful the id of the event is accessible via 'eventID'.
      */
     @RequestMapping(method = RequestMethod.POST, produces = "application/json")
-    public @ResponseBody ResponseEntity<Map<String, String>> saveEvent(@RequestParam String eventFlag,
+    public  ResponseEntity<Map<String, String>> saveEvent(@RequestParam String eventFlag,
                                                           @RequestParam String eventName,
                                                           @RequestParam String eventDescription,
                                                           @RequestParam String startDate,
@@ -228,30 +226,30 @@ public class EventManagementController
                                                           @RequestParam String invitedDivisions,
                                                           @CurrentUser User currentUser)
     {
-        logger.trace("Saving event for " + currentUser.getEmail());
+        logger.trace("[" + currentUser + "] Saving event");
         Map<String, String> responseMap = new HashMap<>();
         Event event;
         if(eventFlag.isEmpty())
         {
-            logger.warn("The event flag is empty");
+            logger.warn("[" + currentUser + "] The event flag is empty");
             responseMap.put("errorMessage", "The event flag is not allowed to be empty");
             return new ResponseEntity<>(responseMap, HttpStatus.BAD_REQUEST);
         } else if(eventFlag.equals("true"))
         {
-            logger.debug("A new event is created, by " + currentUser.getEmail());
+            logger.debug("[" + currentUser + "] A new event is created");
             event = new Event();
         } else
         {
-            logger.debug("The event with id " + eventFlag + " is altered by " + currentUser.getEmail());
+            logger.debug("[" + currentUser + "] The event with id " + eventFlag + " is altered");
             event = eventRepository.findEventById(eventFlag);
             if(event == null)
             {
-                logger.warn("Unable to find the specified event with id " + eventFlag);
+                logger.warn("[" + currentUser + "] Unable to find the specified event with id " + eventFlag);
                 responseMap.put("errorMessage", "Unable to find the specified event");
                 return new ResponseEntity<>(responseMap, HttpStatus.BAD_REQUEST);
             } else if(!currentUser.isAllowedToAdministrate(event))
             {
-                logger.warn("The current user " + currentUser.getEmail() + " is not allowed to alter the selected event " + eventFlag);
+                logger.warn("[" + currentUser + "] The user is not allowed to alter the selected event " + eventFlag);
                 responseMap.put("errorMessage", "You are not allowed to edit the selected event");
                 return new ResponseEntity<>(responseMap, HttpStatus.FORBIDDEN);
             }
@@ -262,7 +260,7 @@ public class EventManagementController
 
         if(startDate.isEmpty() || startTime.isEmpty() || endDate.isEmpty() || endTime.isEmpty())
         {
-            logger.warn("The date and times defining the event (ID " + eventFlag + ") are not allowed to be empty.");
+            logger.warn("[" + currentUser + "] The date and times defining the event (ID " + eventFlag + ") are not allowed to be empty.");
             responseMap.put("errorMessage", "The date and times defining the event are not allowed to be empty");
             return new ResponseEntity<>(responseMap, HttpStatus.BAD_REQUEST);
         } else
@@ -273,7 +271,7 @@ public class EventManagementController
                 event.setStartDateTime(LocalDateTime.parse(startDate + "T" + startTime, formatter));
             } catch (DateTimeParseException e)
             {
-                logger.warn("Unrecognized date format " + startDate + "T" + startTime);
+                logger.warn("[" + currentUser + "] Unrecognized date format " + startDate + "T" + startTime);
                 responseMap.put("errorMessage", "Unrecognized date or time format within start time");
                 return new ResponseEntity<>(responseMap, HttpStatus.BAD_REQUEST);
             }
@@ -283,7 +281,7 @@ public class EventManagementController
                 event.setEndDateTime(LocalDateTime.parse(endDate + "T" + endTime, formatter));
             } catch (DateTimeParseException e)
             {
-                logger.warn("Unrecognized date format " + endDate + "T" + endTime);
+                logger.warn("[" + currentUser + "] Unrecognized date format " + endDate + "T" + endTime);
                 responseMap.put("errorMessage", "Unrecognized date or time format within end time");
                 return new ResponseEntity<>(responseMap, HttpStatus.BAD_REQUEST);
             }
@@ -298,7 +296,7 @@ public class EventManagementController
                 event.setLocationLat(Double.parseDouble(locationLat));
             } catch (NumberFormatException e)
             {
-                logger.warn("Unable to paste lat " + locationLat);
+                logger.warn("[" + currentUser + "] Unable to paste lat " + locationLat);
                 responseMap.put("errorMessage", "Unable to parse latitude coordinate");
                 return new ResponseEntity<>(responseMap, HttpStatus.BAD_REQUEST);
             }
@@ -311,7 +309,7 @@ public class EventManagementController
                 event.setLocationLng(Double.parseDouble(locationLng));
             } catch (NumberFormatException e)
             {
-                logger.warn("Unable to paste lng " + locationLng);
+                logger.warn("[" + currentUser + "] Unable to paste lng " + locationLng);
                 responseMap.put("errorMessage", "Unable to parse longitude coordinate");
                 return new ResponseEntity<>(responseMap, HttpStatus.BAD_REQUEST);
             }
@@ -326,7 +324,7 @@ public class EventManagementController
                 Division div = divisionRepository.findByName(division);
                 if (div == null)
                 {
-                    logger.warn("Unrecognized division (" + division + ")");
+                    logger.warn("[" + currentUser + "] Unrecognized division (" + division + ")");
                     responseMap.put("errorMessage", "Division " + division + " does not exist");
                     return new ResponseEntity<>(responseMap, HttpStatus.BAD_REQUEST);
                 }
@@ -343,13 +341,13 @@ public class EventManagementController
         try
         {
             eventRepository.save(event);
-            logger.info("Successfully saved event " + eventFlag);
+            logger.info("[" + currentUser + "] Successfully saved event " + eventFlag);
             responseMap.put("successMessage", "Successfully saved the event");
             responseMap.put("eventID", event.getId());
             return new ResponseEntity<>(responseMap, HttpStatus.OK);
         } catch (ConstraintViolationException e)
         {
-            logger.warn("A database constraint was violated while saving the event " + eventFlag);
+            logger.warn("[" + currentUser + "] A database constraint was violated while saving the event " + eventFlag);
             responseMap.put("errorMessage", "A database constraint was violated while saving the event");
             return new ResponseEntity<>(responseMap, HttpStatus.BAD_REQUEST);
         }
@@ -362,12 +360,12 @@ public class EventManagementController
      * @return An HTTP response with a status code. If an error occurred an error message is bundled into the response, otherwise a success message is available
      */
     @RequestMapping(method = RequestMethod.DELETE)
-    public @ResponseBody ResponseEntity<String> deleteEvent(@RequestParam String id, @CurrentUser User currentUser)
+    public ResponseEntity<String> deleteEvent(@RequestParam String id, @CurrentUser User currentUser)
     {
-        logger.trace("Deleting event with id " + id);
+        logger.trace("[" + currentUser + "] Deleting event with id " + id);
         if(id.isEmpty())
         {
-            logger.warn("The id of an event is not allowed to be empty.");
+            logger.warn("[" + currentUser + "] The id of an event is not allowed to be empty.");
             return new ResponseEntity<>("The ID of an event is not allowed to be empty", HttpStatus.BAD_REQUEST);
         }
 
@@ -375,22 +373,22 @@ public class EventManagementController
 
         if(event == null)
         {
-            logger.warn("Unable to find the selected event with id " + id);
+            logger.warn("[" + currentUser + "] Unable to find the selected event with id " + id);
             return new ResponseEntity<>("Unable to find the selected event", HttpStatus.BAD_REQUEST);
         } else if(!currentUser.isAllowedToAdministrate(event))
         {
-            logger.warn("The user " + currentUser.getEmail() + " is not allowed to modify the event owned by " + event.getEventAdmin().getEmail());
+            logger.warn("[" + currentUser + "] The user is not allowed to modify the event owned by " + event.getEventAdmin());
             return new ResponseEntity<>("You are not allowed to modify the selected event", HttpStatus.FORBIDDEN);
         } else
         {
             try
             {
                 eventRepository.delete(event);
-                logger.info("Successfully delete the selected event");
+                logger.info("[" + currentUser + "] Successfully delete the selected event");
                 return new ResponseEntity<>("Successfully deleted selected event", HttpStatus.OK);
             } catch (IllegalArgumentException e)
             {
-                logger.warn("Unable to delete selected event: " + e.getMessage());
+                logger.warn("[" + currentUser + "] Unable to delete selected event: " + e.getMessage());
                 return new ResponseEntity<>("Unable to delete the selected event", HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }

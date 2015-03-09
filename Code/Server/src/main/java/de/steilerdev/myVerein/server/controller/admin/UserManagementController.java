@@ -24,10 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.ConstraintViolationException;
 import java.time.LocalDate;
@@ -41,7 +38,7 @@ import java.util.stream.Collectors;
 /**
  * This controller is processing all requests associated with the user management.
  */
-@Controller
+@RestController
 @RequestMapping("/api/admin/user")
 public class UserManagementController
 {
@@ -81,46 +78,46 @@ public class UserManagementController
      * @return An HTTP response with a status code. If an error occurred an error message is bundled into the response, otherwise a success message is available.
      */
     @RequestMapping(method = RequestMethod.POST)
-    public @ResponseBody ResponseEntity<String> saveUser(@RequestParam String firstName,
-                                                 @RequestParam String lastName,
-                                                 @RequestParam String email,
-                                                 @RequestParam String birthday,
-                                                 @RequestParam String password,
-                                                 @RequestParam(required = false) String gender,
-                                                 @RequestParam String street,
-                                                 @RequestParam String streetNumber,
-                                                 @RequestParam String zip,
-                                                 @RequestParam String city,
-                                                 @RequestParam String country,
-                                                 @RequestParam String activeMemberSince,
-                                                 @RequestParam String passiveMemberSince,
-                                                 @RequestParam String resignationDate,
-                                                 @RequestParam String iban,
-                                                 @RequestParam String bic,
-                                                 @RequestParam String divisions,
-                                                 @RequestParam String userFlag,
-                                                 @RequestParam Map<String, String> parameters,
-                                                 @CurrentUser User currentUser)
+    public ResponseEntity<String> saveUser(@RequestParam String firstName,
+                                           @RequestParam String lastName,
+                                           @RequestParam String email,
+                                           @RequestParam String birthday,
+                                           @RequestParam String password,
+                                           @RequestParam(required = false) String gender,
+                                           @RequestParam String street,
+                                           @RequestParam String streetNumber,
+                                           @RequestParam String zip,
+                                           @RequestParam String city,
+                                           @RequestParam String country,
+                                           @RequestParam String activeMemberSince,
+                                           @RequestParam String passiveMemberSince,
+                                           @RequestParam String resignationDate,
+                                           @RequestParam String iban,
+                                           @RequestParam String bic,
+                                           @RequestParam String divisions,
+                                           @RequestParam String userFlag,
+                                           @RequestParam Map<String, String> parameters,
+                                           @CurrentUser User currentUser)
     {
-        logger.trace("Starting to save a user.");
+        logger.trace("[" + currentUser + "] Starting to save a user.");
         User newUserObject;
         User oldUserObject = null;
 
-        logger.debug("Loading user");
+        logger.debug("[" + currentUser + "] Loading user");
 
         if (email.isEmpty() || userFlag.isEmpty())
         {
-            logger.warn("The email/user flag can not be empty");
+            logger.warn("[" + currentUser + "] The email/user flag can not be empty");
             return new ResponseEntity<>("The email can not be empty", HttpStatus.BAD_REQUEST);
         } else if (userFlag.equals("true"))
         {
-            logger.info("A new user is created using the email " + email);
+            logger.info("[" + currentUser + "] A new user is created using the email " + email);
             if (userRepository.findByEmail(email) == null)
             {
                 newUserObject = new User();
                 if (password.isEmpty())
                 {
-                    logger.warn("The password of the new user " + email + " can not be empty");
+                    logger.warn("[" + currentUser + "] The password of the new user " + email + " can not be empty");
                     return new ResponseEntity<>("The password can not be empty", HttpStatus.BAD_REQUEST);
                 } else
                 {
@@ -128,41 +125,41 @@ public class UserManagementController
                 }
             } else
             {
-                logger.warn("A user with the given email " + email + " already exists");
+                logger.warn("[" + currentUser + "] A user with the given email " + email + " already exists");
                 return new ResponseEntity<>("A user with the given email already exists.", HttpStatus.BAD_REQUEST);
             }
         } else
         {
-            logger.info("An existing user " + userFlag + " is modified");
+            logger.info("[" + currentUser + "] An existing user " + userFlag + " is modified");
             if (userFlag.equals(email) && userRepository.findByEmail(email) != null)
             {
-                logger.debug("The identifier of the user " + userFlag + " did not change");
+                logger.debug("[" + currentUser + "] The identifier of the user " + userFlag + " did not change");
                 newUserObject = userRepository.findByEmail(userFlag);
             } else if (userRepository.findByEmail(userFlag) != null && userRepository.findByEmail(email) == null)
             {
-                logger.debug("The user changed his email from " + userFlag + " to " + email);
+                logger.debug("[" + currentUser + "] The user changed his email from " + userFlag + " to " + email);
                 oldUserObject = userRepository.findByEmail(userFlag);
                 newUserObject = userRepository.findByEmail(userFlag);
             } else
             {
-                logger.warn("Unable to modify user " + userFlag + ", either the existing user could not be located or the new email " + email + " is already taken");
+                logger.warn("[" + currentUser + "] Unable to modify user " + userFlag + ", either the existing user could not be located or the new email " + email + " is already taken");
                 return new ResponseEntity<>("A problem occurred while retrieving the user, either the existing user could not be located or the new email is already taken", HttpStatus.BAD_REQUEST);
             }
         }
 
-        logger.debug("Checking permissions");
+        logger.debug("[" + currentUser + "] Checking permissions");
 
         if (!currentUser.isAllowedToAdministrate(newUserObject, divisionRepository))
         {
-            logger.warn("The user " + currentUser.getEmail() + " is not allowed to save the user");
+            logger.warn("[" + currentUser + "] The user is not allowed to save the user");
             return new ResponseEntity<>("You are not allowed to perform these changes.", HttpStatus.FORBIDDEN);
         }
 
-        logger.debug("Parsing parameters and updating user");
+        logger.debug("[" + currentUser + "] Parsing parameters and updating user");
 
         if (newUserObject == null || firstName.isEmpty() || lastName.isEmpty())
         {
-            logger.warn("Required parameter missing");
+            logger.warn("[" + currentUser + "] Required parameter missing");
             return new ResponseEntity<>("Required parameter missing", HttpStatus.BAD_REQUEST);
         }
         newUserObject.setFirstName(firstName);
@@ -171,35 +168,35 @@ public class UserManagementController
 
         if (!birthday.isEmpty())
         {
-            logger.debug("Parsing birthday for " + newUserObject.getEmail());
+            logger.debug("[" + currentUser + "] Parsing birthday for " + newUserObject.getEmail());
             try
             {
                 newUserObject.setBirthday(LocalDate.parse(birthday, DateTimeFormatter.ofPattern("d/MM/y")));
             } catch (DateTimeParseException e)
             {
-                logger.warn("Unrecognized date format (" + birthday + ")");
+                logger.warn("[" + currentUser + "] Unrecognized date format (" + birthday + ")");
                 return new ResponseEntity<>("Wrong date format within birthday field", HttpStatus.BAD_REQUEST);
             }
         } else
         {
-            logger.debug("Clearing birthday field for " + newUserObject.getEmail());
+            logger.debug("[" + currentUser + "] Clearing birthday field for " + newUserObject.getEmail());
             newUserObject.setBirthday(null);
         }
 
         if (gender != null && !gender.isEmpty() && !gender.equals("default"))
         {
-            logger.debug("Parsing gender for " + newUserObject.getEmail());
+            logger.debug("[" + currentUser + "] Parsing gender for " + newUserObject.getEmail());
             try
             {
                 newUserObject.setGender(User.Gender.valueOf(gender));
             } catch (IllegalArgumentException e)
             {
-                logger.warn("Unable to parse gender: " + e.getMessage());
+                logger.warn("[" + currentUser + "] Unable to parse gender: " + e.getMessage());
                 return new ResponseEntity<>("Unable to parse gender", HttpStatus.BAD_REQUEST);
             }
         } else
         {
-            logger.debug("Clearing gender field for " + newUserObject.getEmail());
+            logger.debug("[" + currentUser + "] Clearing gender field for " + newUserObject.getEmail());
             newUserObject.setGender(null);
         }
 
@@ -211,52 +208,52 @@ public class UserManagementController
 
         if(!activeMemberSince.isEmpty())
         {
-            logger.debug("Parsing active member field for " + newUserObject.getEmail());
+            logger.debug("[" + currentUser + "] Parsing active member field for " + newUserObject.getEmail());
             try
             {
                 newUserObject.setActiveSince(LocalDate.parse(activeMemberSince, DateTimeFormatter.ofPattern("d/MM/y")));
             } catch (DateTimeParseException e)
             {
-                logger.warn("Unrecognized date format (" + activeMemberSince + ")");
+                logger.warn("[" + currentUser + "] Unrecognized date format (" + activeMemberSince + ")");
                 return new ResponseEntity<>("Wrong date format within active member field", HttpStatus.BAD_REQUEST);
             }
         } else
         {
-            logger.debug("Clearing active member field for " + newUserObject.getEmail());
+            logger.debug("[" + currentUser + "] Clearing active member field for " + newUserObject.getEmail());
             newUserObject.setActiveSince(null);
         }
 
         if(!passiveMemberSince.isEmpty())
         {
-            logger.debug("Parsing passive member field for " + newUserObject.getEmail());
+            logger.debug("[" + currentUser + "] Parsing passive member field for " + newUserObject.getEmail());
             try
             {
                 newUserObject.setPassiveSince(LocalDate.parse(passiveMemberSince, DateTimeFormatter.ofPattern("d/MM/y")));
             } catch (DateTimeParseException e)
             {
-                logger.warn("Unrecognized date format (" + passiveMemberSince + ")");
+                logger.warn("[" + currentUser + "] Unrecognized date format (" + passiveMemberSince + ")");
                 return new ResponseEntity<>("Wrong date format within passive member field", HttpStatus.BAD_REQUEST);
             }
         } else
         {
-            logger.debug("Clearing passive member field for " + newUserObject.getEmail());
+            logger.debug("[" + currentUser + "] Clearing passive member field for " + newUserObject.getEmail());
             newUserObject.setPassiveSince(null);
         }
 
         if(!resignationDate.isEmpty())
         {
-            logger.debug("Parsing resignation date field for " + newUserObject.getEmail());
+            logger.debug("[" + currentUser + "] Parsing resignation date field for " + newUserObject.getEmail());
             try
             {
                 newUserObject.setResignationDate(LocalDate.parse(resignationDate, DateTimeFormatter.ofPattern("d/MM/y")));
             } catch (DateTimeParseException e)
             {
-                logger.warn("Unrecognized date format (" + resignationDate + ")");
+                logger.warn("[" + currentUser + "] Unrecognized date format (" + resignationDate + ")");
                 return new ResponseEntity<>("Wrong date format within resignation date field", HttpStatus.BAD_REQUEST);
             }
         } else
         {
-            logger.debug("Clearing resignation date field for " + newUserObject.getEmail());
+            logger.debug("[" + currentUser + "] Clearing resignation date field for " + newUserObject.getEmail());
             newUserObject.setResignationDate(null);
         }
 
@@ -265,14 +262,14 @@ public class UserManagementController
 
         if (!divisions.isEmpty())
         {
-            logger.debug("Parsing divisions for " + newUserObject.getEmail());
+            logger.debug("[" + currentUser + "] Parsing divisions for " + newUserObject.getEmail());
             String[] divArray = divisions.split(",");
             for (String division : divArray)
             {
                 Division div = divisionRepository.findByName(division);
                 if (div == null)
                 {
-                    logger.warn("Unrecognized division (" + division + ")");
+                    logger.warn("[" + currentUser + "] Unrecognized division (" + division + ")");
                     return new ResponseEntity<>("Division " + division + " does not exist", HttpStatus.BAD_REQUEST);
                 } else
                 {
@@ -281,30 +278,30 @@ public class UserManagementController
             }
         } else
         {
-            logger.debug("Clearing divisions for " + newUserObject.getEmail());
+            logger.debug("[" + currentUser + "] Clearing divisions for " + newUserObject.getEmail());
             newUserObject.setDivisions(null);
         }
 
-        logger.debug("Parsing and setting custom user fields");
+        logger.debug("[" + currentUser + "] Parsing and setting custom user fields");
         newUserObject.setCustomUserField(parameters.keySet().parallelStream().filter(key -> key.startsWith("cuf_") && !parameters.get(key).trim().isEmpty()) //Filtering all custom user fields, which are not empty
                 .collect(Collectors.toMap(key -> key.substring(4), key -> parameters.get(key).trim()))); //Creating map of all fields
 
-        logger.debug("Saving user " + newUserObject.getEmail());
+        logger.debug("[" + currentUser + "] Saving user " + newUserObject.getEmail());
 
         try
         {
             userRepository.save(newUserObject);
             if(oldUserObject != null)
             {
-                logger.debug("Deleting old user " + oldUserObject.getEmail() + ", because identifier changed");
+                logger.debug("[" + currentUser + "] Deleting old user " + oldUserObject.getEmail() + ", because identifier changed");
                 userRepository.delete(oldUserObject);
             }
         } catch (ConstraintViolationException e)
         {
-            logger.warn("A database constraint was violated while saving the user: " + e.getMessage());
+            logger.warn("[" + currentUser + "] A database constraint was violated while saving the user: " + e.getMessage());
             return new ResponseEntity<>("A database constraint was violated while saving the user.", HttpStatus.BAD_REQUEST);
         }
-        logger.info("Successfully saved user " + newUserObject.getEmail());
+        logger.info("[" + currentUser + "] Successfully saved user " + newUserObject.getEmail());
         return new ResponseEntity<>("Successfully saved user", HttpStatus.OK);
     }
 
@@ -314,26 +311,26 @@ public class UserManagementController
      * @return An HTTP response with a status code, together with the JSON list-object of all users (matching the term, if present), or only an error code if an error occurred.
      */
     @RequestMapping(produces = "application/json", method = RequestMethod.GET)
-    public @ResponseBody ResponseEntity<List<User>> getUser(@RequestParam(required = false) String term)
+    public ResponseEntity<List<User>> getUserList(@RequestParam(required = false) String term, @CurrentUser User currentUser)
     {
         List<User> userList;
         if(term == null || term.isEmpty())
         {
-            logger.trace("Retrieving all users");
+            logger.trace("[" + currentUser + "] Retrieving all users");
             userList = userRepository.findAllEmailAndName();
         } else
         {
-            logger.trace("Retrieving all users using the search term " + term);
+            logger.trace("[" + currentUser + "] Retrieving all users using the search term " + term);
             userList = userRepository.findAllEmailAndNameContainingString(term);
         }
 
         if(userList == null)
         {
-            logger.warn("Unable to get users" + (term != null? " matching term " + term: ""));
+            logger.warn("[" + currentUser + "] Unable to get users" + (term != null? " matching term " + term: ""));
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         } else
         {
-            logger.info("Returning all users" + (term != null? " matching term " + term: ""));
+            logger.info("[" + currentUser + "] Returning all users" + (term != null? " matching term " + term: ""));
             return new ResponseEntity<>(userList, HttpStatus.OK);
         }
     }
@@ -345,26 +342,26 @@ public class UserManagementController
      * @return An HTTP response with a status code, together with the JSON object of the user, or only an error code if an error occurred.
      */
     @RequestMapping(produces = "application/json", params = "email", method = RequestMethod.GET)
-    public @ResponseBody ResponseEntity<User> getUser(@RequestParam String email, @CurrentUser User currentUser)
+    public ResponseEntity<User> getUser(@RequestParam String email, @CurrentUser User currentUser)
     {
-        logger.trace("Getting user " + email);
+        logger.trace("[" + currentUser + "] Getting user " + email);
         User searchedUser;
         if(email.isEmpty())
         {
-            logger.warn("The email is not allowed to be empty");
+            logger.warn("[" + currentUser + "] The email is not allowed to be empty");
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } else if((searchedUser = userRepository.findByEmail(email)) == null)
         {
-            logger.warn("Unable to retrieve user with the email " + email);
+            logger.warn("[" + currentUser + "] Unable to retrieve user with the email " + email);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         } else if(!currentUser.isAllowedToAdministrate(searchedUser, divisionRepository))
         {
-            logger.warn("Currently logged in user (" + currentUser.getEmail() + ") is not administrating selected user (" + searchedUser.getEmail() + "). Hiding private information");
+            logger.warn("[" + currentUser + "] The user is not administrating selected user (" + searchedUser.getEmail() + "). Hiding private information");
             searchedUser.removePrivateInformation();
             searchedUser.setAdministrationNotAllowedMessage("You are not allowed to modify this user, since you are not his administrator");
         } else
         {
-            logger.debug("Currently logged in user (" + currentUser.getEmail() + ") is administrating selected user (" + searchedUser.getEmail() + ")");
+            logger.debug("[" + currentUser + "] Currently logged in user (" + currentUser.getEmail() + ") is administrating selected user (" + searchedUser.getEmail() + ")");
             searchedUser.setAdministrationNotAllowedMessage(null);
             //Adding all custom user fields defined within the settings file to the object
             if(settingsRepository.getCustomUserFields() != null && !settingsRepository.getCustomUserFields().isEmpty())
@@ -381,7 +378,7 @@ public class UserManagementController
             //Not setting admin user null could lead to an infinite loop when creating the JSON
             searchedUser.getDivisions().parallelStream().forEach(div -> div.setAdminUser(null));
         }
-        logger.info("Returning user " + searchedUser.getEmail());
+        logger.info("[" + currentUser + "] Returning user " + searchedUser.getEmail());
         return new ResponseEntity<>(searchedUser, HttpStatus.OK);
     }
 
@@ -392,33 +389,33 @@ public class UserManagementController
      * @return An HTTP response with a status code. If an error occurred an error message is bundled into the response, otherwise a success message is available.
      */
     @RequestMapping(method = RequestMethod.DELETE)
-    public @ResponseBody ResponseEntity<String> deleteUser(@RequestParam String email, @CurrentUser User currentUser)
+    public ResponseEntity<String> deleteUser(@RequestParam String email, @CurrentUser User currentUser)
     {
-        logger.trace("Deleting user " + email);
+        logger.trace("[" + currentUser + "] Deleting user " + email);
         User deletedUser;
         if(email.isEmpty())
         {
-            logger.warn("The email is not allowed to be empty");
+            logger.warn("[" + currentUser + "] The email is not allowed to be empty");
             return new ResponseEntity<>("The email is not allowed to be empty", HttpStatus.BAD_REQUEST);
         } else if((deletedUser = userRepository.findByEmail(email)) == null)
         {
-            logger.warn("Unable to find stated user " + email);
+            logger.warn("[" + currentUser + "] Unable to find stated user " + email);
             return new ResponseEntity<>("Unable to find the stated user", HttpStatus.INTERNAL_SERVER_ERROR);
         } else if (!currentUser.isAllowedToAdministrate(deletedUser, divisionRepository))
         {
-            logger.warn("The user " + currentUser.getEmail() + " is not allowed to delete the user " + deletedUser.getEmail());
+            logger.warn("[" + currentUser + "] The user is not allowed to delete the user " + deletedUser.getEmail());
             return new ResponseEntity<>("You are not allowed to delete the selected user", HttpStatus.BAD_REQUEST);
         } else
         {
             try
             {
-                logger.trace("Deleting user " + deletedUser.getEmail());
+                logger.trace("[" + currentUser + "] Deleting user " + deletedUser.getEmail());
                 userRepository.delete(deletedUser);
-                logger.info("Successfully delete the user " + deletedUser.getEmail());
+                logger.info("[" + currentUser + "] Successfully delete the user " + deletedUser.getEmail());
                 return new ResponseEntity<>("Successfully deleted selected user", HttpStatus.OK);
             } catch (IllegalArgumentException e)
             {
-                logger.warn("Unable to delete selected user: " + e.getMessage());
+                logger.warn("[" + currentUser + "] Unable to delete selected user: " + e.getMessage());
                 return new ResponseEntity<>("Unable to delete the selected user", HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
