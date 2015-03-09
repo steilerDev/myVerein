@@ -18,5 +18,5 @@ class Division: NSManagedObject {
     @NSManaged var admin: User
     @NSManaged var chatMessages: NSSet
     @NSManaged var enrolledUser: NSSet
-
+    @NSManaged var userIsMember: Bool
 }

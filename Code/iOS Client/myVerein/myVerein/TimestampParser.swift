@@ -7,8 +7,12 @@
 //
 
 import Foundation
+import XCGLogger
 
 class TimestampParser {
+    
+    private static let logger = XCGLogger.defaultInstance()
+    
     struct TimestampConstants {
         static let DayOfMonth = "dayOfMonth"
         static let Month = "monthValue"
@@ -20,7 +24,10 @@ class TimestampParser {
     }
     
     /// This function parse the response object of a timestamp to a NSDate. The object is nil if a parse error occured.
-    class func parseTimestamp(responseObject: Dictionary<String, AnyObject>) -> NSDate? {
+    class func parseTimestamp(responseObject: [String: AnyObject]) -> NSDate? {
+        
+        logger.verbose("Parsing timestamp: \(responseObject)")
+        
         var dateComponent = NSDateComponents()
         
         if let dayOfMonth = responseObject[TimestampConstants.DayOfMonth] as? Int,
@@ -38,9 +45,10 @@ class TimestampParser {
             dateComponent.minute = minute
             dateComponent.second = second
             dateComponent.nanosecond = nanoSecond
+            logger.info("Successfully parsed timestamp data")
             return NSCalendar.currentCalendar().dateFromComponents(dateComponent)
         } else {
-            println("Unable to parse timestamp data")
+            logger.warning("Unable to parse timestamp data: \(responseObject)")
             return nil
         }
     }

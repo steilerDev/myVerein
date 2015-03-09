@@ -40,9 +40,7 @@ class DivisionChatCell: UICollectionViewCell {
             // If this attribute is not set a bunch of auto layout warnings will appear
             divisionImageView.superview?.superview?.setTranslatesAutoresizingMaskIntoConstraints(false)
         }
-    }
-    
-    
+    }    
 }
 
 extension UIColor {

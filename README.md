@@ -46,9 +46,10 @@ This project is going to use several frameworks and third-party products. The de
 ### iOS Client
 * Dependency management: [CocoaPods](http://cocoapods.org) licensed under a [MIT license](https://github.com/CocoaPods/CocoaPods/blob/master/LICENSE)
 * Animations: [Facebook Pop](https://github.com/facebook/pop) licensed under a [BSD license](https://github.com/facebook/pop/blob/master/LICENSE), [RKNotificationHub](https://github.com/cwRichardKim/RKNotificationHub) licensed under a [MIT license](https://github.com/cwRichardKim/RKNotificationHub/blob/master/LICENSE)
-* UI features: [UIImageView+Letters](https://github.com/bachonk/UIImageView-Letters) licensed under a [MIT license](https://github.com/bachonk/UIImageView-Letters/blob/master/LICENSE)
+* UI features: [UIImageView+Letters](https://github.com/bachonk/UIImageView-Letters) licensed under a [MIT license](https://github.com/bachonk/UIImageView-Letters/blob/master/LICENSE), [JSQMessagesViewController](https://github.com/jessesquires/JSQMessagesViewController) licensed under a [MIT license](https://github.com/jessesquires/JSQMessagesViewController/blob/develop/LICENSE)
 * Data management: [SwiftyUserDefaults](https://github.com/radex/SwiftyUserDefaults/) licensed under a [MIT license](https://github.com/radex/SwiftyUserDefaults/blob/master/LICENSE), [Locksmith](https://github.com/matthewpalmer/Locksmith) licensed under a [MIT license](https://github.com/matthewpalmer/Locksmith/blob/master/LICENSE) 
 * Password management: [1Password Password Management Extension](https://github.com/AgileBits/onepassword-app-extension) licensed under a [MIT license](https://github.com/AgileBits/onepassword-app-extension/blob/master/LICENSE.txt)
 * Networking: [AFNetworking](http://afnetworking.com) licensed under a [MIT license](http://opensource.org/licenses/mit-license)
+* Logging: [XCGLogger](https://github.com/DaveWoodCom/XCGLogger) licensed under a [MIT license](https://github.com/DaveWoodCom/XCGLogger/blob/master/LICENSE.txt)
 
 If you have any feedback, feature request, or you are a society's IT administrator and want your club to be among the first one to use this product, feel free to [contact me](mailto:frank@steilerdev.de).

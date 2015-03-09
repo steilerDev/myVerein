@@ -8,8 +8,11 @@
 
 import Foundation
 import Locksmith
+import XCGLogger
 
 class MVSecurity {
+    
+    private let logger = XCGLogger.defaultInstance()
     
     private struct SecurityConstants {
         static let UserAccount = "myVereinUserAccount"
@@ -34,27 +37,34 @@ class MVSecurity {
     }
     
     init() {
+        logger.verbose("Initializing security instance")
         if let keychainData = Locksmith.loadDataForUserAccount(SecurityConstants.UserAccount).0 {
             currentUsername = keychainData[SecurityConstants.Username] as? String
             currentPassword = keychainData[SecurityConstants.Password] as? String
             currentDomain = keychainData[SecurityConstants.Domain] as? String
+            logger.debug("Successfully initialized security instance")
         } else {
-            println(MVError.createError(.MVKeychainEmptyError))
+            let error = MVError.createError(.MVKeychainEmptyError)
+            logger.warning("Unable to initialize security instance: \(error.localizedDescription)")
         }
     }
     
     /// This function updates the stored information within the keychain. If one of the arguments is nil, the entry is deleted.
     func updateKeychain(newUsername: String?, newPassword: String?, newDomain: String?) {
+        logger.verbose("Updating keychain information")
         if let username = newUsername, password = newPassword, domain = newDomain {
             if currentUsername == nil && currentDomain == nil && currentPassword == nil {
+                logger.info("Creating new keychain object")
                 Locksmith.saveData([SecurityConstants.Username: username, SecurityConstants.Password: password, SecurityConstants.Domain: domain], forUserAccount: SecurityConstants.UserAccount)
             } else {
+                logger.info("Updating keychain object")
                 Locksmith.updateData([SecurityConstants.Username: username, SecurityConstants.Password: password, SecurityConstants.Domain: domain], forUserAccount: SecurityConstants.UserAccount)
             }
             currentUsername = newUsername
             currentPassword = newPassword
             currentUsername = newDomain
         } else {
+            logger.info("Deleting current keychain object")
             Locksmith.deleteDataForUserAccount(SecurityConstants.UserAccount)
             currentUsername = nil
             currentPassword = nil
@@ -63,6 +73,7 @@ class MVSecurity {
     }
     
     func currentKeychain() -> (username: String?, password: String?, domain: String?) {
+        logger.debug("Returning current keychain credentials")
         return (currentUsername, currentPassword, currentDomain)
     }
 }

@@ -674,6 +674,24 @@ public class User implements UserDetails
     }
 
     /**
+     * This function removes all fields that the other users of the app are not allowed to see.
+     */
+    public void prepareForInternalUse()
+    {
+        customUserField = null;
+        divisions = null;
+
+        activeSince = null;
+        passiveSince = null;
+        resignationDate = null;
+
+        iban = null;
+        bic = null;
+
+        administrationNotAllowedMessage = null;
+    }
+
+    /**
      * This function checks if the current user is allowed to modify a specified event. The user is allowed to modify the event, if he is either the creator of the event or the superadmin.
      * @param event The selected event.
      * @return True if the user is allowed, false otherwise.

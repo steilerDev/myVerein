@@ -30,6 +30,8 @@ public interface UserRepository extends MongoRepository<User, String> {
 
     public User findByEmail(String email);
 
+    public User findById(String id);
+
     @Query(value="{}", fields="{ 'firstName' : 1, 'lastName' : 1, 'email' : 1 }")
     public List<User> findAllEmailAndName();
 

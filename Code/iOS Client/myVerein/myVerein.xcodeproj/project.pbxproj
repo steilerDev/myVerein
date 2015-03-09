@@ -7,22 +7,23 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		3012715A1AA5C83C00C23AEF /* NetworkingSessionFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 301271591AA5C83C00C23AEF /* NetworkingSessionFactory.swift */; };
+		3012715A1AA5C83C00C23AEF /* MVNetworkingSessionFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 301271591AA5C83C00C23AEF /* MVNetworkingSessionFactory.swift */; };
 		3020CBA51A9E1289005AAEEF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3020CBA41A9E1289005AAEEF /* AppDelegate.swift */; };
 		3020CBA71A9E1289005AAEEF /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3020CBA61A9E1289005AAEEF /* LoginViewController.swift */; };
 		3020CBAA1A9E1289005AAEEF /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3020CBA81A9E1289005AAEEF /* Main.storyboard */; };
 		3020CBAC1A9E1289005AAEEF /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3020CBAB1A9E1289005AAEEF /* Images.xcassets */; };
 		3020CBAF1A9E1289005AAEEF /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3020CBAD1A9E1289005AAEEF /* LaunchScreen.xib */; };
 		3020CBBB1A9E128A005AAEEF /* myVereinTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3020CBBA1A9E128A005AAEEF /* myVereinTests.swift */; };
+		3026FE8E1AADE71F0006ABA8 /* XCGLogger.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3026FE8D1AADE71F0006ABA8 /* XCGLogger.framework */; };
 		302BE8C21AA642EB001D0FE7 /* DivisionChatCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 302BE8C11AA642EB001D0FE7 /* DivisionChatCell.swift */; };
 		302BE8C41AA64599001D0FE7 /* DivisionChatOverviewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 302BE8C31AA64599001D0FE7 /* DivisionChatOverviewViewController.swift */; };
 		304C577F1AACA3CC00B221D7 /* MVSecurity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 304C577E1AACA3CC00B221D7 /* MVSecurity.swift */; };
-		306FD7321AAA356000719B82 /* NetworkingHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 306FD7311AAA356000719B82 /* NetworkingHelper.swift */; };
+		306FD7321AAA356000719B82 /* MVNetworkingHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 306FD7311AAA356000719B82 /* MVNetworkingHelper.swift */; };
 		306FD7341AAB0F4400719B82 /* MVError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 306FD7331AAB0F4400719B82 /* MVError.swift */; };
 		30916FFB1AA8B9D0004D30D1 /* MenuController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30916FFA1AA8B9D0004D30D1 /* MenuController.swift */; };
 		3091702F1AA8C097004D30D1 /* myVereinModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 3091702D1AA8C097004D30D1 /* myVereinModel.xcdatamodeld */; };
 		309170341AA8D2B4004D30D1 /* MessageRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 309170331AA8D2B4004D30D1 /* MessageRepository.swift */; };
-		30A4F7D91AA97D400064EA2C /* NetworkingAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30A4F7D81AA97D400064EA2C /* NetworkingAction.swift */; };
+		30A4F7D91AA97D400064EA2C /* MVNetworking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30A4F7D81AA97D400064EA2C /* MVNetworking.swift */; };
 		30BAFEE51AA52828000D18EF /* ca-cert.cer in Resources */ = {isa = PBXBuildFile; fileRef = 30BAFEE11AA518EA000D18EF /* ca-cert.cer */; };
 		30FB44BB1AACC088003E4512 /* DivisionRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30FB44BA1AACC088003E4512 /* DivisionRepository.swift */; };
 		30FB44BD1AACC096003E4512 /* UserRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30FB44BC1AACC096003E4512 /* UserRepository.swift */; };
@@ -44,7 +45,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		301271591AA5C83C00C23AEF /* NetworkingSessionFactory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkingSessionFactory.swift; sourceTree = "<group>"; };
+		301271591AA5C83C00C23AEF /* MVNetworkingSessionFactory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MVNetworkingSessionFactory.swift; sourceTree = "<group>"; };
 		3020CB9F1A9E1289005AAEEF /* myVerein.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = myVerein.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3020CBA31A9E1289005AAEEF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		3020CBA41A9E1289005AAEEF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -55,15 +56,16 @@
 		3020CBB41A9E128A005AAEEF /* myVereinTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = myVereinTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		3020CBB91A9E128A005AAEEF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		3020CBBA1A9E128A005AAEEF /* myVereinTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = myVereinTests.swift; sourceTree = "<group>"; };
+		3026FE8D1AADE71F0006ABA8 /* XCGLogger.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCGLogger.framework; path = "XCGLogger/build/Debug-iphoneos/XCGLogger.framework"; sourceTree = "<group>"; };
 		302BE8C11AA642EB001D0FE7 /* DivisionChatCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DivisionChatCell.swift; sourceTree = "<group>"; };
 		302BE8C31AA64599001D0FE7 /* DivisionChatOverviewViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DivisionChatOverviewViewController.swift; sourceTree = "<group>"; };
 		304C577E1AACA3CC00B221D7 /* MVSecurity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MVSecurity.swift; sourceTree = "<group>"; };
-		306FD7311AAA356000719B82 /* NetworkingHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkingHelper.swift; sourceTree = "<group>"; };
+		306FD7311AAA356000719B82 /* MVNetworkingHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MVNetworkingHelper.swift; sourceTree = "<group>"; };
 		306FD7331AAB0F4400719B82 /* MVError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MVError.swift; sourceTree = "<group>"; };
 		30916FFA1AA8B9D0004D30D1 /* MenuController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MenuController.swift; sourceTree = "<group>"; };
 		3091702E1AA8C097004D30D1 /* myVereinModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = myVereinModel.xcdatamodel; sourceTree = "<group>"; };
 		309170331AA8D2B4004D30D1 /* MessageRepository.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MessageRepository.swift; sourceTree = "<group>"; };
-		30A4F7D81AA97D400064EA2C /* NetworkingAction.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkingAction.swift; sourceTree = "<group>"; };
+		30A4F7D81AA97D400064EA2C /* MVNetworking.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MVNetworking.swift; sourceTree = "<group>"; };
 		30BAFEE11AA518EA000D18EF /* ca-cert.cer */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ca-cert.cer"; sourceTree = "<group>"; };
 		30FB44BA1AACC088003E4512 /* DivisionRepository.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DivisionRepository.swift; sourceTree = "<group>"; };
 		30FB44BC1AACC096003E4512 /* UserRepository.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserRepository.swift; sourceTree = "<group>"; };
@@ -81,6 +83,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3026FE8E1AADE71F0006ABA8 /* XCGLogger.framework in Frameworks */,
 				669D9154C16CB2C002A6D28F /* Pods.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -98,6 +101,7 @@
 		18F6693D3B569EC6E7DBD91F /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				3026FE8D1AADE71F0006ABA8 /* XCGLogger.framework */,
 				FE0498950F9A959DC502856B /* Pods.framework */,
 			);
 			name = Frameworks;
@@ -115,9 +119,9 @@
 		3012715B1AA5C85500C23AEF /* Networking */ = {
 			isa = PBXGroup;
 			children = (
-				301271591AA5C83C00C23AEF /* NetworkingSessionFactory.swift */,
-				30A4F7D81AA97D400064EA2C /* NetworkingAction.swift */,
-				306FD7311AAA356000719B82 /* NetworkingHelper.swift */,
+				30A4F7D81AA97D400064EA2C /* MVNetworking.swift */,
+				301271591AA5C83C00C23AEF /* MVNetworkingSessionFactory.swift */,
+				306FD7311AAA356000719B82 /* MVNetworkingHelper.swift */,
 				30FB44C01AACD819003E4512 /* TimestampParser.swift */,
 			);
 			name = Networking;
@@ -405,7 +409,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				3020CBA71A9E1289005AAEEF /* LoginViewController.swift in Sources */,
-				30A4F7D91AA97D400064EA2C /* NetworkingAction.swift in Sources */,
+				30A4F7D91AA97D400064EA2C /* MVNetworking.swift in Sources */,
 				30FB44C71AACD898003E4512 /* Division.swift in Sources */,
 				30FB44C51AACD898003E4512 /* Message.swift in Sources */,
 				30916FFB1AA8B9D0004D30D1 /* MenuController.swift in Sources */,
@@ -416,8 +420,8 @@
 				309170341AA8D2B4004D30D1 /* MessageRepository.swift in Sources */,
 				30FB44BB1AACC088003E4512 /* DivisionRepository.swift in Sources */,
 				302BE8C21AA642EB001D0FE7 /* DivisionChatCell.swift in Sources */,
-				3012715A1AA5C83C00C23AEF /* NetworkingSessionFactory.swift in Sources */,
-				306FD7321AAA356000719B82 /* NetworkingHelper.swift in Sources */,
+				3012715A1AA5C83C00C23AEF /* MVNetworkingSessionFactory.swift in Sources */,
+				306FD7321AAA356000719B82 /* MVNetworkingHelper.swift in Sources */,
 				30FB44C31AACD897003E4512 /* User.swift in Sources */,
 				306FD7341AAB0F4400719B82 /* MVError.swift in Sources */,
 				3020CBA51A9E1289005AAEEF /* AppDelegate.swift in Sources */,
@@ -550,6 +554,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = myVerein/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -565,6 +570,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = myVerein/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";

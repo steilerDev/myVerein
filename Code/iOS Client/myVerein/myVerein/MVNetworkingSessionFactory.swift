@@ -10,9 +10,12 @@ import Foundation
 
 import AFNetworking
 import Locksmith
+import XCGLogger
 
 /// This class is used to manage the shared HTTPSession.
-class NetworkingSessionFactory {
+class MVNetworkingSessionFactory {
+    
+    private static let logger = XCGLogger.defaultInstance()
     
     private static var sharedSessionManager: AFHTTPSessionManager?
     
@@ -25,8 +28,9 @@ class NetworkingSessionFactory {
     }
     
     /// This function returns the shared session manager used within the whole system. The object is lazily created
-    static func instance() -> AFHTTPSessionManager? {
+    class func instance() -> AFHTTPSessionManager? {
         if sharedSessionManager == nil {
+            logger.debug("Creating new session instance")
             if let baseUrlString = MVSecurity.instance().currentKeychain().domain,
                 baseUrl = NSURL(string: baseUrlString),
                 certificatePath = NSBundle.mainBundle().pathForResource(NetworkingConstants.Certificate.Name, ofType: NetworkingConstants.Certificate.Type),
@@ -39,13 +43,18 @@ class NetworkingSessionFactory {
                 sharedSessionManager?.securityPolicy.pinnedCertificates = [certificate]
                 
                 sharedSessionManager?.responseSerializer = AFJSONResponseSerializer()
+                
+                logger.info("Successfully created new session instance")
+            } else {
+                logger.warning("Unable to create new session instance")
             }
         }
         return sharedSessionManager
     }
     
     /// This function invalidates the current instance of the session manager
-    static func invalidateInstance() {
+    class func invalidateInstance() {
+        logger.debug("Invalidating session instance")
         sharedSessionManager?.invalidateSessionCancelingTasks(true)
         sharedSessionManager = nil
     }

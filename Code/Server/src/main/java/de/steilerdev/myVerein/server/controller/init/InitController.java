@@ -29,10 +29,7 @@ import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
@@ -40,7 +37,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
-@Controller
+@RestController
 @RequestMapping("/api/init")
 public class InitController
 {
@@ -72,7 +69,7 @@ public class InitController
      * @return An HTTP response with a status code. If an error occurred an error message is bundled into the response, otherwise a success message is available.
      */
     @RequestMapping(value = "settings", method = RequestMethod.POST)
-    public @ResponseBody ResponseEntity<String> initSettings(@RequestParam String clubName,
+    public ResponseEntity<String> initSettings(@RequestParam String clubName,
                                                @RequestParam String databaseHost,
                                                @RequestParam String databasePort,
                                                @RequestParam String databaseUser,
@@ -158,7 +155,7 @@ public class InitController
      * @return An HTTP response with a status code. If an error occurred an error message is bundled into the response, otherwise a success message is available.
      */
     @RequestMapping(value = "superAdmin", method = RequestMethod.POST)
-    public @ResponseBody ResponseEntity<String> initSuperAdmin(@RequestParam String firstName,
+    public ResponseEntity<String> initSuperAdmin(@RequestParam String firstName,
                                                  @RequestParam String lastName,
                                                  @RequestParam String email,
                                                  @RequestParam String password,
