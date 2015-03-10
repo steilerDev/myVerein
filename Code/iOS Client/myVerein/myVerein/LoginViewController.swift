@@ -145,7 +145,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate, POPAnimationDe
             passwordTextField.text = password
             hostTextField.text = domain
                     
-            MVNetworking.loginAction(
+            MVNetworking.loginActionWithCallbackOnMainQueue(
                 success: {
                     XCGLogger.info("Login successfully, performing segue to main view controller")
                     self.performSegueWithIdentifier(LoginViewControllerConstants.SegueToMainApplication, sender: self)

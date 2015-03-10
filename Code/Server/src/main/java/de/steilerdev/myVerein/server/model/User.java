@@ -676,10 +676,13 @@ public class User implements UserDetails
     /**
      * This function removes all fields that the other users of the app are not allowed to see.
      */
-    public void prepareForInternalUse()
+    public void prepareForInternalSync()
     {
         customUserField = null;
-        divisions = null;
+        if(divisions != null)
+        {
+            divisions.stream().forEach(Division::removeEverythingExceptId);
+        }
 
         activeSince = null;
         passiveSince = null;

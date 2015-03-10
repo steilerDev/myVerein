@@ -9,7 +9,7 @@
 import Foundation
 import XCGLogger
 
-class TimestampParser {
+class DateParser {
     
     private static let logger = XCGLogger.defaultInstance()
     
@@ -23,10 +23,10 @@ class TimestampParser {
         static let NanoSecond = "nano"
     }
     
-    /// This function parse the response object of a timestamp to a NSDate. The object is nil if a parse error occured.
-    class func parseTimestamp(responseObject: [String: AnyObject]) -> NSDate? {
+    /// This function parse the response object of a (Java 8) LocalDateTime to a NSDate. The object is nil if a parse error occured.
+    class func parseDateTime(responseObject: [String: AnyObject]) -> NSDate? {
         
-        logger.verbose("Parsing timestamp: \(responseObject)")
+        logger.verbose("Parsing DateTime: \(responseObject)")
         
         var dateComponent = NSDateComponents()
         
@@ -45,10 +45,32 @@ class TimestampParser {
             dateComponent.minute = minute
             dateComponent.second = second
             dateComponent.nanosecond = nanoSecond
-            logger.info("Successfully parsed timestamp data")
+            logger.info("Successfully parsed DateTime data")
             return NSCalendar.currentCalendar().dateFromComponents(dateComponent)
         } else {
-            logger.warning("Unable to parse timestamp data: \(responseObject)")
+            logger.warning("Unable to parse DateTime data: \(responseObject)")
+            return nil
+        }
+    }
+    
+    /// This function parse the response object of a (Java 8) LocalDate to a NSDate. The object is nil if a parse error occured.
+    class func parseDate(responseObject: [String: AnyObject]) -> NSDate? {
+        
+        logger.verbose("Parsing Date: \(responseObject)")
+        
+        var dateComponent = NSDateComponents()
+        
+        if let dayOfMonth = responseObject[TimestampConstants.DayOfMonth] as? Int,
+            month = responseObject[TimestampConstants.Month] as? Int,
+            year = responseObject[TimestampConstants.Year] as? Int
+        {
+            dateComponent.day = dayOfMonth
+            dateComponent.month = month
+            dateComponent.year = year
+            logger.info("Successfully parsed Date data")
+            return NSCalendar.currentCalendar().dateFromComponents(dateComponent)
+        } else {
+            logger.warning("Unable to parse Date data: \(responseObject)")
             return nil
         }
     }

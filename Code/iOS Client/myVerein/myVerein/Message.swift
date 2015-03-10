@@ -18,4 +18,8 @@ class Message: NSManagedObject {
     @NSManaged var division: Division
     @NSManaged var sender: User
 
+    func setInverseRelations() {
+        sender.sendMessages.addObject(self)
+        division.chatMessages.addObject(self)
+    }
 }

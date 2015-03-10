@@ -183,6 +183,10 @@ public class Division
         name = null;
     }
 
+    public void prepareForInternalSync() {
+        adminUser.removeEverythingExceptId();
+    }
+
     /**
      * Comparing two objects of the division class according to their name. Overwritten to be able to use the contains() method of java.util.List.
      * @param obj The object compared to the current object.

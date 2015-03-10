@@ -57,6 +57,15 @@ class MVNetworking {
     // MARK: - Login
     
     /// This function tries to log the user into the system using the stored credentials within the keychain. The callbacks are guaranteed to be executed on the main queue.
+    class func loginActionWithCallbackOnMainQueue(#success: () -> (), failure: (NSError) -> ()) {
+        // Wrapping call backs into the marshal prefix operator, to execute them on the main queue
+        loginAction(
+            success: { ~>success },
+            failure: { error in ~>{failure(error)} }
+        )
+    }
+    
+    /// This function tries to log the user into the system using the stored credentials within the keychain. The callbacks are not executed on the main queue
     class func loginAction(#success: () -> (), failure: (NSError) -> ()) {
         logger.verbose("Logging in using stored credentials")
         let (currentUsername, currentPassword, _) = MVSecurity.instance().currentKeychain()
@@ -65,14 +74,12 @@ class MVNetworking {
         } else {
             let error = MVError.createError(.MVSessionLoadingError)
             logger.warning("Unable to log in: \(error.localizedDescription)")
-            dispatch_async(dispatch_get_main_queue()) {
-                failure(error)
-            }
+            failure(error)
         }
     }
     
     /// This function tries to log the user into the system using the provided credentials. The callbacks are guaranteed to be executed on the main queue.
-    class func loginAction(username: String, password: String, success: () -> (), failure: (NSError) -> ()) {
+    private class func loginAction(username: String, password: String, success: () -> (), failure: (NSError) -> ()) {
         logger.verbose("Logging in using provided parameters")
         if let session = MVNetworkingSessionFactory.instance() {
 
@@ -88,10 +95,7 @@ class MVNetworking {
                 {
                     _, _ in
                     XCGLogger.info("Successfully logged in")
-                    // Executing success callback on main queue
-                    dispatch_async(dispatch_get_main_queue()) {
-                        success()
-                    }
+                    success()
                 },
                 failure:
                 {
@@ -102,23 +106,28 @@ class MVNetworking {
                     MVNetworkingSessionFactory.invalidateInstance()
                     
                     // Executing failure callback on main queue
-                    dispatch_async(dispatch_get_main_queue()) {
-                        failure(error)
-                    }
+                    failure(error)
                 }
             )
         } else {
             let error = MVError.createError(MVErrorCodes.MVSessionLoadingError)
             logger.warning("Unable to log in: \(error.localizedDescription)")
-            dispatch_async(dispatch_get_main_queue()) {
-                failure(error)
-            }
+            failure(error)
         }
     }
     
     // MARK: - Messages
     
     /// This function is gathering all unread messages. The callbacks are guaranteed to be executed on the main queue.
+    class func messageSyncActionWithCallbackOnMainQueue(#success: (AnyObject) -> (), failure: (NSError?) -> ()) {
+        // Wrapping call backs into the marshal prefix operator, to execute them on the main queue
+        messageSyncAction(
+            success: { response in {~>success(response)} },
+            failure: { error in {~>failure(error)} }
+        )
+    }
+    
+    /// This function is gathering all unread messages. The callbacks are not executed on the main queue.
     class func messageSyncAction(#success: (AnyObject) -> (), failure: (NSError?) -> ()) {
         logger.verbose("Started message sync action")
         handleRequest(
@@ -134,6 +143,15 @@ class MVNetworking {
     // MARK: - User
     
     /// This function is gathering all information available about a user. The callbacks are guaranteed to be executed on the main queue.
+    class func userSyncActionWithCallbackOnMainQueue(#userId: String, success: (AnyObject) -> (), failure: (NSError?) -> ()) {
+        // Wrapping call backs into the marshal prefix operator, to execute them on the main queue
+        userSyncAction(
+            success: { response in {~>success(response)} },
+            failure: { error in {~>failure(error)} }
+        )
+    }
+    
+    /// This function is gathering all information available about a user. The callbacks are not executed on the main queue.
     class func userSyncAction(#userId: String, success: (AnyObject) -> (), failure: (NSError?) -> ()) {
         logger.verbose("Started user sync action")
         let parameters = [NetworkingConstants.User.Get.Parameter.UserID : userId]
@@ -173,17 +191,15 @@ class MVNetworking {
                 {
                     _, response in
                     XCGLogger.info("Successfully executed request (URI: \(URI), parameters \(parameters), request method \(requestMethod), retry count \(retryCount)")
-                    // Executing success callback on main queue
-                    dispatch_async(dispatch_get_main_queue()) {
-                        success(response)
-                    }
+                    // Executing success callback
+                    success(response)
                 },
                 failure:
                 {
                     _, error in
                     XCGLogger.warning("Failed executing request (URI: \(URI), parameters \(parameters), request method \(requestMethod), retry count \(retryCount)): \(error.localizedDescription)")
                     // Handling a request error using the request failure handler. If the error was because of a 401 error, the handler is trying to log the user in before retrying
-                    self.handleRequestFailure(
+                    MVNetworking.handleRequestFailure(
                         error: error,
                         URI: URI,
                         parameters: parameters,
@@ -197,9 +213,7 @@ class MVNetworking {
         } else {
             let error = MVError.createError(.MVSessionLoadingError)
             logger.warning("Unable to execute request: \(error.localizedDescription)")
-            dispatch_async(dispatch_get_main_queue()) {
-                failure(error)
-            }
+            failure(error)
         }
     }
     
@@ -218,7 +232,7 @@ class MVNetworking {
                 // Since the error occured because the user was not logged in, the log in function is called with the original function with all callbacks as success handler object. Concluding if the log in is successfull the original function is called again and should succeed, otherwise the initial failure handler is executed.
                 loginAction(
                     success: {
-                        self.handleRequest(
+                         MVNetworking.handleRequest(
                             URI: URI,
                             parameters: parameters,
                             requestMethod: requestMethod,
@@ -236,9 +250,7 @@ class MVNetworking {
             }
         } else {
             logger.warning("Handling error of unknown kind: \(error.localizedDescription)")
-            dispatch_async(dispatch_get_main_queue()) {
-                initialFailure(error)
-            }
+            initialFailure(error)
         }
     }
 }

@@ -4,41 +4,41 @@
         <attribute name="desc" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="id" attributeType="String" indexed="YES" syncable="YES"/>
         <attribute name="lastSynced" optional="YES" attributeType="Date" syncable="YES"/>
-        <attribute name="name" attributeType="String" syncable="YES"/>
+        <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="userIsMember" optional="YES" attributeType="Boolean" syncable="YES"/>
-        <relationship name="admin" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="User" inverseName="administratedDivision" inverseEntity="User" syncable="YES"/>
-        <relationship name="chatMessages" optional="YES" toMany="YES" deletionRule="Deny" destinationEntity="Message" inverseName="division" inverseEntity="Message" syncable="YES"/>
-        <relationship name="enrolledUser" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="User" inverseName="division" inverseEntity="User" syncable="YES"/>
+        <relationship name="admin" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="User" inverseName="rawAdministratedDivisions" inverseEntity="User" syncable="YES"/>
+        <relationship name="rawChatMessages" optional="YES" toMany="YES" deletionRule="Deny" destinationEntity="Message" inverseName="division" inverseEntity="Message" syncable="YES"/>
+        <relationship name="rawEnrolledUser" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="User" inverseName="rawDivisions" inverseEntity="User" syncable="YES"/>
     </entity>
     <entity name="Message" representedClassName="myVerein.Message" syncable="YES">
-        <attribute name="content" attributeType="String" syncable="YES"/>
+        <attribute name="content" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="id" attributeType="String" indexed="YES" syncable="YES"/>
-        <attribute name="read" attributeType="Boolean" defaultValueString="NO" syncable="YES"/>
-        <attribute name="timestamp" attributeType="Date" syncable="YES"/>
-        <relationship name="division" maxCount="1" deletionRule="Nullify" destinationEntity="Division" inverseName="chatMessages" inverseEntity="Division" syncable="YES"/>
-        <relationship name="sender" maxCount="1" deletionRule="Nullify" destinationEntity="User" inverseName="sendMessages" inverseEntity="User" syncable="YES"/>
+        <attribute name="read" optional="YES" attributeType="Boolean" defaultValueString="NO" syncable="YES"/>
+        <attribute name="timestamp" optional="YES" attributeType="Date" syncable="YES"/>
+        <relationship name="division" maxCount="1" deletionRule="Nullify" destinationEntity="Division" inverseName="rawChatMessages" inverseEntity="Division" syncable="YES"/>
+        <relationship name="sender" maxCount="1" deletionRule="Nullify" destinationEntity="User" inverseName="rawSendMessages" inverseEntity="User" syncable="YES"/>
     </entity>
     <entity name="User" representedClassName="myVerein.User" syncable="YES">
         <attribute name="birthday" optional="YES" attributeType="Date" syncable="YES"/>
         <attribute name="city" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="country" optional="YES" attributeType="String" syncable="YES"/>
-        <attribute name="email" attributeType="String" syncable="YES"/>
-        <attribute name="firstName" attributeType="String" syncable="YES"/>
-        <attribute name="gender" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="email" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="firstName" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="id" attributeType="String" indexed="YES" syncable="YES"/>
-        <attribute name="lastName" attributeType="String" syncable="YES"/>
+        <attribute name="lastName" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="lastSynced" optional="YES" attributeType="Date" syncable="YES"/>
-        <attribute name="membershipStatuts" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="rawGender" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="rawMembershipStatus" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="street" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="streetNumber" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="zipCode" optional="YES" attributeType="String" syncable="YES"/>
-        <relationship name="administratedDivision" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Division" inverseName="admin" inverseEntity="Division" syncable="YES"/>
-        <relationship name="division" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Division" inverseName="enrolledUser" inverseEntity="Division" syncable="YES"/>
-        <relationship name="sendMessages" optional="YES" toMany="YES" deletionRule="Deny" destinationEntity="Message" inverseName="sender" inverseEntity="Message" syncable="YES"/>
+        <relationship name="rawAdministratedDivisions" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Division" inverseName="admin" inverseEntity="Division" syncable="YES"/>
+        <relationship name="rawDivisions" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Division" inverseName="rawEnrolledUser" inverseEntity="Division" syncable="YES"/>
+        <relationship name="rawSendMessages" optional="YES" toMany="YES" deletionRule="Deny" destinationEntity="Message" inverseName="sender" inverseEntity="Message" syncable="YES"/>
     </entity>
     <elements>
         <element name="Division" positionX="0" positionY="108" width="128" height="165"/>
-        <element name="Message" positionX="-650" positionY="-234" width="128" height="133"/>
-        <element name="User" positionX="-794" positionY="81" width="128" height="283"/>
+        <element name="Message" positionX="-650" positionY="-234" width="128" height="135"/>
+        <element name="User" positionX="-794" positionY="81" width="128" height="285"/>
     </elements>
 </model>
