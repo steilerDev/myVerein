@@ -18,6 +18,9 @@ class DivisionChatOverviewViewController: UICollectionViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        //Syncing user divisions everytime the view loads
+        MVNetworkingHelper.syncUserDivision()
+        
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
 

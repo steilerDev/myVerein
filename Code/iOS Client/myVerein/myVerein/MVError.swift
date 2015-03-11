@@ -16,6 +16,8 @@ enum MVErrorCodes: Int {
     case MVSessionLoadingError = 21
     case MVMaximumLoginRetriesReached = 22
     case MVServerResponseParseError = 23
+    case MVLocalDatabaseError = 50
+    case MVLocalDatabaseLoadingError = 51
     case MVEntityCreationError = 60
     case MVDivisionCreationError = 61
     case MVMessageCreationError = 62
@@ -123,6 +125,17 @@ class MVError {
                     NSLocalizedDescriptionKey: "Unable to create user entity",
                     NSLocalizedFailureReasonErrorKey: "Unknown",
                     NSLocalizedRecoverySuggestionErrorKey: "Retry your action"
+                ]
+            case .MVLocalDatabaseError:
+                return [
+                    NSLocalizedDescriptionKey: "An error related to your local database ocurred",
+                    NSLocalizedFailureReasonErrorKey: "Unknown"
+                ]
+            case .MVLocalDatabaseLoadingError:
+                return [
+                    NSLocalizedDescriptionKey: "Failed to initialize the application's saved data",
+                    NSLocalizedFailureReasonErrorKey: "There was an error creating or loading the application's saved data.",
+                    NSLocalizedRecoverySuggestionErrorKey: "If the error persists, remove the application and re-install it"
                 ]
             default: return nil
         }

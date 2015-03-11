@@ -11,11 +11,12 @@ import CoreData
 import UIKit
 import XCGLogger
 
-class DivisionRepository {
+class DivisionRepository: CoreDataRepository {
     
     private struct DivisionConstants {
         static let ClassName = "Division"
         static let IdField = "id"
+        static let UserMembershipStatus = "rawUserMembershipStatus"
         
         struct remoteDivision {
             static let Id = "id"
@@ -24,12 +25,9 @@ class DivisionRepository {
             static let AdminUser = "adminUser"
         }
     }
+
+    // MARK: - Functions used to query the database
     
-    private let logger = XCGLogger.defaultInstance()
-
-    // Retreive the managedObjectContext from AppDelegate
-    let managedObjectContext = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext!
-
     /// This function gathers the division object with the corresponding id from the database and returns it. The object is nil if the program was unable to find it.
     func findDivisionBy(#id: String) -> Division? {
         logger.verbose("Retrieving division with id \(id) from database")
@@ -42,8 +40,20 @@ class DivisionRepository {
         // Execute the fetch request, and cast the results to an array of LogItem objects
         return managedObjectContext.executeFetchRequest(fetchRequest, error: nil)?.last as? Division
     }
+
+    func findDivisionBy(#userMembershipStatus: Division.UserMembershipStatus) -> [Division]? {
+        logger.verbose("Retrieving divisions the user's membership status is \(userMembershipStatus)")
+        // Create a new fetch request using the Message entity
+        let fetchRequest = NSFetchRequest(entityName: DivisionConstants.ClassName)
+        
+        let predicate = NSPredicate(format: "\(DivisionConstants.UserMembershipStatus) == %@", userMembershipStatus.rawValue)
+        fetchRequest.predicate = predicate
+        
+        // Execute the fetch request, and cast the results to an array of LogItem objects
+        return managedObjectContext.executeFetchRequest(fetchRequest, error: nil) as? [Division]
+    }
     
-    // MARK: - Creation and population of user
+    // MARK: - Creation and population of division
     
     /// This function returns the division defined through the response object. The object needs to be a dictionary, containing the id of the division. If the division does not exist, it is created and populated asynchronously.
     func getOrCreateDivisionFrom(#serverResponseObject: [String: AnyObject]) -> (division: Division?, error: NSError?) {
@@ -69,14 +79,14 @@ class DivisionRepository {
     /// This function returns a list of divisions defined through the server response array. If the divisions do not exist, they are created and populated asynchronously.
     func getOrCreateDivisionsFrom(#serverResponseObject: [AnyObject]) -> ([Division]?, NSError?) {
         logger.verbose("Parsing division from response object: \(serverResponseObject)")
-        var newDivisions = [Division]()
+        var searchedDivisions = [Division]()
         for division in serverResponseObject {
             if let divisionDict = division as? [String: AnyObject] {
                 let (newDivision, error) = getOrCreateDivisionFrom(serverResponseObject: divisionDict)
                 if error != nil && newDivision == nil {
                     return (nil, error)
                 } else {
-                    newDivisions.append(newDivision!)
+                    searchedDivisions.append(newDivision!)
                 }
             } else {
                 let error = MVError.createError(.MVServerResponseParseError)
@@ -84,12 +94,12 @@ class DivisionRepository {
                 return (nil, error)
             }
         }
-        logger.info("Returning \(newDivisions.count) new divisions")
-        return (newDivisions, nil)
+        logger.info("Returning \(searchedDivisions.count) new divisions")
+        return (searchedDivisions, nil)
     }
     
     /// This function either populates an existing division using the response object, or creates a new division from the scratch
-    func createDivisionFrom(#serverResponseObject: [String: AnyObject]) -> (Division?, NSError?) {
+    func syncDivisionWith(#serverResponseObject: [String: AnyObject]) -> (Division?, NSError?) {
         logger.verbose("Creating division from response object \(serverResponseObject)")
         
         // TODO: Improve, because if user is created he gets populated again.
@@ -101,26 +111,28 @@ class DivisionRepository {
         } else {
             logger.debug("Parsing division properties")
             if let division = wrappedDivision,
-                name = serverResponseObject[DivisionConstants.remoteDivision.Name] as? String,
-                description = serverResponseObject[DivisionConstants.remoteDivision.Description] as? String,
-                adminUserDict = serverResponseObject[DivisionConstants.remoteDivision.AdminUser] as? [String: AnyObject]
+                name = serverResponseObject[DivisionConstants.remoteDivision.Name] as? String
             {
-                let userRepository = UserRepository()
-                let (adminUser, error) = userRepository.getOrCreateUserFrom(serverResponseObject: adminUserDict)
-                
-                if error != nil && adminUser == nil {
-                    logger.warning("Unable to parse admin user for division: \(error?.localizedDescription)")
-                    return (nil, error)
+                if let adminUserDict = serverResponseObject[DivisionConstants.remoteDivision.AdminUser] as? [String: AnyObject] {
+                    logger.debug("Found an administrator for the division")
+                    let userRepository = UserRepository()
+                    let (adminUser, error) = userRepository.getOrCreateUserFrom(serverResponseObject: adminUserDict)
+                    
+                    if error != nil {
+                        logger.warning("Unable to parse admin user for division: \(error?.localizedDescription)")
+                        return (nil, error)
+                    }
+                    division.admin = adminUser
                 } else {
-                    logger.debug("Successfully parsed all properties")
-                    
-                    division.name = name
-                    division.desc = description
-                    division.setAdminUser(adminUser!)
-                    
-                    logger.info("Succesfully parsed and populaterd division")
-                    return (division, nil)
+                    logger.debug("No admin user for division")
                 }
+                
+                division.desc = serverResponseObject[DivisionConstants.remoteDivision.Description] as? String
+                division.name = name
+                division.lastSynced = NSDate()
+                
+                logger.info("Succesfully parsed and populaterd division")
+                return (division, nil)
             } else {
                 let error = MVError.createError(.MVServerResponseParseError)
                 logger.error("Unable to parse user: \(error.localizedDescription)")
@@ -134,20 +146,10 @@ class DivisionRepository {
         logger.verbose("Creating new division with id \(id)")
         let newItem = NSEntityDescription.insertNewObjectForEntityForName(DivisionConstants.ClassName, inManagedObjectContext: managedObjectContext) as! Division
         newItem.id = id
-        
-        /// TODO: Get rest of the object
+        newItem.lastSynced = NSDate()
+        /// Getting the rest of the division asynchronously
+        MVNetworkingHelper.syncDivision(id)
         
         return newItem
-    }
-    
-    /// This function saves the database permanently
-    func save() {
-        logger.verbose("Saving database changes")
-        var error : NSError?
-        if managedObjectContext.save(&error) {
-            logger.info("Successfully saved database")
-        } else {
-            logger.error("Unable to save database: \(error?.localizedDescription)")
-        }
     }
 }

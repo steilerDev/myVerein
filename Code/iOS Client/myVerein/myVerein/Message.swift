@@ -11,15 +11,10 @@ import CoreData
 
 class Message: NSManagedObject {
 
-    @NSManaged var content: String
+    @NSManaged var content: String?
     @NSManaged var id: String
     @NSManaged var read: Bool
-    @NSManaged var timestamp: NSDate
+    @NSManaged var timestamp: NSDate?
     @NSManaged var division: Division
     @NSManaged var sender: User
-
-    func setInverseRelations() {
-        sender.sendMessages.addObject(self)
-        division.chatMessages.addObject(self)
-    }
 }

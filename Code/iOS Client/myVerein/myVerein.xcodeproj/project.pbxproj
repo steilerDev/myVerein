@@ -24,6 +24,7 @@
 		30916FFB1AA8B9D0004D30D1 /* MenuController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30916FFA1AA8B9D0004D30D1 /* MenuController.swift */; };
 		3091702F1AA8C097004D30D1 /* myVereinModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 3091702D1AA8C097004D30D1 /* myVereinModel.xcdatamodeld */; };
 		309170341AA8D2B4004D30D1 /* MessageRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 309170331AA8D2B4004D30D1 /* MessageRepository.swift */; };
+		309256161AB098A400E55691 /* CoreDataRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 309256151AB098A400E55691 /* CoreDataRepository.swift */; };
 		30A4F7D91AA97D400064EA2C /* MVNetworking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30A4F7D81AA97D400064EA2C /* MVNetworking.swift */; };
 		30BAFEE51AA52828000D18EF /* ca-cert.cer in Resources */ = {isa = PBXBuildFile; fileRef = 30BAFEE11AA518EA000D18EF /* ca-cert.cer */; };
 		30FB44BB1AACC088003E4512 /* DivisionRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30FB44BA1AACC088003E4512 /* DivisionRepository.swift */; };
@@ -67,6 +68,7 @@
 		30916FFA1AA8B9D0004D30D1 /* MenuController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MenuController.swift; sourceTree = "<group>"; };
 		3091702E1AA8C097004D30D1 /* myVereinModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = myVereinModel.xcdatamodel; sourceTree = "<group>"; };
 		309170331AA8D2B4004D30D1 /* MessageRepository.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MessageRepository.swift; sourceTree = "<group>"; };
+		309256151AB098A400E55691 /* CoreDataRepository.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataRepository.swift; sourceTree = "<group>"; };
 		30A4F7D81AA97D400064EA2C /* MVNetworking.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MVNetworking.swift; sourceTree = "<group>"; };
 		30BAFEE11AA518EA000D18EF /* ca-cert.cer */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ca-cert.cer"; sourceTree = "<group>"; };
 		30FB44BA1AACC088003E4512 /* DivisionRepository.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DivisionRepository.swift; sourceTree = "<group>"; };
@@ -237,6 +239,7 @@
 				30FB44BA1AACC088003E4512 /* DivisionRepository.swift */,
 				309170331AA8D2B4004D30D1 /* MessageRepository.swift */,
 				30FB44BC1AACC096003E4512 /* UserRepository.swift */,
+				309256151AB098A400E55691 /* CoreDataRepository.swift */,
 			);
 			name = Model;
 			sourceTree = "<group>";
@@ -421,6 +424,7 @@
 				30FB44BD1AACC096003E4512 /* UserRepository.swift in Sources */,
 				304C577F1AACA3CC00B221D7 /* MVSecurity.swift in Sources */,
 				309170341AA8D2B4004D30D1 /* MessageRepository.swift in Sources */,
+				309256161AB098A400E55691 /* CoreDataRepository.swift in Sources */,
 				30FB44BB1AACC088003E4512 /* DivisionRepository.swift in Sources */,
 				302BE8C21AA642EB001D0FE7 /* DivisionChatCell.swift in Sources */,
 				3079B1DA1AAF242600ACD793 /* MarshalOperator.swift in Sources */,

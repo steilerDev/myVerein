@@ -24,19 +24,20 @@ class DateParser {
     }
     
     /// This function parse the response object of a (Java 8) LocalDateTime to a NSDate. The object is nil if a parse error occured.
-    class func parseDateTime(responseObject: [String: AnyObject]) -> NSDate? {
+    class func parseDateTime(responseObject: [String: AnyObject]?) -> NSDate? {
         
         logger.verbose("Parsing DateTime: \(responseObject)")
         
         var dateComponent = NSDateComponents()
         
-        if let dayOfMonth = responseObject[TimestampConstants.DayOfMonth] as? Int,
-                month = responseObject[TimestampConstants.Month] as? Int,
-                year = responseObject[TimestampConstants.Year] as? Int,
-                hour = responseObject[TimestampConstants.Hour] as? Int,
-                minute = responseObject[TimestampConstants.Minute] as? Int,
-                second = responseObject[TimestampConstants.Second] as? Int,
-                nanoSecond = responseObject[TimestampConstants.NanoSecond] as? Int
+        if let response = responseObject,
+                dayOfMonth = response[TimestampConstants.DayOfMonth] as? Int,
+                month = response[TimestampConstants.Month] as? Int,
+                year = response[TimestampConstants.Year] as? Int,
+                hour = response[TimestampConstants.Hour] as? Int,
+                minute = response[TimestampConstants.Minute] as? Int,
+                second = response[TimestampConstants.Second] as? Int,
+                nanoSecond = response[TimestampConstants.NanoSecond] as? Int
         {
             dateComponent.day = dayOfMonth
             dateComponent.month = month
@@ -54,15 +55,16 @@ class DateParser {
     }
     
     /// This function parse the response object of a (Java 8) LocalDate to a NSDate. The object is nil if a parse error occured.
-    class func parseDate(responseObject: [String: AnyObject]) -> NSDate? {
+    class func parseDate(responseObject: [String: AnyObject]?) -> NSDate? {
         
         logger.verbose("Parsing Date: \(responseObject)")
         
         var dateComponent = NSDateComponents()
         
-        if let dayOfMonth = responseObject[TimestampConstants.DayOfMonth] as? Int,
-            month = responseObject[TimestampConstants.Month] as? Int,
-            year = responseObject[TimestampConstants.Year] as? Int
+        if let response = responseObject,
+            dayOfMonth = response[TimestampConstants.DayOfMonth] as? Int,
+            month = response[TimestampConstants.Month] as? Int,
+            year = response[TimestampConstants.Year] as? Int
         {
             dateComponent.day = dayOfMonth
             dateComponent.month = month

@@ -30,6 +30,7 @@ public interface DivisionRepository extends MongoRepository<Division, String> {
 
     public Division findByName(String name);
     public List<Division> findByAdminUser(User adminUser);
+    public Division findById(String id);
 
     /**
      * Gathers all division names available.

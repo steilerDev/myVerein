@@ -108,7 +108,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate, POPAnimationDe
     @IBAction func loginAction() {
         logger.verbose("Trying to log in user")
         if var hostname = hostTextField.text, username = usernameTextField.text, password = passwordTextField.text
-            where hostname.isEmpty || username.isEmpty || password.isEmpty
+            where !hostname.isEmpty && !username.isEmpty && !password.isEmpty
         {
             //Adjusting hostname to meet required format
             if !hostname.hasPrefix("http") {

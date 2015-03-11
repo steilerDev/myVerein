@@ -28,15 +28,17 @@ class MVNetworking {
         }
         
         struct Message {
+            static let BaseURI = "/api/user/message"
             struct Sync {
-                static let URI = "/api/user/message"
+                static let URI = Message.BaseURI
                 static let Method = HTTPMethods.GET
             }
         }
         
         struct User {
+            static let BaseURI = "/api/user/user"
             struct Get {
-                static let URI = "/api/user/user"
+                static let URI = User.BaseURI
                 static let Method = HTTPMethods.GET
                 struct Parameter {
                     static let UserID = "userID"
@@ -44,14 +46,40 @@ class MVNetworking {
             }
         }
         
+        struct Division {
+            static let BaseURI = "/api/user/division"
+            struct Get {
+                static let URI = Division.BaseURI
+                static let Method = HTTPMethods.GET
+                struct Parameter {
+                    static let DivisionID = "divisionID"
+                }
+            }
+            struct Sync {
+                static let URI = Division.BaseURI + "/sync"
+                static let Method = HTTPMethods.GET
+            }
+        }
+        
         // This constant defines the amount of retries in case of being unable to log in.
-        static let MaxLoginRetries = 1
+        static let MaxLoginRetries = 2
     }
     
-    private enum HTTPMethods {
+    private enum HTTPMethods: Printable {
         case GET
         case POST
         case DELETE
+        
+        var description: String {
+            switch self {
+                case .GET:
+                    return "Get"
+                case .POST:
+                    return "Post"
+                case .DELETE:
+                    return "Delete"
+            }
+        }
     }
     
     // MARK: - Login
@@ -104,7 +132,7 @@ class MVNetworking {
                     
                     // Invaliating the session in case the user changes the domain
                     MVNetworkingSessionFactory.invalidateInstance()
-                    
+                    // TODO: This should be the place to handle invalid credentials
                     // Executing failure callback on main queue
                     failure(error)
                 }
@@ -117,15 +145,6 @@ class MVNetworking {
     }
     
     // MARK: - Messages
-    
-    /// This function is gathering all unread messages. The callbacks are guaranteed to be executed on the main queue.
-    class func messageSyncActionWithCallbackOnMainQueue(#success: (AnyObject) -> (), failure: (NSError?) -> ()) {
-        // Wrapping call backs into the marshal prefix operator, to execute them on the main queue
-        messageSyncAction(
-            success: { response in {~>success(response)} },
-            failure: { error in {~>failure(error)} }
-        )
-    }
     
     /// This function is gathering all unread messages. The callbacks are not executed on the main queue.
     class func messageSyncAction(#success: (AnyObject) -> (), failure: (NSError?) -> ()) {
@@ -142,18 +161,9 @@ class MVNetworking {
     
     // MARK: - User
     
-    /// This function is gathering all information available about a user. The callbacks are guaranteed to be executed on the main queue.
-    class func userSyncActionWithCallbackOnMainQueue(#userId: String, success: (AnyObject) -> (), failure: (NSError?) -> ()) {
-        // Wrapping call backs into the marshal prefix operator, to execute them on the main queue
-        userSyncAction(
-            success: { response in {~>success(response)} },
-            failure: { error in {~>failure(error)} }
-        )
-    }
-    
     /// This function is gathering all information available about a user. The callbacks are not executed on the main queue.
     class func userSyncAction(#userId: String, success: (AnyObject) -> (), failure: (NSError?) -> ()) {
-        logger.verbose("Started user sync action")
+        logger.verbose("Syncing user with id \(userId)")
         let parameters = [NetworkingConstants.User.Get.Parameter.UserID : userId]
         
         handleRequest(
@@ -166,11 +176,40 @@ class MVNetworking {
         )
     }
     
+    // MARK: - Division
+    
+    /// This function is gathering all information available about a user. The callbacks are not executed on the main queue.
+    class func divisionSyncAction(#divisionId: String, success: (AnyObject) -> (), failure: (NSError?) -> ()) {
+        logger.verbose("Syncing division with id \(divisionId)")
+        let parameters = [NetworkingConstants.Division.Get.Parameter.DivisionID : divisionId]
+        handleRequest(
+            URI: NetworkingConstants.Division.Get.URI,
+            parameters: parameters,
+            requestMethod: NetworkingConstants.Division.Get.Method,
+            retryCount: 0,
+            success: success,
+            failure: failure
+        )
+    }
+    
+    class func userDivisionSyncAction(#success: (AnyObject) -> (), failure: (NSError?) -> ()) {
+        logger.verbose("Starting to sync list of divisions the user is part of")
+        handleRequest(
+            URI: NetworkingConstants.Division.Sync.URI,
+            parameters: nil,
+            requestMethod: NetworkingConstants.Division.Sync.Method,
+            retryCount: 0,
+            success: success,
+            failure: failure
+        )
+    }
+    
     // MARK: - Internal functions
     
     /// This function performs a network action specified by its signature. If the request fails because of an unauthenticated user, the function tries to log the user in and then retries the initial action.
     private class func handleRequest(#URI: String, parameters: [String: String]?, requestMethod: HTTPMethods, retryCount: Int, success: (AnyObject) -> (), failure: (NSError) -> ()) {
-        logger.debug("Handling request for URI \(URI) with parameters \(parameters), request method \(requestMethod) and retry count \(retryCount)")
+        
+        logger.debug("About to handle request for URI \(URI) with parameters \(parameters), request method \(requestMethod) and retry count \(retryCount)")
         
         if let session = MVNetworkingSessionFactory.instance() {
             
@@ -185,6 +224,8 @@ class MVNetworking {
                     requestFunction = session.POST
             }
             
+            logger.debug("Executing request for URI \(URI) with parameters \(parameters), request method \(requestMethod) and retry count \(retryCount)")
+
             requestFunction(NSURL(string: URI, relativeToURL: session.baseURL)?.absoluteString,
                 parameters: parameters,
                 success:
@@ -220,15 +261,17 @@ class MVNetworking {
     /// This function is used to handle a failure during a request. If the failure is due to the fact that the user was not logged in the function is going to try to log the user in. In case of a successfully log in, the initial function is executed again. The retry count is tracking how often the request tried to re-log in, to prevent an infinite loop, in case of a forbidden resource.
     private class func handleRequestFailure(#error: NSError, URI: String, parameters: [String: String]?, requestMethod: HTTPMethods, retryCount: Int, initialSuccess: (AnyObject) -> (), initialFailure: (NSError) -> ()) {
         logger.verbose("Handling request failure (URI: \(URI), parameters \(parameters), request method \(requestMethod), retry count \(retryCount)): \(error.localizedDescription)")
-        if  error.code == 401 || // If we are dealing with a simple HTTP error, the code will be 401
-            error.code == -1011 && // If we are dealing with a serialization error, whose underlying error is 401 things get tricky
-            error.domain == AFURLResponseSerializationErrorDomain &&
-            (error.userInfo?[AFNetworkingOperationFailingURLResponseErrorKey] as? NSHTTPURLResponse)?.statusCode == 401
-        {
-            logger.info("Error occured because user was not logged in: \(error.localizedDescription)")
-            if retryCount < NetworkingConstants.MaxLoginRetries {
-                logger.debug("Maximum login retries not reached yet: \(retryCount) of \(NetworkingConstants.MaxLoginRetries)")
-                let newCount = retryCount + 1
+        
+        
+        if retryCount < NetworkingConstants.MaxLoginRetries {
+            logger.debug("Maximum login retries not reached yet: \(retryCount) of \(NetworkingConstants.MaxLoginRetries)")
+            let newCount = retryCount + 1
+            if  error.code == 401 || // If we are dealing with a simple HTTP error, the code will be 401
+                error.code == -1011 && // If we are dealing with a serialization error, whose underlying error is 401 things get tricky
+                error.domain == AFURLResponseSerializationErrorDomain &&
+                (error.userInfo?[AFNetworkingOperationFailingURLResponseErrorKey] as? NSHTTPURLResponse)?.statusCode == 401
+            {
+                logger.info("Error occured because user was not logged in: \(error.localizedDescription)")
                 // Since the error occured because the user was not logged in, the log in function is called with the original function with all callbacks as success handler object. Concluding if the log in is successfull the original function is called again and should succeed, otherwise the initial failure handler is executed.
                 loginAction(
                     success: {
@@ -244,13 +287,20 @@ class MVNetworking {
                     failure: initialFailure
                 )
             } else {
-                logger.warning("Reached maximum amount of log in retries \(NetworkingConstants.MaxLoginRetries)")
-                // TODO: Implement showing of log in screen
-                initialFailure(MVError.createError(.MVMaximumLoginRetriesReached))
+                logger.warning("Handling error of unknown kind: \(error.localizedDescription). Retrying.")
+                MVNetworking.handleRequest(
+                    URI: URI,
+                    parameters: parameters,
+                    requestMethod: requestMethod,
+                    retryCount: newCount,
+                    success: initialSuccess,
+                    failure: initialFailure
+                )
             }
+            /// Todo: Exclude stuff like unavailable network connection & Handle unaccepted credentials
         } else {
-            logger.warning("Handling error of unknown kind: \(error.localizedDescription)")
-            initialFailure(error)
+            logger.warning("Reached maximum amount of log in retries \(NetworkingConstants.MaxLoginRetries)")
+            initialFailure(MVError.createError(.MVMaximumLoginRetriesReached))
         }
     }
 }

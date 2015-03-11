@@ -11,7 +11,7 @@ import UIKit
 import CoreData
 import XCGLogger
 
-class MessageRepository {
+class MessageRepository: CoreDataRepository {
     
     private struct MessageConstants {
         static let ClassName = "Message"
@@ -29,19 +29,34 @@ class MessageRepository {
         }
     }
     
-    private let logger = XCGLogger.defaultInstance()
+    // MARK: - Functions used to query the database
     
-    // Retreive the managedObjectContext from AppDelegate
-    let managedObjectContext = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext!
+    // This function gathers all messages send through the division's chat
+    func findMessagesBy(#division: Division) -> [Message]? {
+        logger.verbose("Getting all messages from database by division \(division.id)")
+        // Create a new fetch request using the Message entity
+        let fetchRequest = NSFetchRequest(entityName: MessageConstants.ClassName)
+        fetchRequest.fetchBatchSize = MessageConstants.BatchSize
+        let sortDescriptor = NSSortDescriptor(key: MessageConstants.TimestampField, ascending: true)
+        fetchRequest.sortDescriptors = [sortDescriptor]
+        
+        let predicate = NSPredicate(format: "\(MessageConstants.DivisionField) == %@", division)
+        fetchRequest.predicate = predicate
+        
+        // Execute the fetch request, and cast the results to an array of LogItem objects
+        return managedObjectContext.executeFetchRequest(fetchRequest, error: nil) as? [Message]
+    }
+    
+    // MARK: - Creation and population of message
     
     /// This function tries to parse an array of messages and inserts them temporarily into the database.
-    func parseMessagesFrom(#serverResponseObject: [AnyObject]) -> (messages: [Message]?, error: NSError?) {
+    func createMessagesFrom(#serverResponseObject: [AnyObject]) -> (messages: [Message]?, error: NSError?) {
         logger.verbose("Creating message from response object: \(serverResponseObject)")
         var newMessages = [Message]()
         for message in serverResponseObject {
             
             if let messageDict = message as? [String: AnyObject] {
-                let (newMessage, error) = parseMessageFrom(serverResponseObject: messageDict)
+                let (newMessage, error) = createMessageFrom(serverResponseObject: messageDict)
                 if error != nil && newMessage == nil {
                     return (nil, error)
                 } else {
@@ -58,7 +73,7 @@ class MessageRepository {
     }
     
     /// This function tries to parse a message and inserts it temporarily into the database.
-    func parseMessageFrom(#serverResponseObject: [String: AnyObject]) -> (message: Message?, error: NSError?) {
+    func createMessageFrom(#serverResponseObject: [String: AnyObject]) -> (message: Message?, error: NSError?) {
         if let content = serverResponseObject[MessageConstants.remoteMessage.Content] as? String,
             id = serverResponseObject[MessageConstants.remoteMessage.Id] as? String,
             timestampDict = serverResponseObject[MessageConstants.remoteMessage.Timestamp] as? Dictionary<String, AnyObject>,
@@ -104,34 +119,6 @@ class MessageRepository {
         newItem.division = division
         newItem.sender = sender
         newItem.read = false
-        newItem.setInverseRelations()
         return newItem
-    }
-    
-    // This function gathers all messages send through the division's chat
-    func findMessagesBy(#division: Division) -> [Message]? {
-        logger.verbose("Getting all messages from database by division \(division.id)")
-        // Create a new fetch request using the Message entity
-        let fetchRequest = NSFetchRequest(entityName: MessageConstants.ClassName)
-        fetchRequest.fetchBatchSize = MessageConstants.BatchSize
-        let sortDescriptor = NSSortDescriptor(key: MessageConstants.TimestampField, ascending: true)
-        fetchRequest.sortDescriptors = [sortDescriptor]
-        
-        let predicate = NSPredicate(format: "\(MessageConstants.DivisionField) == %@", division)
-        fetchRequest.predicate = predicate
-        
-        // Execute the fetch request, and cast the results to an array of LogItem objects
-        return managedObjectContext.executeFetchRequest(fetchRequest, error: nil) as? [Message]
-    }
-    
-    /// This function saves the database permanently
-    func save() {
-        logger.verbose("Saving database changes")
-        var error : NSError?
-        if managedObjectContext.save(&error) {
-            logger.info("Successfully saved database")
-        } else {
-            logger.error("Unable to save database: \(error?.localizedDescription)")
-        }
     }
 }

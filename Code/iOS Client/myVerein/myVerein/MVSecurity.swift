@@ -62,7 +62,7 @@ class MVSecurity {
             }
             currentUsername = newUsername
             currentPassword = newPassword
-            currentUsername = newDomain
+            currentDomain = newDomain
         } else {
             logger.info("Deleting current keychain object")
             Locksmith.deleteDataForUserAccount(SecurityConstants.UserAccount)
