@@ -7,13 +7,12 @@
 //
 
 import Foundation
-import UIKit
 import CoreData
 import XCGLogger
 
-class UserRepository: CoreDataRepository {
+class UserRepository: MVCoreDataRepository {
     
-    private struct UserConstants {
+    struct UserConstants {
         static let ClassName = "User"
         static let IdField = "id"
         
@@ -46,7 +45,7 @@ class UserRepository: CoreDataRepository {
         fetchRequest.predicate = predicate
         
         // Execute the fetch request, and cast the results to an array of LogItem objects
-        return managedObjectContext.executeFetchRequest(fetchRequest, error: nil)?.last as? User
+        return executeSingleRequest(fetchRequest)
     }
     
     // MARK: - Creation and population of user
@@ -169,7 +168,7 @@ class UserRepository: CoreDataRepository {
         newItem.lastSynced = NSDate()
         
         // Getting rest of the user asynchronously
-        MVNetworkingHelper.syncUser(id)
+        User.syncFunction(newItem)
         
         return newItem
     }

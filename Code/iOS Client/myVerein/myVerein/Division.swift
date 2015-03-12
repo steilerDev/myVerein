@@ -9,7 +9,7 @@
 import Foundation
 import CoreData
 
-class Division: NSManagedObject {
+class Division: NSManagedObject, MVCoreDataObject {
 
     private struct DivisionConstants {
         static let ChatMessages = "rawChatMessage"
@@ -20,6 +20,22 @@ class Division: NSManagedObject {
         case Member = "MEMBER"
         case FormerMember = "FORMERMEMBER"
         case NoMember = "NOMEMBER"
+    }
+    
+    static var syncRequired: MVCoreDataObject -> Bool = {
+        object in
+        if let division = object as? Division {
+            return division.name == nil
+        } else {
+            return false
+        }
+    }
+    
+    static var syncFunction: MVCoreDataObject -> () = {
+        object in
+        if let division = object as? Division {
+            MVNetworkingHelper.syncDivision(division.id)
+        }
     }
     
     @NSManaged var id: String

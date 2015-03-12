@@ -27,13 +27,14 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
 /**
  * This object is representing an entity within the division's collection of the MongoDB. On top of that the class is providing several useful helper methods.
  */
-public class Division
+public class Division implements Comparable<Division>
 {
     @Id
     private String id;
@@ -184,7 +185,61 @@ public class Division
     }
 
     public void prepareForInternalSync() {
-        adminUser.removeEverythingExceptId();
+        if(adminUser != null)
+        {
+            adminUser.removeEverythingExceptId();
+        }
+    }
+
+    //Todo: These two are expensive!! Especially expanded set, which is called fairly often.
+
+    /**
+     * This function is using a set of divisions, and reduces it to the divisions closest to the root
+     * @param unoptimizedSetOfDivisions A set of divisions.
+     * @return The list of optimized divisions.
+     */
+    public static List<Division> getOptimizedSetOfDivisions(List<Division> unoptimizedSetOfDivisions)
+    {
+        if(unoptimizedSetOfDivisions == null || unoptimizedSetOfDivisions.isEmpty())
+        {
+            logger.warn("Trying to optimize set of divisions, but unoptimized set is either null or empty");
+            return null;
+        } else
+        {
+            logger.debug("Optimizing division set");
+            //Reducing the list to the divisions that are on the top of the tree, removing all unnecessary divisions.
+            return unoptimizedSetOfDivisions.parallelStream() //Creating a stream of all divisions
+                    .filter(division -> unoptimizedSetOfDivisions.parallelStream().sorted() //filtering all divisions that are already defined in a divisions that is closer to the root of the tree. Using a parallel and sorted stream, because therefore the likeliness of an early match increases
+                            .noneMatch(allDivisions -> division.getAncestors().contains(allDivisions))) //Checking, if there is any division in the list, that is an ancestor of the current division. If there is a match there exists a closer division.
+                    .collect(Collectors.toList()); // Converting the stream to a list
+        }
+    }
+
+    /**
+     * This function expands the set of divisions. This means that every division, the user is part of (all child divisions of every division) are going to be returned.
+     * @param initialSetOfDivisions The set of divisions that needs to be expanded.
+     * @param divisionRepository The division repository, needed to get queried.
+     * @return The expanded list of divisions.
+     */
+    public static List<Division> getExpandedSetOfDivisions(List<Division> initialSetOfDivisions, DivisionRepository divisionRepository)
+    {
+        if( (initialSetOfDivisions = getOptimizedSetOfDivisions(initialSetOfDivisions)) == null)
+        {
+            logger.warn("Trying to expand a set of divisions, but initial set is either null or empty");
+            return null;
+        } else
+        {
+            logger.debug("Expanding division set");
+            ArrayList<Division> expandedSetOfDivisions = new ArrayList<>();
+            //The set is guaranteed to be sorted
+
+            for (Division division: initialSetOfDivisions)
+            {
+                expandedSetOfDivisions.addAll(divisionRepository.findByAncestors(division));
+                expandedSetOfDivisions.add(division);
+            }
+            return expandedSetOfDivisions;
+        }
     }
 
     /**
@@ -202,5 +257,28 @@ public class Division
     public int hashCode()
     {
         return id == null? 0: id.hashCode();
+    }
+
+    /**
+     * This function is comparable to other divisions according to their distance to the root node.
+     * @param o The division which is compared to the current division.
+     * @return A negative integer, zero, or a positive integer as this object is less than, equal to, or greater than the specified object.
+     */
+    @Override
+    public int compareTo(Division o)
+    {
+        List<Division> thisAncestors = this.getAncestors(),
+                otherAncestors = o.getAncestors();
+
+        if(thisAncestors == null || thisAncestors.isEmpty())
+        {
+            return 1;
+        } else if(otherAncestors == null || otherAncestors.isEmpty())
+        {
+            return -1;
+        } else
+        {
+            return Integer.compare(thisAncestors.size(), otherAncestors.size());
+        }
     }
 }

@@ -8,15 +8,15 @@
 
 import Foundation
 import CoreData
-import UIKit
 import XCGLogger
 
-class DivisionRepository: CoreDataRepository {
+class DivisionRepository: MVCoreDataRepository {
     
-    private struct DivisionConstants {
+    struct DivisionConstants {
         static let ClassName = "Division"
         static let IdField = "id"
         static let UserMembershipStatus = "rawUserMembershipStatus"
+        static let Name = "name"
         
         struct remoteDivision {
             static let Id = "id"
@@ -38,7 +38,7 @@ class DivisionRepository: CoreDataRepository {
         fetchRequest.predicate = predicate
         
         // Execute the fetch request, and cast the results to an array of LogItem objects
-        return managedObjectContext.executeFetchRequest(fetchRequest, error: nil)?.last as? Division
+        return executeSingleRequest(fetchRequest)
     }
 
     func findDivisionBy(#userMembershipStatus: Division.UserMembershipStatus) -> [Division]? {
@@ -50,7 +50,16 @@ class DivisionRepository: CoreDataRepository {
         fetchRequest.predicate = predicate
         
         // Execute the fetch request, and cast the results to an array of LogItem objects
-        return managedObjectContext.executeFetchRequest(fetchRequest, error: nil) as? [Division]
+        return executeListRequest(fetchRequest)
+    }
+    
+    func findAllDivisions() -> [Division]? {
+        logger.verbose("Retrieving all divisions")
+        // Create a new fetch request using the Message entity
+        let fetchRequest = NSFetchRequest(entityName: DivisionConstants.ClassName)
+        
+        // Execute the fetch request, and cast the results to an array of LogItem objects
+        return executeListRequest(fetchRequest)
     }
     
     // MARK: - Creation and population of division
@@ -148,7 +157,7 @@ class DivisionRepository: CoreDataRepository {
         newItem.id = id
         newItem.lastSynced = NSDate()
         /// Getting the rest of the division asynchronously
-        MVNetworkingHelper.syncDivision(id)
+        Division.syncFunction(newItem)
         
         return newItem
     }

@@ -299,7 +299,7 @@ class MVNetworking {
             }
             /// Todo: Exclude stuff like unavailable network connection & Handle unaccepted credentials
         } else {
-            logger.warning("Reached maximum amount of log in retries \(NetworkingConstants.MaxLoginRetries)")
+            logger.severe("Reached maximum amount of log in retries \(NetworkingConstants.MaxLoginRetries)")
             initialFailure(MVError.createError(.MVMaximumLoginRetriesReached))
         }
     }

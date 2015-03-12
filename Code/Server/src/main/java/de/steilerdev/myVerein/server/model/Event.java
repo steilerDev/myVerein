@@ -432,7 +432,7 @@ public class Event
     {
         if(invitedDivision != null && !invitedDivision.isEmpty())
         {
-            invitedDivision = DivisionManagementController.getOptimizedSetOfDivisions(invitedDivision);
+            invitedDivision = Division.getOptimizedSetOfDivisions(invitedDivision);
         }
     }
 

@@ -32,7 +32,7 @@ class DivisionChatCell: UICollectionViewCell {
     
     var lastUser: String? {
         didSet {
-            divisionImageView.setImageWithString(lastUser!, color: UIColor(hex: 0x3AD18C))
+            divisionImageView.setImageWithString(lastUser ?? "", color: UIColor(hex: 0x3AD18C))
             divisionImageView.layer.borderWidth = 2
             divisionImageView.layer.borderColor = UIColor(hex: 0x13CD78).CGColor
             divisionImageView.layer.cornerRadius = divisionImageView.layer.bounds.size.width/2

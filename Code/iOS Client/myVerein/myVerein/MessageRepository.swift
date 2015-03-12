@@ -7,13 +7,12 @@
 //
 
 import Foundation
-import UIKit
 import CoreData
 import XCGLogger
 
-class MessageRepository: CoreDataRepository {
+class MessageRepository: MVCoreDataRepository {
     
-    private struct MessageConstants {
+    struct MessageConstants {
         static let ClassName = "Message"
         static let TimestampField = "timestamp"
         static let ReadField = "read"
@@ -44,7 +43,7 @@ class MessageRepository: CoreDataRepository {
         fetchRequest.predicate = predicate
         
         // Execute the fetch request, and cast the results to an array of LogItem objects
-        return managedObjectContext.executeFetchRequest(fetchRequest, error: nil) as? [Message]
+        return executeListRequest(fetchRequest)
     }
     
     // MARK: - Creation and population of message

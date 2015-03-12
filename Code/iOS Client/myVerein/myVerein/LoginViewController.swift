@@ -114,8 +114,8 @@ class LoginViewController: UIViewController, UITextFieldDelegate, POPAnimationDe
             if !hostname.hasPrefix("http") {
                 hostname = "http://" + hostname
             }
-            if hostname.hasSuffix("/") {
-                hostname.removeAtIndex(advance(hostname.startIndex, count(hostname) - 1))
+            if !hostname.hasSuffix("/") {
+                hostname += "/"
             }
             
             MVSecurity.instance().updateKeychain(username, newPassword: password, newDomain: hostname)            

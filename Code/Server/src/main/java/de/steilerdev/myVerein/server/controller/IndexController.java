@@ -204,6 +204,7 @@ public class IndexController
         divisionRepository.save(div4);
         divisionRepository.save(div5);
 
+        user1.addDivision(div1);
         user2.addDivision(div2);
         user2.addDivision(div4);
         user3.addDivision(div2);

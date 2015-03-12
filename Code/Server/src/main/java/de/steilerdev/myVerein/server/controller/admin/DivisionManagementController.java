@@ -469,31 +469,11 @@ public class DivisionManagementController
             logger.trace("Gathering optimized set of administrated divisions.");
             // Checking if user is superadmin, which concludes he would administrate every division.
             return currentUser.isSuperAdmin() ? divisionRepository.findByParent(null) //Returning root node
-                    : getOptimizedSetOfDivisions(divisionRepository.findByAdminUser(currentUser)); //Return an optimized set of divisions if he is a normal admin
+                    : Division.getOptimizedSetOfDivisions(divisionRepository.findByAdminUser(currentUser)); //Return an optimized set of divisions if he is a normal admin
         }
     }
 
-    /**
-     * This function is using a set of divisions, and reduces it to the divisions closest to the root
-     * @param unoptimizedSetOfDivisions A set of divisions.
-     * @return The list of optimized divisions.
-     */
-    public static List<Division> getOptimizedSetOfDivisions(List<Division> unoptimizedSetOfDivisions)
-    {
-        if(unoptimizedSetOfDivisions == null || unoptimizedSetOfDivisions.isEmpty())
-        {
-            logger.warn("Trying to optimize set of divisions, but unoptimized set is either null or empty");
-            return null;
-        } else
-        {
-            logger.debug("Optimizing division set.");
-            //Reducing the list to the divisions that are on the top of the tree, removing all unnecessary divisions.
-            return unoptimizedSetOfDivisions.stream() //Creating a stream of all divisions
-                    .filter(division -> unoptimizedSetOfDivisions.stream() //filtering all divisions that are already defined in a divisions that is closer to the root of the tree
-                            .noneMatch(allDivisions -> division.getAncestors().contains(allDivisions))) //Checking, if there is any division in the list, that is an ancestor of the current division. If there is a match there exists a closer division.
-                    .collect(Collectors.toList()); // Converting the stream to a list
-        }
-    }
+
 
     /**
      * This subclass is representing the data structure needed by the jqTree framework

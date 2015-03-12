@@ -20,7 +20,7 @@
 	</Appenders>
 
 	<Loggers>
-		<Logger name="de.steilerdev.myVerein" level="debug" />
+		<Logger name="de.steilerdev.myVerein" level="trace" />
 
 		<Logger name="org.springframework.core" level="${third-party-log-level}" />
 

@@ -9,7 +9,7 @@
 import Foundation
 import CoreData
 
-class User: NSManagedObject {
+class User: NSManagedObject, MVCoreDataObject {
 
     private struct UserConstants {
         static let SendMessages = "rawSendMessages"
@@ -28,6 +28,22 @@ class User: NSManagedObject {
         case Resigned = "RESIGNED"
     }
     
+    static var syncRequired: MVCoreDataObject -> Bool = {
+        object in
+        if let user = object as? User {
+            return (user.email == nil || user.firstName == nil || user.lastName == nil)
+        } else {
+            return false
+        }
+    }
+    
+    static var syncFunction: MVCoreDataObject -> () = {
+        object in
+        if let user = object as? User {
+            MVNetworkingHelper.syncUser(user.id)
+        }
+    }
+    
     @NSManaged var birthday: NSDate?
     @NSManaged var city: String?
     @NSManaged var country: String?
@@ -39,7 +55,6 @@ class User: NSManagedObject {
     @NSManaged var streetNumber: String?
     @NSManaged var zipCode: String?
     @NSManaged var lastSynced: NSDate
-    
     
     @NSManaged var rawMembershipStatus: String?
     var membershipStatus: MembershipStatus? {

@@ -751,7 +751,7 @@ public class User implements UserDetails
                 division != null && //The division needs to be present
                 (
                     this.isSuperAdmin() || //If the user is a super admin he can do whatever he wants
-                    DivisionManagementController.getOptimizedSetOfDivisions(divisionRepository.findByAdminUser(this)) //Getting all divisions administrated by the user, should not be empty, since the user is an admin
+                    Division.getOptimizedSetOfDivisions(divisionRepository.findByAdminUser(this)) //Getting all divisions administrated by the user, should not be empty, since the user is an admin
                         .parallelStream().anyMatch(div -> div.equals(division) ||  //If the selected division is one of the administrated ones
                                                           division.getAncestors().contains(div)) //If the selected division is an ancestor of the administrated ones
                 );

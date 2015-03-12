@@ -48,4 +48,7 @@ public interface DivisionRepository extends MongoRepository<Division, String> {
     public List<Division> findAllNamesContainingString(String contains);
 
     public List<Division> findByParent(Division parent);
+
+    //@Query(value = "{'ancestor': {?0}}")
+    public List<Division> findByAncestors(Division ancestors);
 }
