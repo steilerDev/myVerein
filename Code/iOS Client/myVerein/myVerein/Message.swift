@@ -10,10 +10,6 @@ import Foundation
 import CoreData
 
 class Message: NSManagedObject, MVCoreDataObject {
-
-    static var syncRequired: MVCoreDataObject -> Bool = {_ in return false}
-    
-    static var syncFunction: MVCoreDataObject -> () = {_ in MVNetworkingHelper.syncMessages()}
     
     @NSManaged var content: String?
     @NSManaged var id: String
@@ -21,4 +17,14 @@ class Message: NSManagedObject, MVCoreDataObject {
     @NSManaged var timestamp: NSDate?
     @NSManaged var division: Division
     @NSManaged var sender: User
+    
+    // MARK: - MVCoreDataObject
+    
+    var syncRequired: Bool {
+        return false
+    }
+    
+    func sync() {
+        MVNetworkingHelper.syncMessages()
+    }
 }

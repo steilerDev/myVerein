@@ -7,6 +7,8 @@
 //
 
 import Foundation
+import CoreData
+import UIKit
 
 // This file introduces a new infix operator: '~>'. It will be called the marshal operator. It defines the execution of two closures after each other on different threads. The operator is implemented according to Josh Smith's suggestion: http://ijoshsmith.com/2014/07/05/custom-threading-operator-in-swift/
 
@@ -29,6 +31,15 @@ prefix func ~> (mainClosure: () -> ()) {
 /// :param: backgroundClosure The closure executed on a background thread.
 postfix func ~> (backgroundClosure: () -> ()) {
     dispatch_async(queue, backgroundClosure)
+}
+
+// Using the Marshal operator as a postfix operator, means that the closure is executed on a background thread. This operator provides a managed object context created on the background queue and can therefore be used without any concurency problems.
+postfix func ~> (backgroundClosure: (NSManagedObjectContext) -> ()) {
+    dispatch_async(queue) {
+        var backgroundContext = NSManagedObjectContext()
+        backgroundContext.persistentStoreCoordinator = (UIApplication.sharedApplication().delegate as! AppDelegate).persistentStoreCoordinator!
+        backgroundClosure(backgroundContext)
+    }
 }
 
 /// Executes the left-hand closure on the background thread, upon completion the right-hand closure is executed on the main thread.

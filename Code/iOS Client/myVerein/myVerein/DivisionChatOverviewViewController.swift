@@ -113,8 +113,19 @@ class DivisionChatOverviewViewController: UICollectionViewController, NSFetchedR
         return cell
     }
     
+    private func configureCell(indexPath: [NSIndexPath]) {
+        for path in indexPath {
+            if let currentCell = collectionView?.cellForItemAtIndexPath(path) as? DivisionChatCell {
+                configureCell(path, cell: currentCell)
+            } else {
+                logger.error("Unable to get cell for item path \(path)")
+            }
+        }
+    }
+    
     private func configureCell(indexPath: NSIndexPath, cell: DivisionChatCell) {
         if let divisionObject = fetchedResultController.objectAtIndexPath(indexPath) as? Division {
+            logger.debug("Configuring cell for index path \(indexPath)")
             cell.divisionLabel.text = divisionObject.name
             cell.lastUser = divisionObject.name
         } else {
@@ -155,44 +166,122 @@ class DivisionChatOverviewViewController: UICollectionViewController, NSFetchedR
     
     // MARK: NSFetchedResultsControllerDelegate
     
-    /*
-    Assume self has a property 'tableView' -- as is the case for an instance of a UITableViewController
-    subclass -- and a method configureCell:atIndexPath: which updates the contents of a given cell
-    with information from a managed object at the given index path in the fetched results controller.
-    */
+    /// Dictionary used to collect section changes
+    private lazy var sectionChanges: [NSFetchedResultsChangeType: NSMutableIndexSet] = {
+        // Setting up objects in dict
+        var dict = [NSFetchedResultsChangeType: NSMutableIndexSet]()
+        dict[.Insert] = NSMutableIndexSet() as NSMutableIndexSet
+        dict[.Delete] = NSMutableIndexSet() as NSMutableIndexSet
+        return dict
+    }()
     
+    /// Dictionary used to collect object changes
+    private lazy var objectChanges: [NSFetchedResultsChangeType: [NSIndexPath]] = {
+        // Setting up objects in dict
+        var dict = [NSFetchedResultsChangeType: [NSIndexPath]]()
+        dict[.Insert] = [NSIndexPath]()
+        dict[.Delete] = [NSIndexPath]()
+        dict[.Update] = [NSIndexPath]()
+        return dict
+    }()
+    
+    /// Collecting section changes in dictionary and applying them in a batch after they have all been applied
     func controller(controller: NSFetchedResultsController, didChangeSection sectionInfo: NSFetchedResultsSectionInfo, atIndex sectionIndex: Int, forChangeType type: NSFetchedResultsChangeType) {
         switch type {
-            case .Insert:
-                self.collectionView?.insertSections(NSIndexSet(index: sectionIndex))
+            case .Insert: fallthrough
             case .Delete:
-                self.collectionView?.deleteSections(NSIndexSet(index: sectionIndex))
+                sectionChanges[type]?.addIndex(sectionIndex)
             default:
                 break;
         }
     }
     
+    /// Collecting object changes in dictionary and applying them in a batch after they have all been applied
     func controller(controller: NSFetchedResultsController, didChangeObject anObject: AnyObject, atIndexPath indexPath: NSIndexPath?, forChangeType type: NSFetchedResultsChangeType, newIndexPath: NSIndexPath?) {
+        logger.debug("Object in division chat overview changed.")
         if let collectionView = self.collectionView {
             switch type {
-            case .Insert:
-                if let currentIndexPath = newIndexPath {
-                    collectionView.insertItemsAtIndexPaths([currentIndexPath])
-                }
-            case .Delete:
-                if let currentIndexPath = indexPath {
-                    collectionView.deleteItemsAtIndexPaths([currentIndexPath])
-                }
-            case .Update:
-                if let currentIndexPath = indexPath, currentCell = collectionView.cellForItemAtIndexPath(currentIndexPath) as? DivisionChatCell {
-                    configureCell(currentIndexPath, cell: currentCell)
-                }
-            case .Move:
-                if let currentIndexPath = newIndexPath, oldIndexPath = indexPath {
-                    collectionView.deleteItemsAtIndexPaths([oldIndexPath])
-                    collectionView.insertItemsAtIndexPaths([currentIndexPath])
-                }
+                case .Insert:
+                    if let currentIndexPath = newIndexPath {
+                        objectChanges[type]?.append(currentIndexPath)
+                    } else {
+                        logger.error("Unable to insert object in chat overview")
+                    }
+                case .Delete:
+                    if let currentIndexPath = indexPath {
+                        objectChanges[type]?.append(currentIndexPath)
+                    } else {
+                        logger.error("Unable to delete object in chat overview")
+                    }
+                case .Update:
+                    if let currentIndexPath = indexPath {
+                        objectChanges[type]?.append(currentIndexPath)
+                    } else {
+                        logger.error("Unable to update object in chat overview")
+                    }
+                case .Move:
+                    if let currentIndexPath = newIndexPath, oldIndexPath = indexPath {
+                        objectChanges[.Delete]?.append(oldIndexPath)
+                        objectChanges[.Insert]?.append(currentIndexPath)
+                    } else {
+                        logger.error("Unable to move object in chat overview")
+                    }
             }
+        } else {
+            logger.error("Unable to change object in collection view")
+        }
+    }
+    
+    /// Batch changing controller after the content finished changing. This needs to be done since CollectionView and NSFetchedResultsController don't play nicely. See https://github.com/ashfurrow/UICollectionView-NSFetchedResultsController
+    func controllerDidChangeContent(controller: NSFetchedResultsController) {
+        logger.debug("Applying batch changes because model changed")
+        if let currentCollectionView = collectionView {
+            // Apply section changes
+            if (sectionChanges[.Insert]?.count > 0 ?? false) || (sectionChanges[.Delete]?.count > 0 ?? false) {
+                logger.debug("Applying section changes")
+                currentCollectionView.performBatchUpdates({
+                    for (type, section) in self.sectionChanges {
+                        switch type {
+                            case .Insert:
+                                currentCollectionView.insertSections(section)
+                            case .Delete:
+                                currentCollectionView.deleteSections(section)
+                            default:
+                                XCGLogger.debugExec {abort()}
+                                XCGLogger.error("Reached default case while applying section changes. This should not happen: Type \(type.rawValue)")
+                                break
+                        }
+                    }
+                }, completion: nil)
+            } else if !(objectChanges[.Insert]?.isEmpty ?? true) || !(objectChanges[.Delete]?.isEmpty ?? true) || !(objectChanges[.Update]?.isEmpty ?? true) { //Applying object changes only if there was no section changes
+                logger.debug("Applying object changes")
+                currentCollectionView.performBatchUpdates({
+                    for (type, indexPath) in self.objectChanges {
+                        switch type {
+                            case .Insert:
+                                currentCollectionView.insertItemsAtIndexPaths(indexPath)
+                            case .Delete:
+                                currentCollectionView.deleteItemsAtIndexPaths(indexPath)
+                            case .Update:
+                                self.configureCell(indexPath)
+                            default:
+                                XCGLogger.debugExec {abort()}
+                                XCGLogger.error("Reached default case while applying object changes. This should not happen: Type \(type.rawValue)")
+                                break
+                        }
+                    }
+                }, completion: nil)
+            } else {
+                logger.info("No need to apply batch changes because model did not change")
+            }
+            
+            // Reset the dictionaries
+            sectionChanges[.Insert] = NSMutableIndexSet() as NSMutableIndexSet
+            sectionChanges[.Delete] = NSMutableIndexSet() as NSMutableIndexSet
+            
+            objectChanges[.Insert] = [NSIndexPath]()
+            objectChanges[.Delete] = [NSIndexPath]()
+            objectChanges[.Update] = [NSIndexPath]()
         }
     }
 }

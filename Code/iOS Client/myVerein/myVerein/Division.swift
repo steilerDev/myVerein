@@ -22,22 +22,6 @@ class Division: NSManagedObject, MVCoreDataObject {
         case NoMember = "NOMEMBER"
     }
     
-    static var syncRequired: MVCoreDataObject -> Bool = {
-        object in
-        if let division = object as? Division {
-            return division.name == nil
-        } else {
-            return false
-        }
-    }
-    
-    static var syncFunction: MVCoreDataObject -> () = {
-        object in
-        if let division = object as? Division {
-            MVNetworkingHelper.syncDivision(division.id)
-        }
-    }
-    
     @NSManaged var id: String
     @NSManaged var desc: String?
     @NSManaged var name: String?
@@ -58,4 +42,15 @@ class Division: NSManagedObject, MVCoreDataObject {
     @NSManaged var rawEnrolledUser: NSSet?
     
     @NSManaged var admin: User?
+
+    // MARK: - MVCoreDataObject
+    
+    var syncRequired: Bool {
+        return name == nil
+    }
+    
+    func sync() {
+        MVNetworkingHelper.syncDivision(id)
+    }
+
 }

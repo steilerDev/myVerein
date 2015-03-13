@@ -157,7 +157,7 @@ class DivisionRepository: MVCoreDataRepository {
         newItem.id = id
         newItem.lastSynced = NSDate()
         /// Getting the rest of the division asynchronously
-        Division.syncFunction(newItem)
+        newItem.sync()
         
         return newItem
     }

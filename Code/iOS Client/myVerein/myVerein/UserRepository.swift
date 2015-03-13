@@ -168,7 +168,7 @@ class UserRepository: MVCoreDataRepository {
         newItem.lastSynced = NSDate()
         
         // Getting rest of the user asynchronously
-        User.syncFunction(newItem)
+        newItem.sync()
         
         return newItem
     }

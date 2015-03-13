@@ -147,7 +147,7 @@ public class Division implements Comparable<Division>
                 ancestor = new ArrayList<>(parent.getAncestors());
             }
             ancestor.add(parent);
-            logger.debug("Ancestors " + ancestor.stream().map(div -> div.getName()).collect(Collectors.joining(", ")) + " for division " + this.name);
+            logger.debug("Ancestors " + ancestor.stream().map(Division::getName).collect(Collectors.joining(", ")) + " for division " + this.name);
             this.ancestors = ancestor;
         }
         this.parent = parent;

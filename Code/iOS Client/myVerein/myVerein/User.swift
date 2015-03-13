@@ -28,22 +28,6 @@ class User: NSManagedObject, MVCoreDataObject {
         case Resigned = "RESIGNED"
     }
     
-    static var syncRequired: MVCoreDataObject -> Bool = {
-        object in
-        if let user = object as? User {
-            return (user.email == nil || user.firstName == nil || user.lastName == nil)
-        } else {
-            return false
-        }
-    }
-    
-    static var syncFunction: MVCoreDataObject -> () = {
-        object in
-        if let user = object as? User {
-            MVNetworkingHelper.syncUser(user.id)
-        }
-    }
-    
     @NSManaged var birthday: NSDate?
     @NSManaged var city: String?
     @NSManaged var country: String?
@@ -97,5 +81,15 @@ class User: NSManagedObject, MVCoreDataObject {
     @NSManaged private var rawSendMessages: NSSet
     var sendMessages: NSMutableSet {
         return mutableSetValueForKey(UserConstants.SendMessages)
+    }
+    
+    // MARK: - MVCoreDataObject
+    
+    var syncRequired: Bool {
+        return (email == nil || firstName == nil || lastName == nil)
+    }
+    
+    func sync() {
+        MVNetworkingHelper.syncUser(id)
     }
 }
