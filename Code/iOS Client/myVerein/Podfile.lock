@@ -21,7 +21,7 @@ PODS:
   - AFNetworking/UIKit (2.5.1):
     - AFNetworking/NSURLConnection
     - AFNetworking/NSURLSession
-  - JSQMessagesViewController (6.1.3):
+  - JSQMessagesViewController (7.0.0):
     - JSQSystemSoundPlayer (~> 2.0.1)
   - JSQSystemSoundPlayer (2.0.1)
   - Locksmith (1.2.0)
@@ -47,13 +47,13 @@ EXTERNAL SOURCES:
 
 CHECKOUT OPTIONS:
   1PasswordExtension:
-    :commit: 032794256ba1c3ae5645a8a2e4a5fa8ef1af5aaa
+    :commit: cbddcfce20434c005c29553e9e8ec0819a2d46da
     :git: https://github.com/AgileBits/onepassword-app-extension.git
 
 SPEC CHECKSUMS:
   1PasswordExtension: b13c2217ee5c05464d9b2ae29a81b324b7ce451b
   AFNetworking: 8bee59492a6ff15d69130efa4d0dc67e0094a52a
-  JSQMessagesViewController: e93a288a9662d4519c95a28a8c0eec10beae1bfc
+  JSQMessagesViewController: 9fd7e9ac96e9fc91f2deca86928e2cc916aeebaa
   JSQSystemSoundPlayer: 55528c699a283aae2220d3ae7b8b527d2ecef4b4
   Locksmith: 15a873e266beceb1b81476e0f50a1e1cba103a6f
   pop: 2f14a1ea61339767af9e66741b418c831b3844df
@@ -61,4 +61,4 @@ SPEC CHECKSUMS:
   SwiftyUserDefaults: c13a0c5a00d03da70d68ac7b05dbea548c64d87b
   UIImageView-Letters: 9f21bca067a6cf8651e104c3b1c9253bc98c9071
 
-COCOAPODS: 0.36.0.rc.1
+COCOAPODS: 0.36.0

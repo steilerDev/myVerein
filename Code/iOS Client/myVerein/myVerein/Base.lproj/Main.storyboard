@@ -200,14 +200,14 @@
             <objects>
                 <collectionViewController id="Tl6-AJ-nRN" customClass="DivisionChatOverviewViewController" customModule="myVerein" customModuleProvider="target" sceneMemberID="viewController">
                     <collectionView key="view" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" id="fwl-MN-XWd">
-                        <rect key="frame" x="0.0" y="0.0" width="600" height="551"/>
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="487"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="qCh-Eb-ckT">
                             <size key="itemSize" width="150" height="150"/>
                             <size key="headerReferenceSize" width="0.0" height="0.0"/>
                             <size key="footerReferenceSize" width="0.0" height="0.0"/>
-                            <inset key="sectionInset" minX="20" minY="20" maxX="20" maxY="20"/>
+                            <inset key="sectionInset" minX="20" minY="10" maxX="20" maxY="20"/>
                         </collectionViewFlowLayout>
                         <cells>
                             <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="ChatCell" id="Qq8-ix-5zX" customClass="DivisionChatCell" customModule="myVerein" customModuleProvider="target">
@@ -263,11 +263,32 @@
                         </connections>
                     </collectionView>
                     <extendedEdge key="edgesForExtendedLayout"/>
-                    <tabBarItem key="tabBarItem" title="Chats" image="ChatsLogo" id="fs0-Z2-Ieq"/>
+                    <navigationItem key="navigationItem" title="Chats" id="t6F-U3-q2R"/>
+                    <connections>
+                        <segue destination="Hz5-qD-F9C" kind="show" identifier="showChatView" id="PFd-mF-NmF"/>
+                    </connections>
                 </collectionViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="xBu-kV-VQE" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2058" y="90"/>
+            <point key="canvasLocation" x="2772" y="90"/>
+        </scene>
+        <!--Chat View Controller-->
+        <scene sceneID="h6k-J1-Xsb">
+            <objects>
+                <viewController id="Hz5-qD-F9C" customClass="ChatViewController" customModule="myVerein" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="L65-t8-8pX"/>
+                        <viewControllerLayoutGuide type="bottom" id="CW5-Hh-jNx"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="606-og-Ia0">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="487"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="0U5-l8-hD8" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="3483" y="90"/>
         </scene>
         <!--Menu Controller-->
         <scene sceneID="DcL-gZ-hnU">
@@ -281,13 +302,32 @@
                     </tabBar>
                     <connections>
                         <outlet property="tabBar" destination="bE8-SZ-oKk" id="0A7-ux-aO6"/>
-                        <segue destination="Tl6-AJ-nRN" kind="relationship" relationship="viewControllers" id="CBb-Bb-Lhx"/>
+                        <segue destination="3wK-OD-24f" kind="relationship" relationship="viewControllers" id="CBb-Bb-Lhx"/>
                         <segue destination="a28-zv-3eW" kind="relationship" relationship="viewControllers" id="V4Q-Wf-3uJ"/>
                     </connections>
                 </tabBarController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="BaR-XS-Ch4" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="1242" y="403"/>
+        </scene>
+        <!--Chats-->
+        <scene sceneID="gbc-DA-SgA">
+            <objects>
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="3wK-OD-24f" sceneMemberID="viewController">
+                    <tabBarItem key="tabBarItem" title="Chats" image="ChatsLogo" id="fs0-Z2-Ieq"/>
+                    <toolbarItems/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" translucent="NO" id="qdX-T2-iXr">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="Tl6-AJ-nRN" kind="relationship" relationship="rootViewController" id="4Mg-XS-XWI"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="3Cg-Yy-h3x" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2058" y="90"/>
         </scene>
     </scenes>
     <resources>

@@ -68,7 +68,7 @@ public class MessageController
             undeliveredMessages.parallelStream().forEach(message -> message.setDelivered(currentUser));
             try
             {
-                //messageRepository.save(undeliveredMessages);
+                messageRepository.save(undeliveredMessages);
                 undeliveredMessages.parallelStream().forEach(Message::prepareForSending);
                 logger.info("[" + currentUser + "] Returning undelivered messages for " + currentUser.getEmail());
                 return new ResponseEntity<>(undeliveredMessages, HttpStatus.OK);

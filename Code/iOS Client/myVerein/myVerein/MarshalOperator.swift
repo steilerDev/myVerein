@@ -24,42 +24,42 @@ private let queue = dispatch_queue_create("serial-worker", DISPATCH_QUEUE_SERIAL
 /// Using the Marshal operator as a prefix operator, means that the closure is executed on the main thread.
 /// :param: mainClosure The closure executed on the main thread.
 prefix func ~> (mainClosure: () -> ()) {
-    dispatch_async(dispatch_get_main_queue(), mainClosure)
+  dispatch_async(dispatch_get_main_queue(), mainClosure)
 }
 
 /// Using the Marshal operator as a postfix operator, means that the closure is executed on a background thread.
 /// :param: backgroundClosure The closure executed on a background thread.
 postfix func ~> (backgroundClosure: () -> ()) {
-    dispatch_async(queue, backgroundClosure)
+  dispatch_async(queue, backgroundClosure)
 }
 
 // Using the Marshal operator as a postfix operator, means that the closure is executed on a background thread. This operator provides a managed object context created on the background queue and can therefore be used without any concurency problems.
 postfix func ~> (backgroundClosure: (NSManagedObjectContext) -> ()) {
-    dispatch_async(queue) {
-        var backgroundContext = NSManagedObjectContext()
-        backgroundContext.persistentStoreCoordinator = (UIApplication.sharedApplication().delegate as! AppDelegate).persistentStoreCoordinator!
-        backgroundClosure(backgroundContext)
-    }
+  dispatch_async(queue) {
+    var backgroundContext = NSManagedObjectContext()
+    backgroundContext.persistentStoreCoordinator = (UIApplication.sharedApplication().delegate as! AppDelegate).persistentStoreCoordinator!
+    backgroundClosure(backgroundContext)
+  }
 }
 
 /// Executes the left-hand closure on the background thread, upon completion the right-hand closure is executed on the main thread.
 /// :param: backgroundClosure The closure executed on a background thread.
 /// :param: mainClosure The closure executed on the main thread, after the background thread is finished.
 func ~> (backgroundClosure: () -> (), mainClosure: () -> ()) {
-    dispatch_async(queue) {
-        backgroundClosure()
-        dispatch_async(dispatch_get_main_queue(), mainClosure)
-    }
+  dispatch_async(queue) {
+    backgroundClosure()
+    dispatch_async(dispatch_get_main_queue(), mainClosure)
+  }
 }
 
 /// Executes the left-hand closure on the background thread, upon completion the right-hand closure is executed on the main thread using the return value of the left-hand closure.
 /// :param: backgroundClosure The closure executed on a background thread.
 /// :param: mainClosure The closure executed on the main thread.
 func ~> <R> (backgroundClosure: () -> (R), mainClosure: (R) -> ()) {
-    dispatch_async(queue) {
-        let result = backgroundClosure()
-        dispatch_async(dispatch_get_main_queue()) {
-            mainClosure(result)
-        }
+  dispatch_async(queue) {
+    let result = backgroundClosure()
+    dispatch_async(dispatch_get_main_queue()) {
+      mainClosure(result)
     }
+  }
 }

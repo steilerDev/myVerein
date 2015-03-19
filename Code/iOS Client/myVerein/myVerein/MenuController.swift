@@ -9,12 +9,9 @@
 import UIKit
 
 class MenuController: UITabBarController {
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        UITabBar.appearance().tintColor = UIColor(hex: 0x13CD78)
-        
-        // Do any additional setup after loading the view.
-    }
+  
+  override func viewDidLoad() {
+    super.viewDidLoad()
+    UITabBar.appearance().tintColor = UIColor(hex: 0x13CD78)
+  }
 }

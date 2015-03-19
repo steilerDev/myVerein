@@ -70,7 +70,7 @@ public class ContentController
             logger.info("Directly loading default club logo");
         }
 
-        if(clubLogo == null || defaultLogo != null)
+        if(clubLogo == null)
         {
             if(defaultLogo == null)
             {

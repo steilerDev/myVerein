@@ -14,7 +14,6 @@
 		3020CBAC1A9E1289005AAEEF /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3020CBAB1A9E1289005AAEEF /* Images.xcassets */; };
 		3020CBAF1A9E1289005AAEEF /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3020CBAD1A9E1289005AAEEF /* LaunchScreen.xib */; };
 		3020CBBB1A9E128A005AAEEF /* myVereinTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3020CBBA1A9E128A005AAEEF /* myVereinTests.swift */; };
-		3026FE8E1AADE71F0006ABA8 /* XCGLogger.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3026FE8D1AADE71F0006ABA8 /* XCGLogger.framework */; };
 		302BE8C21AA642EB001D0FE7 /* DivisionChatCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 302BE8C11AA642EB001D0FE7 /* DivisionChatCell.swift */; };
 		302BE8C41AA64599001D0FE7 /* DivisionChatOverviewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 302BE8C31AA64599001D0FE7 /* DivisionChatOverviewViewController.swift */; };
 		304C577F1AACA3CC00B221D7 /* MVSecurity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 304C577E1AACA3CC00B221D7 /* MVSecurity.swift */; };
@@ -25,8 +24,11 @@
 		3091702F1AA8C097004D30D1 /* myVereinModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 3091702D1AA8C097004D30D1 /* myVereinModel.xcdatamodeld */; };
 		309170341AA8D2B4004D30D1 /* MessageRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 309170331AA8D2B4004D30D1 /* MessageRepository.swift */; };
 		309256161AB098A400E55691 /* CoreDataRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 309256151AB098A400E55691 /* CoreDataRepository.swift */; };
+		309A8A7C1AB374040087CBC5 /* ChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 309A8A7B1AB374040087CBC5 /* ChatViewController.swift */; };
 		30A4F7D91AA97D400064EA2C /* MVNetworking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30A4F7D81AA97D400064EA2C /* MVNetworking.swift */; };
 		30BAFEE51AA52828000D18EF /* ca-cert.cer in Resources */ = {isa = PBXBuildFile; fileRef = 30BAFEE11AA518EA000D18EF /* ca-cert.cer */; };
+		30D4E8EC1AB45939000F2C90 /* XCGLogger.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 30D4E8EB1AB45939000F2C90 /* XCGLogger.framework */; };
+		30D4E8ED1AB45939000F2C90 /* XCGLogger.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 30D4E8EB1AB45939000F2C90 /* XCGLogger.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		30FB44BB1AACC088003E4512 /* DivisionRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30FB44BA1AACC088003E4512 /* DivisionRepository.swift */; };
 		30FB44BD1AACC096003E4512 /* UserRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30FB44BC1AACC096003E4512 /* UserRepository.swift */; };
 		30FB44C11AACD819003E4512 /* DateParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30FB44C01AACD819003E4512 /* DateParser.swift */; };
@@ -45,6 +47,20 @@
 			remoteInfo = myVerein;
 		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		30D4E8EE1AB45939000F2C90 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				30D4E8ED1AB45939000F2C90 /* XCGLogger.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		301271591AA5C83C00C23AEF /* MVNetworkingSessionFactory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MVNetworkingSessionFactory.swift; sourceTree = "<group>"; };
@@ -69,8 +85,10 @@
 		3091702E1AA8C097004D30D1 /* myVereinModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = myVereinModel.xcdatamodel; sourceTree = "<group>"; };
 		309170331AA8D2B4004D30D1 /* MessageRepository.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MessageRepository.swift; sourceTree = "<group>"; };
 		309256151AB098A400E55691 /* CoreDataRepository.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataRepository.swift; sourceTree = "<group>"; };
+		309A8A7B1AB374040087CBC5 /* ChatViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChatViewController.swift; sourceTree = "<group>"; };
 		30A4F7D81AA97D400064EA2C /* MVNetworking.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MVNetworking.swift; sourceTree = "<group>"; };
 		30BAFEE11AA518EA000D18EF /* ca-cert.cer */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ca-cert.cer"; sourceTree = "<group>"; };
+		30D4E8EB1AB45939000F2C90 /* XCGLogger.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; name = XCGLogger.framework; path = "/Users/FrankSteiler/Library/Developer/Xcode/DerivedData/myVerein-fjumogbovoaqtlaguqenwejpzlol/Build/Products/Debug-iphoneos/XCGLogger.framework"; sourceTree = "<absolute>"; };
 		30FB44BA1AACC088003E4512 /* DivisionRepository.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DivisionRepository.swift; sourceTree = "<group>"; };
 		30FB44BC1AACC096003E4512 /* UserRepository.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserRepository.swift; sourceTree = "<group>"; };
 		30FB44C01AACD819003E4512 /* DateParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DateParser.swift; sourceTree = "<group>"; };
@@ -87,8 +105,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3026FE8E1AADE71F0006ABA8 /* XCGLogger.framework in Frameworks */,
 				669D9154C16CB2C002A6D28F /* Pods.framework in Frameworks */,
+				30D4E8EC1AB45939000F2C90 /* XCGLogger.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -105,6 +123,7 @@
 		18F6693D3B569EC6E7DBD91F /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				30D4E8EB1AB45939000F2C90 /* XCGLogger.framework */,
 				3026FE8D1AADE71F0006ABA8 /* XCGLogger.framework */,
 				FE0498950F9A959DC502856B /* Pods.framework */,
 			);
@@ -226,6 +245,7 @@
 			children = (
 				302BE8C31AA64599001D0FE7 /* DivisionChatOverviewViewController.swift */,
 				302BE8C11AA642EB001D0FE7 /* DivisionChatCell.swift */,
+				309A8A7B1AB374040087CBC5 /* ChatViewController.swift */,
 			);
 			name = Chat;
 			sourceTree = "<group>";
@@ -274,6 +294,7 @@
 				3020CB9D1A9E1289005AAEEF /* Resources */,
 				19C9BB18739ABCF4A60F39F1 /* Copy Pods Resources */,
 				878C2CE25A9A36C5EC28190F /* Embed Pods Frameworks */,
+				30D4E8EE1AB45939000F2C90 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -424,6 +445,7 @@
 				30FB44BD1AACC096003E4512 /* UserRepository.swift in Sources */,
 				304C577F1AACA3CC00B221D7 /* MVSecurity.swift in Sources */,
 				309170341AA8D2B4004D30D1 /* MessageRepository.swift in Sources */,
+				309A8A7C1AB374040087CBC5 /* ChatViewController.swift in Sources */,
 				309256161AB098A400E55691 /* CoreDataRepository.swift in Sources */,
 				30FB44BB1AACC088003E4512 /* DivisionRepository.swift in Sources */,
 				302BE8C21AA642EB001D0FE7 /* DivisionChatCell.swift in Sources */,
@@ -562,7 +584,11 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/XCGLogger/build/Debug-iphoneos",
+					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/myVerein-fjumogbovoaqtlaguqenwejpzlol/Build/Products/Debug-iphoneos",
+				);
 				INFOPLIST_FILE = myVerein/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -578,7 +604,11 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/XCGLogger/build/Debug-iphoneos",
+					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/myVerein-fjumogbovoaqtlaguqenwejpzlol/Build/Products/Debug-iphoneos",
+				);
 				INFOPLIST_FILE = myVerein/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
