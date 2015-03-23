@@ -17,9 +17,10 @@ class MessageRepository: MVCoreDataRepository {
     static let TimestampField = "timestamp"
     static let ReadField = "read"
     static let DivisionField = "division"
+    static let IdField = "id"
     static let BatchSize = 35
     
-    struct remoteMessage {
+    struct RemoteMessage {
       static let Content = "content"
       static let Division = "group"
       static let Id = "id"
@@ -46,16 +47,29 @@ class MessageRepository: MVCoreDataRepository {
     return executeListRequest(fetchRequest)
   }
   
+  func findMessageBy(#id: String) -> Message? {
+    logger.verbose("Getting message with id \(id)")
+    // Create a new fetch request using the Message entity
+    let fetchRequest = NSFetchRequest(entityName: MessageConstants.ClassName)
+    fetchRequest.fetchBatchSize = MessageConstants.BatchSize
+    
+    let predicate = NSPredicate(format: "\(MessageConstants.IdField) == %@", id)
+    fetchRequest.predicate = predicate
+    
+    // Execute the fetch request, and cast the results to an array of LogItem objects
+    return executeListRequest(fetchRequest)?.last
+  }
+  
   // MARK: - Creation and population of message
   
   /// This function tries to parse an array of messages and inserts them temporarily into the database.
-  func createMessagesFrom(#serverResponseObject: [AnyObject]) -> (messages: [Message]?, error: NSError?) {
+  func getOrCreateMessagesFrom(#serverResponseObject: [AnyObject]) -> (messages: [Message]?, error: NSError?) {
     logger.verbose("Creating message from response object: \(serverResponseObject)")
     var newMessages = [Message]()
     for message in serverResponseObject {
       
       if let messageDict = message as? [String: AnyObject] {
-        let (newMessage, error) = createMessageFrom(serverResponseObject: messageDict)
+        let (newMessage, error) = getOrCreateMessageFrom(serverResponseObject: messageDict)
         if error != nil && newMessage == nil {
           return (nil, error)
         } else {
@@ -72,38 +86,45 @@ class MessageRepository: MVCoreDataRepository {
   }
   
   /// This function tries to parse a message and inserts it temporarily into the database.
-  func createMessageFrom(#serverResponseObject: [String: AnyObject]) -> (message: Message?, error: NSError?) {
-    if let content = serverResponseObject[MessageConstants.remoteMessage.Content] as? String,
-      id = serverResponseObject[MessageConstants.remoteMessage.Id] as? String,
-      timestampDict = serverResponseObject[MessageConstants.remoteMessage.Timestamp] as? Dictionary<String, AnyObject>,
-      timestamp = DateParser.parseDateTime(timestampDict),
-      divisionDict = serverResponseObject[MessageConstants.remoteMessage.Division] as? Dictionary<String, AnyObject>,
-      senderDict = serverResponseObject[MessageConstants.remoteMessage.Sender] as? Dictionary<String, AnyObject>
-    {
-      let divisionRepository = DivisionRepository()
-      let userRepository = UserRepository()
-      let (divisionOptional, divisionError) = divisionRepository.getOrCreateDivisionFrom(serverResponseObject: divisionDict)
-      let (senderOptional, senderError) = userRepository.getOrCreateUserFrom(serverResponseObject: senderDict)
-      
-      if senderError != nil {
-        logger.error("Unable to create message because an error ocurred while getting sender: \(senderError?.localizedDescription)")
-        return (nil, senderError)
-      } else if divisionError != nil {
-        logger.error("Unable to create message because an error ocurred while getting receiving division: \(divisionError?.localizedDescription)")
-        return (nil, divisionError)
-      } else if let division = divisionOptional,
-        sender = senderOptional
+  func getOrCreateMessageFrom(#serverResponseObject: [String: AnyObject]) -> (message: Message?, error: NSError?) {
+    if let id = serverResponseObject[MessageConstants.RemoteMessage.Id] as? String {
+      if let message = findMessageBy(id: id) {
+        return (message, nil)
+      } else if let content = serverResponseObject[MessageConstants.RemoteMessage.Content] as? String,
+        timestampDict = serverResponseObject[MessageConstants.RemoteMessage.Timestamp] as? Dictionary<String, AnyObject>,
+        timestamp = DateParser.parseDateTime(timestampDict),
+        divisionDict = serverResponseObject[MessageConstants.RemoteMessage.Division] as? Dictionary<String, AnyObject>,
+        senderDict = serverResponseObject[MessageConstants.RemoteMessage.Sender] as? Dictionary<String, AnyObject>
       {
-        logger.debug("Creating message with id \(id), content \(content), timestamp \(timestamp), sender \(sender.id) and division \(division.id)")
-        return (createMessage(content, id: id, timestamp: timestamp, division: division, sender: sender), nil)
+        let divisionRepository = DivisionRepository()
+        let userRepository = UserRepository()
+        let (divisionOptional, divisionError) = divisionRepository.getOrCreateDivisionFrom(serverResponseObject: divisionDict)
+        let (senderOptional, senderError) = userRepository.getOrCreateUserFrom(serverResponseObject: senderDict)
+        
+        if senderError != nil {
+          logger.error("Unable to create message because an error ocurred while getting sender: \(senderError?.localizedDescription)")
+          return (nil, senderError)
+        } else if divisionError != nil {
+          logger.error("Unable to create message because an error ocurred while getting receiving division: \(divisionError?.localizedDescription)")
+          return (nil, divisionError)
+        } else if let division = divisionOptional,
+          sender = senderOptional
+        {
+          logger.debug("Creating message with id \(id), content \(content), timestamp \(timestamp), sender \(sender.id) and division \(division.id)")
+          return (createMessage(content, id: id, timestamp: timestamp, division: division, sender: sender), nil)
+        } else {
+          let error = MVError.createError(MVErrorCodes.MVMessageCreationError)
+          logger.error("Unable to create message: \(error.localizedDescription)")
+          return (nil , error)
+        }
       } else {
-        let error = MVError.createError(MVErrorCodes.MVMessageCreationError)
+        let error = MVError.createError(.MVServerResponseParseError)
         logger.error("Unable to create message: \(error.localizedDescription)")
-        return (nil , error)
+        return (nil, error)
       }
     } else {
       let error = MVError.createError(.MVServerResponseParseError)
-      logger.error("Unable to create message: \(error.localizedDescription)")
+      logger.error("Unable to read message id: \(error.localizedDescription)")
       return (nil, error)
     }
   }

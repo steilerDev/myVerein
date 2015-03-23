@@ -24,7 +24,7 @@
 
 		<Logger name="org.springframework.core" level="${third-party-log-level}" />
 
-		<Logger name="org.springframework.data.mongodb" level="${third-party-log-level}" />
+		<Logger name="org.springframework.data.mongodb" level="debug" />
 
 		<Logger name="org.springframework.beans" level="${third-party-log-level}" />
 

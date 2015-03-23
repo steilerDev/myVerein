@@ -9,6 +9,7 @@
 import Foundation
 import CoreData
 import XCGLogger
+import SwiftyUserDefaults
 
 class UserRepository: MVCoreDataRepository {
   
@@ -36,7 +37,7 @@ class UserRepository: MVCoreDataRepository {
   // MARK: - Functions used to query the database
   
   /// This function gathers the user object with the corresponding id from the database and returns it. The object is nil if the program was unable to find it.
-  func findUserBy(#id: String) -> User? {
+  private func findUserBy(#id: String) -> User? {
     logger.verbose("Retrieving user with ID \(id) from database")
     // Create a new fetch request using the Message entity
     let fetchRequest = NSFetchRequest(entityName: UserConstants.ClassName)
@@ -76,13 +77,7 @@ class UserRepository: MVCoreDataRepository {
   func getOrCreateUserFrom(#serverResponseObject: [String: AnyObject]) -> (user: User?, error: NSError?) {
     logger.verbose("Retrieving user object from response object \(serverResponseObject)")
     if let userId = serverResponseObject[UserConstants.IdField] as? String {
-      if let user = findUserBy(id: userId) {
-        logger.info("Returning user with ID \(userId) from local database")
-        return (user, nil)
-      } else {
-        logger.info("Creating new user with ID \(userId)")
-        return (createUser(userId), nil)
-      }
+      return getOrCreateUserFrom(id: userId)
     } else {
       let error = MVError.createError(.MVUserCreationError,
         failureReason: "User could not be created, because the server response object could not be parsed",
@@ -90,6 +85,18 @@ class UserRepository: MVCoreDataRepository {
       )
       logger.warning("Unable to create user from request object \(serverResponseObject): \(error.localizedDescription)")
       return (nil, error)
+    }
+  }
+  
+  /// This functino returns the user defined by its id.
+  func getOrCreateUserFrom(#id: String) -> (user: User?, error: NSError?) {
+    logger.debug("Get or create user from id \(id)")
+    if let user = findUserBy(id: id) {
+      logger.info("Returning user with ID \(id) from local database")
+      return (user, nil)
+    } else {
+      logger.info("Creating new user with ID \(id)")
+      return (createUser(id), nil)
     }
   }
   
@@ -171,5 +178,15 @@ class UserRepository: MVCoreDataRepository {
     newItem.sync()
     
     return newItem
+  }
+  
+  class func getCurrentUser() -> User? {
+    XCGLogger.debug("Gathering current user")
+    if let currentUserId = Defaults[UserDefaultsConstants.UserID].string {
+      return UserRepository().findUserBy(id: currentUserId)
+    } else {
+      XCGLogger.warning("Unable to find current user")
+      return nil
+    }
   }
 }

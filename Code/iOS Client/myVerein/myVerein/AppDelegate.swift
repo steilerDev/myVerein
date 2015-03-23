@@ -104,21 +104,27 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   func flushDatabase() {
     logger.debug("Flushing database")
     managedObjectContext?.lock()
-    var stores = persistentStoreCoordinator?.persistentStores
-    if let stores = stores as? [NSPersistentStore], persistentStoreCoordinator = persistentStoreCoordinator {
+    if let persistentStoreCoordinator = persistentStoreCoordinator, stores = persistentStoreCoordinator.persistentStores as? [NSPersistentStore] {
       for store in stores {
         var error: NSError?
         if !persistentStoreCoordinator.removePersistentStore(store, error: &error) {
           logger.error("Unable to remove persistent store \(error?.localizedDescription)")
+        } else {
+          logger.debug("Successfully removed persistent store \(store)")
         }
         if let storeURL = store.URL?.path {
-          NSFileManager.defaultManager().removeItemAtPath(storeURL, error: &error)
+          if !NSFileManager.defaultManager().removeItemAtPath(storeURL, error: &error) {
+            logger.error("Unable to remove item at path \(storeURL): \(error?.localizedDescription)")
+          } else {
+            logger.debug("Successfully removed item at path \(storeURL)")
+          }
         }
       }
     }
     managedObjectContext?.unlock()
     persistentStoreCoordinator = createPersistentStoreCoordinator()
     managedObjectContext = createManagedObjectContext()
+    logger.info("Successfully flushed database")
   }
   
   func saveContext () {

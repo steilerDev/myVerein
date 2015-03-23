@@ -100,6 +100,7 @@ public class Message
         {
             this.receiver.put(user.getId(), MessageStatus.PENDING);
         }
+        setDelivered(sender);
     }
 
     public String getId()

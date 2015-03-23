@@ -12,15 +12,17 @@ import AFNetworking
 import XCGLogger
 import SwiftyUserDefaults
 
+struct UserDefaultsConstants {
+  static let UserID = "userId"
+  static let SystemID = "systemId"
+}
+
 /// This class holds all available network interaction functions. It provides proper error handling and callbacks for each call.
 class MVNetworking {
   
   private static let logger = XCGLogger.defaultInstance()
   
-  private struct UserDefaultsConstants {
-    static let UserID = "userId"
-    static let SystemID = "systemId"
-  }
+  
   
   private struct NetworkingConstants {
     
@@ -43,6 +45,17 @@ class MVNetworking {
       struct Sync {
         static let URI = Message.BaseURI
         static let Method = HTTPMethods.GET
+        struct Parameter {
+          static let All = "all"
+        }
+      }
+      struct Send {
+        static let URI = Message.BaseURI
+        static let Method = HTTPMethods.POST
+        struct Parameter {
+          static let Content = "content"
+          static let Division = "division"
+        }
       }
     }
     
@@ -117,7 +130,7 @@ class MVNetworking {
     }
   }
   
-  /// This function tries to log the user into the system using the provided credentials. The callbacks are guaranteed to be executed on the main queue.
+  /// This function tries to log the user into the system using the provided credentials. The callbacks are guaranteed to be executed on the main queue. After a successfull log in the function checks the consitency of the application database, resets it if neccessary and starts syncing messages and user divisions.
   private class func loginAction(username: String, password: String, success: () -> (), failure: (NSError) -> ()) {
     logger.verbose("Logging in using provided parameters")
     if let session = MVNetworkingSessionFactory.instance() {
@@ -153,10 +166,13 @@ class MVNetworking {
               Defaults[UserDefaultsConstants.UserID] = newUserID
               Defaults[UserDefaultsConstants.SystemID] = newSystemID
               (UIApplication.sharedApplication().delegate as! AppDelegate).flushDatabase()
+              MVNetworkingHelper.syncAllMessages()
             } else {
+              MVNetworkingHelper.syncMessages()
               logger.debug("No need to reset database, because System ID and User ID did not change")
             }
-        
+            
+            MVNetworkingHelper.syncUserDivision()
             logger.info("Successfully logged in")
             success()
           } else {
@@ -198,16 +214,43 @@ class MVNetworking {
     )
   }
   
+  /// This function is gathering all unread messages. The callbacks are not executed on the main queue.
+  class func allMessageSyncAction(#success: (AnyObject) -> (), failure: (NSError?) -> ()) {
+    logger.verbose("Started all messages sync action")
+    handleRequest(
+      URI: NetworkingConstants.Message.Sync.URI,
+      parameters: [NetworkingConstants.Message.Sync.Parameter.All: "true"],
+      requestMethod: NetworkingConstants.Message.Sync.Method,
+      retryCount: 0,
+      success: success,
+      failure: failure
+    )
+  }
+  
+  class func sendMessageAction(#success: (AnyObject) -> (), failure: (NSError?) -> (), message: Message) {
+    logger.verbose("Started sending message action")
+    handleRequest(
+      URI: NetworkingConstants.Message.Send.URI,
+      parameters: [
+        NetworkingConstants.Message.Send.Parameter.Content: message.content!,
+        NetworkingConstants.Message.Send.Parameter.Division: message.division.id
+      ],
+      requestMethod: NetworkingConstants.Message.Send.Method,
+      retryCount: 0,
+      success: success,
+      failure: failure
+    )
+  }
+  
   // MARK: - User
   
   /// This function is gathering all information available about a user. The callbacks are not executed on the main queue.
   class func userSyncAction(#userId: String, success: (AnyObject) -> (), failure: (NSError?) -> ()) {
     logger.verbose("Syncing user with id \(userId)")
-    let parameters = [NetworkingConstants.User.Get.Parameter.UserID : userId]
     
     handleRequest(
       URI: NetworkingConstants.User.Get.URI,
-      parameters: parameters,
+      parameters: [NetworkingConstants.User.Get.Parameter.UserID : userId],
       requestMethod: NetworkingConstants.User.Get.Method,
       retryCount: 0,
       success: success,
@@ -220,10 +263,9 @@ class MVNetworking {
   /// This function is gathering all information available about a user. The callbacks are not executed on the main queue.
   class func divisionSyncAction(#divisionId: String, success: (AnyObject) -> (), failure: (NSError?) -> ()) {
     logger.verbose("Syncing division with id \(divisionId)")
-    let parameters = [NetworkingConstants.Division.Get.Parameter.DivisionID : divisionId]
     handleRequest(
       URI: NetworkingConstants.Division.Get.URI,
-      parameters: parameters,
+      parameters: [NetworkingConstants.Division.Get.Parameter.DivisionID : divisionId],
       requestMethod: NetworkingConstants.Division.Get.Method,
       retryCount: 0,
       success: success,

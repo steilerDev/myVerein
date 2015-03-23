@@ -29,6 +29,7 @@ import javax.validation.ConstraintViolationException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -263,6 +264,7 @@ public class UserManagementController
         {
             logger.debug("[" + currentUser + "] Parsing divisions for " + newUserObject.getEmail());
             String[] divArray = divisions.split(",");
+            List<Division> divisionList = new ArrayList<>();
             for (String division : divArray)
             {
                 Division div = divisionRepository.findByName(division);
@@ -272,9 +274,10 @@ public class UserManagementController
                     return new ResponseEntity<>("Division " + division + " does not exist", HttpStatus.BAD_REQUEST);
                 } else
                 {
-                    newUserObject.addDivision(div);
+                    divisionList.add(div);
                 }
             }
+            newUserObject.setDivisions(Division.getExpandedSetOfDivisions(divisionList, divisionRepository));
         } else
         {
             logger.debug("[" + currentUser + "] Clearing divisions for " + newUserObject.getEmail());

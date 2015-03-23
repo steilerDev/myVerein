@@ -85,7 +85,7 @@ public class IndexController
     @RequestMapping(value = "login", method = RequestMethod.GET)
     public String login(@RequestParam(required = false) String error, @RequestParam(required = false) String logout, @RequestParam(required = false) String cookieTheft, Model model)
     {
-        //createDatabaseExample();
+        createDatabaseExample();
         logger.trace("Getting login page.");
         if (Settings.loadSettings(settingsRepository).isInitialSetup())
         {
@@ -210,6 +210,13 @@ public class IndexController
         user5.addDivision(div2);
         user5.addDivision(div4);
 
+
+        user1.setDivisions(Division.getExpandedSetOfDivisions(user1.getDivisions(), divisionRepository));
+        user2.setDivisions(Division.getExpandedSetOfDivisions(user2.getDivisions(), divisionRepository));
+        user3.setDivisions(Division.getExpandedSetOfDivisions(user3.getDivisions(), divisionRepository));
+        user4.setDivisions(Division.getExpandedSetOfDivisions(user4.getDivisions(), divisionRepository));
+        user5.setDivisions(Division.getExpandedSetOfDivisions(user5.getDivisions(), divisionRepository));
+
         userRepository.save(user1);
         userRepository.save(user2);
         userRepository.save(user3);
@@ -257,7 +264,9 @@ public class IndexController
         receiverList.add(user1);
         receiverList.add(user2);
         Message message1 = new Message("Hello world", LocalDateTime.now(), user1, receiverList, div1);
+        Message message2 = new Message("Hello world, too", LocalDateTime.now(), user2, receiverList, div1);
         messageRepository.save(message1);
+        messageRepository.save(message2);
     }
 
     /**

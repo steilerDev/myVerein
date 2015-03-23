@@ -9,6 +9,7 @@
 import Foundation
 import CoreData
 import JSQMessagesViewController
+import SwiftyUserDefaults
 
 class Message: NSManagedObject {
   @NSManaged var content: String?
@@ -17,6 +18,14 @@ class Message: NSManagedObject {
   @NSManaged var timestamp: NSDate
   @NSManaged var division: Division
   @NSManaged var sender: User
+  
+  var isOutgoingMessage: Bool {
+    if let userID = Defaults[UserDefaultsConstants.UserID].string{
+      return userID == sender.id
+    } else {
+      return true
+    }
+  }
 }
 
 // MARK: - MVCoreDataObject
@@ -61,6 +70,6 @@ extension Message: JSQMessageData {
   }
   
   func messageHash() -> UInt {
-    return UInt(content?.hash ?? 0 ^ timestamp.hash ?? 0)
+    return UInt(abs(content?.hash ?? 0) ^ abs(timestamp.hash ?? 0))
   }
 }

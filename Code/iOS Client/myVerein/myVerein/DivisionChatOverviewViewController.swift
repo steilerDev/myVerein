@@ -44,7 +44,8 @@ class DivisionChatOverviewViewController: UICollectionViewController {
     var controller = NSFetchedResultsController(fetchRequest: fetchRequest,
       managedObjectContext: (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext!,
       sectionNameKeyPath: nil,
-      cacheName: DivisionChatOverviewConstants.CacheName)
+      cacheName: DivisionChatOverviewConstants.CacheName
+    )
     
     controller.delegate = self
     
@@ -170,9 +171,12 @@ extension DivisionChatOverviewViewController: UICollectionViewDataSource {
 // MARK: - UICollectionViewDelegate
 extension DivisionChatOverviewViewController: UICollectionViewDelegate {
   override func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
-    var selectedCell = collectionView.cellForItemAtIndexPath(indexPath) as? DivisionChatCell
-    performSegueWithIdentifier(DivisionChatOverviewConstants.SegueToChat, sender: selectedCell)
-    selectedCell?.notificationCount++
+    if let selectedCell = collectionView.cellForItemAtIndexPath(indexPath) as? DivisionChatCell {
+      performSegueWithIdentifier(DivisionChatOverviewConstants.SegueToChat, sender: selectedCell)
+      selectedCell.notificationCount = 0
+    } else {
+      logger.error("Unable to perform segue to chat because the tapped cell was not found")
+    }
   }
   
   /*

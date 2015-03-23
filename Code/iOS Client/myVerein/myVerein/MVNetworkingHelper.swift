@@ -14,6 +14,8 @@ class MVNetworkingHelper {
   
   private static let logger = XCGLogger.defaultInstance()
   
+  // MARK: Messages
+  
   /// This function is used to gather all new messages for the user and store them persistent.
   class func syncMessages() {
     logger.verbose("Syncing messages")
@@ -23,7 +25,7 @@ class MVNetworkingHelper {
         let logger = XCGLogger.defaultInstance()
         if let responseArray = response as? Array<AnyObject> {
           let messageRepository = MessageRepository()
-          let (messages, error) = messageRepository.createMessagesFrom(serverResponseObject: responseArray)
+          let (messages, error) = messageRepository.getOrCreateMessagesFrom(serverResponseObject: responseArray)
           if messages == nil && error != nil {
             logger.warning("Unable to sync messages \(error?.localizedDescription)")
           } else {
@@ -41,6 +43,60 @@ class MVNetworkingHelper {
       }
     )
   }
+  
+  /// This function is used to gather all messages for the user and store them persistent.
+  class func syncAllMessages() {
+    logger.verbose("Syncing all messages")
+    MVNetworking.allMessageSyncAction(
+      success: {
+        response in
+        let logger = XCGLogger.defaultInstance()
+        if let responseArray = response as? Array<AnyObject> {
+          let messageRepository = MessageRepository()
+          let (messages, error) = messageRepository.getOrCreateMessagesFrom(serverResponseObject: responseArray)
+          if messages == nil && error != nil {
+            logger.warning("Unable to sync all messages \(error?.localizedDescription)")
+          } else {
+            messageRepository.save()
+            logger.info("Successfully synced and saved all messages")
+          }
+        } else {
+          let error = MVError.createError(.MVMessageCreationError, failureReason: "Unable to parse response array", underlyingError: .MVServerResponseParseError)
+          logger.warning("Unable to sync all messages: \(error.localizedDescription)")
+        }
+      },
+      failure: {
+        error in
+        XCGLogger.warning("Unable to sync all messages: \(error?.localizedDescription)")
+      }
+    )
+  }
+  
+  class func sendMessage(message: Message) {
+    println("Sending message")
+    MVNetworking.sendMessageAction(
+      success: {
+        response in
+        let logger = XCGLogger.defaultInstance()
+        if let responseDict = response as? [String: AnyObject],
+          responseId = responseDict[MessageRepository.MessageConstants.RemoteMessage.Id] as? String
+        {
+          logger.debug("Updating message id from \(message.id) to \(responseId)")
+          let messageRepository = MessageRepository()
+          message.id = responseId
+          messageRepository.save()
+        }
+      },
+      failure: {
+        error in
+        XCGLogger.warning("Unable to send message: \(error?.localizedDescription)")
+        // TODO: Implement some fallback queue that keeps on trying
+      },
+      message: message
+    )
+  }
+  
+  // MARK: User
   
   /// This function is used to load a user specified by its id and store him persistent
   class func syncUser(userId: String) {
@@ -70,6 +126,8 @@ class MVNetworkingHelper {
       }
     )
   }
+  
+  // MARK: Division
   
   /// This function is used to load a user specified by its id and store him persistent
   class func syncDivision(divisionId: String) {

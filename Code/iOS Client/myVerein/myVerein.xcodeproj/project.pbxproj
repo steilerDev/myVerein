@@ -16,6 +16,7 @@
 		3020CBBB1A9E128A005AAEEF /* myVereinTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3020CBBA1A9E128A005AAEEF /* myVereinTests.swift */; };
 		302BE8C21AA642EB001D0FE7 /* DivisionChatCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 302BE8C11AA642EB001D0FE7 /* DivisionChatCell.swift */; };
 		302BE8C41AA64599001D0FE7 /* DivisionChatOverviewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 302BE8C31AA64599001D0FE7 /* DivisionChatOverviewViewController.swift */; };
+		3035D66C1AC086E800C5C0FB /* MVColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3035D66B1AC086E800C5C0FB /* MVColor.swift */; };
 		304C577F1AACA3CC00B221D7 /* MVSecurity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 304C577E1AACA3CC00B221D7 /* MVSecurity.swift */; };
 		306FD7321AAA356000719B82 /* MVNetworkingHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 306FD7311AAA356000719B82 /* MVNetworkingHelper.swift */; };
 		306FD7341AAB0F4400719B82 /* MVError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 306FD7331AAB0F4400719B82 /* MVError.swift */; };
@@ -77,6 +78,7 @@
 		3026FE8D1AADE71F0006ABA8 /* XCGLogger.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCGLogger.framework; path = "XCGLogger/build/Debug-iphoneos/XCGLogger.framework"; sourceTree = "<group>"; };
 		302BE8C11AA642EB001D0FE7 /* DivisionChatCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DivisionChatCell.swift; sourceTree = "<group>"; };
 		302BE8C31AA64599001D0FE7 /* DivisionChatOverviewViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DivisionChatOverviewViewController.swift; sourceTree = "<group>"; };
+		3035D66B1AC086E800C5C0FB /* MVColor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MVColor.swift; sourceTree = "<group>"; };
 		304C577E1AACA3CC00B221D7 /* MVSecurity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MVSecurity.swift; sourceTree = "<group>"; };
 		306FD7311AAA356000719B82 /* MVNetworkingHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MVNetworkingHelper.swift; sourceTree = "<group>"; };
 		306FD7331AAB0F4400719B82 /* MVError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MVError.swift; sourceTree = "<group>"; };
@@ -203,6 +205,7 @@
 				3091702D1AA8C097004D30D1 /* myVereinModel.xcdatamodeld */,
 				3020CBA31A9E1289005AAEEF /* Info.plist */,
 				3079B1D91AAF242600ACD793 /* MarshalOperator.swift */,
+				3035D66B1AC086E800C5C0FB /* MVColor.swift */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -439,6 +442,7 @@
 				30A4F7D91AA97D400064EA2C /* MVNetworking.swift in Sources */,
 				30FB44C71AACD898003E4512 /* Division.swift in Sources */,
 				30FB44C51AACD898003E4512 /* Message.swift in Sources */,
+				3035D66C1AC086E800C5C0FB /* MVColor.swift in Sources */,
 				30916FFB1AA8B9D0004D30D1 /* MenuController.swift in Sources */,
 				3091702F1AA8C097004D30D1 /* myVereinModel.xcdatamodeld in Sources */,
 				302BE8C41AA64599001D0FE7 /* DivisionChatOverviewViewController.swift in Sources */,

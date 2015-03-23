@@ -8,6 +8,7 @@
 
 import Foundation
 import CoreData
+import UIKit
 
 class User: NSManagedObject {
   
@@ -39,6 +40,40 @@ class User: NSManagedObject {
   @NSManaged var streetNumber: String?
   @NSManaged var zipCode: String?
   @NSManaged var lastSynced: NSDate
+  
+  var displayName: String {
+    if let firstName = firstName, lastName = lastName {
+      return "\(firstName) \(lastName)"
+    } else {
+      return id
+    }
+  }
+  
+  var initials: String {
+    if let firstName = firstName, lastName = lastName {
+      return "\(firstName[firstName.startIndex])\(lastName[lastName.startIndex])"
+    } else {
+      return "N/A"
+    }
+  }
+  
+  @NSManaged var rawAvatar: NSData?
+  var avatar: UIImage? {
+    get {
+      if let imageData = rawAvatar {
+        return UIImage(data: imageData)
+      } else {
+        return nil
+      }
+    }
+    set {
+      if let image = newValue {
+        rawAvatar = UIImagePNGRepresentation(image)
+      } else {
+        rawAvatar = nil
+      }
+    }
+  }
   
   @NSManaged var rawMembershipStatus: String?
   var membershipStatus: MembershipStatus? {

@@ -76,10 +76,9 @@ public class DivisionController
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         } else
         {
-            List<Division> returnedDivisions = Division.getExpandedSetOfDivisions(divisions, divisionRepository);
-            returnedDivisions.parallelStream().forEach(Division::removeEverythingExceptId);
+            divisions.parallelStream().forEach(Division::removeEverythingExceptId);
             logger.info("[" + currentUser + "] Returning user divisions");
-            return new ResponseEntity<>(returnedDivisions, HttpStatus.OK);
+            return new ResponseEntity<>(divisions, HttpStatus.OK);
         }
     }
 
