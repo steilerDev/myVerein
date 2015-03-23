@@ -18,7 +18,7 @@ package de.steilerdev.myVerein.server.controller.init;
 
 import com.mongodb.*;
 import de.steilerdev.myVerein.server.model.Division;
-import de.steilerdev.myVerein.server.model.SettingsRepository;
+import de.steilerdev.myVerein.server.model.Settings;
 import de.steilerdev.myVerein.server.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +28,6 @@ import org.springframework.context.support.ReloadableResourceBundleMessageSource
 import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -36,14 +35,12 @@ import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/init")
 public class InitController
 {
-    @Autowired
-    private SettingsRepository settingsRepository;
-
     @Autowired
     private ReloadableResourceBundleMessageSource messageSource;
 
@@ -79,7 +76,8 @@ public class InitController
                                                Locale locale)
     {
         logger.trace("Starting initial settings configuration");
-        if(!settingsRepository.isInitSetup())
+        Settings settings = new Settings();
+        if(!settings.isInitialSetup())
         {
             logger.warn("An initial setup API was used, even though the system is already configured.");
             return new ResponseEntity<>(messageSource.getMessage("init.message.settings.notAllowed", null, "You are not allowed to perform this action at the moment", locale), HttpStatus.BAD_REQUEST);
@@ -125,14 +123,15 @@ public class InitController
             try
             {
                 logger.debug("Temporarily storing settings information");
-                settingsRepository.setClubName(clubName);
-                settingsRepository.setDatabaseHost(databaseHost);
-                settingsRepository.setDatabasePort(databasePort);
-                settingsRepository.setDatabaseUser(databaseUser);
-                settingsRepository.setDatabasePassword(databasePassword);
-                settingsRepository.setDatabaseName(databaseCollection);
+                settings.setClubName(clubName);
+                settings.setDatabaseHost(databaseHost);
+                settings.setDatabasePort(databasePort);
+                settings.setDatabaseUser(databaseUser);
+                settings.setDatabasePassword(databasePassword);
+                settings.setDatabaseName(databaseCollection);
                 databaseName = databaseCollection;
-                settingsRepository.setRememberMeKey(rememberMeTokenKey);
+                settings.setRememberMeKey(rememberMeTokenKey);
+                savingInitialSetup(null, null, settings);
             } catch (IOException e)
             {
                 logger.warn("Unable to save settings.");
@@ -162,8 +161,9 @@ public class InitController
                                                  @RequestParam String passwordRe,
                                                  Locale locale)
     {
+        Settings settings = new Settings();
         logger.trace("Starting initial admin configuration");
-        if(!settingsRepository.isInitSetup())
+        if(!settings.isInitialSetup())
         {
             logger.warn("An initial setup API was used, even though the system is already configured.");
             return new ResponseEntity<>(messageSource.getMessage("init.message.admin.notAllowed", null, "You are not allowed to perform this action at the moment", locale), HttpStatus.BAD_REQUEST);
@@ -185,25 +185,17 @@ public class InitController
             superAdmin.setPassword(password);
 
             logger.debug("Creating a new initial root division.");
-            Division rootDivision = new Division(settingsRepository.getClubName(), null, superAdmin, null);
+            Division rootDivision = new Division(settings.getClubName(), null, superAdmin, null);
 
-            try
-            {
-                //Un-setting init flag.
-                settingsRepository.setInitSetup(false);
-            } catch (IOException e)
-            {
-                logger.warn("Unable to un-set initial configuration flag within settings.");
-                return new ResponseEntity<>(messageSource.getMessage("init.message.admin.savingSettingsError", null, "Unable to save settings, please try again", locale), HttpStatus.INTERNAL_SERVER_ERROR);
-            }
+            settings.setInitialSetup(false);
 
             logger.info("Everything in place, now the settings are stored durable.");
 
-            if(!savingUserAndDivision(superAdmin, rootDivision))
+            if(!savingInitialSetup(superAdmin, rootDivision, null))
             {
                 logger.warn("Storing data into database was not successfully.");
                 return new ResponseEntity<>(messageSource.getMessage("init.message.admin.savingAdminError", null, "Unable to save new super admin, please try again", locale), HttpStatus.INTERNAL_SERVER_ERROR);
-            } else if(!savingSettings(superAdmin))
+            } else if(!settings.saveSettings(superAdmin, null))
             {
                 logger.warn("Unable to save settings or refresh application context");
                 return new ResponseEntity<>(messageSource.getMessage("init.message.admin.savingSettingsError", null, "Unable to save settings, please try again", locale), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -270,11 +262,8 @@ public class InitController
             return false;
         } finally
         {
-            if(mongoClient != null)
-            {
-                logger.debug("Closing mongo client");
-                mongoClient.close();
-            }
+            logger.debug("Closing mongo client");
+            mongoClient.close();
         }
     }
 
@@ -284,7 +273,7 @@ public class InitController
      * @param division The new root division.
      * @return True if the operation was successfully, false otherwise.
      */
-    private boolean savingUserAndDivision(User user, Division division)
+    private boolean savingInitialSetup(User user, Division division, Settings settings)
     {
         if(mongoAddress != null && databaseName != null && !databaseName.isEmpty())
         {
@@ -301,15 +290,30 @@ public class InitController
 
             try
             {
-                logger.debug("Storing user");
-                DBObject userObject = (DBObject) mappingMongoConverter.convertToMongoType(user);
-                userObject.put("_class", user.getClass().getCanonicalName());
-                mongoDB.getCollection(user.getClass().getSimpleName().toLowerCase()).insert(userObject);
+                if(user != null)
+                {
+                    logger.debug("Storing user");
+                    DBObject userObject = (DBObject) mappingMongoConverter.convertToMongoType(user);
+                    userObject.put("_class", user.getClass().getCanonicalName());
+                    mongoDB.getCollection(user.getClass().getSimpleName().toLowerCase()).insert(userObject);
+                }
 
-                logger.debug("Storing division");
-                DBObject divisionObject = (DBObject) mappingMongoConverter.convertToMongoType(division);
-                divisionObject.put("_class", division.getClass().getCanonicalName());
-                mongoDB.getCollection(division.getClass().getSimpleName().toLowerCase()).insert(divisionObject);
+                if(division != null)
+                {
+                    logger.debug("Storing division");
+                    DBObject divisionObject = (DBObject) mappingMongoConverter.convertToMongoType(division);
+                    divisionObject.put("_class", division.getClass().getCanonicalName());
+                    mongoDB.getCollection(division.getClass().getSimpleName().toLowerCase()).insert(divisionObject);
+                }
+
+                if(settings != null)
+                {
+                    logger.debug("Storing settings");
+                    settings.saveSettings(user, null);
+                    DBObject settingsObject = (DBObject) mappingMongoConverter.convertToMongoType(settings);
+                    settingsObject.put("_class", settings.getClass().getCanonicalName());
+                    mongoDB.getCollection(settings.getClass().getSimpleName().toLowerCase()).insert(settingsObject);
+                }
 
                 logger.info("Successfully saved root division and super admin");
                 return true;
@@ -319,39 +323,11 @@ public class InitController
                 return false;
             } finally
             {
-                if(mongoClient != null)
-                {
-                    mongoClient.close();
-                }
+                mongoClient.close();
             }
         } else
         {
             logger.warn("Unable to save super admin and new root division, because the new MongoDB connection is not available");
-            return false;
-        }
-    }
-
-    /**
-     * This function is permanently storing the new information within the settings file.
-     * @param currentUser The currently logged in user.
-     * @return True if the operation was successfully, false otherwise.
-     */
-    private boolean savingSettings(User currentUser)
-    {
-        logger.trace("Permanently saving settings and restarting context afterwards if necessary");
-        try
-        {
-            //This call is restarting the application.
-            settingsRepository.saveSettings(currentUser);
-            logger.info("Successfully saved settings and restarted context.");
-            return true;
-        } catch (BeansException | IllegalStateException | MongoException e)
-        {
-            logger.warn("Unable to refresh application context: " + e.getMessage());
-            return false;
-        } catch (IOException e)
-        {
-            logger.warn("Unable to save settings: " + e.getMessage());
             return false;
         }
     }

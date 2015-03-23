@@ -18,6 +18,7 @@ package de.steilerdev.myVerein.server.controller;
 
 import com.mongodb.gridfs.GridFSDBFile;
 import de.steilerdev.myVerein.server.model.GridFSRepository;
+import de.steilerdev.myVerein.server.model.Settings;
 import de.steilerdev.myVerein.server.model.SettingsRepository;
 import de.steilerdev.myVerein.server.model.User;
 import de.steilerdev.myVerein.server.security.CurrentUser;
@@ -135,7 +136,7 @@ public class ContentController
     @ResponseBody ResponseEntity<String> getClubName()
     {
         logger.trace("Gathering club name");
-        String clubName = settingsRepository.getClubName();
+        String clubName = Settings.loadSettings(settingsRepository).getClubName();
         if(clubName == null || clubName.isEmpty())
         {
             logger.warn("Unable to get club name");

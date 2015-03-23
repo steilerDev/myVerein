@@ -28,7 +28,6 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -89,17 +88,8 @@ public class SettingsController
         } else
         {
             logger.debug("[" + currentUser + "] Loading settings for super admin");
-            try
-            {
-                if((settings = (Map<String,Object>) settingsRepository.loadSettings().clone()) == null)
-                {
-                    throw new IOException("Settings are null");
-                }
-            } catch (IOException | ClassCastException e)
-            {
-                logger.warn("[" + currentUser + "] Unable to load system settings: " + e.getMessage());
-                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
+
+            settings = Settings.loadSettings(settingsRepository).getSettingsMap();
 
             if(gridFSRepository.findClubLogo() != null)
             {
@@ -150,6 +140,7 @@ public class SettingsController
                                                @CurrentUser User currentUser)
     {
         logger.trace("[" + currentUser + "] Starting to save settings");
+        Settings settings = Settings.loadSettings(settingsRepository);
         if(!passwordEncoder.isPasswordValid(currentUser.getPassword(), currentAdminPassword, currentUser.getSalt()))
         {
             logger.warn("[" + currentUser + "] The stated password is invalid");
@@ -162,10 +153,10 @@ public class SettingsController
                 if(currentAdmin != null && !currentAdmin.equals(currentUser.getEmail()))
                 {
                     logger.warn("[" + currentUser + "] The super admin user is changing to " + currentAdmin);
-                    Division rootDivision = divisionRepository.findByName(settingsRepository.getClubName());
+                    Division rootDivision = divisionRepository.findByName(settings.getClubName());
                     if(rootDivision == null)
                     {
-                        logger.warn("[" + currentUser + "] Unable to find root division " + settingsRepository.getClubName());
+                        logger.warn("[" + currentUser + "] Unable to find root division " + settings.getClubName());
                         return new ResponseEntity<>("Unable to find root division", HttpStatus.INTERNAL_SERVER_ERROR);
                     }
 
@@ -186,7 +177,7 @@ public class SettingsController
                     if (clubName != null && !clubName.isEmpty())
                     {
                         logger.debug("[" + currentUser + "] Setting club name to " + clubName);
-                        Division rootDivision = divisionRepository.findByName(settingsRepository.getClubName());
+                        Division rootDivision = divisionRepository.findByName(settings.getClubName());
                         if(rootDivision == null)
                         {
                             logger.warn("[" + currentUser + "] Unable to find former root division.");
@@ -195,7 +186,7 @@ public class SettingsController
                         //Changing and saving the root division
                         rootDivision.setName(clubName);
                         divisionRepository.save(rootDivision);
-                        settingsRepository.setClubName(clubName);
+                        settings.setClubName(clubName);
                     }
 
                     if (clubLogo != null && !clubLogo.isEmpty())
@@ -214,37 +205,37 @@ public class SettingsController
                     if (databaseHost != null && !databaseHost.isEmpty())
                     {
                         logger.debug("[" + currentUser + "] Setting database host to " + databaseHost);
-                        settingsRepository.setDatabaseHost(databaseHost);
+                        settings.setDatabaseHost(databaseHost);
                     }
 
                     if (databasePort != null && !databasePort.isEmpty())
                     {
                         logger.debug("[" + currentUser + "] Setting database port to " + databasePort);
-                        settingsRepository.setDatabasePort(databasePort);
+                        settings.setDatabasePort(databasePort);
                     }
 
                     if (databaseUser != null)
                     {
                         logger.debug("[" + currentUser + "] Setting database user to " + databaseUser);
-                        settingsRepository.setDatabaseUser(databaseUser);
+                        settings.setDatabaseUser(databaseUser);
                     }
 
                     if (databasePassword != null)
                     {
                         logger.debug("[" + currentUser + "] Setting database password");
-                        settingsRepository.setDatabasePassword(databasePassword);
+                        settings.setDatabasePassword(databasePassword);
                     }
 
                     if (databaseCollection != null && !databaseCollection.isEmpty())
                     {
                         logger.debug("[" + currentUser + "] Setting database collection name " + databaseCollection);
-                        settingsRepository.setDatabaseName(databaseCollection);
+                        settings.setDatabaseName(databaseCollection);
                     }
 
                     if (rememberMeTokenKey != null && !rememberMeTokenKey.isEmpty())
                     {
                         logger.debug("[" + currentUser + "] Setting remember me token key " + rememberMeTokenKey);
-                        settingsRepository.setRememberMeKey(rememberMeTokenKey);
+                        settings.setRememberMeKey(rememberMeTokenKey);
                     }
 
                     logger.debug("[" + currentUser + "] Gathering all custom user fields");
@@ -286,7 +277,7 @@ public class SettingsController
                             } else
                             {
                                 String value = parameters.get("cuf_" + key).trim();
-                                if(!key.equals(value) && settingsRepository.getCustomUserFields().contains(key)) //The key was renamed
+                                if(!key.equals(value) && settings.getCustomUserFields().contains(key)) //The key was renamed
                                 {
                                     logger.debug("[" + currentUser + "] The custom user field " + key + " changed to " + value);
                                     List<User> user = mongoTemplate.find(new Query(Criteria.where("customUserField." + User.escapeCustomUserKey(key)).exists(true)), User.class);
@@ -309,11 +300,11 @@ public class SettingsController
                                 customUserFieldValues.add(value);
                             }
                         });
-                        settingsRepository.setCustomUserFields(customUserFieldValues);
+                        settings.setCustomUserFields(customUserFieldValues);
                     }
 
                     logger.debug("[" + currentUser + "] Saving updated settings file");
-                    settingsRepository.saveSettings(currentUser);
+                    settings.saveSettings(currentUser, settingsRepository);
                     logger.info("[" + currentUser + "] Successfully saved updated settings file");
                 } catch (IOException e)
                 {
@@ -369,7 +360,7 @@ public class SettingsController
     public ResponseEntity<List<String>> getCustomUserFields(@CurrentUser User currentUser)
     {
         logger.trace("[" + currentUser + "] Gathering custom user fields");
-        List<String> customUserFields = settingsRepository.getCustomUserFields();
+        List<String> customUserFields = Settings.loadSettings(settingsRepository).getCustomUserFields();
         if(customUserFields != null)
         {
             logger.debug("[" + currentUser + "] Returning custom user fields");

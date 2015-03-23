@@ -136,7 +136,7 @@ function loadSettings() {
                     $('#clubLogoDelete').addClass("hidden");
                 }
 
-                response.customUserFields.split(",").forEach(function(entry){
+                response.customUserFields.forEach(function(entry){
                     addCustomUserFieldSettings(entry);
                 })
             }

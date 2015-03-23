@@ -5,7 +5,6 @@ import de.steilerdev.myVerein.server.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cglib.core.Local;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,10 +18,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.Set;
 
 /**
  * This controller is processing all general requests.
@@ -60,7 +58,7 @@ public class IndexController
     public String startApplication(Model model)
     {
         logger.trace("Gathering club name for index page.");
-        String clubName = settingsRepository.getClubName();
+        String clubName = Settings.loadSettings(settingsRepository).getClubName();
         if(clubName == null || clubName.isEmpty())
         {
             logger.warn("Unable to retrieve club name, or club name is empty. Using default name.");
@@ -89,13 +87,13 @@ public class IndexController
     {
         //createDatabaseExample();
         logger.trace("Getting login page.");
-        if (settingsRepository.isInitSetup())
+        if (Settings.loadSettings(settingsRepository).isInitialSetup())
         {
             logger.warn("Starting initial setup.");
             return "init";
         } else
         {
-            String clubName = settingsRepository.getClubName();
+            String clubName = Settings.loadSettings(settingsRepository).getClubName();
             if(clubName == null || clubName.isEmpty())
             {
                 logger.warn("Unable to retrieve club name, or club name is empty. Using default name.");

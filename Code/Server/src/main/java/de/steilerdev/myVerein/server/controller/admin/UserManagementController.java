@@ -23,7 +23,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.ConstraintViolationException;
@@ -31,8 +30,8 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -364,9 +363,10 @@ public class UserManagementController
             logger.debug("[" + currentUser + "] Currently logged in user (" + currentUser.getEmail() + ") is administrating selected user (" + searchedUser.getEmail() + ")");
             searchedUser.setAdministrationNotAllowedMessage(null);
             //Adding all custom user fields defined within the settings file to the object
-            if(settingsRepository.getCustomUserFields() != null && !settingsRepository.getCustomUserFields().isEmpty())
+            Settings settings = Settings.loadSettings(settingsRepository);
+            if(settings.getCustomUserFields() != null && !settings.getCustomUserFields().isEmpty())
             {
-                settingsRepository.getCustomUserFields().stream().forEach(fieldKey -> searchedUser.addCustomUserField(fieldKey, "", false));
+                settings.getCustomUserFields().stream().forEach(fieldKey -> searchedUser.addCustomUserField(fieldKey, "", false));
             } else if(searchedUser.getCustomUserField() == null || searchedUser.getCustomUserField().isEmpty())
             {
                 searchedUser.setCustomUserField(null);
