@@ -119,9 +119,7 @@ class DivisionChatOverviewViewController: UICollectionViewController {
 }
 
 // MARK: - UICollectionViewDataSource
-
 extension DivisionChatOverviewViewController: UICollectionViewDataSource {
-  
   override func numberOfSectionsInCollectionView(collectionView: UICollectionView) -> Int {
     return fetchedResultController.sections?.count ?? 1
   }

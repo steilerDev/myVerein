@@ -66,11 +66,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     return NSManagedObjectModel(contentsOfURL: modelURL)!
     }()
   
-  lazy var persistentStoreCoordinator: NSPersistentStoreCoordinator? = {
+  lazy var persistentStoreCoordinator: NSPersistentStoreCoordinator? = createPersistentStoreCoordinator(self)()
+  
+  private func createPersistentStoreCoordinator() -> NSPersistentStoreCoordinator? {
     // The persistent store coordinator for the application. This implementation creates and return a coordinator, having added the store for the application to it. This property is optional since there are legitimate error conditions that could cause the creation of the store to fail.
     // Create the coordinator and store
-    var coordinator: NSPersistentStoreCoordinator? = NSPersistentStoreCoordinator(managedObjectModel: self.managedObjectModel)
-    let url = self.applicationDocumentsDirectory.URLByAppendingPathComponent("myVereinModel.sqlite")
+    var coordinator: NSPersistentStoreCoordinator? = NSPersistentStoreCoordinator(managedObjectModel: managedObjectModel)
+    let url = applicationDocumentsDirectory.URLByAppendingPathComponent("myVereinModel.sqlite")
     var error: NSError? = nil
     let mOptions = [NSMigratePersistentStoresAutomaticallyOption: true,
       NSInferMappingModelAutomaticallyOption: true]
@@ -83,19 +85,41 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     } else {
       return coordinator
     }
-  }()
+  }
   
-  lazy var managedObjectContext: NSManagedObjectContext? = {
-    if let coordinator = self.persistentStoreCoordinator {
+  lazy var managedObjectContext: NSManagedObjectContext? = createManagedObjectContext(self)()
+  
+  private func createManagedObjectContext() -> NSManagedObjectContext? {
+    if let coordinator = persistentStoreCoordinator {
       var managedObjectContext = NSManagedObjectContext()
       managedObjectContext.persistentStoreCoordinator = coordinator
       return managedObjectContext
     } else {
       return nil
     }
-  }()
+  }
   
-  // MARK: - Core Data Saving support
+  // MARK: - Core Data functions
+  
+  func flushDatabase() {
+    logger.debug("Flushing database")
+    managedObjectContext?.lock()
+    var stores = persistentStoreCoordinator?.persistentStores
+    if let stores = stores as? [NSPersistentStore], persistentStoreCoordinator = persistentStoreCoordinator {
+      for store in stores {
+        var error: NSError?
+        if !persistentStoreCoordinator.removePersistentStore(store, error: &error) {
+          logger.error("Unable to remove persistent store \(error?.localizedDescription)")
+        }
+        if let storeURL = store.URL?.path {
+          NSFileManager.defaultManager().removeItemAtPath(storeURL, error: &error)
+        }
+      }
+    }
+    managedObjectContext?.unlock()
+    persistentStoreCoordinator = createPersistentStoreCoordinator()
+    managedObjectContext = createManagedObjectContext()
+  }
   
   func saveContext () {
     if let moc = self.managedObjectContext {

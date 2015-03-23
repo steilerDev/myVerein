@@ -16,6 +16,7 @@ enum MVErrorCodes: Int {
   case MVSessionLoadingError = 21
   case MVMaximumLoginRetriesReached = 22
   case MVServerResponseParseError = 23
+  case MVResponseHeaderError = 24
   case MVLocalDatabaseError = 50
   case MVLocalDatabaseLoadingError = 51
   case MVEntityCreationError = 60
@@ -97,9 +98,9 @@ class MVError {
           NSLocalizedFailureReasonErrorKey: "The server response was invalid, or the server uses an incompatible version",
           NSLocalizedRecoverySuggestionErrorKey: "Retry your action"
         ]
-      case .MVServerResponseParseError:
+      case .MVResponseHeaderError:
         return [
-          NSLocalizedDescriptionKey: "Unable to parse server response",
+          NSLocalizedDescriptionKey: "Unable to read the response header fields",
           NSLocalizedFailureReasonErrorKey: "The server response was invalid, or the server uses an incompatible version",
           NSLocalizedRecoverySuggestionErrorKey: "Retry your action"
         ]

@@ -48,7 +48,6 @@ class ChatViewController: JSQMessagesViewController {
   
   override func viewDidLoad() {
     super.viewDidLoad()
-    
     senderDisplayName = "Hello"
     senderId = "1"
   }
@@ -65,43 +64,77 @@ class ChatViewController: JSQMessagesViewController {
 }
 
 // MARK: - JSQMessagesCollectionViewDataSource
-extension ChatViewController: JSQMessagesCollectionViewDataSource {
+extension ChatViewController {
+  
+//  override func senderDisplayName() -> String! {
+//    return "Hello"
+//  }
+//  
+//  override func senderId() -> String! {
+//    return "1"
+//  }
+  
+//  override var senderDisplayName:String! {
+//    get {
+//      return "Hello"
+//    }
+//    set {
+//      println("hello")
+//    }
+//  }
+//  
+//  override var senderId:String! {
+//    get {
+//      return "1"
+//    }
+//    set {
+//      println("hel")
+//    }
+//  }
+  
   override func collectionView(collectionView: JSQMessagesCollectionView!, messageDataForItemAtIndexPath indexPath: NSIndexPath!) -> JSQMessageData! {
-    <#code#>
+    return fetchedResultController.objectAtIndexPath(indexPath) as! Message
   }
   
   override func collectionView(collectionView: JSQMessagesCollectionView!, messageBubbleImageDataForItemAtIndexPath indexPath: NSIndexPath!) -> JSQMessageBubbleImageDataSource! {
-    <#code#>
+    let factory = JSQMessagesBubbleImageFactory()
+    let message = fetchedResultController.objectAtIndexPath(indexPath) as! Message
+    if message.sender.id == senderId {
+      return factory.outgoingMessagesBubbleImageWithColor(UIColor(hex: 0xEEEEEE))
+    } else {
+      return factory.incomingMessagesBubbleImageWithColor(UIColor(hex: 0x13CD78))
+    }
   }
   
   override func collectionView(collectionView: JSQMessagesCollectionView!, avatarImageDataForItemAtIndexPath indexPath: NSIndexPath!) -> JSQMessageAvatarImageDataSource! {
-    <#code#>
+    //let factory = JSQMessageAvatarImageFactory()
+    return nil
   }
   
   override func collectionView(collectionView: JSQMessagesCollectionView!, attributedTextForCellTopLabelAtIndexPath indexPath: NSIndexPath!) -> NSAttributedString! {
-    <#code#>
+    return NSAttributedString()
   }
   
   override func collectionView(collectionView: JSQMessagesCollectionView!, attributedTextForMessageBubbleTopLabelAtIndexPath indexPath: NSIndexPath!) -> NSAttributedString! {
-    <#code#>
+    return NSAttributedString()
   }
   
   override func collectionView(collectionView: JSQMessagesCollectionView!, attributedTextForCellBottomLabelAtIndexPath indexPath: NSIndexPath!) -> NSAttributedString! {
-    <#code#>
+    return NSAttributedString()
   }
 }
 
 // MARK: - JSQMessagesCollectionViewDelegateFlowLayout
-extension ChatViewController: JSQMessagesCollectionViewDelegateFlowLayout {
+extension ChatViewController {
   override func collectionView(collectionView: JSQMessagesCollectionView!, didTapAvatarImageView avatarImageView: UIImageView!, atIndexPath indexPath: NSIndexPath!) {
-    <#code#>
+    println("Hello")
   }
   
   override func collectionView(collectionView: JSQMessagesCollectionView!, didTapCellAtIndexPath indexPath: NSIndexPath!, touchLocation: CGPoint) {
-    <#code#>
+    println("Hello")
   }
   
   override func collectionView(collectionView: JSQMessagesCollectionView!, didTapMessageBubbleAtIndexPath indexPath: NSIndexPath!) {
-    <#code#>
+    println("Hello")
   }
 }

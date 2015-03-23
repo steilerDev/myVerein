@@ -10,11 +10,17 @@ import Foundation
 import Locksmith
 import AFNetworking
 import XCGLogger
+import SwiftyUserDefaults
 
 /// This class holds all available network interaction functions. It provides proper error handling and callbacks for each call.
 class MVNetworking {
   
   private static let logger = XCGLogger.defaultInstance()
+  
+  private struct UserDefaultsConstants {
+    static let UserID = "userId"
+    static let SystemID = "systemId"
+  }
   
   private struct NetworkingConstants {
     
@@ -24,6 +30,11 @@ class MVNetworking {
         static let Username = "username"
         static let Password = "password"
         static let RememberMe = "rememberMe"
+      }
+      struct ResponseHeaderFields {
+        static let SystemID = "System-ID"
+        static let UserID = "User-ID"
+        static let SystemVersion = "System-Version"
       }
     }
     
@@ -121,9 +132,37 @@ class MVNetworking {
         parameters: parameters,
         success:
         {
-          _, _ in
-          XCGLogger.info("Successfully logged in")
-          success()
+          dataTask, _ in
+          
+          let logger = XCGLogger.defaultInstance()
+          
+          if let response = dataTask.response as? NSHTTPURLResponse,
+            header = response.allHeaderFields as? [String: String],
+            newUserID = header[NetworkingConstants.Login.ResponseHeaderFields.UserID],
+            newSystemID = header[NetworkingConstants.Login.ResponseHeaderFields.SystemID],
+            newSystemVersion = header[NetworkingConstants.Login.ResponseHeaderFields.SystemVersion]
+          {
+            logger.debug("Successfully read header fields")
+            
+            if !Defaults.hasKey(UserDefaultsConstants.UserID) ||
+              Defaults[UserDefaultsConstants.UserID].string! != newUserID ||
+              !Defaults.hasKey(UserDefaultsConstants.SystemID)  ||
+              Defaults[UserDefaultsConstants.SystemID].string! != newSystemID
+            {
+              logger.info("System ID or User ID did change or this is the first log in. Storing and resetting database")
+              Defaults[UserDefaultsConstants.UserID] = newUserID
+              Defaults[UserDefaultsConstants.SystemID] = newSystemID
+              (UIApplication.sharedApplication().delegate as! AppDelegate).flushDatabase()
+            } else {
+              logger.debug("No need to reset database, because System ID and User ID did not change")
+            }
+        
+            logger.info("Successfully logged in")
+            success()
+          } else {
+            logger.error("Unable to log in because reading header fields failed")
+            failure(MVError.createError(.MVResponseHeaderError))
+          }
         },
         failure:
         {
