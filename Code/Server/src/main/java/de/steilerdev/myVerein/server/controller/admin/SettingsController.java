@@ -258,7 +258,7 @@ public class SettingsController
                                 if(parameters.get("deleteContent" + key) != null)
                                 {
                                     logger.warn("[" + currentUser + "] Deleting content of custom user field " + key + " on every user object");
-                                    List<User> user = mongoTemplate.find(new Query(Criteria.where("customUserField." + User.escapeCustomUserKey(key)).exists(true)), User.class);
+                                    List<User> user = mongoTemplate.find(new Query(Criteria.where("customUserField." + key).exists(true)), User.class);
                                     if(user != null && !user.isEmpty())
                                     {
                                         user.parallelStream().forEach(thisUser -> {
@@ -280,7 +280,7 @@ public class SettingsController
                                 if(!key.equals(value) && settings.getCustomUserFields().contains(key)) //The key was renamed
                                 {
                                     logger.debug("[" + currentUser + "] The custom user field " + key + " changed to " + value);
-                                    List<User> user = mongoTemplate.find(new Query(Criteria.where("customUserField." + User.escapeCustomUserKey(key)).exists(true)), User.class);
+                                    List<User> user = mongoTemplate.find(new Query(Criteria.where("customUserField." + key).exists(true)), User.class);
                                     if(user != null && !user.isEmpty())
                                     {
                                         user.parallelStream().forEach(thisUser -> {

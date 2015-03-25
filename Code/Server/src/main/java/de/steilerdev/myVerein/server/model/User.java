@@ -19,6 +19,7 @@ package de.steilerdev.myVerein.server.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.util.ArrayIterator;
 import de.steilerdev.myVerein.server.controller.admin.DivisionManagementController;
 import de.steilerdev.myVerein.server.security.PasswordEncoder;
 import de.steilerdev.myVerein.server.security.UserAuthenticationService;
@@ -37,6 +38,7 @@ import org.springframework.security.crypto.keygen.KeyGenerators;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * This object is representing an entity within the user's collection of the MongoDB and is used by Spring Security as UserDetails implementation. On top of that the class is providing several useful helper methods.
@@ -216,98 +218,14 @@ public class User implements UserDetails
         this.password = passwordEncoder.encodePassword(password, salt);
     }
 
-    /**
-     * This function adds a custom user field and overwrites the existing value.
-     * @param key The unescaped key of the field.
-     * @param value The value of the field.
-     */
-    public void addCustomUserField(String key, String value)
-    {
-        addCustomUserField(key, value, true);
-    }
-
-    /**
-     * This function adds a custom user field to the user
-     * @param key The unescaped key of the custom field
-     * @param value The value of the custom field
-     * @param overwrite The flag, indicating if an existing value should be overwritten (true) or not
-     */
-    public void addCustomUserField(String key, String value, boolean overwrite)
-    {
-        key = escapeCustomUserKey(key);
-        if (customUserField == null)
-        {
-            customUserField = new HashMap<>();
-            //Escaping a dot for the key is needed
-            customUserField.put(key, value);
-        }else if(overwrite || !customUserField.keySet().contains(key))
-        {
-            //Escaping a dot for the key is needed
-            customUserField.put(key, value);
-        }
-    }
-
-    /**
-     * This function removes a custom user field specified by the key.
-     * @param key The unescaped key of the custom user field.
-     */
-    public void removeCustomUserField(String key)
-    {
-        if(customUserField != null)
-        {
-            customUserField.remove(escapeCustomUserKey(key));
-        }
-    }
-
-    /**
-     * This function renames a custom user field.
-     * @param oldKey The unescaped old key.
-     * @param newKey The unescaped new key.
-     */
-    public void renameCustomUserField(String oldKey, String newKey)
-    {
-        if(customUserField != null && customUserField.get(escapeCustomUserKey(oldKey)) != null)
-        {
-            logger.debug("Moving " + customUserField.get(escapeCustomUserKey(oldKey)) + " from " + oldKey + " to " + newKey);
-            customUserField.put(escapeCustomUserKey(newKey), customUserField.get(escapeCustomUserKey(oldKey)));
-            customUserField.remove(escapeCustomUserKey(oldKey));
-        }
-    }
-
-    /**
-     * This function returns the unescaped map of custom user fields
-     * @return The unescaped custom user field map
-     */
     public Map<String, String> getCustomUserField()
     {
-        if(customUserField != null)
-        {
-            //Returning a map, containing unescaped characters
-            return customUserField.keySet().parallelStream().collect(Collectors.toMap(User::unEscapeCustomUserKey, customUserField::get));
-        } else
-        {
-            return null;
-        }
+        return customUserField;
     }
 
-    public void unEscapeCustomUserField()
-    {
-        customUserField = getCustomUserField();
-    }
-
-    /**
-     * This function sets the custom user fields and escapes the key field.
-     * @param customUserField The new custom user field map.
-     */
     public void setCustomUserField(Map<String, String> customUserField)
     {
-        if(customUserField != null)
-        {
-            this.customUserField = customUserField.keySet().parallelStream().collect(Collectors.toMap(User::escapeCustomUserKey, customUserField::get));
-        } else
-        {
-            this.customUserField = null;
-        }
+        this.customUserField = customUserField;
     }
 
     public List<Division> getDivisions()
@@ -315,29 +233,14 @@ public class User implements UserDetails
         return divisions;
     }
 
+    /**
+     * This function sets the division list, not respecting the inverse list in the divisions objects. This function should only be used to repopulate the bean.
+     * Use replaceDivision instead.
+     * @param divisions The new list of divisions.
+     */
     public void setDivisions(List<Division> divisions)
     {
         this.divisions = divisions;
-    }
-
-    public void addDivision(Division division)
-    {
-        if(divisions == null)
-        {
-            divisions = new ArrayList<>();
-            divisions.add(division);
-        } else if(!divisions.contains(division))
-        {
-            divisions.add(division);
-        }
-    }
-
-    public void removeDivision(Division division)
-    {
-        if(divisions != null && !divisions.isEmpty())
-        {
-            divisions.remove(division);
-        }
     }
 
     public String getSalt()
@@ -491,6 +394,128 @@ public class User implements UserDetails
     public void setMembershipStatus(MembershipStatus membershipStatus)
     {
         this.membershipStatus = membershipStatus;
+    }
+
+    /*
+
+        Other getter/setter functions
+
+     */
+
+    /**
+     * This function adds a custom user field and overwrites the existing value.
+     * @param key The unescaped key of the field.
+     * @param value The value of the field.
+     */
+    public void addCustomUserField(String key, String value)
+    {
+        addCustomUserField(key, value, true);
+    }
+
+    /**
+     * This function adds a custom user field to the user
+     * @param key The unescaped key of the custom field
+     * @param value The value of the custom field
+     * @param overwrite The flag, indicating if an existing value should be overwritten (true) or not
+     */
+    public void addCustomUserField(String key, String value, boolean overwrite)
+    {
+        if (customUserField == null)
+        {
+            customUserField = new HashMap<>();
+            customUserField.put(key, value);
+        } else if(overwrite || !customUserField.keySet().contains(key))
+        {
+            //Escaping a dot for the key is needed
+            customUserField.put(key, value);
+        }
+    }
+
+    /**
+     * This function removes a custom user field specified by the key.
+     * @param key The unescaped key of the custom user field.
+     */
+    public void removeCustomUserField(String key)
+    {
+        if(customUserField != null)
+        {
+            customUserField.remove(key);
+        }
+    }
+
+    /**
+     * This function renames a custom user field.
+     * @param oldKey The unescaped old key.
+     * @param newKey The unescaped new key.
+     */
+    public void renameCustomUserField(String oldKey, String newKey)
+    {
+        if(customUserField != null && customUserField.get(oldKey) != null)
+        {
+            logger.debug("Moving " + customUserField.get(oldKey) + " from " + oldKey + " to " + newKey);
+            customUserField.put(newKey, customUserField.get(oldKey));
+            customUserField.remove(oldKey);
+        }
+    }
+
+    public void replaceDivisions(DivisionRepository divisionRepository, Division... divs)
+    {
+        replaceDivisions(divisionRepository, Arrays.asList(divs));
+    }
+
+    /**
+     * This function replaces the set of divisions by the stated divisions. The function guarantees that the inverse membership is handled correctly.
+     * @param divisionRepository The division repository needed to save the altered divisions.
+     * @param divs The new list of divisions for the user.
+     */
+    public void replaceDivisions(DivisionRepository divisionRepository, List<Division> divs)
+    {
+        List<Division> finalDivisions = Division.getExpandedSetOfDivisions(divs, divisionRepository);
+        List<Division> oldDivisions = divisions;
+
+        if((finalDivisions == null || finalDivisions.isEmpty()) && (oldDivisions == null || oldDivisions.isEmpty()))
+        {
+            logger.debug("Division sets before and after are both empty");
+            divisions = new ArrayList<>();
+        } else if(finalDivisions == null || finalDivisions.isEmpty())
+        {
+            logger.debug("Division set after is empty, before is not. Removing membership subscription from old divisions.");
+            oldDivisions.parallelStream().forEach(div -> div.removeMember(this));
+            divisionRepository.save(oldDivisions);
+            divisions = new ArrayList<>();
+        } else if(oldDivisions == null || oldDivisions.isEmpty())
+        {
+            logger.debug("Division set before is empty, after is not. Adding membership subscription to new divisions.");
+            finalDivisions.parallelStream().forEach(div -> div.addMember(this));
+            divisionRepository.save(finalDivisions);
+            divisions = finalDivisions;
+        } else
+        {
+            logger.debug("Division set after and before are not empty. Applying changed membership subscriptions.");
+            List<Division> intersect = finalDivisions.stream().filter(oldDivisions::contains).collect(Collectors.toList()); //These items are already in the list, and do not need to be modified
+
+            //Collecting changed division for batch save
+            List<Division> changedDivisions = new ArrayList<>();
+
+            //Removing membership from removed divisions
+            oldDivisions.parallelStream()
+                    .filter(div -> !intersect.contains(div))
+                    .forEach(div -> {
+                        div.removeMember(this);
+                        changedDivisions.add(div);
+                    });
+
+            //Adding membership to added divisions
+            finalDivisions.parallelStream()
+                    .filter(div -> !intersect.contains(div))
+                    .forEach(div -> {
+                        div.addMember(this);
+                        changedDivisions.add(div);
+                    });
+
+            divisionRepository.save(changedDivisions);
+            divisions = finalDivisions;
+        }
     }
 
     /*
@@ -781,34 +806,6 @@ public class User implements UserDetails
                authorities.parallelStream()
                     .anyMatch(authority -> authority.getAuthority().equals(UserAuthenticationService.AuthorityRoles.ADMIN.toString()) ||
                                         authority.getAuthority().equals(UserAuthenticationService.AuthorityRoles.SUPERADMIN.toString()));
-    }
-
-    /**
-     * This function escapes non allowed characters within the key of a custom user field.
-     * @param source The key of a custom user field.
-     * @return The escaped key of a custom user field.
-     */
-    public static String escapeCustomUserKey(String source)
-    {
-        if(source.contains("."))
-        {
-            source = source.replace(".", "[dot]");
-        }
-        return source;
-    }
-
-    /**
-     * This function un-escapes non allowed characters within the escaped key of a custom user field.
-     * @param source The escaped key of a custom user field.
-     * @return The un-escaped key of a custom user field.
-     */
-    public static String unEscapeCustomUserKey(String source)
-    {
-        if(source.contains("[dot]"))
-        {
-            source = source.replace("[dot]", ".");
-        }
-        return source;
     }
 
     /*

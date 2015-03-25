@@ -60,6 +60,9 @@ public class Division implements Comparable<Division>
     private List<Division> ancestors;
 
     @JsonIgnore
+    private List<String> memberList;
+
+    @JsonIgnore
     @Transient
     private static Logger logger = LoggerFactory.getLogger(Division.class);
 
@@ -125,6 +128,36 @@ public class Division implements Comparable<Division>
     public Division getParent()
     {
         return parent;
+    }
+
+    public List<String> getMemberList()
+    {
+        return memberList;
+    }
+
+    public void setMemberList(List<String> memberList)
+    {
+        this.memberList = memberList;
+    }
+
+    public void addMember(User user)
+    {
+        if(memberList == null)
+        {
+            memberList = new ArrayList<>();
+            memberList.add(user.getId());
+        } else if (!memberList.contains(user.getId()))
+        {
+            memberList.add(user.getId());
+        }
+    }
+
+    public void removeMember(User user)
+    {
+        if(memberList != null && !memberList.isEmpty())
+        {
+            memberList.remove(user.getId());
+        }
     }
 
     /**

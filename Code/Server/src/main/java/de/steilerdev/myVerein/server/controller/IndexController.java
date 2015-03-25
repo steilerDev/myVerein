@@ -17,10 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * This controller is processing all general requests.
@@ -202,20 +199,11 @@ public class IndexController
         divisionRepository.save(div4);
         divisionRepository.save(div5);
 
-        user1.addDivision(div1);
-        user2.addDivision(div2);
-        user2.addDivision(div4);
-        user3.addDivision(div2);
-        user4.addDivision(div3);
-        user5.addDivision(div2);
-        user5.addDivision(div4);
-
-
-        user1.setDivisions(Division.getExpandedSetOfDivisions(user1.getDivisions(), divisionRepository));
-        user2.setDivisions(Division.getExpandedSetOfDivisions(user2.getDivisions(), divisionRepository));
-        user3.setDivisions(Division.getExpandedSetOfDivisions(user3.getDivisions(), divisionRepository));
-        user4.setDivisions(Division.getExpandedSetOfDivisions(user4.getDivisions(), divisionRepository));
-        user5.setDivisions(Division.getExpandedSetOfDivisions(user5.getDivisions(), divisionRepository));
+        user1.replaceDivisions(divisionRepository, div1);
+        user2.replaceDivisions(divisionRepository, div2, div4);
+        user3.replaceDivisions(divisionRepository, div2);
+        user4.replaceDivisions(divisionRepository, div3);
+        user5.replaceDivisions(divisionRepository, div2, div4);
 
         userRepository.save(user1);
         userRepository.save(user2);
@@ -224,8 +212,8 @@ public class IndexController
         userRepository.save(user5);
 
         Event event1 = new Event();
-        event1.setStartDateTime(LocalDateTime.of(2015, 1, 20, 13, 00));
-        event1.setEndDateTime(LocalDateTime.of(2015, 1, 20, 14, 00));
+        event1.setStartDateTime(LocalDateTime.of(2015, 1, 20, 13, 0));
+        event1.setEndDateTime(LocalDateTime.of(2015, 1, 20, 14, 0));
         event1.setName("Super Event 1");
         event1.addDivision(div2);
         event1.setEventAdmin(user1);

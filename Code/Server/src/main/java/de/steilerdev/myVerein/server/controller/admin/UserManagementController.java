@@ -277,11 +277,11 @@ public class UserManagementController
                     divisionList.add(div);
                 }
             }
-            newUserObject.setDivisions(Division.getExpandedSetOfDivisions(divisionList, divisionRepository));
+            newUserObject.replaceDivisions(divisionRepository, divisionList);
         } else
         {
             logger.debug("[" + currentUser + "] Clearing divisions for " + newUserObject.getEmail());
-            newUserObject.setDivisions(null);
+            newUserObject.replaceDivisions(divisionRepository, (List<Division>)null);
         }
 
         logger.debug("[" + currentUser + "] Parsing and setting custom user fields");
