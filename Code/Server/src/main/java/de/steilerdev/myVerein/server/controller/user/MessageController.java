@@ -46,9 +46,6 @@ public class MessageController
     @Autowired
     private DivisionRepository divisionRepository;
 
-    @Autowired
-    private UserRepository userRepository;
-
     /**
      * This function retrieves all unread messages of a user. The function is invoked bu GETting the URI /api/user/message.
      * @param currentUser The currently logged in user.
@@ -77,8 +74,8 @@ public class MessageController
             try
             {
                 messageRepository.save(messages);
-                messages.parallelStream().forEach(Message::prepareForSending);
-                logger.info("[" + currentUser + "] Returning undelivered messages for " + currentUser.getEmail());
+                messages.replaceAll(Message::getSendingObjectInternalSync);
+                logger.info("[" + currentUser + "] Returning messages for " + currentUser.getEmail());
                 return new ResponseEntity<>(messages, HttpStatus.OK);
             } catch (IllegalArgumentException e)
             {
@@ -96,7 +93,7 @@ public class MessageController
      * @return An HTTP response with a status code. If an error occurred an error message is bundled into the response, otherwise a success message is available.
      */
     @RequestMapping(produces = "application/json", method = RequestMethod.POST)
-    public ResponseEntity<Message> sendMessage(@CurrentUser User currentUser, @RequestParam String division, @RequestParam String content)
+    public ResponseEntity<Message> sendMessage(@CurrentUser User currentUser, @RequestParam String division, @RequestParam String content, @RequestParam(required = false) String timestamp)
     {
         logger.trace("[" + currentUser + "] Sending message to " + division);
         Division receivingDivision;
@@ -114,18 +111,16 @@ public class MessageController
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } else
         {
-            List<User> receivingUser = userRepository.findAllByDivisionInDivisions(receivingDivision);
-
-            if (receivingUser.isEmpty())
+            if (receivingDivision.getMemberList().isEmpty())
             {
                 logger.warn("[" + currentUser + "] Empty receiver list");
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             } else
             {
-                Message message = new Message(content, LocalDateTime.now(), currentUser, receivingUser, receivingDivision);
+                Message message = new Message(content, currentUser, receivingDivision);
                 messageRepository.save(message);
                 logger.info("[" + currentUser + "] Successfully saved message");
-                return new ResponseEntity<>(message, HttpStatus.OK);
+                return new ResponseEntity<>(message.getSendingObjectOnlyId(), HttpStatus.OK);
             }
         }
     }

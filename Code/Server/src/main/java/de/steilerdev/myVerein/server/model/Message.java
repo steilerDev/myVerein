@@ -17,11 +17,15 @@
 package de.steilerdev.myVerein.server.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.hibernate.validator.constraints.NotBlank;
+import org.springframework.beans.BeanUtils;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 
 import javax.validation.constraints.NotNull;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -69,9 +73,11 @@ public class Message
     private String id;
 
     @NotBlank
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String content;
 
     @NotNull
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private LocalDateTime timestamp;
 
     @NotNull
@@ -80,15 +86,22 @@ public class Message
 
     @DBRef
     @NotNull
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private User sender;
 
     @DBRef
     @NotNull
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private Division group;
 
     public Message() {}
 
-    public Message(String content, LocalDateTime timestamp, User sender, List<User> receivers, Division group)
+    public Message(String content, User sender, Division group)
+    {
+        this(content, LocalDateTime.now(), sender, group);
+    }
+
+    public Message(String content, LocalDateTime timestamp, User sender, Division group)
     {
         this.content = content;
         this.timestamp = timestamp;
@@ -96,9 +109,9 @@ public class Message
         this.group = group;
 
         this.receiver = new HashMap<>();
-        for(User user: receivers)
+        for(String userID: group.getMemberList())
         {
-            this.receiver.put(user.getId(), MessageStatus.PENDING);
+            this.receiver.put(userID, MessageStatus.PENDING);
         }
         setDelivered(sender);
     }
@@ -182,10 +195,63 @@ public class Message
         }
     }
 
-    public void prepareForSending()
+    /**
+     * This function creates a new message object and copies only the id of the current message.
+     * @return A new message object only containing the id.
+     */
+    @JsonIgnore
+    @Transient
+    public Message getSendingObjectOnlyId()
     {
-        sender.removeEverythingExceptId();
-        group.removeEverythingExceptId();
+        Message sendingObject = new Message();
+        sendingObject.setId(id);
+        return sendingObject;
+    }
+
+    /**
+     * This function removes all fields that the other users of the app are not allowed to see.
+     * @return A copied message object, without the fields, other users are not allowed to see.
+     */
+    @JsonIgnore
+    @Transient
+    public Message getSendingObjectInternalSync()
+    {
+        return getSendingObject();
+    }
+
+    /**
+     * This function creates a sending-save object (ensuring there is no infinite loop caused by references)
+     * @return A sending-save instance of the object.
+     */
+    @JsonIgnore
+    @Transient
+    public Message getSendingObject()
+    {
+        Message sendingObject = getSendingObject(new String[0]);
+        if(sendingObject.getSender() != null)
+        {
+            sendingObject.setSender(sender.getSendingObjectOnlyId());
+        }
+
+        if(sendingObject.getGroup() != null)
+        {
+            sendingObject.setGroup(group.getSendingObjectOnlyId());
+        }
+        return sendingObject;
+    }
+
+    /**
+     * This function copies the current object, ignoring the member fields specified by the ignored properties vararg.
+     * @param ignoredProperties The member fields ignored during the copying.
+     * @return A copy of the current object, not containing information about the ignored properties.
+     */
+    @JsonIgnore
+    @Transient
+    private Message getSendingObject(String... ignoredProperties)
+    {
+        Message sendingObject = new Message();
+        BeanUtils.copyProperties(this, sendingObject, ignoredProperties);
+        return sendingObject;
     }
 
     /**

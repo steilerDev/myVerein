@@ -248,11 +248,8 @@ public class IndexController
         eventRepository.save(event3);
         eventRepository.save(event4);
 
-        List<User> receiverList = new ArrayList<>();
-        receiverList.add(user1);
-        receiverList.add(user2);
-        Message message1 = new Message("Hello world", LocalDateTime.now(), user1, receiverList, div1);
-        Message message2 = new Message("Hello world, too", LocalDateTime.now(), user2, receiverList, div1);
+        Message message1 = new Message("Hello world", user1, div1);
+        Message message2 = new Message("Hello world, too", user2, div1);
         messageRepository.save(message1);
         messageRepository.save(message2);
     }

@@ -59,9 +59,8 @@ public class DivisionController
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         } else
         {
-            searchedDivision.prepareForInternalSync();
             logger.info("[" + currentUser + "] Returning division with ID " + divisionID);
-            return new ResponseEntity<>(searchedDivision, HttpStatus.OK);
+            return new ResponseEntity<>(searchedDivision.getSendingObjectInternalSync(), HttpStatus.OK);
         }
     }
 
@@ -76,7 +75,7 @@ public class DivisionController
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         } else
         {
-            divisions.parallelStream().forEach(Division::removeEverythingExceptId);
+            divisions.replaceAll(Division::getSendingObjectOnlyId);
             logger.info("[" + currentUser + "] Returning user divisions");
             return new ResponseEntity<>(divisions, HttpStatus.OK);
         }

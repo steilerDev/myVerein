@@ -260,6 +260,7 @@ public class DivisionManagementController
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         } else
         {
+            divisions.replaceAll(Division::getSendingObjectInternalSync);
             logger.info("[" + currentUser + "]  Returning all divisions" + (term != null? " matching term " + term: ""));
             return new ResponseEntity<>(divisions, HttpStatus.OK);
         }
@@ -285,13 +286,8 @@ public class DivisionManagementController
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         } else
         {
-            if (searchedDivision.getAdminUser() != null)
-            {
-                logger.debug("[" + currentUser + "]  Clearing admin user of division " + name);
-                searchedDivision.getAdminUser().removeEverythingExceptEmailAndName();
-            }
             logger.debug("[" + currentUser + "]  Returning division " + name);
-            return new ResponseEntity<>(searchedDivision, HttpStatus.OK);
+            return new ResponseEntity<>(searchedDivision.getSendingObject(), HttpStatus.OK);
         }
     }
 

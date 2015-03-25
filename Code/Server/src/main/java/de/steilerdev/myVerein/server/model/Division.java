@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import org.hibernate.validator.constraints.NotBlank;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -210,18 +211,58 @@ public class Division implements Comparable<Division>
         this.ancestors = ancestors;
     }
 
-    public void removeEverythingExceptId()
+    /**
+     * This function creates a new division object and copies only the id of the current division.
+     * @return A new division object only containing the id.
+     */
+    @JsonIgnore
+    @Transient
+    public Division getSendingObjectOnlyId()
     {
-        adminUser = null;
-        desc = null;
-        name = null;
+        Division sendingObject = new Division();
+        sendingObject.setId(id);
+        return sendingObject;
     }
 
-    public void prepareForInternalSync() {
-        if(adminUser != null)
+    /**
+     * This function removes all fields that the other users of the app are not allowed to see.
+     * @return A copied division object, without the fields, other users are not allowed to see.
+     */
+    @JsonIgnore
+    @Transient
+    public Division getSendingObjectInternalSync()
+    {
+        return getSendingObject();
+    }
+
+    /**
+     * This function creates a sending-save object (ensuring there is no infinite loop caused by references)
+     * @return A sending-save instance of the object.
+     */
+    @JsonIgnore
+    @Transient
+    public Division getSendingObject()
+    {
+        Division sendingObject = getSendingObject(new String[0]);
+        if(sendingObject.getAdminUser() != null)
         {
-            adminUser.removeEverythingExceptId();
+            sendingObject.setAdminUser(sendingObject.getAdminUser().getSendingObjectOnlyEmailNameId());
         }
+        return sendingObject;
+    }
+
+    /**
+     * This function copies the current object, ignoring the member fields specified by the ignored properties vararg.
+     * @param ignoredProperties The member fields ignored during the copying.
+     * @return A copy of the current object, not containing information about the ignored properties.
+     */
+    @JsonIgnore
+    @Transient
+    private Division getSendingObject(String... ignoredProperties)
+    {
+        Division sendingObject = new Division();
+        BeanUtils.copyProperties(this, sendingObject, ignoredProperties);
+        return sendingObject;
     }
 
     //Todo: These two are expensive!! Especially expanded set, which is called fairly often.
@@ -231,6 +272,8 @@ public class Division implements Comparable<Division>
      * @param unoptimizedSetOfDivisions A set of divisions.
      * @return The list of optimized divisions.
      */
+    @JsonIgnore
+    @Transient
     public static List<Division> getOptimizedSetOfDivisions(List<Division> unoptimizedSetOfDivisions)
     {
         if(unoptimizedSetOfDivisions == null || unoptimizedSetOfDivisions.isEmpty())
@@ -254,6 +297,8 @@ public class Division implements Comparable<Division>
      * @param divisionRepository The division repository, needed to get queried.
      * @return The expanded list of divisions.
      */
+    @JsonIgnore
+    @Transient
     public static List<Division> getExpandedSetOfDivisions(List<Division> initialSetOfDivisions, DivisionRepository divisionRepository)
     {
         if( (initialSetOfDivisions = getOptimizedSetOfDivisions(initialSetOfDivisions)) == null)

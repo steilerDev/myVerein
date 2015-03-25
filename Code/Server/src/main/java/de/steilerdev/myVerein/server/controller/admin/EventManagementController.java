@@ -140,13 +140,7 @@ public class EventManagementController
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         } else
         {
-            eventsOfDay.stream().forEach(event -> {
-                event.setInvitedDivision(null);
-                event.setLocation(null);
-                event.setDescription(null);
-                event.setEventAdmin(null);
-            });
-
+            eventsOfDay.replaceAll(Event::getSendingObjectOnlyNameTimeId);
             logger.debug("[" + currentUser + "] Returning " + eventsOfDay.size() + " events for " + date);
             return new ResponseEntity<>(eventsOfDay, HttpStatus.OK);
         }
@@ -175,21 +169,11 @@ public class EventManagementController
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             } else
             {
+                selectedEvent = selectedEvent.getSendingObjectInternalSync();
                 if (!currentUser.isAllowedToAdministrate(selectedEvent))
                 {
                     logger.debug("[" + currentUser + "] The user is not allowed to edit the event " + id);
                     selectedEvent.setAdministrationNotAllowedMessage("You are not allowed to modify this event, since you did not create it.");
-                }
-
-                //Preventing data loop
-                logger.debug("[" + currentUser + "] Clearing admin user for divisions within request");
-                if(selectedEvent.getInvitedDivision() != null)
-                {
-                    selectedEvent.getInvitedDivision().parallelStream().forEach(division -> division.setAdminUser(null));
-                }
-                if(selectedEvent.getEventAdmin() != null && selectedEvent.getEventAdmin().getDivisions() != null)
-                {
-                    selectedEvent.getEventAdmin().getDivisions().parallelStream().forEach(division -> division.setAdminUser(null));
                 }
                 return new ResponseEntity<>(selectedEvent, HttpStatus.OK);
             }

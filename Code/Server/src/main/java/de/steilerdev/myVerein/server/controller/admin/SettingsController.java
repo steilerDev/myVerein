@@ -98,8 +98,7 @@ public class SettingsController
             }
         }
 
-        currentUser.removeEverythingExceptEmailAndName();
-        settings.put("currentAdmin", currentUser);
+        settings.put("currentAdmin", currentUser.getSendingObjectOnlyEmailNameId());
         logger.info("[" + currentUser + "] Finished loading settings");
         return new ResponseEntity<>(settings, HttpStatus.OK);
     }

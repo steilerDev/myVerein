@@ -54,9 +54,8 @@ public class UserController
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         } else
         {
-            searchedUser.prepareForInternalSync();
             logger.info("[" + currentUser + "] Returning user with ID " + userID);
-            return new ResponseEntity<>(searchedUser, HttpStatus.OK);
+            return new ResponseEntity<>(searchedUser.getSendingObjectInternalSync(), HttpStatus.OK);
         }
     }
 }

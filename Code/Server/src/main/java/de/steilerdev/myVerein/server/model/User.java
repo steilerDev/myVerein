@@ -27,6 +27,7 @@ import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotBlank;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -37,6 +38,7 @@ import org.springframework.security.crypto.keygen.KeyGenerators;
 
 import java.time.LocalDate;
 import java.util.*;
+import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -647,76 +649,117 @@ public class User implements UserDetails
         }
     }
 
-    public void removeEverythingExceptId()
+    /**
+     * This function creates a new user object and copies only the id of the current user.
+     * @return A new user object only containing the id.
+     */
+    @JsonIgnore
+    @Transient
+    public User getSendingObjectOnlyId()
     {
-        removeEverythingExceptEmailAndName();
-        firstName = null;
-        lastName = null;
-        email = null;
+        User sendingObject = new User();
+        sendingObject.setId(id);
+        return sendingObject;
     }
 
     /**
-     * This function removes all unnecessary information besides the email and name of a user.
+     * This function creates a new user object and copies only the email, name and id of the current user.
+     * @return A new user object only containing email, name and id.
      */
-    public void removeEverythingExceptEmailAndName()
+    @JsonIgnore
+    @Transient
+    public User getSendingObjectOnlyEmailNameId()
     {
-        customUserField = null;
-        divisions = null;
-
-        activeSince = null;
-        passiveSince = null;
-        resignationDate = null;
-        birthday = null;
-
-        gender  = null;
-
-        zipCode = null;
-        city = null;
-        country = null;
-        street = null;
-        streetNumber = null;
-
-        iban = null;
-        bic = null;
-
-        membershipStatus = null;
-        administrationNotAllowedMessage = null;
+        User sendingObject = new User();
+        sendingObject.setEmail(email);
+        sendingObject.setFirstName(firstName);
+        sendingObject.setLastName(lastName);
+        sendingObject.setId(id);
+        return sendingObject;
     }
 
     /**
-     * This function removes all private information (information only the administrator of the user is allowed to see)
+     * This function creates a new user object, by copying the properties of the current object, ignoring the private information.
+     * @return A copied user object, without the private information.
      */
-    public void removePrivateInformation()
+    @JsonIgnore
+    @Transient
+    public User getSendingObjectNoPrivateInformation()
     {
-        customUserField = null;
-        bic = null;
-        iban = null;
-        birthday = null;
-        street = null;
-        streetNumber = null;
-        city = null;
-        zipCode = null;
+        String[] ignoredProperties = {
+                "customUserField",
+                "bic",
+                "iban",
+                "birthday",
+                "street",
+                "streetNumber",
+                "city",
+                "zipCode"
+        };
+        User sendingObject = getSendingObject(ignoredProperties);
+        if(sendingObject.getDivisions() != null)
+        {
+            sendingObject.getDivisions().replaceAll(Division::getSendingObjectInternalSync);
+        }
+
+        return sendingObject;
     }
 
     /**
      * This function removes all fields that the other users of the app are not allowed to see.
+     * @return A copied user object, without the fields, other users are not allowed to see.
      */
-    public void prepareForInternalSync()
+    @JsonIgnore
+    @Transient
+    public User getSendingObjectInternalSync()
     {
-        customUserField = null;
-        if(divisions != null)
+        String[] ignoriedProperties = {
+                "customUserFields",
+                "activeSince",
+                "passiveSince",
+                "resignationDate",
+                "iban",
+                "bic",
+                "administrationNotAllowed"
+        };
+
+        User sendingObject = getSendingObject(ignoriedProperties);
+        if(sendingObject.getDivisions() != null)
         {
-            divisions.stream().forEach(Division::removeEverythingExceptId);
+            sendingObject.getDivisions().replaceAll(Division::getSendingObjectOnlyId);
         }
 
-        activeSince = null;
-        passiveSince = null;
-        resignationDate = null;
+        return sendingObject;
+    }
 
-        iban = null;
-        bic = null;
+    /**
+     * This function creates a sending save object (ensuring there is no infinite loop caused by the admin user references)
+     * @return A sending save instance of the object
+     */
+    @JsonIgnore
+    @Transient
+    public User getSendingObject()
+    {
+        User sendingObject = this.getSendingObject(new String[0]);
+        if(sendingObject.getDivisions() != null)
+        {
+            sendingObject.getDivisions().replaceAll(Division::getSendingObject);
+        }
+        return sendingObject;
+    }
 
-        administrationNotAllowedMessage = null;
+    /**
+     * This function copies the current object, ignoring the member fields specified by the ignored properties vararg.
+     * @param ignoredProperties The member fields ignored during the copying.
+     * @return A copy of the current object, not containing information about the ignored properties.
+     */
+    @JsonIgnore
+    @Transient
+    private User getSendingObject(String... ignoredProperties)
+    {
+        User sendingObject = new User();
+        BeanUtils.copyProperties(this, sendingObject, ignoredProperties);
+        return sendingObject;
     }
 
     /**
@@ -725,6 +768,7 @@ public class User implements UserDetails
      * @return True if the user is allowed, false otherwise.
      */
     @JsonIgnore
+    @Transient
     public boolean isAllowedToAdministrate(Event event)
     {
         return this.isAdmin() &&
@@ -800,6 +844,7 @@ public class User implements UserDetails
      * @return Tue if the user is an administrator, false otherwise.
      */
     @JsonIgnore
+    @Transient
     public boolean isAdmin()
     {
         return authorities != null &&
@@ -817,7 +862,11 @@ public class User implements UserDetails
     @Override
     public String toString()
     {
-        return email;
+        return (email != null && !email.isEmpty())
+                ? email
+                : (id != null && !id.isEmpty())
+                    ? id
+                    : "N/A";
     }
 
     @Override

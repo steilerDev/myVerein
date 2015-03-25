@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import de.steilerdev.myVerein.server.controller.admin.DivisionManagementController;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.NotEmpty;
+import org.springframework.beans.BeanUtils;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.DBRef;
@@ -434,6 +435,86 @@ public class Event
         {
             invitedDivision = Division.getOptimizedSetOfDivisions(invitedDivision);
         }
+    }
+
+    /**
+     * This function creates a new message object and copies only the id of the current message.
+     * @return A new message object only containing the id.
+     */
+    @JsonIgnore
+    @Transient
+    public Event getSendingObjectOnlyId()
+    {
+        Event sendingObject = new Event();
+        sendingObject.setId(id);
+        return sendingObject;
+    }
+
+    /**
+     * This function creates a new message object only copies name time and id of the current message.
+     * @return A new message object only containing the name, times and id.
+     */
+    @JsonIgnore
+    @Transient
+    public Event getSendingObjectOnlyNameTimeId()
+    {
+        String[] ignoredProperties = {
+                "invitedDivision",
+                "description",
+                "location",
+                "locationLat",
+                "locationLng",
+                "eventAdmin"
+        };
+        return getSendingObject(ignoredProperties);
+    }
+
+    /**
+     * This function removes all fields that the other users of the app are not allowed to see.
+     * @return A copied message object, without the fields, other users are not allowed to see.
+     */
+    @JsonIgnore
+    @Transient
+    public Event getSendingObjectInternalSync()
+    {
+        return getSendingObject();
+    }
+
+    /**
+     * This function creates a sending-save object (ensuring there is no infinite loop caused by references)
+     * @return A sending-save instance of the object.
+     */
+    @JsonIgnore
+    @Transient
+    public Event getSendingObject()
+    {
+        Event sendingObject = getSendingObject(new String[0]);
+
+        if(sendingObject.getEventAdmin() != null)
+        {
+            sendingObject.setEventAdmin(sendingObject.getEventAdmin().getSendingObjectOnlyEmailNameId());
+        }
+
+        if(sendingObject.getInvitedDivision() != null)
+        {
+            sendingObject.getInvitedDivision().replaceAll(Division::getSendingObjectInternalSync);
+        }
+
+        return sendingObject;
+    }
+
+    /**
+     * This function copies the current object, ignoring the member fields specified by the ignored properties vararg.
+     * @param ignoredProperties The member fields ignored during the copying.
+     * @return A copy of the current object, not containing information about the ignored properties.
+     */
+    @JsonIgnore
+    @Transient
+    private Event getSendingObject(String... ignoredProperties)
+    {
+        Event sendingObject = new Event();
+        BeanUtils.copyProperties(this, sendingObject, ignoredProperties);
+        return sendingObject;
     }
 
     @Override

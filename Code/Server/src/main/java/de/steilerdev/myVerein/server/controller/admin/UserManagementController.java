@@ -332,6 +332,7 @@ public class UserManagementController
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         } else
         {
+            userList.replaceAll(User::getSendingObjectOnlyEmailNameId);
             logger.info("[" + currentUser + "] Returning all users" + (term != null? " matching term " + term: ""));
             return new ResponseEntity<>(userList, HttpStatus.OK);
         }
@@ -347,23 +348,24 @@ public class UserManagementController
     public ResponseEntity<User> getUser(@RequestParam String email, @CurrentUser User currentUser)
     {
         logger.trace("[" + currentUser + "] Getting user " + email);
-        User searchedUser;
+        User searchedUser, queriedUser;
         if(email.isEmpty())
         {
             logger.warn("[" + currentUser + "] The email is not allowed to be empty");
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        } else if((searchedUser = userRepository.findByEmail(email)) == null)
+        } else if((queriedUser = userRepository.findByEmail(email)) == null)
         {
             logger.warn("[" + currentUser + "] Unable to retrieve user with the email " + email);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        } else if(!currentUser.isAllowedToAdministrate(searchedUser, divisionRepository))
+        } else if(!currentUser.isAllowedToAdministrate(queriedUser, divisionRepository))
         {
-            logger.warn("[" + currentUser + "] The user is not administrating selected user (" + searchedUser.getEmail() + "). Hiding private information");
-            searchedUser.removePrivateInformation();
+            logger.warn("[" + currentUser + "] The user is not administrating selected user (" + queriedUser.getEmail() + "). Hiding private information");
+            searchedUser = queriedUser.getSendingObjectNoPrivateInformation();
             searchedUser.setAdministrationNotAllowedMessage("You are not allowed to modify this user, since you are not his administrator");
         } else
         {
-            logger.debug("[" + currentUser + "] Currently logged in user (" + currentUser.getEmail() + ") is administrating selected user (" + searchedUser.getEmail() + ")");
+            logger.debug("[" + currentUser + "] Currently logged in user (" + currentUser.getEmail() + ") is administrating selected user (" + queriedUser.getEmail() + ")");
+            searchedUser = queriedUser.getSendingObject();
             searchedUser.setAdministrationNotAllowedMessage(null);
             //Adding all custom user fields defined within the settings file to the object
             Settings settings = Settings.loadSettings(settingsRepository);
@@ -376,11 +378,6 @@ public class UserManagementController
             }
         }
 
-        if(searchedUser.getDivisions() != null)
-        {
-            //Not setting admin user null could lead to an infinite loop when creating the JSON
-            searchedUser.getDivisions().parallelStream().forEach(div -> div.setAdminUser(null));
-        }
         logger.info("[" + currentUser + "] Returning user " + searchedUser.getEmail());
         return new ResponseEntity<>(searchedUser, HttpStatus.OK);
     }
