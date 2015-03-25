@@ -17,8 +17,10 @@ class DivisionRepository: MVCoreDataRepository {
     static let IdField = "id"
     static let UserMembershipStatus = "rawUserMembershipStatus"
     static let Name = "name"
+    static let Messages = "rawChatMessage"
+    static let LatestMessage = "latestMessage"
     
-    struct remoteDivision {
+    struct RemoteDivision {
       static let Id = "id"
       static let Name = "name"
       static let Description = "desc"
@@ -120,9 +122,9 @@ class DivisionRepository: MVCoreDataRepository {
     } else {
       logger.debug("Parsing division properties")
       if let division = wrappedDivision,
-        name = serverResponseObject[DivisionConstants.remoteDivision.Name] as? String
+        name = serverResponseObject[DivisionConstants.RemoteDivision.Name] as? String
       {
-        if let adminUserDict = serverResponseObject[DivisionConstants.remoteDivision.AdminUser] as? [String: AnyObject] {
+        if let adminUserDict = serverResponseObject[DivisionConstants.RemoteDivision.AdminUser] as? [String: AnyObject] {
           logger.debug("Found an administrator for the division")
           let userRepository = UserRepository()
           let (adminUser, error) = userRepository.getOrCreateUserFrom(serverResponseObject: adminUserDict)
@@ -136,7 +138,7 @@ class DivisionRepository: MVCoreDataRepository {
           logger.debug("No admin user for division")
         }
         
-        division.desc = serverResponseObject[DivisionConstants.remoteDivision.Description] as? String
+        division.desc = serverResponseObject[DivisionConstants.RemoteDivision.Description] as? String
         division.name = name
         division.lastSynced = NSDate()
         

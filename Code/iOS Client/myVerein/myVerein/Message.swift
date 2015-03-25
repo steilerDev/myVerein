@@ -16,8 +16,8 @@ class Message: NSManagedObject {
   @NSManaged var id: String
   @NSManaged var read: Bool
   @NSManaged var timestamp: NSDate
-  @NSManaged var division: Division
   @NSManaged var sender: User
+  @NSManaged var division: Division
   
   var isOutgoingMessage: Bool {
     if let userID = Defaults[UserDefaultsConstants.UserID].string{

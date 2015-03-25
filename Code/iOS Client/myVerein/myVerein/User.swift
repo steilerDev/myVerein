@@ -45,6 +45,7 @@ class User: NSManagedObject {
     if let firstName = firstName, lastName = lastName {
       return "\(firstName) \(lastName)"
     } else {
+      sync()
       return id
     }
   }
@@ -53,6 +54,7 @@ class User: NSManagedObject {
     if let firstName = firstName, lastName = lastName {
       return "\(firstName[firstName.startIndex])\(lastName[lastName.startIndex])"
     } else {
+      sync()
       return "N/A"
     }
   }

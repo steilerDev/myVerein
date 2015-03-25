@@ -223,8 +223,7 @@ extension ChatViewController: NSFetchedResultsControllerDelegate {
           logger.error("Unable to delete object in chat view")
         }
       case .Update:
-        XCGLogger.debugExec {abort()}
-        XCGLogger.error("Reached update case while applying object changes in chat view. This should not happen")
+        XCGLogger.error("Reached update case while applying object changes in chat view. Ignoring changes")
       case .Move:
         if let currentIndexPath = newIndexPath, oldIndexPath = indexPath {
           objectChanges[.Delete]?.append(oldIndexPath)

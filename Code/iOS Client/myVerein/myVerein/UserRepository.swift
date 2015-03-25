@@ -17,7 +17,7 @@ class UserRepository: MVCoreDataRepository {
     static let ClassName = "User"
     static let IdField = "id"
     
-    struct remoteUser {
+    struct RemoteUser {
       static let Id = "id"
       static let FirstName = "firstName"
       static let LastName = "lastName"
@@ -113,15 +113,15 @@ class UserRepository: MVCoreDataRepository {
     } else {
       logger.debug("Parsing user properties")
       if let user = wrappedUser,
-        firstName = serverResponseObject[UserConstants.remoteUser.FirstName] as? String,
-        lastName = serverResponseObject[UserConstants.remoteUser.LastName] as? String,
-        email = serverResponseObject[UserConstants.remoteUser.Email] as? String
+        firstName = serverResponseObject[UserConstants.RemoteUser.FirstName] as? String,
+        lastName = serverResponseObject[UserConstants.RemoteUser.LastName] as? String,
+        email = serverResponseObject[UserConstants.RemoteUser.Email] as? String
       {
         user.firstName = firstName
         user.lastName = lastName
         user.email = email
         
-        if let divisionArray = serverResponseObject[UserConstants.remoteUser.Divisions] as? [AnyObject] {
+        if let divisionArray = serverResponseObject[UserConstants.RemoteUser.Divisions] as? [AnyObject] {
           let divisionRepository = DivisionRepository()
           let (divisions, error) = divisionRepository.getOrCreateDivisionsFrom(serverResponseObject: divisionArray)
           
@@ -137,24 +137,24 @@ class UserRepository: MVCoreDataRepository {
           logger.debug("No user divisions defined")
         }
         
-        if let genderString = serverResponseObject[UserConstants.remoteUser.Gender] as? String,
+        if let genderString = serverResponseObject[UserConstants.RemoteUser.Gender] as? String,
           gender = User.Gender(rawValue: genderString)
         {
           user.gender = gender
         }
         
-        if let membershipStatusString = serverResponseObject[UserConstants.remoteUser.MembershipStatus] as? String,
+        if let membershipStatusString = serverResponseObject[UserConstants.RemoteUser.MembershipStatus] as? String,
           membershipStatus = User.MembershipStatus(rawValue: membershipStatusString)
         {
           user.membershipStatus = membershipStatus
         }
         
-        user.birthday = DateParser.parseDate(serverResponseObject[UserConstants.remoteUser.Birthday] as? [String: AnyObject])
-        user.street = serverResponseObject[UserConstants.remoteUser.Street] as? String
-        user.streetNumber = serverResponseObject[UserConstants.remoteUser.StreetNumber] as? String
-        user.zipCode = serverResponseObject[UserConstants.remoteUser.ZipCode] as? String
-        user.city = serverResponseObject[UserConstants.remoteUser.City] as? String
-        user.country = serverResponseObject[UserConstants.remoteUser.Country] as? String
+        user.birthday = DateParser.parseDate(serverResponseObject[UserConstants.RemoteUser.Birthday] as? [String: AnyObject])
+        user.street = serverResponseObject[UserConstants.RemoteUser.Street] as? String
+        user.streetNumber = serverResponseObject[UserConstants.RemoteUser.StreetNumber] as? String
+        user.zipCode = serverResponseObject[UserConstants.RemoteUser.ZipCode] as? String
+        user.city = serverResponseObject[UserConstants.RemoteUser.City] as? String
+        user.country = serverResponseObject[UserConstants.RemoteUser.Country] as? String
         user.lastSynced = NSDate()
         
         logger.info("Succesfully parsed and populaterd user")

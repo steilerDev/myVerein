@@ -26,6 +26,7 @@ class Division: NSManagedObject {
   @NSManaged var desc: String?
   @NSManaged var name: String?
   @NSManaged var lastSynced: NSDate
+  @NSManaged var latestMessage: Message?
   
   @NSManaged private var rawUserMembershipStatus: String
   var userMembershipStatus: UserMembershipStatus {

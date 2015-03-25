@@ -28,7 +28,7 @@
 		309A8A7C1AB374040087CBC5 /* ChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 309A8A7B1AB374040087CBC5 /* ChatViewController.swift */; };
 		30A4F7D91AA97D400064EA2C /* MVNetworking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30A4F7D81AA97D400064EA2C /* MVNetworking.swift */; };
 		30BAFEE51AA52828000D18EF /* ca-cert.cer in Resources */ = {isa = PBXBuildFile; fileRef = 30BAFEE11AA518EA000D18EF /* ca-cert.cer */; };
-		30D4E8EC1AB45939000F2C90 /* XCGLogger.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 30D4E8EB1AB45939000F2C90 /* XCGLogger.framework */; };
+		30D4E8EC1AB45939000F2C90 /* XCGLogger.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 30D4E8EB1AB45939000F2C90 /* XCGLogger.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		30D4E8ED1AB45939000F2C90 /* XCGLogger.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 30D4E8EB1AB45939000F2C90 /* XCGLogger.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		30FB44BB1AACC088003E4512 /* DivisionRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30FB44BA1AACC088003E4512 /* DivisionRepository.swift */; };
 		30FB44BD1AACC096003E4512 /* UserRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30FB44BC1AACC096003E4512 /* UserRepository.swift */; };

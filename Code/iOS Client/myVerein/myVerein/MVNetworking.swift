@@ -157,6 +157,7 @@ class MVNetworking {
           {
             logger.debug("Successfully read header fields")
             
+            //TODO: Distinct system change and user change
             if !Defaults.hasKey(UserDefaultsConstants.UserID) ||
               Defaults[UserDefaultsConstants.UserID].string! != newUserID ||
               !Defaults.hasKey(UserDefaultsConstants.SystemID)  ||

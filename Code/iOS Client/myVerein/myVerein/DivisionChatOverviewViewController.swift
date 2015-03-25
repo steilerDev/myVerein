@@ -16,7 +16,7 @@ class DivisionChatOverviewViewController: UICollectionViewController {
     static let BatchSize = 20
     static let Entity = DivisionRepository.DivisionConstants.ClassName
     static let PredicateField = DivisionRepository.DivisionConstants.UserMembershipStatus
-    static let SortField = DivisionRepository.DivisionConstants.Name
+    static let SortField = DivisionRepository.DivisionConstants.LatestMessage + "." + MessageRepository.MessageConstants.TimestampField
     static let CacheName = "myVerein.ChatOverviewCache"
     static let ReuseCellIdentifier = "ChatCell"
     static let SegueToChat = "showChatView"
@@ -31,7 +31,7 @@ class DivisionChatOverviewViewController: UICollectionViewController {
     fetchRequest.fetchBatchSize = DivisionChatOverviewConstants.BatchSize
     
     /// TODO: Improve sort
-    let sortDescriptor = NSSortDescriptor(key: DivisionChatOverviewConstants.SortField, ascending: true)
+    let sortDescriptor = NSSortDescriptor(key: DivisionChatOverviewConstants.SortField, ascending: false)
     fetchRequest.sortDescriptors = [sortDescriptor]
     
     let predicate = NSCompoundPredicate(type: .OrPredicateType,
@@ -165,6 +165,7 @@ extension DivisionChatOverviewViewController: UICollectionViewDataSource {
   private func configureCell(indexPath: NSIndexPath, cell: DivisionChatCell) {
     logger.debug("Configuring cell for index path \(indexPath)")
     cell.division = fetchedResultController.objectAtIndexPath(indexPath) as? Division
+    cell.updateAvatarView()
   }
 }
 
@@ -256,7 +257,7 @@ extension DivisionChatOverviewViewController: NSFetchedResultsControllerDelegate
     logger.debug("Applying batch changes because model changed")
     if let currentCollectionView = collectionView {
       // Apply section changes
-      if (sectionChanges[.Insert]?.count > 0 ?? false) || (sectionChanges[.Delete]?.count > 0 ?? false) {
+      if (sectionChanges[.Insert]?.count > 0) || (sectionChanges[.Delete]?.count > 0) {
         logger.debug("Applying section changes")
         currentCollectionView.performBatchUpdates({
           for (type, section) in self.sectionChanges {

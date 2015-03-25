@@ -103,25 +103,33 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   
   func flushDatabase() {
     logger.debug("Flushing database")
-    managedObjectContext?.lock()
-    if let persistentStoreCoordinator = persistentStoreCoordinator, stores = persistentStoreCoordinator.persistentStores as? [NSPersistentStore] {
-      for store in stores {
-        var error: NSError?
-        if !persistentStoreCoordinator.removePersistentStore(store, error: &error) {
-          logger.error("Unable to remove persistent store \(error?.localizedDescription)")
-        } else {
-          logger.debug("Successfully removed persistent store \(store)")
-        }
-        if let storeURL = store.URL?.path {
-          if !NSFileManager.defaultManager().removeItemAtPath(storeURL, error: &error) {
-            logger.error("Unable to remove item at path \(storeURL): \(error?.localizedDescription)")
+    
+    
+    if let managedObjectContext = managedObjectContext {
+      if let persistentStoreCoordinator = self.persistentStoreCoordinator, stores = persistentStoreCoordinator.persistentStores as? [NSPersistentStore] {
+        for store in stores {
+          var error: NSError?
+          if !persistentStoreCoordinator.removePersistentStore(store, error: &error) {
+            logger.error("Unable to remove persistent store \(error?.localizedDescription)")
           } else {
-            logger.debug("Successfully removed item at path \(storeURL)")
+            logger.debug("Successfully removed persistent store \(store)")
+          }
+          if let storeURL = store.URL?.path {
+            if !NSFileManager.defaultManager().removeItemAtPath(storeURL, error: &error) {
+              logger.error("Unable to remove item at path \(storeURL): \(error?.localizedDescription)")
+            } else {
+              logger.debug("Successfully removed item at path \(storeURL)")
+            }
+          } else {
+            logger.error("Unable to delete store, because the store URL could not be retrieved")
           }
         }
+      } else {
+        logger.error("Unable to get persistent stores")
       }
+    } else {
+      logger.error("Unable to get managed object context")
     }
-    managedObjectContext?.unlock()
     persistentStoreCoordinator = createPersistentStoreCoordinator()
     managedObjectContext = createManagedObjectContext()
     logger.info("Successfully flushed database")
