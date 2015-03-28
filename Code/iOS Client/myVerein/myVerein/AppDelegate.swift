@@ -20,9 +20,21 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
     // Override point for customization after application launch.
     
+    UIApplication.sharedApplication().registerForRemoteNotifications()
+    
     // Setting up the logger
     logger.setup(logLevel: .Debug, showLogLevel: true, showFileNames: true, showLineNumbers: true, writeToFile: nil)
     return true
+  }
+  
+  func application(application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: NSData) {
+    println("####################################################")
+    println("Device token: \(deviceToken)")
+  }
+  
+  func application(application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: NSError) {
+    println("####################################################")
+    println("Unable to register remote notification: \(error)")
   }
   
   func applicationWillResignActive(application: UIApplication) {
@@ -142,6 +154,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         logger.severe("Unresolved error \(error), \(error!.userInfo)")
         logger.debugExec { abort() } // abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
       }
+    }
+  }
+  
+  func showLoginView() {
+    if let currentViewController = window?.rootViewController as? UITabBarController,
+      loginViewController = currentViewController.storyboard?.instantiateViewControllerWithIdentifier(LoginViewController.StoryBoardID) as? LoginViewController
+    {
+        logger.info("Showing log in screen")
+        currentViewController.presentViewController(loginViewController, animated: true, completion: {})
+    } else {
+      logger.severe("Unable to show log in screen")
     }
   }
   

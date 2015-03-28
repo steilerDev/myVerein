@@ -380,8 +380,16 @@ class MVNetworking {
         )
       }
       /// Todo: Exclude stuff like unavailable network connection & Handle unaccepted credentials
+    } else if error.code == 401 || // If we are dealing with a simple HTTP error, the code will be 401
+      error.code == -1011 && // If we are dealing with a serialization error, whose underlying error is 401 things get tricky
+      error.domain == AFURLResponseSerializationErrorDomain &&
+      (error.userInfo?[AFNetworkingOperationFailingURLResponseErrorKey] as? NSHTTPURLResponse)?.statusCode == 401
+    {
+      logger.error("Reached maximum amount of log in retries \(NetworkingConstants.MaxLoginRetries) and they occured because user credentials cannot be validated. Requesting re-login")
+      (UIApplication.sharedApplication().delegate as! AppDelegate).showLoginView()
+      initialFailure(MVError.createError(.MVMaximumLoginRetriesReached))
     } else {
-      logger.severe("Reached maximum amount of log in retries \(NetworkingConstants.MaxLoginRetries)")
+      logger.severe("Reached maximum amount of retries \(NetworkingConstants.MaxLoginRetries)")
       initialFailure(MVError.createError(.MVMaximumLoginRetriesReached))
     }
   }

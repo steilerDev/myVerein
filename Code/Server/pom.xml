@@ -47,6 +47,9 @@
         <maven.compiler.version>3.2</maven.compiler.version>
         <maven.tomcat.version>2.2</maven.tomcat.version>
         <maven.minify.version>1.7.4</maven.minify.version>
+
+        <!-- APNS service -->
+        <apns.version>1.0.0.Beta6</apns.version>
     </properties>
 
     <dependencies>
@@ -188,6 +191,13 @@
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
             <version>${javax.servlet.version}</version>
+        </dependency>
+
+        <!-- APNS service -->
+        <dependency>
+            <groupId>com.notnoop.apns</groupId>
+            <artifactId>apns</artifactId>
+            <version>${apns.version}</version>
         </dependency>
 
     </dependencies>

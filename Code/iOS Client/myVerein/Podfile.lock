@@ -1,29 +1,30 @@
 PODS:
   - 1PasswordExtension (1.1.2)
-  - AFNetworking (2.5.1):
-    - AFNetworking/NSURLConnection (= 2.5.1)
-    - AFNetworking/NSURLSession (= 2.5.1)
-    - AFNetworking/Reachability (= 2.5.1)
-    - AFNetworking/Security (= 2.5.1)
-    - AFNetworking/Serialization (= 2.5.1)
-    - AFNetworking/UIKit (= 2.5.1)
-  - AFNetworking/NSURLConnection (2.5.1):
+  - AFNetworking (2.5.2):
+    - AFNetworking/NSURLConnection (= 2.5.2)
+    - AFNetworking/NSURLSession (= 2.5.2)
+    - AFNetworking/Reachability (= 2.5.2)
+    - AFNetworking/Security (= 2.5.2)
+    - AFNetworking/Serialization (= 2.5.2)
+    - AFNetworking/UIKit (= 2.5.2)
+  - AFNetworking/NSURLConnection (2.5.2):
     - AFNetworking/Reachability
     - AFNetworking/Security
     - AFNetworking/Serialization
-  - AFNetworking/NSURLSession (2.5.1):
+  - AFNetworking/NSURLSession (2.5.2):
     - AFNetworking/Reachability
     - AFNetworking/Security
     - AFNetworking/Serialization
-  - AFNetworking/Reachability (2.5.1)
-  - AFNetworking/Security (2.5.1)
-  - AFNetworking/Serialization (2.5.1)
-  - AFNetworking/UIKit (2.5.1):
+  - AFNetworking/Reachability (2.5.2)
+  - AFNetworking/Security (2.5.2)
+  - AFNetworking/Serialization (2.5.2)
+  - AFNetworking/UIKit (2.5.2):
     - AFNetworking/NSURLConnection
     - AFNetworking/NSURLSession
   - JSQMessagesViewController (7.0.0):
     - JSQSystemSoundPlayer (~> 2.0.1)
   - JSQSystemSoundPlayer (2.0.1)
+  - JTCalendar (1.2.2)
   - Locksmith (1.2.0)
   - pop (1.0.7)
   - RKNotificationHub (1.0.4)
@@ -31,9 +32,11 @@ PODS:
   - UIImageView-Letters (1.0)
 
 DEPENDENCIES:
-  - 1PasswordExtension (from `https://github.com/AgileBits/onepassword-app-extension.git`, branch `master`)
+  - 1PasswordExtension (from `https://github.com/AgileBits/onepassword-app-extension.git`,
+    branch `master`)
   - AFNetworking (~> 2.0)
   - JSQMessagesViewController
+  - JTCalendar
   - Locksmith
   - pop (~> 1.0)
   - RKNotificationHub
@@ -47,18 +50,19 @@ EXTERNAL SOURCES:
 
 CHECKOUT OPTIONS:
   1PasswordExtension:
-    :commit: cbddcfce20434c005c29553e9e8ec0819a2d46da
+    :commit: 1acd0f91264d982e25c2d5fa122d9cd9de444715
     :git: https://github.com/AgileBits/onepassword-app-extension.git
 
 SPEC CHECKSUMS:
   1PasswordExtension: b13c2217ee5c05464d9b2ae29a81b324b7ce451b
-  AFNetworking: 8bee59492a6ff15d69130efa4d0dc67e0094a52a
+  AFNetworking: fefbce9660acb17f48ae0011292d4da0f457bf36
   JSQMessagesViewController: 9fd7e9ac96e9fc91f2deca86928e2cc916aeebaa
   JSQSystemSoundPlayer: 55528c699a283aae2220d3ae7b8b527d2ecef4b4
+  JTCalendar: 35f2fcc3513cdc31e68818f27c3faa8388cfa04a
   Locksmith: 15a873e266beceb1b81476e0f50a1e1cba103a6f
   pop: 2f14a1ea61339767af9e66741b418c831b3844df
   RKNotificationHub: 04a08446faa30b801b7f227392e0ade6d4b9b9d0
   SwiftyUserDefaults: c13a0c5a00d03da70d68ac7b05dbea548c64d87b
   UIImageView-Letters: 9f21bca067a6cf8651e104c3b1c9253bc98c9071
 
-COCOAPODS: 0.36.0
+COCOAPODS: 0.36.1

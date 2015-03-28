@@ -18,6 +18,8 @@ import CoreData
 
 class LoginViewController: UIViewController {
   
+  static let StoryBoardID = "LoginViewControllerID"
+  
   /// Struct containing String constants only used by this class
   private struct LoginViewControllerConstants {
     static let LoginBoxAnimationKey = "moveLoginBoxAnimation"

@@ -227,6 +227,7 @@
 					};
 					55E3EE4419D76F280068C3A7 = {
 						CreatedOnToolsVersion = 6.1;
+						DevelopmentTeam = C23UW3NA42;
 					};
 					55E3EE4F19D76F280068C3A7 = {
 						CreatedOnToolsVersion = 6.1;
@@ -449,6 +450,8 @@
 			buildSettings = {
 				BUNDLE_IDENTIFIER = com.cerebralgardens.xcglogger;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -458,6 +461,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_MODULE_NAME = XCGLogger;
 				PRODUCT_NAME = XCGLogger;
+				PROVISIONING_PROFILE = "";
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -468,6 +472,8 @@
 			buildSettings = {
 				BUNDLE_IDENTIFIER = com.cerebralgardens.xcglogger;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -477,6 +483,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_MODULE_NAME = XCGLogger;
 				PRODUCT_NAME = XCGLogger;
+				PROVISIONING_PROFILE = "";
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 			};
