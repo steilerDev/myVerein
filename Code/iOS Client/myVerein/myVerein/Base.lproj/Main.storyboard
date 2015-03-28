@@ -76,7 +76,7 @@
                                         <constraints>
                                             <constraint firstAttribute="width" secondItem="LeS-iD-5Zi" secondAttribute="height" multiplier="1:1" id="qeN-tf-YmM"/>
                                         </constraints>
-                                        <state key="normal" image="onepassword-button">
+                                        <state key="normal" image="password-manager-button">
                                             <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                         </state>
                                         <connections>
@@ -164,7 +164,6 @@
                         <outlet property="passwordTextField" destination="b1d-2P-Qaq" id="Wf4-NR-F0C"/>
                         <outlet property="topConstraintForLoginBox" destination="K4Y-2Y-BLP" id="861-eD-Ym2"/>
                         <outlet property="usernameTextField" destination="BHo-HQ-fAc" id="G07-Gk-aaV"/>
-                        <segue destination="anG-Qv-Hwh" kind="showDetail" identifier="showMainApplicationSegue" id="ksa-Tv-6t3"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
@@ -176,7 +175,7 @@
             </objects>
             <point key="canvasLocation" x="1242" y="-422"/>
         </scene>
-        <!--Item 2-->
+        <!--Calendar-->
         <scene sceneID="pr5-MW-aHi">
             <objects>
                 <viewController id="a28-zv-3eW" sceneMemberID="viewController">
@@ -189,11 +188,45 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                     </view>
-                    <tabBarItem key="tabBarItem" title="Item 2" id="QyH-k7-AwZ"/>
+                    <tabBarItem key="tabBarItem" title="Calendar" image="Calendar" id="QyH-k7-AwZ"/>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Axl-p1-siy" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="2024" y="860"/>
+        </scene>
+        <!--Settings-->
+        <scene sceneID="ibg-bl-ulV">
+            <objects>
+                <viewController id="vrU-jZ-q2Q" customClass="SettingsViewController" customModule="myVerein" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="fb0-N9-kUt"/>
+                        <viewControllerLayoutGuide type="bottom" id="VQc-zB-Hrl"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="AQr-el-HOK">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="551"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="1Or-vI-t5k">
+                                <rect key="frame" x="277" y="261" width="55" height="30"/>
+                                <state key="normal" title="Log-out">
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="logoutPress" destination="vrU-jZ-q2Q" eventType="touchUpInside" id="0Xt-is-MIm"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="1Or-vI-t5k" firstAttribute="leading" secondItem="AQr-el-HOK" secondAttribute="leading" constant="277" id="Qev-Rm-DnF"/>
+                            <constraint firstItem="1Or-vI-t5k" firstAttribute="top" secondItem="fb0-N9-kUt" secondAttribute="bottom" constant="241" id="WnH-l4-C6B"/>
+                        </constraints>
+                    </view>
+                    <tabBarItem key="tabBarItem" title="Settings" image="Settings" id="qME-n2-c3J"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="4Pc-Ug-OH6" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1726" y="1622"/>
         </scene>
         <!--Chats-->
         <scene sceneID="Grp-CK-DDK">
@@ -294,27 +327,27 @@
         <scene sceneID="DcL-gZ-hnU">
             <objects>
                 <tabBarController id="anG-Qv-Hwh" customClass="MenuController" customModule="myVerein" customModuleProvider="target" sceneMemberID="viewController">
-                    <nil key="simulatedBottomBarMetrics"/>
+                    <simulatedTabBarMetrics key="simulatedBottomBarMetrics" translucent="NO"/>
                     <tabBar key="tabBar" contentMode="scaleToFill" translucent="NO" id="bE8-SZ-oKk">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="49"/>
                         <autoresizingMask key="autoresizingMask"/>
-                        <color key="tintColor" red="0.074509803920000006" green="0.80392156859999997" blue="0.47058823529999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     </tabBar>
                     <connections>
                         <outlet property="tabBar" destination="bE8-SZ-oKk" id="0A7-ux-aO6"/>
                         <segue destination="3wK-OD-24f" kind="relationship" relationship="viewControllers" id="CBb-Bb-Lhx"/>
                         <segue destination="a28-zv-3eW" kind="relationship" relationship="viewControllers" id="V4Q-Wf-3uJ"/>
+                        <segue destination="vrU-jZ-q2Q" kind="relationship" relationship="viewControllers" id="71A-3V-FeK"/>
                     </connections>
                 </tabBarController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="BaR-XS-Ch4" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="1242" y="403"/>
         </scene>
-        <!--Chats-->
+        <!--Chats NC-->
         <scene sceneID="gbc-DA-SgA">
             <objects>
-                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="3wK-OD-24f" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="Chats" image="ChatsLogo" id="fs0-Z2-Ieq"/>
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="3wK-OD-24f" userLabel="Chats NC" sceneMemberID="viewController">
+                    <tabBarItem key="tabBarItem" title="Chats" image="Chats" id="fs0-Z2-Ieq"/>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" translucent="NO" id="qdX-T2-iXr">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
@@ -331,9 +364,11 @@
         </scene>
     </scenes>
     <resources>
-        <image name="ChatsLogo" width="32" height="32"/>
+        <image name="Calendar" width="32" height="32"/>
+        <image name="Chats" width="32" height="32"/>
+        <image name="Settings" width="32" height="32"/>
         <image name="myVereinLogo" width="3250" height="3412"/>
-        <image name="onepassword-button" width="27" height="27"/>
+        <image name="password-manager-button" width="27" height="27"/>
     </resources>
     <color key="tintColor" red="0.074509803920000006" green="0.80392156859999997" blue="0.47058823529999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
 </document>

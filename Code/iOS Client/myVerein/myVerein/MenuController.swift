@@ -12,6 +12,8 @@ import XCGLogger
 
 class MenuController: UITabBarController {
   
+  let logger = XCGLogger.defaultInstance()
+  
   override func viewDidLoad() {
     super.viewDidLoad()
     UITabBar.appearance().tintColor = UIColor(hex: MVColor.Primary.Normal)
@@ -26,8 +28,10 @@ class MenuController: UITabBarController {
       currentPassword == nil ||
       currentDomain == nil
     {
+      logger.info("No credentials stored, asking the user to enter his")
       (UIApplication.sharedApplication().delegate as! AppDelegate).showLoginView()
     } else {
+      logger.info("Credentials found, checking if they are valid")
       MVNetworking.loginActionWithCallbackOnMainQueue(
         success: {
           XCGLogger.info("Login successfully, no need to ask for credentials")

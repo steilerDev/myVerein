@@ -16,6 +16,8 @@ import XCGLogger
 
 import CoreData
 
+// TODO: Convert to XIB
+
 class LoginViewController: UIViewController {
   
   static let StoryBoardID = "LoginViewControllerID"
@@ -24,7 +26,6 @@ class LoginViewController: UIViewController {
   private struct LoginViewControllerConstants {
     static let LoginBoxAnimationKey = "moveLoginBoxAnimation"
     static let WrongPasswordAnimationKey = "shakePassword"
-    static let SegueToMainApplication = "showMainApplicationSegue"
     
     static let PasswordManagerURL = "https://agilebits.com/onepassword"
   }
@@ -133,7 +134,7 @@ class LoginViewController: UIViewController {
         MVNetworking.loginActionWithCallbackOnMainQueue(
           success: {
             XCGLogger.info("Login successfully, performing segue to main view controller")
-            self.performSegueWithIdentifier(LoginViewControllerConstants.SegueToMainApplication, sender: self)
+            self.dismissViewControllerAnimated(true, completion: {})
             self.activityIndicator.stopAnimating()
           },
           failure:
