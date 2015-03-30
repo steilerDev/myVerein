@@ -78,15 +78,22 @@ public class EventManagementController
             logger.warn("[" + currentUser + "] Unable to parse month or year.");
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        //Getting all single date events
-        dates.addAll(eventRepository.findEventsByStartDateMonthAndStartDateYearAndMultiDate(monthInt, yearInt, false).parallelStream().map(event -> event.getStartDateTime().toLocalDate()).collect(Collectors.toList()));
 
+        LocalDateTime start = LocalDate.of(yearInt, monthInt, 1).atStartOfDay();
+        LocalDateTime end = start.plusMonths(1);
+
+        logger.debug("Getting all single day events...");
+        dates.addAll(eventRepository.findAllByEndDateTimeBetweenAndMultiDate(start, end, false).parallelStream().map(Event::getStartDate).collect(Collectors.toList()));
+        logger.debug("All single day events retrieved, got " + dates.size() + " dates so far");
+
+        logger.debug("Getting all multi day events...");
         //Collecting all multi date events, that either start or end within the selected month (which means that events that are spanning over several months are not collected)
-        Stream.concat(eventRepository.findEventsByStartDateMonthAndStartDateYearAndMultiDate(monthInt, yearInt, true).stream(), //All multi date events starting within the month
-                      eventRepository.findEventsByEndDateMonthAndEndDateYearAndMultiDate(monthInt, yearInt, true).stream()) //All multi date events ending within the month
+        Stream.concat(eventRepository.findAllByStartDateTimeBetweenAndMultiDate(start, end, true).stream(), //All multi date events starting within the month
+                      eventRepository.findAllByEndDateTimeBetweenAndMultiDate(start, end, true).stream()) //All multi date events ending within the month
                         .distinct() //Removing all duplicated events
+                        .parallel()
                         .forEach(event -> { //Creating a local date for each occupied date of the event
-                            for (LocalDate date = event.getStartDateTime().toLocalDate(); //Starting with the start date
+                            for (LocalDate date = event.getStartDate(); //Starting with the start date
                                  !date.equals(event.getEndDateTime().toLocalDate()); //Until reaching the end date
                                  date = date.plusDays(1)) //Adding a day within each iterations
                             {
@@ -94,6 +101,7 @@ public class EventManagementController
                             }
                             dates.add(event.getEndDateTime().toLocalDate()); //Finally adding the last date
                         });
+        logger.debug("All multi day events gathered, got " + dates.size() + " dates so far");
 
         if(dates.isEmpty())
         {
@@ -115,26 +123,35 @@ public class EventManagementController
     public ResponseEntity<List<Event>> getEventsOfDate(@RequestParam String date, @CurrentUser User currentUser)
     {
         logger.trace("[" + currentUser + "] Getting events of date " + date);
-        LocalDate dateObject;
+        LocalDateTime startOfDay, endOfDay, startOfMonth, endOfMonth;
         ArrayList<Event> eventsOfDay = new ArrayList<>();
         try
         {
-            dateObject = LocalDate.parse(date, DateTimeFormatter.ISO_LOCAL_DATE);
-            logger.debug("[" + currentUser + "] Converted to date object: " + dateObject.toString());
+            // Get start of day and start of next day
+            startOfDay = LocalDate.parse(date, DateTimeFormatter.ISO_LOCAL_DATE).atStartOfDay();
+            endOfDay = startOfDay.plusDays(1);
+
+            startOfMonth = LocalDate.of(startOfDay.getYear(), startOfDay.getMonth(), 1).atStartOfDay();
+            endOfMonth = startOfMonth.plusMonths(1);
+            logger.debug("[" + currentUser + "] Converted to date object: " + startOfDay.toString());
         } catch (DateTimeParseException e)
         {
             logger.warn("[" + currentUser + "] Unable to parse date: " + date + ": " + e.toString());
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-        eventsOfDay.addAll(eventRepository.findEventsByStartDateDayOfMonthAndStartDateMonthAndStartDateYearAndMultiDate(dateObject.getDayOfMonth(), dateObject.getMonthValue(), dateObject.getYear(), false));
+        logger.debug("Getting all single day events...");
+        eventsOfDay.addAll(eventRepository.findAllByStartDateTimeBetweenAndMultiDate(startOfDay, endOfDay, false));
+        logger.debug("All single day events retrieved, got " + eventsOfDay.size() + " events so far");
 
+        logger.debug("Getting all multi day events...");
         //Collecting all multi date events, that either start or end within the selected month (which means that events that are spanning over several months are not collected)
-        eventsOfDay.addAll(Stream.concat(eventRepository.findEventsByStartDateMonthAndStartDateYearAndMultiDate(dateObject.getMonthValue(), dateObject.getYear(), true).stream(), //All multi date events starting within the month
-                eventRepository.findEventsByEndDateMonthAndEndDateYearAndMultiDate(dateObject.getMonthValue(), dateObject.getYear(), true).stream()) //All multi date events ending within the month
+        eventsOfDay.addAll(Stream.concat(eventRepository.findAllByStartDateTimeBetweenAndMultiDate(startOfMonth, endOfMonth, true).stream(), //All multi date events starting within the month
+                eventRepository.findAllByEndDateTimeBetweenAndMultiDate(startOfMonth, endOfMonth, true).stream()) //All multi date events ending within the month
                 .distinct() //Removing all duplicated events
-                .filter(event -> event.getStartDate().isEqual(dateObject) || event.getEndDate().isEqual(dateObject) || (event.getEndDate().isAfter(dateObject) && event.getStartDate().isBefore(dateObject))) //Filter all multi date events that do not span over the date
+                .parallel().filter(event -> event.getStartDate().isEqual(startOfDay.toLocalDate()) || event.getEndDate().isEqual(startOfDay.toLocalDate()) || (event.getEndDate().isAfter(endOfDay.toLocalDate()) && event.getStartDate().isBefore(startOfDay.toLocalDate()))) //Filter all multi date events that do not span over the date
                 .collect(Collectors.toList()));
+        logger.debug("All multi day events gathered, got " + eventsOfDay.size() + " events so far");
 
         if(eventsOfDay.isEmpty())
         {

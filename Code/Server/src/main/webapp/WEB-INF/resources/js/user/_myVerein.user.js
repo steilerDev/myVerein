@@ -225,7 +225,7 @@ function loadNewUser(doNotHideDeleteButton) {
             $('#customUserFieldsLoading').removeClass('heartbeat');
         },
         success: function (customUserFields) {
-            if (customUserFields && customUserFields.length > 0) {
+            if (customUserFields && customUserFields.length) {
                 $.each(customUserFields, function (index, customUserField) {
                     addCustomUserFieldUser(customUserField, "");
                 });

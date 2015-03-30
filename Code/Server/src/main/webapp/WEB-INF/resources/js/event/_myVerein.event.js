@@ -34,7 +34,8 @@ var calendar, pseudoEventName = 'pseudoEvent',
             '</div>' +
             '<div class="events-list">' +
                 '<% _.each(eventsThisMonth, function(event) { ' +
-                    'if(event.title != pseudoEventName) { %>' +
+                    'console.log(event);' +
+                    'if(event.title != pseudoEventName) { console.log(event)%>' +
                         '<div class="event">' +
                             '<a href="/" data-id="<%= event.id %>" class="events eventClickable"><%= moment(event.startTime).format(\'Do MMM HH:mm\') %> - <%= moment(event.endTime).format(\'Do MMM HH:mm\') %>: <%= event.title %></a>' +
                         '</div>' +

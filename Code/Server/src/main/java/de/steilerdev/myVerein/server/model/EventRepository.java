@@ -28,10 +28,10 @@ import java.util.List;
 @Repository
 public interface EventRepository extends MongoRepository<Event, String> {
 
-    public List<Event> findEventsByStartDateMonthAndStartDateYearAndMultiDate(int startDateMonth, int startDateYear, boolean multiDate);
-    public List<Event> findEventsByEndDateMonthAndEndDateYearAndMultiDate(int endDateMonth, int endDateYear, boolean multiDate);
+    List<Event> findAllByStartDateTimeBetweenAndMultiDate(LocalDateTime start, LocalDateTime end, boolean multiDate);
+    List<Event> findAllByEndDateTimeBetweenAndMultiDate(LocalDateTime start, LocalDateTime end, boolean multiDate);
 
-    public List<Event> findEventsByStartDateDayOfMonthAndStartDateMonthAndStartDateYearAndMultiDate(int startDateDayOfMonth, int startDateMonth, int startDateYear, boolean multiDate);
+    Event findEventById(String id);
 
-    public Event findEventById(String id);
+    List<Event> findAllByInvitedDivision(Division invitedDivision);
 }

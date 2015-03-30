@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 
 import javax.validation.constraints.NotNull;
@@ -110,30 +111,20 @@ public class Event
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private double locationLng;
 
-    @NotNull
     @JsonIgnore
-    private int startDateDayOfMonth, startDateMonth, startDateYear, startDateHour, startDateMinute;
-    @NotNull
-    @JsonIgnore
-    private int endDateDayOfMonth, endDateMonth,endDateYear, endDateHour, endDateMinute;
-
+    private Map<String, EventStatus> invitedUser;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private LocalDateTime lastChanged = LocalDateTime.now();
+    private LocalDateTime lastChanged;
 
-    @Transient
+
+    @Indexed
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private LocalDateTime startDateTime;
-    @Transient
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private LocalDate startDate;
 
-    @Transient
+    @Indexed
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private LocalDateTime endDateTime;
-    @Transient
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private LocalDate endDate;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private boolean multiDate;
@@ -213,106 +204,6 @@ public class Event
         this.locationLng = locationLng;
     }
 
-    public int getStartDateDayOfMonth()
-    {
-        return startDateDayOfMonth;
-    }
-
-    public void setStartDateDayOfMonth(int startDateDayOfMonth)
-    {
-        this.startDateDayOfMonth = startDateDayOfMonth;
-    }
-
-    public int getStartDateMonth()
-    {
-        return startDateMonth;
-    }
-
-    public void setStartDateMonth(int startDateMonth)
-    {
-        this.startDateMonth = startDateMonth;
-    }
-
-    public int getStartDateYear()
-    {
-        return startDateYear;
-    }
-
-    public void setStartDateYear(int startDateYear)
-    {
-        this.startDateYear = startDateYear;
-    }
-
-    public int getStartDateHour()
-    {
-        return startDateHour;
-    }
-
-    public void setStartDateHour(int startDateHour)
-    {
-        this.startDateHour = startDateHour;
-    }
-
-    public int getStartDateMinute()
-    {
-        return startDateMinute;
-    }
-
-    public void setStartDateMinute(int startDateMinute)
-    {
-        this.startDateMinute = startDateMinute;
-    }
-
-    public int getEndDateDayOfMonth()
-    {
-        return endDateDayOfMonth;
-    }
-
-    public void setEndDateDayOfMonth(int endDateDayOfMonth)
-    {
-        this.endDateDayOfMonth = endDateDayOfMonth;
-    }
-
-    public int getEndDateMonth()
-    {
-        return endDateMonth;
-    }
-
-    public void setEndDateMonth(int endDateMonth)
-    {
-        this.endDateMonth = endDateMonth;
-    }
-
-    public int getEndDateYear()
-    {
-        return endDateYear;
-    }
-
-    public void setEndDateYear(int endDateYear)
-    {
-        this.endDateYear = endDateYear;
-    }
-
-    public int getEndDateHour()
-    {
-        return endDateHour;
-    }
-
-    public void setEndDateHour(int endDateHour)
-    {
-        this.endDateHour = endDateHour;
-    }
-
-    public int getEndDateMinute()
-    {
-        return endDateMinute;
-    }
-
-    public void setEndDateMinute(int endDateMinute)
-    {
-        this.endDateMinute = endDateMinute;
-    }
-
     public LocalDateTime getLastChanged()
     {
         return lastChanged;
@@ -328,13 +219,7 @@ public class Event
      */
     public LocalDateTime getStartDateTime()
     {
-        if(startDateYear == 0 && startDateMonth == 0 && startDateDayOfMonth == 0 && startDateHour == 0 && startDateMinute == 0)
-        {
-            startDateTime = null;
-        } else
-        {
-            startDateTime = LocalDateTime.of(startDateYear, startDateMonth, startDateDayOfMonth, startDateHour, startDateMinute);
-        }
+
         return startDateTime;
     }
 
@@ -345,21 +230,6 @@ public class Event
     public void setStartDateTime(LocalDateTime startDateTime)
     {
         this.startDateTime = startDateTime;
-        if(startDateTime != null)
-        {
-            startDateYear = startDateTime.getYear();
-            startDateMonth = startDateTime.getMonthValue();
-            startDateDayOfMonth = startDateTime.getDayOfMonth();
-            startDateHour = startDateTime.getHour();
-            startDateMinute = startDateTime.getMinute();
-        } else
-        {
-            startDateYear = 0;
-            startDateMonth = 0;
-            startDateDayOfMonth = 0;
-            startDateHour = 0;
-            startDateMinute = 0;
-        }
     }
 
     /**
@@ -367,13 +237,7 @@ public class Event
      */
     public LocalDateTime getEndDateTime()
     {
-        if(endDateYear == 0 && endDateMonth == 0 && endDateDayOfMonth == 0 && endDateHour == 0 && endDateMinute == 0)
-        {
-            endDateTime = null;
-        } else
-        {
-            endDateTime = LocalDateTime.of(endDateYear, endDateMonth, endDateDayOfMonth, endDateHour, endDateMinute);
-        }
+
         return endDateTime;
     }
 
@@ -384,21 +248,18 @@ public class Event
     public void setEndDateTime(LocalDateTime endDateTime)
     {
         this.endDateTime = endDateTime;
-        if(endDateTime != null)
-        {
-            endDateYear = endDateTime.getYear();
-            endDateMonth = endDateTime.getMonthValue();
-            endDateDayOfMonth = endDateTime.getDayOfMonth();
-            endDateHour = endDateTime.getHour();
-            endDateMinute = endDateTime.getMinute();
-        } else
-        {
-            endDateYear = 0;
-            endDateMonth = 0;
-            endDateDayOfMonth = 0;
-            endDateHour = 0;
-            endDateMinute = 0;
-        }
+    }
+
+    @Transient
+    public LocalDate getEndDate()
+    {
+        return endDateTime.toLocalDate();
+    }
+
+    @Transient
+    public LocalDate getStartDate()
+    {
+        return startDateTime.toLocalDate();
     }
 
     public List<Division> getInvitedDivision()
@@ -439,30 +300,9 @@ public class Event
      */
     public void updateMultiDate()
     {
-        multiDate = (startDateDayOfMonth != endDateDayOfMonth) || (startDateMonth != endDateMonth) || (startDateYear != endDateYear);
+        multiDate = !startDateTime.toLocalDate().equals(endDateTime.toLocalDate());
     }
 
-    public LocalDate getStartDate()
-    {
-        startDate = getStartDateTime().toLocalDate();
-        return startDate;
-    }
-
-    public void setStartDate(LocalDate startDate)
-    {
-        this.startDate = startDate;
-    }
-
-    public LocalDate getEndDate()
-    {
-        endDate = getEndDateTime().toLocalDate();
-        return endDate;
-    }
-
-    public void setEndDate(LocalDate endDate)
-    {
-        this.endDate = endDate;
-    }
 
     public User getEventAdmin()
     {
