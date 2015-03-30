@@ -17,6 +17,7 @@
 package de.steilerdev.myVerein.server.model;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
@@ -34,4 +35,9 @@ public interface EventRepository extends MongoRepository<Event, String> {
     Event findEventById(String id);
 
     List<Event> findAllByInvitedDivision(Division invitedDivision);
+
+    @Query(value = "{?0 : { $exists: true } }")
+    List<Event> findAllByPrefixedInvitedUser(String prefixedUserID);
+
+    List<Event> findAllByInvitedUserAndLastChangedLessThan(String user, LocalDateTime lastChanged);
 }

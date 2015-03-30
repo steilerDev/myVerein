@@ -101,14 +101,15 @@ public class Event
     private String id;
 
     @NotBlank
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String name;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String description;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String location;
-    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private double locationLat;
-    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private double locationLng;
 
     @JsonIgnore
@@ -126,7 +127,7 @@ public class Event
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private LocalDateTime endDateTime;
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private boolean multiDate;
 
     @Transient
@@ -140,6 +141,7 @@ public class Event
 
     @DBRef
     @NotNull
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private User eventAdmin;
 
     public Event() {}
@@ -251,12 +253,14 @@ public class Event
     }
 
     @Transient
+    @JsonIgnore
     public LocalDate getEndDate()
     {
         return endDateTime.toLocalDate();
     }
 
     @Transient
+    @JsonIgnore
     public LocalDate getStartDate()
     {
         return startDateTime.toLocalDate();
@@ -503,5 +507,14 @@ public class Event
     public boolean equals(Object obj)
     {
         return obj != null && obj instanceof Event && this.id != null && this.id.equals(((Event) obj).getId());
+    }
+
+    /**
+     * {@link de.steilerdev.myVerein.server.model.EventRepository#findAllByPrefixedInvitedUser(String)} needs a user id, prefixed with "invitedUser.", because a custom query with a fixed prefix is not working. This function creates this prefixed user id.
+     * @param user The user, which needs to be prefixed.
+     * @return The prefixed user ID.
+     */
+    public static String prefixedUserIDForUser(User user) {
+        return user == null? null: "invitedUser." + user.getId();
     }
 }
