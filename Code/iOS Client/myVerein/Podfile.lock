@@ -27,13 +27,12 @@ PODS:
   - JTCalendar (1.2.2)
   - Locksmith (1.2.0)
   - pop (1.0.7)
-  - RKNotificationHub (1.0.4)
+  - RKNotificationHub (1.0.5)
   - SwiftyUserDefaults (1.0.0)
   - UIImageView-Letters (1.0)
 
 DEPENDENCIES:
-  - 1PasswordExtension (from `https://github.com/AgileBits/onepassword-app-extension.git`,
-    branch `master`)
+  - 1PasswordExtension
   - AFNetworking (~> 2.0)
   - JSQMessagesViewController
   - JTCalendar
@@ -43,26 +42,16 @@ DEPENDENCIES:
   - SwiftyUserDefaults
   - UIImageView-Letters
 
-EXTERNAL SOURCES:
-  1PasswordExtension:
-    :branch: master
-    :git: https://github.com/AgileBits/onepassword-app-extension.git
-
-CHECKOUT OPTIONS:
-  1PasswordExtension:
-    :commit: 1acd0f91264d982e25c2d5fa122d9cd9de444715
-    :git: https://github.com/AgileBits/onepassword-app-extension.git
-
 SPEC CHECKSUMS:
-  1PasswordExtension: b13c2217ee5c05464d9b2ae29a81b324b7ce451b
+  1PasswordExtension: 66365c1e1264a83edec6c84c6eb2df41b50a70d3
   AFNetworking: fefbce9660acb17f48ae0011292d4da0f457bf36
   JSQMessagesViewController: 9fd7e9ac96e9fc91f2deca86928e2cc916aeebaa
-  JSQSystemSoundPlayer: 55528c699a283aae2220d3ae7b8b527d2ecef4b4
+  JSQSystemSoundPlayer: c5850e77a4363ffd374cd851154b9af93264ed8d
   JTCalendar: 35f2fcc3513cdc31e68818f27c3faa8388cfa04a
-  Locksmith: 15a873e266beceb1b81476e0f50a1e1cba103a6f
-  pop: 2f14a1ea61339767af9e66741b418c831b3844df
-  RKNotificationHub: 04a08446faa30b801b7f227392e0ade6d4b9b9d0
-  SwiftyUserDefaults: c13a0c5a00d03da70d68ac7b05dbea548c64d87b
-  UIImageView-Letters: 9f21bca067a6cf8651e104c3b1c9253bc98c9071
+  Locksmith: 97fa742bf69a5b9b9bb855dd31c7a9355b952ae5
+  pop: 628ffc631644601567ee8bfaaaea493ebd7d0923
+  RKNotificationHub: 529ee3c92564738d3e489057968bfbc4ffd3e942
+  SwiftyUserDefaults: 76cb548fdbcb0d28c27bfa01e261fd78df65e38f
+  UIImageView-Letters: 41432060262e9e19ac2ff24fd633e1a31bdcc5d2
 
 COCOAPODS: 0.36.1

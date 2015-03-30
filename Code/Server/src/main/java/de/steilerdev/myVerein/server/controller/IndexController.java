@@ -199,18 +199,6 @@ public class IndexController
         divisionRepository.save(div4);
         divisionRepository.save(div5);
 
-        user1.replaceDivisions(divisionRepository, div1);
-        user2.replaceDivisions(divisionRepository, div2, div4);
-        user3.replaceDivisions(divisionRepository, div2);
-        user4.replaceDivisions(divisionRepository, div3);
-        user5.replaceDivisions(divisionRepository, div2, div4);
-
-        userRepository.save(user1);
-        userRepository.save(user2);
-        userRepository.save(user3);
-        userRepository.save(user4);
-        userRepository.save(user5);
-
         Event event1 = new Event();
         event1.setStartDateTime(LocalDateTime.of(2015, 1, 20, 13, 0));
         event1.setEndDateTime(LocalDateTime.of(2015, 1, 20, 14, 0));
@@ -220,24 +208,24 @@ public class IndexController
         event1.updateMultiDate();
 
         Event event2 = new Event();
-        event2.setStartDateTime(LocalDateTime.of(2015, 1, 20, 13, 00));
-        event2.setEndDateTime(LocalDateTime.of(2015, 1, 21, 13, 00));
+        event2.setStartDateTime(LocalDateTime.of(2015, 1, 20, 13, 0));
+        event2.setEndDateTime(LocalDateTime.of(2015, 1, 21, 13, 0));
         event2.setName("Super Event 2");
         event2.addDivision(div3);
         event2.setEventAdmin(user4);
         event2.updateMultiDate();
 
         Event event3 = new Event();
-        event3.setStartDateTime(LocalDateTime.of(2015, 1, 21, 13, 00));
-        event3.setEndDateTime(LocalDateTime.of(2015, 1, 21, 13, 05));
+        event3.setStartDateTime(LocalDateTime.of(2015, 1, 21, 13, 0));
+        event3.setEndDateTime(LocalDateTime.of(2015, 1, 21, 13, 5));
         event3.setName("Super Event 3");
         event3.addDivision(div1);
         event3.setEventAdmin(user1);
         event3.updateMultiDate();
 
         Event event4 = new Event();
-        event4.setStartDateTime(LocalDateTime.of(2015, 1, 11, 13, 00));
-        event4.setEndDateTime(LocalDateTime.of(2015, 1, 15, 13, 05));
+        event4.setStartDateTime(LocalDateTime.of(2015, 1, 11, 13, 0));
+        event4.setEndDateTime(LocalDateTime.of(2015, 1, 15, 13, 5));
         event4.setName("Super Event 4");
         event4.addDivision(div1);
         event4.setEventAdmin(user2);
@@ -247,6 +235,18 @@ public class IndexController
         eventRepository.save(event2);
         eventRepository.save(event3);
         eventRepository.save(event4);
+
+        user1.replaceDivisions(divisionRepository, eventRepository, div1);
+        user2.replaceDivisions(divisionRepository, eventRepository, div2, div4);
+        user3.replaceDivisions(divisionRepository, eventRepository, div2);
+        user4.replaceDivisions(divisionRepository, eventRepository, div3);
+        user5.replaceDivisions(divisionRepository, eventRepository, div2, div4);
+
+        userRepository.save(user1);
+        userRepository.save(user2);
+        userRepository.save(user3);
+        userRepository.save(user4);
+        userRepository.save(user5);
 
         Message message1 = new Message("Hello world", user1, div1);
         Message message2 = new Message("Hello world, too", user2, div1);

@@ -21,6 +21,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import de.steilerdev.myVerein.server.controller.admin.DivisionManagementController;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.NotEmpty;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
@@ -29,14 +31,70 @@ import org.springframework.data.mongodb.core.mapping.DBRef;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * This object is representing an entity within the division's collection of the MongoDB. On top of that the class is providing several useful helper methods.
  */
 public class Event
 {
+    /**
+     * This enum is representing the status of a message sent to a specific receiver.
+     */
+    public enum EventStatus {
+        /**
+         * This status is assigned to an event which has not received any answer from a particular user
+         */
+        PENDING {
+            @Override
+            public String toString() {
+                return "PENDING";
+            }
+        },
+        /**
+         * This status is assigned to an event where the user stated he would participate
+         */
+        GOING {
+            @Override
+            public String toString() {
+                return "GOING";
+            }
+        },
+        /**
+         * This status is assigned to an event where the user stated he might participate
+         */
+        MAYBE {
+            @Override
+            public String toString() {
+                return "MAYBE";
+            }
+        },
+        /**
+         * This status is assigned to an event where the user stated he is not participating
+         */
+        DECLINE {
+            @Override
+            public String toString() {
+                return "DECLINE";
+            }
+        },
+        /**
+         * This status is assigned to an event where the user was previously invited, but left the division
+         */
+        REMOVED {
+            @Override
+            public String toString() {
+                return "DECLINE";
+            }
+        }
+    }
+
+    @Transient
+    @JsonIgnore
+    private static Logger logger = LoggerFactory.getLogger(Event.class);
+
     @Id
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String id;
@@ -426,19 +484,92 @@ public class Event
         this.administrationNotAllowedMessage = administrationNotAllowedMessage;
     }
 
+    public Map<String, EventStatus> getInvitedUser()
+    {
+        return invitedUser;
+    }
+
+    public void setInvitedUser(Map<String, EventStatus> invitedUser)
+    {
+        this.invitedUser = invitedUser;
+    }
+
+    public void setGoing(User user)
+    {
+        invitedUser.put(user.getId(), EventStatus.GOING);
+    }
+
+    public void setDecline(User user)
+    {
+        invitedUser.put(user.getId(), EventStatus.DECLINE);
+    }
+
+    public void setMaybe(User user)
+    {
+        invitedUser.put(user.getId(), EventStatus.MAYBE);
+    }
+
+    public void setRemoved(User user)
+    {
+        invitedUser.put(user.getId(), EventStatus.REMOVED);
+    }
+
     /**
      * This function is removing unnecessary divisions from the invited division set.
      */
-    public void optimizeInvitedDivisionSet()
+    public void optimizeInvitedDivisionSet(DivisionRepository divisionRepository)
     {
         if(invitedDivision != null && !invitedDivision.isEmpty())
         {
-            invitedDivision = Division.getOptimizedSetOfDivisions(invitedDivision);
+            invitedDivision = Division.getExpandedSetOfDivisions(invitedDivision, divisionRepository);
         }
     }
 
     /**
-     * This function creates a new message object and copies only the id of the current message.
+     * This function updates the list of invited user of this event
+     * @param divisionRepository An active division repository used to expand the division set
+     */
+    public void updateInvitedUser(DivisionRepository divisionRepository)
+    {
+        if(invitedDivision == null || (invitedDivision = Division.getExpandedSetOfDivisions(invitedDivision, divisionRepository)) == null)
+        {
+            logger.error("Unable to update invited user, because invited divisions are null!");
+        } else if (invitedUser == null)
+        {
+            invitedUser = new HashMap<>();
+        } else
+        {
+            logger.info("Updating invited user for event " + this.getId());
+            Set<String> oldInvitedUser = invitedUser.keySet();
+            HashSet<String> newInvitedUser = new HashSet<>();
+            invitedDivision.stream().forEach(div -> newInvitedUser.addAll(div.getMemberList()));
+
+            if(oldInvitedUser.isEmpty() && newInvitedUser.isEmpty())
+            {
+                logger.debug("Old set of invited user and new set of invited user is empty");
+                invitedUser = new HashMap<>();
+            } else if(oldInvitedUser.isEmpty())
+            {
+                logger.debug("Old set of invited user is empty and new set of invited user is not empty");
+                invitedUser = new HashMap<>();
+                newInvitedUser.stream().forEach(userID -> invitedUser.put(userID, EventStatus.PENDING));
+            } else if(newInvitedUser.isEmpty())
+            {
+                logger.debug("New set of invited user is empty and old set of invited user is not empty");
+                invitedUser = new HashMap<>();
+                oldInvitedUser.stream().forEach(userID -> invitedUser.put(userID, EventStatus.REMOVED));
+            } else
+            {
+                logger.debug("Old and new set of invited user is not empty");
+                oldInvitedUser.removeAll(newInvitedUser);
+                oldInvitedUser.stream().forEach(userID -> invitedUser.put(userID, EventStatus.REMOVED));
+                newInvitedUser.stream().forEach(userID -> invitedUser.putIfAbsent(userID, EventStatus.PENDING));
+            }
+        }
+    }
+
+    /**
+     * This function creates a new event object and copies only the id of the current message.
      * @return A new message object only containing the id.
      */
     @JsonIgnore

@@ -31,6 +31,7 @@
 		30D4E8EC1AB45939000F2C90 /* XCGLogger.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 30D4E8EB1AB45939000F2C90 /* XCGLogger.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		30D4E8ED1AB45939000F2C90 /* XCGLogger.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 30D4E8EB1AB45939000F2C90 /* XCGLogger.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		30F254E61AC7224E00E10CB9 /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30F254E51AC7224E00E10CB9 /* SettingsViewController.swift */; };
+		30F254E81AC7271A00E10CB9 /* CalendarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30F254E71AC7271A00E10CB9 /* CalendarViewController.swift */; };
 		30FB44BB1AACC088003E4512 /* DivisionRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30FB44BA1AACC088003E4512 /* DivisionRepository.swift */; };
 		30FB44BD1AACC096003E4512 /* UserRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30FB44BC1AACC096003E4512 /* UserRepository.swift */; };
 		30FB44C11AACD819003E4512 /* DateParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30FB44C01AACD819003E4512 /* DateParser.swift */; };
@@ -93,6 +94,7 @@
 		30BAFEE11AA518EA000D18EF /* ca-cert.cer */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ca-cert.cer"; sourceTree = "<group>"; };
 		30D4E8EB1AB45939000F2C90 /* XCGLogger.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; name = XCGLogger.framework; path = "/Users/FrankSteiler/Library/Developer/Xcode/DerivedData/myVerein-fjumogbovoaqtlaguqenwejpzlol/Build/Products/Debug-iphoneos/XCGLogger.framework"; sourceTree = "<absolute>"; };
 		30F254E51AC7224E00E10CB9 /* SettingsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
+		30F254E71AC7271A00E10CB9 /* CalendarViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CalendarViewController.swift; sourceTree = "<group>"; };
 		30FB44BA1AACC088003E4512 /* DivisionRepository.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DivisionRepository.swift; sourceTree = "<group>"; };
 		30FB44BC1AACC096003E4512 /* UserRepository.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserRepository.swift; sourceTree = "<group>"; };
 		30FB44C01AACD819003E4512 /* DateParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DateParser.swift; sourceTree = "<group>"; };
@@ -157,6 +159,7 @@
 		3012715C1AA5C86400C23AEF /* ViewController */ = {
 			isa = PBXGroup;
 			children = (
+				30F254E91AC7271F00E10CB9 /* Calendar */,
 				30F254E41AC7222D00E10CB9 /* Settings */,
 				30916FF91AA79F1E004D30D1 /* Chat */,
 				30916FF81AA79F0A004D30D1 /* Login */,
@@ -276,6 +279,14 @@
 				30F254E51AC7224E00E10CB9 /* SettingsViewController.swift */,
 			);
 			name = Settings;
+			sourceTree = "<group>";
+		};
+		30F254E91AC7271F00E10CB9 /* Calendar */ = {
+			isa = PBXGroup;
+			children = (
+				30F254E71AC7271A00E10CB9 /* CalendarViewController.swift */,
+			);
+			name = Calendar;
 			sourceTree = "<group>";
 		};
 		30FB44BE1AACD203003E4512 /* Error */ = {
@@ -449,6 +460,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				30F254E81AC7271A00E10CB9 /* CalendarViewController.swift in Sources */,
 				3020CBA71A9E1289005AAEEF /* LoginViewController.swift in Sources */,
 				30A4F7D91AA97D400064EA2C /* MVNetworking.swift in Sources */,
 				30FB44C71AACD898003E4512 /* Division.swift in Sources */,

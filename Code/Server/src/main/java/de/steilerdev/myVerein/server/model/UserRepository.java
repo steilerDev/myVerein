@@ -43,6 +43,5 @@ public interface UserRepository extends MongoRepository<User, String> {
     @Query(value="{$or : [{'_id': { $regex: '.*?0.*', $options: 'i' }}, {'firstName': { $regex: '.*?0.*', $options: 'i' }}, {'lastName': { $regex: '.*?0.*', $options: 'i' }}]}", fields="{ 'firstName' : 1, 'lastName' : 1, 'email' : 1}")
     public List<User> findAllEmailAndNameContainingString(String contains);
 
-    @Query(value = "{'divisions': {$elemMatch: ?0 } }")
-    public List<User> findAllByDivisionInDivisions(Division division);
+    public List<User> findAllByDivisions(Division division);
 }

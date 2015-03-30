@@ -8,9 +8,7 @@
                                    http://www.springframework.org/schema/data/mongo/spring-mongo.xsd">
 
         <!-- Converter used to enable the use of Java 8 time classes with Spring Data -->
-        <mapping-converter id="mappingMongoConverter">
-            <custom-converters base-package="de.steilerdev.myVerein.server.converter"/>
-        </mapping-converter>
+        <mapping-converter id="mappingMongoConverter" />
 
        <!-- Database configuration -->
        <repositories base-package="de.steilerdev.myVerein.server.model" />

@@ -460,17 +460,24 @@ public class User implements UserDetails
         }
     }
 
-    public void replaceDivisions(DivisionRepository divisionRepository, Division... divs)
+    /**
+     * This function replaces the set of divisions by the stated divisions. The function guarantees that the inverse membership is handled correctly.
+     * @param divisionRepository The division repository needed to save the altered divisions.
+     * @param eventRepository The event repository needed to save the altered events.
+     * @param divs The new list of divisions for the user.
+     */
+    public void replaceDivisions(DivisionRepository divisionRepository, EventRepository eventRepository, Division... divs)
     {
-        replaceDivisions(divisionRepository, Arrays.asList(divs));
+        replaceDivisions(divisionRepository, eventRepository, Arrays.asList(divs));
     }
 
     /**
      * This function replaces the set of divisions by the stated divisions. The function guarantees that the inverse membership is handled correctly.
      * @param divisionRepository The division repository needed to save the altered divisions.
+     * @param eventRepository The event repository needed to save the altered events.
      * @param divs The new list of divisions for the user.
      */
-    public void replaceDivisions(DivisionRepository divisionRepository, List<Division> divs)
+    public void replaceDivisions(DivisionRepository divisionRepository, EventRepository eventRepository, List<Division> divs)
     {
         List<Division> finalDivisions = Division.getExpandedSetOfDivisions(divs, divisionRepository);
         List<Division> oldDivisions = divisions;
@@ -484,12 +491,26 @@ public class User implements UserDetails
             logger.debug("Division set after is empty, before is not. Removing membership subscription from old divisions.");
             oldDivisions.parallelStream().forEach(div -> div.removeMember(this));
             divisionRepository.save(oldDivisions);
+
+            //Updating events, affected by division change
+            oldDivisions.parallelStream().forEach(div -> {
+                List<Event> changedEvents = eventRepository.findAllByInvitedDivision(div);
+                changedEvents.parallelStream().forEach(event -> event.updateInvitedUser(divisionRepository));
+                eventRepository.save(changedEvents);
+            });
             divisions = new ArrayList<>();
         } else if(oldDivisions == null || oldDivisions.isEmpty())
         {
             logger.debug("Division set before is empty, after is not. Adding membership subscription to new divisions.");
             finalDivisions.parallelStream().forEach(div -> div.addMember(this));
             divisionRepository.save(finalDivisions);
+
+            //Updating events, affected by division change
+            finalDivisions.parallelStream().forEach(div -> {
+                List<Event> changedEvents = eventRepository.findAllByInvitedDivision(div);
+                changedEvents.parallelStream().forEach(event -> event.updateInvitedUser(divisionRepository));
+                eventRepository.save(changedEvents);
+            });
             divisions = finalDivisions;
         } else
         {
@@ -516,6 +537,13 @@ public class User implements UserDetails
                     });
 
             divisionRepository.save(changedDivisions);
+
+            //Updating events, affected by division change
+            changedDivisions.parallelStream().forEach(div -> {
+                List<Event> changedEvents = eventRepository.findAllByInvitedDivision(div);
+                changedEvents.parallelStream().forEach(event -> event.updateInvitedUser(divisionRepository));
+                eventRepository.save(changedEvents);
+            });
             divisions = finalDivisions;
         }
     }

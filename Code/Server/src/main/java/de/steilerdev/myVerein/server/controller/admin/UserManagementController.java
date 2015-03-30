@@ -53,6 +53,9 @@ public class UserManagementController
     @Autowired
     SettingsRepository settingsRepository;
 
+    @Autowired
+    EventRepository eventRepository;
+
     /**
      * If a modification on a division needs to be stored durable, this function is invoked by POSTing the parameters to the URI /api/admin/user.
      * @param firstName The first name of the user.
@@ -277,11 +280,11 @@ public class UserManagementController
                     divisionList.add(div);
                 }
             }
-            newUserObject.replaceDivisions(divisionRepository, divisionList);
+            newUserObject.replaceDivisions(divisionRepository, eventRepository, divisionList);
         } else
         {
             logger.debug("[" + currentUser + "] Clearing divisions for " + newUserObject.getEmail());
-            newUserObject.replaceDivisions(divisionRepository, (List<Division>)null);
+            newUserObject.replaceDivisions(divisionRepository, eventRepository, (List<Division>)null);
         }
 
         logger.debug("[" + currentUser + "] Parsing and setting custom user fields");

@@ -29,8 +29,10 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.ConstraintViolationException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Month;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.time.temporal.TemporalUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -314,13 +316,16 @@ public class EventManagementController
                 }
                 event.addDivision(div);
             }
+            event.updateInvitedUser(divisionRepository);
+        } else if(event.getInvitedDivision() != null && !event.getInvitedDivision().isEmpty())
+        {
+            event.updateInvitedUser(divisionRepository);
         }
 
         //Updating several fields.
         event.setEventAdmin(currentUser);
         event.setLastChanged(LocalDateTime.now());
         event.updateMultiDate();
-        event.optimizeInvitedDivisionSet();
 
         try
         {

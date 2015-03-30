@@ -178,7 +178,7 @@
         <!--Calendar-->
         <scene sceneID="pr5-MW-aHi">
             <objects>
-                <viewController id="a28-zv-3eW" sceneMemberID="viewController">
+                <viewController id="a28-zv-3eW" customClass="CalendarViewController" customModule="myVerein" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="h5X-RU-ARb"/>
                         <viewControllerLayoutGuide type="bottom" id="H6o-GO-hLc"/>
@@ -186,9 +186,42 @@
                     <view key="view" contentMode="scaleToFill" id="NC2-qi-Fus">
                         <rect key="frame" x="0.0" y="0.0" width="600" height="551"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="WjX-pm-TWJ" customClass="JTCalendarMenuView">
+                                <rect key="frame" x="16" y="28" width="568" height="57"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            </view>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ztp-J8-e6v" customClass="JTCalendarContentView">
+                                <rect key="frame" x="16" y="93" width="568" height="458"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            </view>
+                        </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="ztp-J8-e6v" firstAttribute="leading" secondItem="WjX-pm-TWJ" secondAttribute="trailing" constant="8" symbolic="YES" id="1iU-4Y-wZi"/>
+                            <constraint firstItem="ztp-J8-e6v" firstAttribute="leading" secondItem="NC2-qi-Fus" secondAttribute="leadingMargin" id="AtQ-sx-otz"/>
+                            <constraint firstItem="WjX-pm-TWJ" firstAttribute="top" secondItem="h5X-RU-ARb" secondAttribute="bottom" constant="8" symbolic="YES" id="MbI-hT-JYM"/>
+                            <constraint firstItem="ztp-J8-e6v" firstAttribute="height" secondItem="WjX-pm-TWJ" secondAttribute="height" multiplier="8" id="OMm-C8-f7A"/>
+                            <constraint firstItem="ztp-J8-e6v" firstAttribute="top" secondItem="WjX-pm-TWJ" secondAttribute="bottom" constant="8" symbolic="YES" id="S6q-ev-1xG"/>
+                            <constraint firstItem="WjX-pm-TWJ" firstAttribute="leading" secondItem="NC2-qi-Fus" secondAttribute="leadingMargin" id="Xv8-50-E08"/>
+                            <constraint firstItem="WjX-pm-TWJ" firstAttribute="top" secondItem="h5X-RU-ARb" secondAttribute="bottom" constant="8" symbolic="YES" id="YBw-rm-XXy"/>
+                            <constraint firstItem="H6o-GO-hLc" firstAttribute="top" secondItem="ztp-J8-e6v" secondAttribute="bottom" id="Zrt-EN-QRz"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="WjX-pm-TWJ" secondAttribute="trailing" id="aZA-oq-2b5"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="ztp-J8-e6v" secondAttribute="trailing" id="q8o-qW-dvz"/>
+                        </constraints>
+                        <variation key="default">
+                            <mask key="constraints">
+                                <exclude reference="MbI-hT-JYM"/>
+                                <exclude reference="1iU-4Y-wZi"/>
+                            </mask>
+                        </variation>
                     </view>
+                    <extendedEdge key="edgesForExtendedLayout"/>
                     <tabBarItem key="tabBarItem" title="Calendar" image="Calendar" id="QyH-k7-AwZ"/>
+                    <connections>
+                        <outlet property="contentView" destination="ztp-J8-e6v" id="wv5-We-ROI"/>
+                        <outlet property="menuView" destination="WjX-pm-TWJ" id="6cz-A3-OJ5"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Axl-p1-siy" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
