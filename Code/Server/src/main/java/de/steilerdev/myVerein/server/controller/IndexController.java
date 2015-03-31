@@ -206,6 +206,7 @@ public class IndexController
         event1.addDivision(div2);
         event1.setEventAdmin(user1);
         event1.updateMultiDate();
+        event1.setLastChanged(LocalDateTime.now());
 
         Event event2 = new Event();
         event2.setStartDateTime(LocalDateTime.of(2015, 1, 20, 13, 0));
@@ -214,6 +215,7 @@ public class IndexController
         event2.addDivision(div3);
         event2.setEventAdmin(user4);
         event2.updateMultiDate();
+        event2.setLastChanged(LocalDateTime.now());
 
         Event event3 = new Event();
         event3.setStartDateTime(LocalDateTime.of(2015, 1, 21, 13, 0));
@@ -222,6 +224,7 @@ public class IndexController
         event3.addDivision(div1);
         event3.setEventAdmin(user1);
         event3.updateMultiDate();
+        event3.setLastChanged(LocalDateTime.now());
 
         Event event4 = new Event();
         event4.setStartDateTime(LocalDateTime.of(2015, 1, 11, 13, 0));
@@ -230,6 +233,7 @@ public class IndexController
         event4.addDivision(div1);
         event4.setEventAdmin(user2);
         event4.updateMultiDate();
+        event4.setLastChanged(LocalDateTime.now());
 
         eventRepository.save(event1);
         eventRepository.save(event2);
@@ -248,8 +252,8 @@ public class IndexController
         userRepository.save(user4);
         userRepository.save(user5);
 
-        Message message1 = new Message("Hello world", user1, div1);
-        Message message2 = new Message("Hello world, too", user2, div1);
+        Message message1 = new Message("Hello world", user1, divisionRepository.findById(div1.getId()));
+        Message message2 = new Message("Hello world, too", user2, divisionRepository.findById(div1.getId()));
         messageRepository.save(message1);
         messageRepository.save(message2);
     }

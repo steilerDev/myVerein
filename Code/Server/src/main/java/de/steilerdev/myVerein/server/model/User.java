@@ -489,7 +489,7 @@ public class User implements UserDetails
         } else if(finalDivisions == null || finalDivisions.isEmpty())
         {
             logger.debug("Division set after is empty, before is not. Removing membership subscription from old divisions.");
-            oldDivisions.parallelStream().forEach(div -> div.removeMember(this));
+            oldDivisions.stream().forEach(div -> div.removeMember(this));
             divisionRepository.save(oldDivisions);
 
             //Updating events, affected by division change
@@ -502,7 +502,7 @@ public class User implements UserDetails
         } else if(oldDivisions == null || oldDivisions.isEmpty())
         {
             logger.debug("Division set before is empty, after is not. Adding membership subscription to new divisions.");
-            finalDivisions.parallelStream().forEach(div -> div.addMember(this));
+            finalDivisions.stream().forEach(div -> div.addMember(this));
             divisionRepository.save(finalDivisions);
 
             //Updating events, affected by division change
@@ -518,7 +518,7 @@ public class User implements UserDetails
             List<Division> intersect = finalDivisions.stream().filter(oldDivisions::contains).collect(Collectors.toList()); //These items are already in the list, and do not need to be modified
 
             //Collecting changed division for batch save
-            List<Division> changedDivisions = new ArrayList<>();
+            List<Division> changedDivisions = Collections.synchronizedList(new ArrayList<>());
 
             //Removing membership from removed divisions
             oldDivisions.parallelStream()

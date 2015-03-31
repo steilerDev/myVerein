@@ -27,9 +27,7 @@ import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -280,6 +278,9 @@ public class Division implements Comparable<Division>
         {
             logger.warn("Trying to optimize set of divisions, but unoptimized set is either null or empty");
             return null;
+        } else if (unoptimizedSetOfDivisions.size() == 1)
+        {
+            return unoptimizedSetOfDivisions;
         } else
         {
             logger.debug("Optimizing division set");
@@ -308,15 +309,14 @@ public class Division implements Comparable<Division>
         } else
         {
             logger.debug("Expanding division set");
-            ArrayList<Division> expandedSetOfDivisions = new ArrayList<>();
-            //The set is guaranteed to be sorted
+            HashSet<Division>  expandedSetOfDivisions = new HashSet<>();
 
             for (Division division: initialSetOfDivisions)
             {
                 expandedSetOfDivisions.addAll(divisionRepository.findByAncestors(division));
-                expandedSetOfDivisions.add(division);
+                expandedSetOfDivisions.add(divisionRepository.findById(division.getId()));
             }
-            return expandedSetOfDivisions;
+            return new ArrayList<>(expandedSetOfDivisions);
         }
     }
 
@@ -335,6 +335,12 @@ public class Division implements Comparable<Division>
     public int hashCode()
     {
         return id == null? 0: id.hashCode();
+    }
+
+    @Override
+    public String toString()
+    {
+        return name != null && !name.isEmpty()? name: id;
     }
 
     /**

@@ -39,5 +39,6 @@ public interface EventRepository extends MongoRepository<Event, String> {
     @Query(value = "{?0 : { $exists: true } }")
     List<Event> findAllByPrefixedInvitedUser(String prefixedUserID);
 
-    List<Event> findAllByInvitedUserAndLastChangedLessThan(String user, LocalDateTime lastChanged);
+    @Query(value = "{$and: [{?0 : { $exists: true }}, {'lastChanged': {$gt: ?1}}] }")
+    List<Event> findAllByPrefixedInvitedUserAndLastChangedLessThan(String prefixedUserID, LocalDateTime lastChanged);
 }
