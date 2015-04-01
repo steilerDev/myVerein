@@ -15,6 +15,7 @@
 package de.steilerdev.myVerein.server.controller.user;
 
 import de.steilerdev.myVerein.server.model.Event;
+import de.steilerdev.myVerein.server.model.Event.EventStatus;
 import de.steilerdev.myVerein.server.model.EventRepository;
 import de.steilerdev.myVerein.server.model.User;
 import de.steilerdev.myVerein.server.security.CurrentUser;
@@ -28,7 +29,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -44,41 +44,44 @@ public class EventController
     private EventRepository eventRepository;
 
     /**
-     * This function gathers all events for the currently logged in user. If lastChanged is stated only events that changed after that moment are returned.
+     * This function gathers all events for the currently logged in user. If lastChanged is stated only events that
+     * changed after that moment are returned.
+     *
      * @param lastChanged The date of the last changed action, correctly formatted (YYYY-MM-DDTHH:mm:ss)
      * @param currentUser The currently logged in user
-     * @return A list of all events for the user that changed since the last changed moment in time (only containing id's)
+     * @return A list of all events for the user that changed since the last changed moment in time (only containing
+     * id's)
      */
     @RequestMapping(produces = "application/json", method = RequestMethod.GET)
     public ResponseEntity<List<Event>> getAllEventsForUser(@RequestParam(required = false) String lastChanged, @CurrentUser User currentUser)
     {
         List<Event> events;
-        if(lastChanged != null && !lastChanged.isEmpty())
+        if (lastChanged != null && !lastChanged.isEmpty())
         {
-            logger.debug("[" + currentUser + "] Gathering all user events changed after " + lastChanged);
+            logger.debug("[{}] Gathering all user events changed after {}", currentUser, lastChanged);
             LocalDateTime lastChangedTime;
             try
             {
                 lastChangedTime = LocalDateTime.parse(lastChanged, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-            } catch(DateTimeParseException e)
+            } catch (DateTimeParseException e)
             {
-                logger.warn("[" + currentUser + "] Unable to get all events for user, because the last changed format is wrong: " + e.getLocalizedMessage());
+                logger.warn("[{}] Unable to get all events for user, because the last changed format is wrong: {}", currentUser, e.getLocalizedMessage());
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
             events = eventRepository.findAllByPrefixedInvitedUserAndLastChangedLessThan(Event.prefixedUserIDForUser(currentUser), lastChangedTime);
         } else
         {
-            logger.debug("[" + currentUser + "] Gathering all user events");
+            logger.debug("[{}] Gathering all user events", currentUser);
             events = eventRepository.findAllByPrefixedInvitedUser(Event.prefixedUserIDForUser(currentUser));
         }
 
-        if(events == null || events.isEmpty())
+        if (events == null || events.isEmpty())
         {
-            logger.warn("[" + currentUser + "] No events to return");
+            logger.warn("[{}] No events to return", currentUser);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         } else
         {
-            logger.info("[" + currentUser + "] Returning " + events.size() + " events");
+            logger.info("[{}] Returning {} events", currentUser, events.size());
             events.replaceAll(Event::getSendingObjectOnlyId);
             return new ResponseEntity<>(events, HttpStatus.OK);
         }
@@ -87,22 +90,61 @@ public class EventController
     @RequestMapping(produces = "application/json", params = "id", method = RequestMethod.GET)
     public ResponseEntity<Event> getEvent(@RequestParam String id, @CurrentUser User currentUser)
     {
-        logger.debug("[" + currentUser + "] Gathering event with id " + id);
-        if(id.isEmpty())
+        logger.debug("[{}] Gathering event with id {}", currentUser, id);
+        if (id.isEmpty())
         {
-            logger.warn("[" + currentUser + "] The id is not allowed to be empty");
+            logger.warn("[{}] The id is not allowed to be empty", currentUser);
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } else
         {
             Event event = eventRepository.findEventById(id);
             if (event == null)
             {
-                logger.warn("[" + currentUser + "] Unable to find event with id " + id);
+                logger.warn("[{}] Unable to find event with id {}", currentUser, id);
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             } else
             {
-                logger.info("[" + currentUser + "] Returning event " + event);
+                logger.info("[{}] Returning event {}", currentUser, event);
                 return new ResponseEntity<>(event.getSendingObjectInternalSync(), HttpStatus.OK);
+            }
+        }
+    }
+
+    @RequestMapping(produces = "application/json", method = RequestMethod.POST)
+    public ResponseEntity respondToEvent(@RequestParam(value = "response") String responseString, @RequestParam String id, @CurrentUser User currentUser)
+    {
+        logger.debug("[{}] Responding to event {} with {}", currentUser, id, responseString);
+        Event event;
+        if(id.isEmpty())
+        {
+            logger.warn("[{}] The event id is not allowed to be empty", currentUser);
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        } else if((event = eventRepository.findEventById(id)) == null)
+        {
+            logger.warn("[{}] Unable to gather the specified event with id {}", currentUser, id);
+            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+        } else
+        {
+            EventStatus response;
+            try
+            {
+                response = EventStatus.valueOf(responseString.toUpperCase());
+            } catch (IllegalArgumentException e)
+            {
+                logger.warn("[{}] Unable to parse response: {}", currentUser, e.getLocalizedMessage());
+                return new ResponseEntity(HttpStatus.BAD_REQUEST);
+            }
+
+            if(!event.getInvitedUser().containsKey(currentUser.getId()))
+            {
+                logger.warn("[{}] User is not invited to the event");
+                return new ResponseEntity(HttpStatus.BAD_REQUEST);
+            } else
+            {
+                event.getInvitedUser().put(currentUser.getId(), response);
+                eventRepository.save(event);
+                logger.info("[{}] Successfully responded to event {} with response {}", currentUser, event, response);
+                return new ResponseEntity(HttpStatus.OK);
             }
         }
     }

@@ -467,12 +467,12 @@ public class Event
 
         if(sendingObject.getEventAdmin() != null)
         {
-            sendingObject.setEventAdmin(sendingObject.getEventAdmin().getSendingObjectOnlyEmailNameId());
+            sendingObject.setEventAdmin(sendingObject.getEventAdmin().getSendingObjectOnlyId());
         }
 
         if(sendingObject.getInvitedDivision() != null)
         {
-            sendingObject.getInvitedDivision().replaceAll(Division::getSendingObjectInternalSync);
+            sendingObject.getInvitedDivision().replaceAll(Division::getSendingObjectOnlyId);
         }
 
         return sendingObject;
@@ -507,6 +507,12 @@ public class Event
     public boolean equals(Object obj)
     {
         return obj != null && obj instanceof Event && this.id != null && this.id.equals(((Event) obj).getId());
+    }
+
+    @Override
+    public String toString()
+    {
+        return name != null && !name.isEmpty()? name: id;
     }
 
     /**
