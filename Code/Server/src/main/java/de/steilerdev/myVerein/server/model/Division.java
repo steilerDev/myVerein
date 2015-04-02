@@ -47,15 +47,15 @@ public class Division implements Comparable<Division>
     private String desc;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    @DBRef
+    @DBRef(lazy = true)
     private User adminUser;
 
     @JsonIgnore
-    @DBRef
+    @DBRef(lazy = true)
     private Division parent;
 
     @JsonIgnore
-    @DBRef
+    @DBRef(lazy = true)
     private List<Division> ancestors;
 
     @JsonIgnore

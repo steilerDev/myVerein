@@ -88,19 +88,19 @@ public class EventController
     }
 
     @RequestMapping(produces = "application/json", params = "id", method = RequestMethod.GET)
-    public ResponseEntity<Event> getEvent(@RequestParam String id, @CurrentUser User currentUser)
+    public ResponseEntity<Event> getEvent(@RequestParam String eventID, @CurrentUser User currentUser)
     {
-        logger.debug("[{}] Gathering event with id {}", currentUser, id);
-        if (id.isEmpty())
+        logger.debug("[{}] Gathering event with id {}", currentUser, eventID);
+        if (eventID.isEmpty())
         {
             logger.warn("[{}] The id is not allowed to be empty", currentUser);
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } else
         {
-            Event event = eventRepository.findEventById(id);
+            Event event = eventRepository.findEventById(eventID);
             if (event == null)
             {
-                logger.warn("[{}] Unable to find event with id {}", currentUser, id);
+                logger.warn("[{}] Unable to find event with id {}", currentUser, eventID);
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             } else
             {
@@ -111,17 +111,17 @@ public class EventController
     }
 
     @RequestMapping(produces = "application/json", method = RequestMethod.POST)
-    public ResponseEntity respondToEvent(@RequestParam(value = "response") String responseString, @RequestParam String id, @CurrentUser User currentUser)
+    public ResponseEntity respondToEvent(@RequestParam(value = "response") String responseString, @RequestParam String eventID, @CurrentUser User currentUser)
     {
-        logger.debug("[{}] Responding to event {} with {}", currentUser, id, responseString);
+        logger.debug("[{}] Responding to event {} with {}", currentUser, eventID, responseString);
         Event event;
-        if(id.isEmpty())
+        if(eventID.isEmpty())
         {
             logger.warn("[{}] The event id is not allowed to be empty", currentUser);
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
-        } else if((event = eventRepository.findEventById(id)) == null)
+        } else if((event = eventRepository.findEventById(eventID)) == null)
         {
-            logger.warn("[{}] Unable to gather the specified event with id {}", currentUser, id);
+            logger.warn("[{}] Unable to gather the specified event with id {}", currentUser, eventID);
             return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
         } else
         {

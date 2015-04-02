@@ -41,11 +41,11 @@ public class Picture
     private String description;
     private List<String> tags;
 
-    @DBRef
+    @DBRef(lazy = true)
     @NotNull
     private User uploader;
 
-    @DBRef
+    @DBRef(lazy = true)
     private Division division;
 
     public Picture() {}

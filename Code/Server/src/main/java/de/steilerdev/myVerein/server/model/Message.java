@@ -84,12 +84,12 @@ public class Message
     @JsonIgnore
     private Map<String, MessageStatus> receiver;
 
-    @DBRef
+    @DBRef(lazy = true)
     @NotNull
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private User sender;
 
-    @DBRef
+    @DBRef(lazy = true)
     @NotNull
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Division group;

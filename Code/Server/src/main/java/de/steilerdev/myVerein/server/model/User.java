@@ -89,7 +89,7 @@ public class User implements UserDetails
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Map<String,String> customUserField;
 
-    @DBRef
+    @DBRef(lazy = true)
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<Division> divisions;
 

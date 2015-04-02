@@ -134,12 +134,12 @@ public class Event
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String administrationNotAllowedMessage;
 
-    @DBRef
+    @DBRef(lazy = true)
     @NotEmpty
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<Division> invitedDivision;
 
-    @DBRef
+    @DBRef(lazy = true)
     @NotNull
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private User eventAdmin;
