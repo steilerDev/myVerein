@@ -375,33 +375,30 @@ public class Event
      */
     public void updateInvitedUser(DivisionRepository divisionRepository)
     {
+
         if(invitedDivision == null || (invitedDivision = Division.getExpandedSetOfDivisions(invitedDivision, divisionRepository)) == null)
         {
             logger.error("Unable to update invited user, because invited divisions are null!");
-        } else if (invitedUser == null)
+        }  else
         {
-            invitedUser = new HashMap<>();
-        } else
-        {
-            logger.info("Updating invited user for event " + this.getId());
-            Set<String> oldInvitedUser = invitedUser.keySet();
+            logger.info("Updating invited user for event " + this);
+            Set<String> oldInvitedUser = invitedUser == null? new HashSet<>(): invitedUser.keySet();
             HashSet<String> newInvitedUser = new HashSet<>();
             invitedDivision.stream().forEach(div -> newInvitedUser.addAll(div.getMemberList()));
 
-            if(oldInvitedUser.isEmpty() && newInvitedUser.isEmpty())
+            if(oldInvitedUser.isEmpty() || newInvitedUser.isEmpty())
             {
-                logger.debug("Old set of invited user and new set of invited user is empty");
+                logger.debug("Old set of invited user or new set of invited user is empty");
                 invitedUser = new HashMap<>();
-            } else if(oldInvitedUser.isEmpty())
-            {
-                logger.debug("Old set of invited user is empty and new set of invited user is not empty");
-                invitedUser = new HashMap<>();
-                newInvitedUser.stream().forEach(userID -> invitedUser.put(userID, EventStatus.PENDING));
-            } else if(newInvitedUser.isEmpty())
-            {
-                logger.debug("New set of invited user is empty and old set of invited user is not empty");
-                invitedUser = new HashMap<>();
-                oldInvitedUser.stream().forEach(userID -> invitedUser.put(userID, EventStatus.REMOVED));
+                if (oldInvitedUser.isEmpty() && !newInvitedUser.isEmpty())
+                {
+                    logger.debug("Old set of invited user is empty and new set of invited user is not empty");
+                    newInvitedUser.stream().forEach(userID -> invitedUser.put(userID, EventStatus.PENDING));
+                } else if (newInvitedUser.isEmpty() && !oldInvitedUser.isEmpty())
+                {
+                    logger.debug("New set of invited user is empty and old set of invited user is not empty");
+                    oldInvitedUser.stream().forEach(userID -> invitedUser.put(userID, EventStatus.REMOVED));
+                }
             } else
             {
                 logger.debug("Old and new set of invited user is not empty");

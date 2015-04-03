@@ -479,16 +479,18 @@ public class User implements UserDetails
      */
     public void replaceDivisions(DivisionRepository divisionRepository, EventRepository eventRepository, List<Division> divs)
     {
+        logger.debug("[{}] Replacing division set", this);
+
         List<Division> finalDivisions = Division.getExpandedSetOfDivisions(divs, divisionRepository);
         List<Division> oldDivisions = divisions;
 
         if((finalDivisions == null || finalDivisions.isEmpty()) && (oldDivisions == null || oldDivisions.isEmpty()))
         {
-            logger.debug("Division sets before and after are both empty");
+            logger.debug("[{}] Division sets before and after are both empty", this);
             divisions = new ArrayList<>();
         } else if(finalDivisions == null || finalDivisions.isEmpty())
         {
-            logger.debug("Division set after is empty, before is not. Removing membership subscription from old divisions.");
+            logger.debug("[{}] Division set after is empty, before is not. Removing membership subscription from old divisions", this);
             oldDivisions.stream().forEach(div -> div.removeMember(this));
             divisionRepository.save(oldDivisions);
 
@@ -501,20 +503,20 @@ public class User implements UserDetails
             divisions = new ArrayList<>();
         } else if(oldDivisions == null || oldDivisions.isEmpty())
         {
-            logger.debug("Division set before is empty, after is not. Adding membership subscription to new divisions.");
+            logger.debug("[{}] Division set before is empty, after is not. Adding membership subscription to new divisions", this);
             finalDivisions.stream().forEach(div -> div.addMember(this));
             divisionRepository.save(finalDivisions);
 
             //Updating events, affected by division change
-            finalDivisions.parallelStream().forEach(div -> {
+            finalDivisions.stream().forEach(div -> {
                 List<Event> changedEvents = eventRepository.findAllByInvitedDivision(div);
-                changedEvents.parallelStream().forEach(event -> event.updateInvitedUser(divisionRepository));
+                changedEvents.stream().forEach(event -> event.updateInvitedUser(divisionRepository));
                 eventRepository.save(changedEvents);
             });
             divisions = finalDivisions;
         } else
         {
-            logger.debug("Division set after and before are not empty. Applying changed membership subscriptions.");
+            logger.debug("[{}] Division set after and before are not empty. Applying changed membership subscriptions", this);
             List<Division> intersect = finalDivisions.stream().filter(oldDivisions::contains).collect(Collectors.toList()); //These items are already in the list, and do not need to be modified
 
             //Collecting changed division for batch save

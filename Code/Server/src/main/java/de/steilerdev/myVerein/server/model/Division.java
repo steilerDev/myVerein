@@ -346,23 +346,30 @@ public class Division implements Comparable<Division>
     /**
      * This function is comparable to other divisions according to their distance to the root node.
      * @param o The division which is compared to the current division.
-     * @return A negative integer, zero, or a positive integer as this object is less than, equal to, or greater than the specified object.
+     * @return A negative integer, zero, or a positive integer as this object is less than, equal to, or greater than the specified object. If o is null, 0 is returned.
      */
     @Override
     public int compareTo(Division o)
     {
-        List<Division> thisAncestors = this.getAncestors(),
-                otherAncestors = o.getAncestors();
+        if(o != null)
+        {
+            List<Division> thisAncestors = this.getAncestors(),
+                    otherAncestors = o.getAncestors();
 
-        if(thisAncestors == null || thisAncestors.isEmpty())
-        {
-            return 1;
-        } else if(otherAncestors == null || otherAncestors.isEmpty())
-        {
-            return -1;
+            if (thisAncestors == null || thisAncestors.isEmpty())
+            {
+                return 1;
+            } else if (otherAncestors == null || otherAncestors.isEmpty())
+            {
+                return -1;
+            } else
+            {
+                return Integer.compare(thisAncestors.size(), otherAncestors.size());
+            }
         } else
         {
-            return Integer.compare(thisAncestors.size(), otherAncestors.size());
+            System.err.println("Null");
+            return 0;
         }
     }
 }
