@@ -129,21 +129,6 @@
                             <hr/>
 
                             <div class="form-group">
-                                <label for="rememberMeTokenKey" th:text="#{init.page.settings.rememberMeKey.label}">Remember me token key</label>
-                                <input id="rememberMeTokenKey" name="rememberMeTokenKey" class="form-control" type="text"
-                                       placeholder="Enter your private key, used to secure the remember me token"
-                                       th:placeholder="#{init.page.settings.rememberMeKey.placeholder}"
-
-                                       data-bv-notempty="true"
-                                       data-bv-notempty-message="The remember me token key is required and cannot be empty"
-                                       th:attr="data-bv-notempty-message=#{init.page.settings.rememberMeKey.bv}"/>
-
-                                <p class="help-block" th:text="#{init.page.settings.rememberMeKey.help}">This key is used to secure the cookie used by the"remember-me" functionality. Please use a random phrase.</p>
-                            </div>
-
-                            <hr/>
-
-                            <div class="form-group">
                                 <div class="progress-button" id="initSettingsSubmitButton">
                                     <button type="submit"><span th:text="#{init.page.settings.proceed}">Proceed</span></button>
                                     <svg class="progress-circle" width="50" height="50">

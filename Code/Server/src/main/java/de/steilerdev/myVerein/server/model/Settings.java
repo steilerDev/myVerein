@@ -45,8 +45,6 @@ public class Settings
 
     private String clubName;
 
-    private String rememberMeKey;
-
     private List<String> customUserFields;
 
     @Transient
@@ -388,20 +386,25 @@ public class Settings
 
     public Map<String, Object> getSettingsMap()
     {
-        Map<String, Object> settingsMap;
+        Map<String, Object> settingsMap = new HashMap<>();
         try
         {
-            settingsMap = (Map<String, Object>)loadSettingsFromFile().clone();
-            if(settingsMap == null)
+            Properties settingsFromFile;
+            if((settingsFromFile = loadSettingsFromFile()) != null)
             {
-                throw new IOException("There is no settings map");
+                for(Object key: settingsFromFile.keySet())
+                {
+                    settingsMap.put((String)key, settingsFromFile.get(key));
+                }
+            } else
+            {
+                logger.warn("Unable to load settings from file");
             }
         } catch (IOException e)
         {
             logger.error("Unable to load settings from file");
             settingsMap = new HashMap<>();
         }
-        settingsMap.put("rememberMeKey", rememberMeKey);
         settingsMap.put("clubName", clubName);
         settingsMap.put("customUserFields", customUserFields);
 
@@ -436,16 +439,6 @@ public class Settings
     public void setCustomUserFields(List<String> customUserFields)
     {
         this.customUserFields = customUserFields;
-    }
-
-    public String getRememberMeKey()
-    {
-        return rememberMeKey;
-    }
-
-    public void setRememberMeKey(String rememberMeKey)
-    {
-        this.rememberMeKey = rememberMeKey;
     }
 
     public String getSystemVersion()

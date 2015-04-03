@@ -128,7 +128,6 @@ function loadSettings() {
                 $('#databaseUser').val(response.dbUser);
                 $('#databasePassword').val(response.dbPassword);
                 $('#databaseCollection').val(response.dbName);
-                $('#rememberMeTokenKey').val(response.rememberMeKey);
                 $('#clubName').val(response.clubName);
                 if(response.clubLogoAvailable) {
                     $('#clubLogoDelete').removeClass("hidden");
@@ -136,9 +135,11 @@ function loadSettings() {
                     $('#clubLogoDelete').addClass("hidden");
                 }
 
-                response.customUserFields.forEach(function(entry){
-                    addCustomUserFieldSettings(entry);
-                })
+                if(response.customUserFields) {
+                    response.customUserFields.forEach(function (entry) {
+                        addCustomUserFieldSettings(entry);
+                    })
+                }
             }
             currentAdminSelectize[0].selectize.addItem(response.currentAdmin.email);
             $('#locale').val(locale);

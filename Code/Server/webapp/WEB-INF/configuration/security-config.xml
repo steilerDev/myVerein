@@ -65,7 +65,7 @@
 
         <!-- Remember me configuration -->
         <beans:bean id="rememberMeServices" class="org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices">
-            <beans:constructor-arg value="${rememberMeKey}"/>
+            <beans:constructor-arg value="myVereinRememberMeKey"/>
             <beans:constructor-arg ref="userAuthenticationService"/>
             <beans:constructor-arg ref="tokenDataProvider"/>
             <beans:property name="cookieName" value="myVereinRememberMeCookie"/>
@@ -102,6 +102,6 @@
 
         <beans:bean id="rememberMeAuthenticationService"
                     class="org.springframework.security.authentication.RememberMeAuthenticationProvider">
-            <beans:constructor-arg value="${rememberMeKey}"/>
+            <beans:constructor-arg value="myVereinRememberMeKey"/>
         </beans:bean>
 </beans:beans>

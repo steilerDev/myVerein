@@ -256,6 +256,13 @@ public class IndexController
         Message message2 = new Message("Hello world, too", user2, divisionRepository.findById(div1.getId()));
         messageRepository.save(message1);
         messageRepository.save(message2);
+
+        Settings systemSettings = new Settings();
+        systemSettings.setClubName("myVerein");
+        List<String> customUserFields = new ArrayList<>();
+        customUserFields.add("Membership number");
+        systemSettings.setCustomUserFields(customUserFields);
+        settingsRepository.save(systemSettings);
     }
 
     /**

@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
+import org.springframework.data.mongodb.LazyLoadingException;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 
@@ -55,7 +56,7 @@ public class Division implements Comparable<Division>
     private Division parent;
 
     @JsonIgnore
-    @DBRef(lazy = true)
+    @DBRef //(lazy = true)
     private List<Division> ancestors;
 
     @JsonIgnore
@@ -353,22 +354,29 @@ public class Division implements Comparable<Division>
     {
         if(o != null)
         {
-            List<Division> thisAncestors = this.getAncestors(),
-                    otherAncestors = o.getAncestors();
+            try
+            {
+                List<Division> thisAncestors = this.getAncestors(),
+                        otherAncestors = o.getAncestors();
 
-            if (thisAncestors == null || thisAncestors.isEmpty())
+                if (thisAncestors == null || thisAncestors.isEmpty())
+                {
+                    return 1;
+                } else if (otherAncestors == null || otherAncestors.isEmpty())
+                {
+                    return -1;
+                } else
+                {
+                    return Integer.compare(thisAncestors.size(), otherAncestors.size());
+                }
+            } catch (LazyLoadingException e)
             {
-                return 1;
-            } else if (otherAncestors == null || otherAncestors.isEmpty())
-            {
-                return -1;
-            } else
-            {
-                return Integer.compare(thisAncestors.size(), otherAncestors.size());
+                logger.error("Unable to compare divisions {} {}: {}", o, this, e.getLocalizedMessage());
+                return 0;
             }
         } else
         {
-            System.err.println("Null");
+            logger.error("Comparing {} with null division", this);
             return 0;
         }
     }

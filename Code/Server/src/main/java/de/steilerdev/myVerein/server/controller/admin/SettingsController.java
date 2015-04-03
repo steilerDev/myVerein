@@ -133,7 +133,6 @@ public class SettingsController
                                                @RequestParam(required = false) String databaseUser,
                                                @RequestParam(required = false) String databasePassword,
                                                @RequestParam(required = false) String databaseCollection,
-                                               @RequestParam(required = false) String rememberMeTokenKey,
                                                @RequestParam Map<String, String> parameters,
                                                @RequestParam String currentAdminPassword,
                                                @CurrentUser User currentUser)
@@ -229,12 +228,6 @@ public class SettingsController
                     {
                         logger.debug("[" + currentUser + "] Setting database collection name " + databaseCollection);
                         settings.setDatabaseName(databaseCollection);
-                    }
-
-                    if (rememberMeTokenKey != null && !rememberMeTokenKey.isEmpty())
-                    {
-                        logger.debug("[" + currentUser + "] Setting remember me token key " + rememberMeTokenKey);
-                        settings.setRememberMeKey(rememberMeTokenKey);
                     }
 
                     logger.debug("[" + currentUser + "] Gathering all custom user fields");

@@ -72,7 +72,6 @@ public class InitController
                                                @RequestParam String databaseUser,
                                                @RequestParam String databasePassword,
                                                @RequestParam String databaseCollection,
-                                               @RequestParam String rememberMeTokenKey,
                                                Locale locale)
     {
         logger.trace("Starting initial settings configuration");
@@ -81,10 +80,10 @@ public class InitController
         {
             logger.warn("An initial setup API was used, even though the system is already configured.");
             return new ResponseEntity<>(messageSource.getMessage("init.message.settings.notAllowed", null, "You are not allowed to perform this action at the moment", locale), HttpStatus.BAD_REQUEST);
-        } else if(clubName.isEmpty() || rememberMeTokenKey.isEmpty())
+        } else if(clubName.isEmpty())
         {
-            logger.warn("The club name or remember me key is not present");
-            return new ResponseEntity<>(messageSource.getMessage("init.message.settings.noKeyOrName", null, "The club name and remember me key is required", locale), HttpStatus.BAD_REQUEST);
+            logger.warn("The club name is not present");
+            return new ResponseEntity<>(messageSource.getMessage("init.message.settings.noName", null, "The club name is required", locale), HttpStatus.BAD_REQUEST);
         } else
         {
             int databasePortInt = 27017;
@@ -130,7 +129,6 @@ public class InitController
                 settings.setDatabasePassword(databasePassword);
                 settings.setDatabaseName(databaseCollection);
                 databaseName = databaseCollection;
-                settings.setRememberMeKey(rememberMeTokenKey);
                 savingInitialSetup(null, null, settings);
             } catch (IOException e)
             {
