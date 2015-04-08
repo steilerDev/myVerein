@@ -124,7 +124,7 @@ class MessageRepository: MVCoreDataRepository {
     newItem.read = false
     
     // If this is the first message, or the message is newer use it
-    if division.latestMessage == nil || division.latestMessage?.timestamp.compare(timestamp) == NSComparisonResult.OrderedAscending {
+    if division.latestMessage == nil || division.latestMessage?.timestamp?.compare(timestamp) == NSComparisonResult.OrderedAscending {
       logger.debug("Message \(id) is newest in division \(division.id), updating division's latest message")
       division.latestMessage = newItem
     }

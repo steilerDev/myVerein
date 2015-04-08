@@ -36,8 +36,8 @@ class DivisionChatOverviewViewController: UICollectionViewController {
     
     let predicate = NSCompoundPredicate(type: .OrPredicateType,
       subpredicates: [
-        NSPredicate(format: "\(DivisionChatOverviewConstants.PredicateField) == %@", Division.UserMembershipStatus.Member.rawValue),
-        NSPredicate(format: "\(DivisionChatOverviewConstants.PredicateField) == %@", Division.UserMembershipStatus.FormerMember.rawValue)
+        NSPredicate(format: "\(DivisionChatOverviewConstants.PredicateField) == %@", UserMembershipStatus.Member.rawValue),
+        NSPredicate(format: "\(DivisionChatOverviewConstants.PredicateField) == %@", UserMembershipStatus.FormerMember.rawValue)
       ]
     )
     fetchRequest.predicate = predicate

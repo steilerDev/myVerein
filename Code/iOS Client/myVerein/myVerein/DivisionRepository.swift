@@ -27,7 +27,7 @@ class DivisionRepository: MVCoreDataRepository {
     return executeSingleRequest(fetchRequest)
   }
   
-  func findDivisionBy(#userMembershipStatus: Division.UserMembershipStatus) -> [Division]? {
+  func findDivisionBy(#userMembershipStatus: UserMembershipStatus) -> [Division]? {
     logger.verbose("Retrieving divisions the user's membership status is \(userMembershipStatus)")
     // Create a new fetch request using the Message entity
     let fetchRequest = NSFetchRequest(entityName: DivisionConstants.ClassName)

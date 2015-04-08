@@ -1,9 +1,24 @@
 //
-//  NetworkingAction.swift
-//  myVerein
+// Copyright (C) 2015 Frank Steiler <frank@steilerdev.de>
 //
-//  Created by Frank Steiler on 06/03/15.
-//  Copyright (c) 2015 steilerDev. All rights reserved.
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 2 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
+
+//
+//  NetworkingAction.swift
+//  This file is providing the lowest level of networking actions. A unified way to handle errors and authentication is done by this class. 
+//  Extensions of the class offer more abstract ways to perform the pure network interactions for gathering objects.
 //
 
 import Foundation
@@ -12,240 +27,10 @@ import AFNetworking
 import XCGLogger
 import SwiftyUserDefaults
 
-/// This class holds all available network interaction functions. It provides proper error handling and callbacks for each call.
+/// This class provides proper network and error handling with the currently stored host.
 class MVNetworking {
   
   private static let logger = XCGLogger.defaultInstance()
-  
-  // MARK: - Login
-  
-  /// This function tries to log the user into the system using the stored credentials within the keychain. The callbacks are guaranteed to be executed on the main queue.
-  class func loginActionWithCallbackOnMainQueue(#success: () -> (), failure: (NSError) -> ()) {
-    // Wrapping call backs into the marshal prefix operator, to execute them on the main queue
-    loginAction(
-      success: { ~>success },
-      failure: { error in ~>{failure(error)} }
-    )
-  }
-  
-  /// This function tries to log the user into the system using the stored credentials within the keychain. The callbacks are not executed on the main queue
-  class func loginAction(#success: () -> (), failure: (NSError) -> ()) {
-    logger.verbose("Logging in using stored credentials")
-    let (currentUsername, currentPassword, _) = MVSecurity.instance().currentKeychain()
-    if let username = currentUsername, password = currentPassword where !password.isEmpty && !username.isEmpty {
-      loginAction(username, password: password, success: success, failure: failure)
-    } else {
-      let error = MVError.createError(.MVSessionLoadingError)
-      logger.warning("Unable to log in: \(error.localizedDescription)")
-      failure(error)
-    }
-  }
-  
-  /// This function tries to log the user into the system using the provided credentials. The callbacks are guaranteed to be executed on the main queue. After a successfull log in the function checks the consitency of the application database, resets it if neccessary and starts syncing messages and user divisions.
-  private class func loginAction(username: String, password: String, success: () -> (), failure: (NSError) -> ()) {
-    logger.verbose("Logging in using provided parameters")
-    if let session = MVNetworkingSessionFactory.instance() {
-      
-      let parameters = [
-        NetworkingConstants.Login.Parameter.Username: username,
-        NetworkingConstants.Login.Parameter.Password: password,
-        NetworkingConstants.Login.Parameter.RememberMe: "on"
-      ]
-      
-      session.POST(NSURL(string: NetworkingConstants.Login.URI, relativeToURL: session.baseURL)?.absoluteString,
-        parameters: parameters,
-        success:
-        {
-          dataTask, _ in
-          
-          let logger = XCGLogger.defaultInstance()
-          
-          if let response = dataTask.response as? NSHTTPURLResponse,
-            header = response.allHeaderFields as? [String: String],
-            newUserID = header[NetworkingConstants.Login.ResponseHeaderFields.UserID],
-            newSystemID = header[NetworkingConstants.Login.ResponseHeaderFields.SystemID],
-            newSystemVersion = header[NetworkingConstants.Login.ResponseHeaderFields.SystemVersion]
-          {
-            logger.debug("Successfully read header fields")
-            
-            //TODO: Distinct system change and user change
-            if !Defaults.hasKey(MVUserDefaultsConstants.UserID) ||
-              Defaults[MVUserDefaultsConstants.UserID].string! != newUserID ||
-              !Defaults.hasKey(MVUserDefaultsConstants.SystemID)  ||
-              Defaults[MVUserDefaultsConstants.SystemID].string! != newSystemID
-            {
-              logger.info("System ID or User ID did change or this is the first log in. Storing and resetting database")
-              Defaults[MVUserDefaultsConstants.UserID] = newUserID
-              Defaults[MVUserDefaultsConstants.SystemID] = newSystemID
-              (UIApplication.sharedApplication().delegate as! AppDelegate).flushDatabase()
-              MVNetworkingHelper.syncAllMessages()
-            } else {
-              MVNetworkingHelper.syncMessages()
-              logger.debug("No need to reset database, because System ID and User ID did not change")
-            }
-            
-            MVNetworkingHelper.syncUserDivision()
-            logger.info("Successfully logged in")
-            success()
-          } else {
-            logger.error("Unable to log in because reading header fields failed")
-            failure(MVError.createError(.MVResponseHeaderError))
-          }
-        },
-        failure:
-        {
-          _, error in
-          XCGLogger.warning("Unable to log in: \(error.localizedDescription)")
-          
-          // Invaliating the session in case the user changes the domain
-          MVNetworkingSessionFactory.invalidateInstance()
-          // TODO: This should be the place to handle invalid credentials
-          // Executing failure callback on main queue
-          failure(error)
-        }
-      )
-    } else {
-      let error = MVError.createError(MVErrorCodes.MVSessionLoadingError)
-      logger.warning("Unable to log in: \(error.localizedDescription)")
-      failure(error)
-    }
-  }
-  
-  // MARK: - Messages
-  
-  /// This function is gathering all unread messages. The callbacks are not executed on the main queue.
-  class func messageSyncAction(#success: (AnyObject) -> (), failure: (NSError?) -> ()) {
-    logger.verbose("Started message sync action")
-    handleRequest(
-      URI: NetworkingConstants.Message.Sync.URI,
-      parameters: nil,
-      requestMethod: NetworkingConstants.Message.Sync.Method,
-      retryCount: 0,
-      success: success,
-      failure: failure
-    )
-  }
-  
-  /// This function is gathering all unread messages. The callbacks are not executed on the main queue.
-  class func allMessageSyncAction(#success: (AnyObject) -> (), failure: (NSError?) -> ()) {
-    logger.verbose("Started all messages sync action")
-    handleRequest(
-      URI: NetworkingConstants.Message.Sync.URI,
-      parameters: [NetworkingConstants.Message.Sync.Parameter.All: "true"],
-      requestMethod: NetworkingConstants.Message.Sync.Method,
-      retryCount: 0,
-      success: success,
-      failure: failure
-    )
-  }
-  
-  class func sendMessageAction(#success: (AnyObject) -> (), failure: (NSError?) -> (), message: Message) {
-    logger.verbose("Started sending message action")
-    handleRequest(
-      URI: NetworkingConstants.Message.Send.URI,
-      parameters: [
-        NetworkingConstants.Message.Send.Parameter.Content: message.content!,
-        NetworkingConstants.Message.Send.Parameter.Division: message.division.id
-      ],
-      requestMethod: NetworkingConstants.Message.Send.Method,
-      retryCount: 0,
-      success: success,
-      failure: failure
-    )
-  }
-  
-  // MARK: - User
-  
-  /// This function is gathering all information available about a user. The callbacks are not executed on the main queue.
-  class func userSyncAction(#userId: String, success: (AnyObject) -> (), failure: (NSError?) -> ()) {
-    logger.verbose("Syncing user with id \(userId)")
-    
-    handleRequest(
-      URI: NetworkingConstants.User.Get.URI,
-      parameters: [NetworkingConstants.User.Get.Parameter.UserID : userId],
-      requestMethod: NetworkingConstants.User.Get.Method,
-      retryCount: 0,
-      success: success,
-      failure: failure
-    )
-  }
-  
-  // MARK: - Division
-  
-  /// This function is gathering all information available about a user. The callbacks are not executed on the main queue.
-  class func divisionSyncAction(#divisionId: String, success: (AnyObject) -> (), failure: (NSError?) -> ()) {
-    logger.verbose("Syncing division with id \(divisionId)")
-    handleRequest(
-      URI: NetworkingConstants.Division.Get.URI,
-      parameters: [NetworkingConstants.Division.Get.Parameter.DivisionID : divisionId],
-      requestMethod: NetworkingConstants.Division.Get.Method,
-      retryCount: 0,
-      success: success,
-      failure: failure
-    )
-  }
-  
-  class func userDivisionSyncAction(#success: (AnyObject) -> (), failure: (NSError?) -> ()) {
-    logger.verbose("Starting to sync list of divisions the user is part of")
-    handleRequest(
-      URI: NetworkingConstants.Division.Sync.URI,
-      parameters: nil,
-      requestMethod: NetworkingConstants.Division.Sync.Method,
-      retryCount: 0,
-      success: success,
-      failure: failure
-    )
-  }
-  
-  // MARK: - Event
-  
-  class func eventSyncAction(#success: (AnyObject) -> (), failure: (NSError?) -> ()) {
-    logger.verbose("Starting to sync events")
-    var parameters: [String: String]?
-    if let lastChanged = Defaults[MVUserDefaultsConstants.LastSynced.Event].date {
-      logger.debug("Last changed events \(lastChanged)")
-      parameters = [NetworkingConstants.Event.Sync.Parameter.LastChanged: MVDateParser.stringFromDate(lastChanged)]
-    }
-    
-    handleRequest(
-      URI: NetworkingConstants.Event.Sync.URI,
-      parameters: parameters,
-      requestMethod: NetworkingConstants.Event.Sync.Method,
-      retryCount: 0,
-      success: success,
-      failure: failure
-    )
-  }
-  
-  class func eventSyncAction(#eventID: String, success: (AnyObject) -> (), failure: (NSError?) -> ()) {
-    logger.verbose("Syncing event \(eventID)")
-    
-    handleRequest(
-      URI: NetworkingConstants.Event.Sync.URI,
-      parameters: [NetworkingConstants.Event.Sync.Parameter.EventID: eventID],
-      requestMethod: NetworkingConstants.Event.Sync.Method,
-      retryCount: 0,
-      success: success,
-      failure: failure
-    )
-  }
-  
-  class func eventResponseAction(#eventID: String, response: Event.EventResponse, success: (AnyObject) -> (), failure: (NSError?) -> ()) {
-    logger.verbose("Starting to send response \(response) for event \(eventID)")
-    let parameter = [
-      NetworkingConstants.Event.Response.Paramter.EventID: eventID,
-      NetworkingConstants.Event.Response.Paramter.Response: response.rawValue
-    ]
-    
-    handleRequest(
-      URI: NetworkingConstants.Event.Response.URI,
-      parameters: parameter,
-      requestMethod: NetworkingConstants.Event.Response.Method,
-      retryCount: 0,
-      success: success,
-      failure: failure
-    )
-  }
   
   // MARK: - Internal functions
   
@@ -353,5 +138,251 @@ class MVNetworking {
       logger.severe("Reached maximum amount of retries \(NetworkingConstants.MaxLoginRetries)")
       initialFailure(MVError.createError(.MVMaximumLoginRetriesReached))
     }
+  }
+}
+
+// MARK: - Login
+/// This extension is centralizing all authorization related networking actions.
+extension MVNetworking {
+  /// This function tries to log the user into the system using the stored credentials within the keychain. The callbacks are guaranteed to be executed on the main queue.
+  class func loginActionWithCallbackOnMainQueue(#success: () -> (), failure: (NSError) -> ()) {
+    // Wrapping call backs into the marshal prefix operator, to execute them on the main queue
+    loginAction(
+      success: { ~>success },
+      failure: { error in ~>{failure(error)} }
+    )
+  }
+  
+  /// This function tries to log the user into the system using the stored credentials within the keychain. The callbacks are not guaranteed to be executed on the main queue.
+  class func loginAction(#success: () -> (), failure: (NSError) -> ()) {
+    logger.verbose("Logging in using stored credentials")
+    let (currentUsername, currentPassword, _) = MVSecurity.instance().currentKeychain()
+    if let username = currentUsername, password = currentPassword where !password.isEmpty && !username.isEmpty {
+      loginAction(username, password: password, success: success, failure: failure)
+    } else {
+      let error = MVError.createError(.MVSessionLoadingError)
+      logger.warning("Unable to log in: \(error.localizedDescription)")
+      failure(error)
+    }
+  }
+  
+  /// This function tries to log the user into the system using the provided credentials. The callbacks are guaranteed to be executed on the main queue. After a successfull log in the function checks the consitency of the application database, resets it if neccessary and starts syncing messages and user divisions.
+  private class func loginAction(username: String, password: String, success: () -> (), failure: (NSError) -> ()) {
+    logger.verbose("Logging in using provided parameters")
+    if let session = MVNetworkingSessionFactory.instance() {
+      
+      let parameters = [
+        NetworkingConstants.Login.Parameter.Username: username,
+        NetworkingConstants.Login.Parameter.Password: password,
+        NetworkingConstants.Login.Parameter.RememberMe: "on"
+      ]
+      
+      session.POST(NSURL(string: NetworkingConstants.Login.URI, relativeToURL: session.baseURL)?.absoluteString,
+        parameters: parameters,
+        success:
+        {
+          dataTask, _ in
+          
+          let logger = XCGLogger.defaultInstance()
+          
+          if let response = dataTask.response as? NSHTTPURLResponse,
+            header = response.allHeaderFields as? [String: String],
+            newUserID = header[NetworkingConstants.Login.ResponseHeaderFields.UserID],
+            newSystemID = header[NetworkingConstants.Login.ResponseHeaderFields.SystemID],
+            newSystemVersion = header[NetworkingConstants.Login.ResponseHeaderFields.SystemVersion]
+          {
+            logger.debug("Successfully read header fields")
+            
+            //TODO: Distinct system change and user change
+            if !Defaults.hasKey(MVUserDefaultsConstants.UserID) ||
+              Defaults[MVUserDefaultsConstants.UserID].string! != newUserID ||
+              !Defaults.hasKey(MVUserDefaultsConstants.SystemID)  ||
+              Defaults[MVUserDefaultsConstants.SystemID].string! != newSystemID
+            {
+              logger.info("System ID or User ID did change or this is the first log in. Storing and resetting database")
+              Defaults[MVUserDefaultsConstants.UserID] = newUserID
+              Defaults[MVUserDefaultsConstants.SystemID] = newSystemID
+              (UIApplication.sharedApplication().delegate as! AppDelegate).flushDatabase()
+              MVNetworkingHelper.syncAllMessages()
+            } else {
+              MVNetworkingHelper.syncMessages()
+              logger.debug("No need to reset database, because System ID and User ID did not change")
+            }
+            
+            MVNetworkingHelper.syncUserDivision()
+            logger.info("Successfully logged in")
+            success()
+          } else {
+            logger.error("Unable to log in because reading header fields failed")
+            failure(MVError.createError(.MVResponseHeaderError))
+          }
+        },
+        failure:
+        {
+          _, error in
+          XCGLogger.warning("Unable to log in: \(error.localizedDescription)")
+          
+          // Invaliating the session in case the user changes the domain
+          MVNetworkingSessionFactory.invalidateInstance()
+          // TODO: This should be the place to handle invalid credentials
+          // Executing failure callback on main queue
+          failure(error)
+        }
+      )
+    } else {
+      let error = MVError.createError(MVErrorCodes.MVSessionLoadingError)
+      logger.warning("Unable to log in: \(error.localizedDescription)")
+      failure(error)
+    }
+  }
+}
+
+// MARK: - Messages
+/// This extension is centralizing all message related networking actions.
+extension MVNetworking {
+  /// This function is gathering all unread messages. The callbacks are not guaranteed to be executed on the main queue.
+  class func messageSyncAction(#success: (AnyObject) -> (), failure: (NSError?) -> ()) {
+    logger.verbose("Started message sync action")
+    handleRequest(
+      URI: NetworkingConstants.Message.Sync.URI,
+      parameters: nil,
+      requestMethod: NetworkingConstants.Message.Sync.Method,
+      retryCount: 0,
+      success: success,
+      failure: failure
+    )
+  }
+  
+  /// This function is gathering all unread messages. The callbacks are not guaranteed to be executed on the main queue.
+  class func allMessageSyncAction(#success: (AnyObject) -> (), failure: (NSError?) -> ()) {
+    logger.verbose("Started all messages sync action")
+    handleRequest(
+      URI: NetworkingConstants.Message.Sync.URI,
+      parameters: [NetworkingConstants.Message.Sync.Parameter.All: "true"],
+      requestMethod: NetworkingConstants.Message.Sync.Method,
+      retryCount: 0,
+      success: success,
+      failure: failure
+    )
+  }
+  
+  /// This function is sending a specific message to the server. The callbacks are not guaranteed to be executed on the main queue.
+  class func sendMessageAction(#success: (AnyObject) -> (), failure: (NSError?) -> (), message: Message) {
+    logger.verbose("Started sending message action")
+    handleRequest(
+      URI: NetworkingConstants.Message.Send.URI,
+      parameters: [
+        NetworkingConstants.Message.Send.Parameter.Content: message.content!,
+        NetworkingConstants.Message.Send.Parameter.Division: message.division.id
+      ],
+      requestMethod: NetworkingConstants.Message.Send.Method,
+      retryCount: 0,
+      success: success,
+      failure: failure
+    )
+  }
+}
+
+// MARK: - User
+/// This extension is centralizing all user related networking actions.
+extension MVNetworking {
+  /// This function is gathering all information available about a user. The callbacks are not guaranteed to be executed on the main queue.
+  class func userSyncAction(#userId: String, success: (AnyObject) -> (), failure: (NSError?) -> ()) {
+    logger.verbose("Syncing user with id \(userId)")
+    
+    handleRequest(
+      URI: NetworkingConstants.User.Get.URI,
+      parameters: [NetworkingConstants.User.Get.Parameter.UserID : userId],
+      requestMethod: NetworkingConstants.User.Get.Method,
+      retryCount: 0,
+      success: success,
+      failure: failure
+    )
+  }
+}
+
+// MARK: - Division
+/// This extension is centralizing all division related networking actions.
+extension MVNetworking {
+  /// This function is gathering all information available about a division. The callbacks are not guaranteed to be executed on the main queue.
+  class func divisionSyncAction(#divisionId: String, success: (AnyObject) -> (), failure: (NSError?) -> ()) {
+    logger.verbose("Syncing division with id \(divisionId)")
+    handleRequest(
+      URI: NetworkingConstants.Division.Get.URI,
+      parameters: [NetworkingConstants.Division.Get.Parameter.DivisionID : divisionId],
+      requestMethod: NetworkingConstants.Division.Get.Method,
+      retryCount: 0,
+      success: success,
+      failure: failure
+    )
+  }
+  
+  /// This function is gathering all dvisiions the user is subscribed to. The callbacks are not guaranteed to be executed on the main queue.
+  class func userDivisionSyncAction(#success: (AnyObject) -> (), failure: (NSError?) -> ()) {
+    logger.verbose("Starting to sync list of divisions the user is part of")
+    handleRequest(
+      URI: NetworkingConstants.Division.Sync.URI,
+      parameters: nil,
+      requestMethod: NetworkingConstants.Division.Sync.Method,
+      retryCount: 0,
+      success: success,
+      failure: failure
+    )
+  }
+}
+
+// MARK: - Event
+extension MVNetworking {
+  /// This function is syncing all events changed since the last sync and updates the last synced information in the user defaults. The callbacks are not guaranteed to be executed on the main queue.
+  class func eventSyncAction(#success: (AnyObject) -> (), failure: (NSError?) -> ()) {
+    logger.verbose("Starting to sync events")
+    var parameters: [String: String]?
+    if let lastChanged = Defaults[MVUserDefaultsConstants.LastSynced.Event].date {
+      logger.debug("Last changed events \(lastChanged)")
+      parameters = [NetworkingConstants.Event.Sync.Parameter.LastChanged: MVDateParser.stringFromDate(lastChanged)]
+    }
+    
+    Defaults[MVUserDefaultsConstants.LastSynced.Event] = NSDate()
+    
+    handleRequest(
+      URI: NetworkingConstants.Event.Sync.URI,
+      parameters: parameters,
+      requestMethod: NetworkingConstants.Event.Sync.Method,
+      retryCount: 0,
+      success: success,
+      failure: failure
+    )
+  }
+  
+  /// This function is gathering all information about the specified event. The callbacks are not guaranteed to be executed on the main queue.
+  class func eventSyncAction(#eventID: String, success: (AnyObject) -> (), failure: (NSError?) -> ()) {
+    logger.verbose("Syncing event \(eventID)")
+    
+    handleRequest(
+      URI: NetworkingConstants.Event.Sync.URI,
+      parameters: [NetworkingConstants.Event.Sync.Parameter.EventID: eventID],
+      requestMethod: NetworkingConstants.Event.Sync.Method,
+      retryCount: 0,
+      success: success,
+      failure: failure
+    )
+  }
+  
+  /// This function is sending a response of the user about a specific event to the server. The callbacks are not guaranteed to be executed on the main queue.
+  class func eventResponseAction(#eventID: String, response: EventResponse, success: (AnyObject) -> (), failure: (NSError?) -> ()) {
+    logger.verbose("Starting to send response \(response) for event \(eventID)")
+    let parameter = [
+      NetworkingConstants.Event.Response.Paramter.EventID: eventID,
+      NetworkingConstants.Event.Response.Paramter.Response: response.rawValue
+    ]
+    
+    handleRequest(
+      URI: NetworkingConstants.Event.Response.URI,
+      parameters: parameter,
+      requestMethod: NetworkingConstants.Event.Response.Method,
+      retryCount: 0,
+      success: success,
+      failure: failure
+    )
   }
 }

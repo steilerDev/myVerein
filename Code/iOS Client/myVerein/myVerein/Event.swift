@@ -127,7 +127,7 @@ struct EventConstants {
     static let MultiDate = "multiDate"
     static let LastChanged = "lastChanged"
     
-    struct location {
+    struct Location {
       static let Name = "location"
       static let Lat = "locationLat"
       static let Lng = "locationLng"

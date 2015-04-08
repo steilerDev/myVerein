@@ -28,7 +28,7 @@ import SwiftyUserDefaults
 // MARK: - Pure database object, holding only information stored in database
 class Message: NSManagedObject {
   @NSManaged var id: String
-  @NSManaged var read: Bool?
+  @NSManaged var read: Bool
   @NSManaged var timestamp: NSDate?
   @NSManaged var sender: User
   @NSManaged var division: Division
@@ -60,7 +60,7 @@ extension Message: MVCoreDataObject {
 // MARK: - JSQMessageData protocol functions
 extension Message: JSQMessageData {
   func date() -> NSDate {
-    return timestamp
+    return timestamp!
   }
   
   func senderDisplayName() -> String {
@@ -88,7 +88,7 @@ extension Message: JSQMessageData {
   }
   
   func messageHash() -> UInt {
-    return UInt(abs(content?.hash ?? 0) ^ abs(timestamp.hash ?? 0))
+    return UInt(abs(content?.hash ?? 0) ^ abs(timestamp!.hash ?? 0))
   }
 }
 

@@ -96,6 +96,7 @@ class EventRepository: MVCoreDataRepository {
         startDateTime = MVDateParser.parseDate(serverResponseObject[EventConstants.RemoteEvent.StartDateTime] as? [String: AnyObject]),
         endDateTime = MVDateParser.parseDate(serverResponseObject[EventConstants.RemoteEvent.EndDateTime] as? [String: AnyObject])
       {
+        //Parsing invited division
         if let invitedDivisionArray = serverResponseObject[EventConstants.RemoteEvent.InvitedDivision] as? [AnyObject] {
           let divisionRepository = DivisionRepository()
           let (invitedDivision, error) = divisionRepository.getOrCreateDivisionsFrom(serverResponseObject: invitedDivisionArray)
@@ -103,10 +104,20 @@ class EventRepository: MVCoreDataRepository {
             logger.severe("Unable to gather invited division: \(error?.localizedDescription)")
             return (nil, error)
           } else {
-            event.invited
+            event.invitedDivision.addObjectsFromArray(invitedDivision!)
           }
         }
-        /// TODO: Parse event
+        
+        //Parsing optionals
+        event.locationName = serverResponseObject[EventConstants.RemoteEvent.Location.Name] as? String
+        event.locationLat = serverResponseObject[EventConstants.RemoteEvent.Location.Lat] as? Double
+        event.locationLng = serverResponseObject[EventConstants.RemoteEvent.Location.Lng] as? Double
+        event.eventDescription = serverResponseObject[EventConstants.RemoteEvent.Description] as? String
+        
+        //Parsing non-optionals
+        event.name = name
+        event.startDate = startDateTime
+        event.endDate = endDateTime
         
         logger.info("Succesfully parsed and populaterd user")
         return (event, nil)

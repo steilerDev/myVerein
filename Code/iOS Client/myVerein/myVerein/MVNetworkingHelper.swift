@@ -1,9 +1,24 @@
 //
-//  NetworkingHelper.swift
-//  myVerein
+// Copyright (C) 2015 Frank Steiler <frank@steilerdev.de>
 //
-//  Created by Frank Steiler on 06/03/15.
-//  Copyright (c) 2015 steilerDev. All rights reserved.
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 2 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
+
+//
+//  NetworkingHelper.swift
+//  This file provides an extra layer of abstraction for the networking actions. 
+//  It provides class functions allowing to gather, update and store objects from the server.
 //
 
 import Foundation
@@ -215,26 +230,26 @@ extension MVNetworkingHelper {
 // MARK: - Events
 /// This extension is centralizing all event related networking tasks in a user friendly way, as well as handling interactions with the persistent store.
 extension MVNetworkingHelper {
+  
+  /// This function is gathering all events that changed since the last time, the user synced his events. If the user never synced his events all events are synced.
   class func syncUserEvent() {
     logger.verbose("Syncing events for user")
     MVNetworking.eventSyncAction(
       success: {
         response in
         let logger = XCGLogger.defaultInstance()
-        if let response = response as? [[String: String]] {
-          for event in response {
-            if let eventId = event[EventConstants.RemoteEvent.Id] {
-              
-              
-              
-              MVNetworkingHelper.syncEvent(eventId)
-            } else {
-              logger.severe("Unable to get event id for event \(event)")
-            }
+        if let responseArray = response as? [AnyObject] {
+          let eventRepository = EventRepository()
+          let (events, error) = eventRepository.getOrCreateEventsFrom(serverResponseObject: responseArray)
+          if events == nil && error != nil {
+            logger.warning("Unable to sync events \(error?.localizedDescription)")
+          } else {
+            eventRepository.save()
+            logger.info("Successfully synced and saved events")
           }
         } else {
-          let error = MVError.createError(.MVServerResponseParseError)
-          logger.severe("Unable to sync user's divisions: \(error.localizedDescription)")
+          let error = MVError.createError(.MVMessageCreationError, failureReason: "Unable to parse response array", underlyingError: .MVServerResponseParseError)
+          logger.warning("Unable to sync events: \(error.localizedDescription)")
         }
       },
       failure: {
@@ -244,7 +259,32 @@ extension MVNetworkingHelper {
     )
   }
   
+  /// This function is syncing an event with the specified id.
   class func syncEvent(eventId: String) {
-    
+    logger.verbose("Syncing event with ID \(eventId)")
+    MVNetworking.eventSyncAction(
+      eventID: eventId,
+      success: {
+        response in
+        let logger = XCGLogger.defaultInstance()
+        if let responseDict = response as? [String: AnyObject] {
+          let eventRepository = EventRepository()
+          let (event, error) = eventRepository.syncEventWith(serverResponseObject: responseDict)
+          if event == nil && error != nil {
+            logger.warning("Unable to sync event \(eventId): \(error?.localizedDescription)")
+          } else {
+            eventRepository.save()
+            logger.info("Successfully saved event \(eventId)")
+          }
+        } else {
+          let error = MVError.createError(.MVDivisionCreationError, failureReason: "Unable to parse response dictionary", underlyingError: .MVServerResponseParseError)
+          logger.warning("Unable to sync event \(eventId): \(error.localizedDescription)")
+        }
+      },
+      failure: {
+        error in
+        XCGLogger.warning("Unable to event division \(eventId): \(error?.localizedDescription)")
+      }
+    )
   }
 }

@@ -117,13 +117,13 @@ class UserRepository: MVCoreDataRepository {
         }
         
         if let genderString = serverResponseObject[UserConstants.RemoteUser.Gender] as? String,
-          gender = User.Gender(rawValue: genderString)
+          gender = Gender(rawValue: genderString)
         {
           user.gender = gender
         }
         
         if let membershipStatusString = serverResponseObject[UserConstants.RemoteUser.MembershipStatus] as? String,
-          membershipStatus = User.MembershipStatus(rawValue: membershipStatusString)
+          membershipStatus = MembershipStatus(rawValue: membershipStatusString)
         {
           user.membershipStatus = membershipStatus
         }

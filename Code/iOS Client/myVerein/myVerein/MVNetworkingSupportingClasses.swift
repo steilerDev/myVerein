@@ -17,7 +17,8 @@
 
 //
 //  MVNetworkingSupportingClasses.swift
-//  This file holds several helper needed by the networking operations of this application. This includes helper classes to parse objects, the API constants struct and HTTP request method enumerations.
+//  This file holds several helper needed by the networking operations of this application. 
+//  This includes helper classes to parse objects, the API constants struct and HTTP request method enumerations.
 //
 
 import Foundation
