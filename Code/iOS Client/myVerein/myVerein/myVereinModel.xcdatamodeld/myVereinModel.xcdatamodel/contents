@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="7535.1" systemVersion="14D105g" minimumToolsVersion="Xcode 4.3" macOSVersion="Automatic" iOSVersion="Automatic">
+<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="7541.6" systemVersion="14D113c" minimumToolsVersion="Xcode 4.3" macOSVersion="Automatic" iOSVersion="Automatic">
     <entity name="Division" representedClassName="myVerein.Division" syncable="YES">
         <attribute name="desc" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="id" attributeType="String" indexed="YES" syncable="YES"/>
@@ -7,9 +7,26 @@
         <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="rawUserMembershipStatus" optional="YES" attributeType="String" defaultValueString="NOMEMBER" syncable="YES"/>
         <relationship name="admin" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="User" inverseName="rawAdministratedDivisions" inverseEntity="User" syncable="YES"/>
+        <relationship name="events" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Event" inverseName="rawInvitedDivision" inverseEntity="Event" syncable="YES"/>
         <relationship name="latestMessage" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Message" inverseName="latestMessageDivision" inverseEntity="Message" syncable="YES"/>
         <relationship name="rawChatMessage" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Message" inverseName="division" inverseEntity="Message" syncable="YES"/>
         <relationship name="rawEnrolledUser" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="User" inverseName="rawDivisions" inverseEntity="User" syncable="YES"/>
+    </entity>
+    <entity name="Event" representedClassName="myVerein.Event" syncable="YES">
+        <attribute name="endDate" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="eventDescription" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="id" attributeType="String" indexed="YES" syncable="YES"/>
+        <attribute name="locationLat" optional="YES" attributeType="Double" defaultValueString="0.0" syncable="YES"/>
+        <attribute name="locationLng" optional="YES" attributeType="Double" defaultValueString="0.0" syncable="YES"/>
+        <attribute name="locationName" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="rawResponse" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="startDate" optional="YES" attributeType="Date" syncable="YES"/>
+        <relationship name="rawDeclinedUser" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="User" inverseName="rawDeclinedEvents" inverseEntity="User" syncable="YES"/>
+        <relationship name="rawGoingUser" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="User" inverseName="rawGoingEvents" inverseEntity="User" syncable="YES"/>
+        <relationship name="rawInvitedDivision" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Division" inverseName="events" inverseEntity="Division" syncable="YES"/>
+        <relationship name="rawMaybeUser" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="User" inverseName="rawMaybeEvents" inverseEntity="User" syncable="YES"/>
+        <relationship name="rawPendingUser" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="User" inverseName="rawPendingEvents" inverseEntity="User" syncable="YES"/>
     </entity>
     <entity name="Message" representedClassName="myVerein.Message" syncable="YES">
         <attribute name="content" optional="YES" attributeType="String" syncable="YES"/>
@@ -36,12 +53,17 @@
         <attribute name="streetNumber" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="zipCode" optional="YES" attributeType="String" syncable="YES"/>
         <relationship name="rawAdministratedDivisions" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Division" inverseName="admin" inverseEntity="Division" syncable="YES"/>
+        <relationship name="rawDeclinedEvents" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Event" inverseName="rawDeclinedUser" inverseEntity="Event" syncable="YES"/>
         <relationship name="rawDivisions" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Division" inverseName="rawEnrolledUser" inverseEntity="Division" syncable="YES"/>
+        <relationship name="rawGoingEvents" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Event" inverseName="rawGoingUser" inverseEntity="Event" syncable="YES"/>
+        <relationship name="rawMaybeEvents" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Event" inverseName="rawMaybeUser" inverseEntity="Event" syncable="YES"/>
+        <relationship name="rawPendingEvents" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Event" inverseName="rawPendingUser" inverseEntity="Event" syncable="YES"/>
         <relationship name="rawSendMessages" optional="YES" toMany="YES" deletionRule="Deny" destinationEntity="Message" inverseName="sender" inverseEntity="Message" syncable="YES"/>
     </entity>
     <elements>
-        <element name="Division" positionX="-182" positionY="188" width="128" height="178"/>
+        <element name="Division" positionX="-182" positionY="188" width="128" height="30"/>
         <element name="Message" positionX="-497" positionY="81" width="128" height="148"/>
-        <element name="User" positionX="-794" positionY="81" width="128" height="300"/>
+        <element name="User" positionX="-794" positionY="81" width="128" height="360"/>
+        <element name="Event" positionX="-585" positionY="216" width="128" height="255"/>
     </elements>
 </model>

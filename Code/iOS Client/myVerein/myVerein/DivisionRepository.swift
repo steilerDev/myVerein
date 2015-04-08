@@ -12,22 +12,6 @@ import XCGLogger
 
 class DivisionRepository: MVCoreDataRepository {
   
-  struct DivisionConstants {
-    static let ClassName = "Division"
-    static let IdField = "id"
-    static let UserMembershipStatus = "rawUserMembershipStatus"
-    static let Name = "name"
-    static let Messages = "rawChatMessage"
-    static let LatestMessage = "latestMessage"
-    
-    struct RemoteDivision {
-      static let Id = "id"
-      static let Name = "name"
-      static let Description = "desc"
-      static let AdminUser = "adminUser"
-    }
-  }
-  
   // MARK: - Functions used to query the database
   
   /// This function gathers the division object with the corresponding id from the database and returns it. The object is nil if the program was unable to find it.
@@ -113,15 +97,15 @@ class DivisionRepository: MVCoreDataRepository {
   func syncDivisionWith(#serverResponseObject: [String: AnyObject]) -> (Division?, NSError?) {
     logger.verbose("Creating division from response object \(serverResponseObject)")
     
-    // TODO: Improve, because if user is created he gets populated again.
-    let (wrappedDivision, error) = getOrCreateDivisionFrom(serverResponseObject: serverResponseObject)
+    // TODO: Improve, because if division is created he gets populated again.
+    let (division, error) = getOrCreateDivisionFrom(serverResponseObject: serverResponseObject)
     
-    if wrappedDivision == nil && error != nil {
+    if division == nil && error != nil {
       logger.debug("Unable to get existing dvision object \(error?.localizedDescription)")
       return (nil, error)
     } else {
       logger.debug("Parsing division properties")
-      if let division = wrappedDivision,
+      if let division = division,
         name = serverResponseObject[DivisionConstants.RemoteDivision.Name] as? String
       {
         if let adminUserDict = serverResponseObject[DivisionConstants.RemoteDivision.AdminUser] as? [String: AnyObject] {

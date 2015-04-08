@@ -8,14 +8,17 @@
 
 import Foundation
 import XCGLogger
+import SwiftyUserDefaults
 
-/// This function is used to centralized common networking tasks, like loading content and storing it persistent.
+/// This class is used to centralized common networking tasks, like loading content and storing it persistent.
+/// The modules for each part is added via an extension.
 class MVNetworkingHelper {
-  
   private static let logger = XCGLogger.defaultInstance()
-  
-  // MARK: Messages
-  
+}
+
+// MARK: - Messages
+/// This extension is centralizing all message related networking tasks in a user friendly way, as well as handling interactions with the persistent store.
+extension MVNetworkingHelper {
   /// This function is used to gather all new messages for the user and store them persistent.
   class func syncMessages() {
     logger.verbose("Syncing messages")
@@ -72,6 +75,7 @@ class MVNetworkingHelper {
     )
   }
   
+  /// This functino is used to send a specific message. The temporarily created ID is replaced by the system's id, if the request was successful.
   class func sendMessage(message: Message) {
     println("Sending message")
     MVNetworking.sendMessageAction(
@@ -79,7 +83,7 @@ class MVNetworkingHelper {
         response in
         let logger = XCGLogger.defaultInstance()
         if let responseDict = response as? [String: AnyObject],
-          responseId = responseDict[MessageRepository.MessageConstants.RemoteMessage.Id] as? String
+          responseId = responseDict[MessageConstants.RemoteMessage.Id] as? String
         {
           logger.debug("Updating message id from \(message.id) to \(responseId)")
           let messageRepository = MessageRepository()
@@ -95,9 +99,11 @@ class MVNetworkingHelper {
       message: message
     )
   }
-  
-  // MARK: User
-  
+}
+
+// MARK: - User
+/// This extension is centralizing all user related networking tasks in a user friendly way, as well as handling interactions with the persistent store.
+extension MVNetworkingHelper {
   /// This function is used to load a user specified by its id and store him persistent
   class func syncUser(userId: String) {
     logger.verbose("Syncing user with ID \(userId)")
@@ -126,10 +132,12 @@ class MVNetworkingHelper {
       }
     )
   }
-  
-  // MARK: Division
-  
-  /// This function is used to load a user specified by its id and store him persistent
+}
+
+// MARK: - Division
+/// This extension is centralizing all division related networking tasks in a user friendly way, as well as handling interactions with the persistent store.
+extension MVNetworkingHelper {
+  /// This function is used to load a division specified by its id and store it persistent
   class func syncDivision(divisionId: String) {
     logger.verbose("Syncing division with ID \(divisionId)")
     MVNetworking.divisionSyncAction(
@@ -139,8 +147,8 @@ class MVNetworkingHelper {
         let logger = XCGLogger.defaultInstance()
         if let responseDict = response as? [String: AnyObject] {
           let divisionRepository = DivisionRepository()
-          let (user, error) = divisionRepository.syncDivisionWith(serverResponseObject: responseDict)
-          if user == nil && error != nil {
+          let (division, error) = divisionRepository.syncDivisionWith(serverResponseObject: responseDict)
+          if division == nil && error != nil {
             logger.warning("Unable to sync division \(divisionId): \(error?.localizedDescription)")
           } else {
             divisionRepository.save()
@@ -201,5 +209,42 @@ class MVNetworkingHelper {
         XCGLogger.warning("Unable to sync user's divisions: \(error?.localizedDescription)")
       }
     )
+  }
+}
+
+// MARK: - Events
+/// This extension is centralizing all event related networking tasks in a user friendly way, as well as handling interactions with the persistent store.
+extension MVNetworkingHelper {
+  class func syncUserEvent() {
+    logger.verbose("Syncing events for user")
+    MVNetworking.eventSyncAction(
+      success: {
+        response in
+        let logger = XCGLogger.defaultInstance()
+        if let response = response as? [[String: String]] {
+          for event in response {
+            if let eventId = event[EventConstants.RemoteEvent.Id] {
+              
+              
+              
+              MVNetworkingHelper.syncEvent(eventId)
+            } else {
+              logger.severe("Unable to get event id for event \(event)")
+            }
+          }
+        } else {
+          let error = MVError.createError(.MVServerResponseParseError)
+          logger.severe("Unable to sync user's divisions: \(error.localizedDescription)")
+        }
+      },
+      failure: {
+        error in
+        XCGLogger.warning("Unable to sync user's events: \(error?.localizedDescription)")
+      }
+    )
+  }
+  
+  class func syncEvent(eventId: String) {
+    
   }
 }

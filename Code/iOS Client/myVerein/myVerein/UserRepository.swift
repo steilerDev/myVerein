@@ -13,27 +13,6 @@ import SwiftyUserDefaults
 
 class UserRepository: MVCoreDataRepository {
   
-  struct UserConstants {
-    static let ClassName = "User"
-    static let IdField = "id"
-    
-    struct RemoteUser {
-      static let Id = "id"
-      static let FirstName = "firstName"
-      static let LastName = "lastName"
-      static let Email = "email"
-      static let Birthday = "birthday"
-      static let Gender = "gender"
-      static let MembershipStatus = "membershipStatus"
-      static let Street = "street"
-      static let StreetNumber = "streetNumber"
-      static let ZipCode = "zipCode"
-      static let City = "city"
-      static let Country = "country"
-      static let Divisions = "divisions"
-    }
-  }
-  
   // MARK: - Functions used to query the database
   
   /// This function gathers the user object with the corresponding id from the database and returns it. The object is nil if the program was unable to find it.
@@ -149,7 +128,7 @@ class UserRepository: MVCoreDataRepository {
           user.membershipStatus = membershipStatus
         }
         
-        user.birthday = DateParser.parseDate(serverResponseObject[UserConstants.RemoteUser.Birthday] as? [String: AnyObject])
+        user.birthday = MVDateParser.parseDate(serverResponseObject[UserConstants.RemoteUser.Birthday] as? [String: AnyObject])
         user.street = serverResponseObject[UserConstants.RemoteUser.Street] as? String
         user.streetNumber = serverResponseObject[UserConstants.RemoteUser.StreetNumber] as? String
         user.zipCode = serverResponseObject[UserConstants.RemoteUser.ZipCode] as? String
@@ -182,7 +161,7 @@ class UserRepository: MVCoreDataRepository {
   
   class func getCurrentUser() -> User? {
     XCGLogger.debug("Gathering current user")
-    if let currentUserId = Defaults[UserDefaultsConstants.UserID].string {
+    if let currentUserId = Defaults[MVUserDefaultsConstants.UserID].string {
       return UserRepository().findUserBy(id: currentUserId)
     } else {
       XCGLogger.warning("Unable to find current user")

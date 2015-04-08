@@ -12,99 +12,10 @@ import AFNetworking
 import XCGLogger
 import SwiftyUserDefaults
 
-struct UserDefaultsConstants {
-  static let UserID = "userId"
-  static let SystemID = "systemId"
-}
-
 /// This class holds all available network interaction functions. It provides proper error handling and callbacks for each call.
 class MVNetworking {
   
   private static let logger = XCGLogger.defaultInstance()
-  
-  
-  
-  private struct NetworkingConstants {
-    
-    struct Login {
-      static let URI = "/api/login"
-      struct Parameter {
-        static let Username = "username"
-        static let Password = "password"
-        static let RememberMe = "rememberMe"
-      }
-      struct ResponseHeaderFields {
-        static let SystemID = "System-ID"
-        static let UserID = "User-ID"
-        static let SystemVersion = "System-Version"
-      }
-    }
-    
-    struct Message {
-      static let BaseURI = "/api/user/message"
-      struct Sync {
-        static let URI = Message.BaseURI
-        static let Method = HTTPMethods.GET
-        struct Parameter {
-          static let All = "all"
-        }
-      }
-      struct Send {
-        static let URI = Message.BaseURI
-        static let Method = HTTPMethods.POST
-        struct Parameter {
-          static let Content = "content"
-          static let Division = "division"
-        }
-      }
-    }
-    
-    struct User {
-      static let BaseURI = "/api/user/user"
-      struct Get {
-        static let URI = User.BaseURI
-        static let Method = HTTPMethods.GET
-        struct Parameter {
-          static let UserID = "userID"
-        }
-      }
-    }
-    
-    struct Division {
-      static let BaseURI = "/api/user/division"
-      struct Get {
-        static let URI = Division.BaseURI
-        static let Method = HTTPMethods.GET
-        struct Parameter {
-          static let DivisionID = "divisionID"
-        }
-      }
-      struct Sync {
-        static let URI = Division.BaseURI + "/sync"
-        static let Method = HTTPMethods.GET
-      }
-    }
-    
-    // This constant defines the amount of retries in case of being unable to log in.
-    static let MaxLoginRetries = 2
-  }
-  
-  private enum HTTPMethods: Printable {
-    case GET
-    case POST
-    case DELETE
-    
-    var description: String {
-      switch self {
-      case .GET:
-        return "Get"
-      case .POST:
-        return "Post"
-      case .DELETE:
-        return "Delete"
-      }
-    }
-  }
   
   // MARK: - Login
   
@@ -158,14 +69,14 @@ class MVNetworking {
             logger.debug("Successfully read header fields")
             
             //TODO: Distinct system change and user change
-            if !Defaults.hasKey(UserDefaultsConstants.UserID) ||
-              Defaults[UserDefaultsConstants.UserID].string! != newUserID ||
-              !Defaults.hasKey(UserDefaultsConstants.SystemID)  ||
-              Defaults[UserDefaultsConstants.SystemID].string! != newSystemID
+            if !Defaults.hasKey(MVUserDefaultsConstants.UserID) ||
+              Defaults[MVUserDefaultsConstants.UserID].string! != newUserID ||
+              !Defaults.hasKey(MVUserDefaultsConstants.SystemID)  ||
+              Defaults[MVUserDefaultsConstants.SystemID].string! != newSystemID
             {
               logger.info("System ID or User ID did change or this is the first log in. Storing and resetting database")
-              Defaults[UserDefaultsConstants.UserID] = newUserID
-              Defaults[UserDefaultsConstants.SystemID] = newSystemID
+              Defaults[MVUserDefaultsConstants.UserID] = newUserID
+              Defaults[MVUserDefaultsConstants.SystemID] = newSystemID
               (UIApplication.sharedApplication().delegate as! AppDelegate).flushDatabase()
               MVNetworkingHelper.syncAllMessages()
             } else {
@@ -280,6 +191,56 @@ class MVNetworking {
       URI: NetworkingConstants.Division.Sync.URI,
       parameters: nil,
       requestMethod: NetworkingConstants.Division.Sync.Method,
+      retryCount: 0,
+      success: success,
+      failure: failure
+    )
+  }
+  
+  // MARK: - Event
+  
+  class func eventSyncAction(#success: (AnyObject) -> (), failure: (NSError?) -> ()) {
+    logger.verbose("Starting to sync events")
+    var parameters: [String: String]?
+    if let lastChanged = Defaults[MVUserDefaultsConstants.LastSynced.Event].date {
+      logger.debug("Last changed events \(lastChanged)")
+      parameters = [NetworkingConstants.Event.Sync.Parameter.LastChanged: MVDateParser.stringFromDate(lastChanged)]
+    }
+    
+    handleRequest(
+      URI: NetworkingConstants.Event.Sync.URI,
+      parameters: parameters,
+      requestMethod: NetworkingConstants.Event.Sync.Method,
+      retryCount: 0,
+      success: success,
+      failure: failure
+    )
+  }
+  
+  class func eventSyncAction(#eventID: String, success: (AnyObject) -> (), failure: (NSError?) -> ()) {
+    logger.verbose("Syncing event \(eventID)")
+    
+    handleRequest(
+      URI: NetworkingConstants.Event.Sync.URI,
+      parameters: [NetworkingConstants.Event.Sync.Parameter.EventID: eventID],
+      requestMethod: NetworkingConstants.Event.Sync.Method,
+      retryCount: 0,
+      success: success,
+      failure: failure
+    )
+  }
+  
+  class func eventResponseAction(#eventID: String, response: Event.EventResponse, success: (AnyObject) -> (), failure: (NSError?) -> ()) {
+    logger.verbose("Starting to send response \(response) for event \(eventID)")
+    let parameter = [
+      NetworkingConstants.Event.Response.Paramter.EventID: eventID,
+      NetworkingConstants.Event.Response.Paramter.Response: response.rawValue
+    ]
+    
+    handleRequest(
+      URI: NetworkingConstants.Event.Response.URI,
+      parameters: parameter,
+      requestMethod: NetworkingConstants.Event.Response.Method,
       retryCount: 0,
       success: success,
       failure: failure

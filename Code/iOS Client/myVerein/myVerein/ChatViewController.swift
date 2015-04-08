@@ -16,9 +16,9 @@ class ChatViewController: JSQMessagesViewController {
   
   struct ChatViewConstants {
     static let BatchSize = 20
-    static let Entity = MessageRepository.MessageConstants.ClassName
-    static let PredicateField = MessageRepository.MessageConstants.DivisionField
-    static let SortField = MessageRepository.MessageConstants.TimestampField
+    static let Entity = MessageConstants.ClassName
+    static let PredicateField = MessageConstants.DivisionField
+    static let SortField = MessageConstants.TimestampField
     static let CacheName = "myVerein.ChatViewCache."
   }
   
@@ -68,7 +68,7 @@ class ChatViewController: JSQMessagesViewController {
     
     logger.debug("Loading user")
     let userRepository = UserRepository()
-    if let senderId = Defaults[UserDefaultsConstants.UserID].string,
+    if let senderId = Defaults[MVUserDefaultsConstants.UserID].string,
       sender = userRepository.getOrCreateUserFrom(id: senderId).user
     {
       logger.debug("Successfully loaded user")

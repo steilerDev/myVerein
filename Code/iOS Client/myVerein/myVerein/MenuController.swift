@@ -23,7 +23,7 @@ class MenuController: UITabBarController {
   override func viewDidAppear(animated: Bool) {
     let (currentUsername, currentPassword, currentDomain) = MVSecurity.instance().currentKeychain()
     
-    if !Defaults.hasKey(UserDefaultsConstants.UserID) ||
+    if !Defaults.hasKey(MVUserDefaultsConstants.UserID) ||
       currentUsername == nil ||
       currentPassword == nil ||
       currentDomain == nil

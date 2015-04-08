@@ -12,23 +12,6 @@ import XCGLogger
 
 class MessageRepository: MVCoreDataRepository {
   
-  struct MessageConstants {
-    static let ClassName = "Message"
-    static let TimestampField = "timestamp"
-    static let ReadField = "read"
-    static let DivisionField = "division"
-    static let IdField = "id"
-    static let BatchSize = 35
-    
-    struct RemoteMessage {
-      static let Content = "content"
-      static let Division = "group"
-      static let Id = "id"
-      static let Sender = "sender"
-      static let Timestamp = "timestamp"
-    }
-  }
-  
   // MARK: - Functions used to query the database
   
   // This function gathers all messages send through the division's chat
@@ -92,7 +75,7 @@ class MessageRepository: MVCoreDataRepository {
         return (message, nil)
       } else if let content = serverResponseObject[MessageConstants.RemoteMessage.Content] as? String,
         timestampDict = serverResponseObject[MessageConstants.RemoteMessage.Timestamp] as? Dictionary<String, AnyObject>,
-        timestamp = DateParser.parseDateTime(timestampDict),
+        timestamp = MVDateParser.parseDateTime(timestampDict),
         divisionDict = serverResponseObject[MessageConstants.RemoteMessage.Division] as? Dictionary<String, AnyObject>,
         senderDict = serverResponseObject[MessageConstants.RemoteMessage.Sender] as? Dictionary<String, AnyObject>
       {

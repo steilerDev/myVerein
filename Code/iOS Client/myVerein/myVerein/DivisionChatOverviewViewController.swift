@@ -14,9 +14,9 @@ class DivisionChatOverviewViewController: UICollectionViewController {
   
   struct DivisionChatOverviewConstants {
     static let BatchSize = 20
-    static let Entity = DivisionRepository.DivisionConstants.ClassName
-    static let PredicateField = DivisionRepository.DivisionConstants.UserMembershipStatus
-    static let SortField = DivisionRepository.DivisionConstants.LatestMessage + "." + MessageRepository.MessageConstants.TimestampField
+    static let Entity = DivisionConstants.ClassName
+    static let PredicateField = DivisionConstants.UserMembershipStatus
+    static let SortField = DivisionConstants.LatestMessage + "." + MessageConstants.TimestampField
     static let CacheName = "myVerein.ChatOverviewCache"
     static let ReuseCellIdentifier = "ChatCell"
     static let SegueToChat = "showChatView"
