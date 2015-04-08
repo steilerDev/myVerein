@@ -203,6 +203,10 @@ public class IndexController
         event1.setStartDateTime(LocalDateTime.of(2015, 1, 20, 13, 0));
         event1.setEndDateTime(LocalDateTime.of(2015, 1, 20, 14, 0));
         event1.setName("Super Event 1");
+        event1.setLocation("Awesome location");
+        event1.setLocationLat(12.1);
+        event1.setLocationLng(12.1);
+        event1.setDescription("Super event at awesome location with great people");
         event1.addDivision(div2);
         event1.setEventAdmin(user1);
         event1.updateMultiDate();

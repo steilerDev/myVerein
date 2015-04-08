@@ -88,7 +88,7 @@ public class EventController
     }
 
     @RequestMapping(produces = "application/json", params = "id", method = RequestMethod.GET)
-    public ResponseEntity<Event> getEvent(@RequestParam String eventID, @CurrentUser User currentUser)
+    public ResponseEntity<Event> getEvent(@RequestParam(value = "id") String eventID, @CurrentUser User currentUser)
     {
         logger.debug("[{}] Gathering event with id {}", currentUser, eventID);
         if (eventID.isEmpty())

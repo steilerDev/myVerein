@@ -472,6 +472,8 @@ public class Event
             sendingObject.getInvitedDivision().replaceAll(Division::getSendingObjectOnlyId);
         }
 
+        sendingObject.setLastChanged(null);
+
         return sendingObject;
     }
 
