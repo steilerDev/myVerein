@@ -277,7 +277,7 @@ extension MVNetworkingHelper {
             logger.info("Successfully saved event \(eventId)")
           }
         } else {
-          let error = MVError.createError(.MVDivisionCreationError, failureReason: "Unable to parse response dictionary", underlyingError: .MVServerResponseParseError)
+          let error = MVError.createError(.MVEventCreationError, failureReason: "Unable to parse response dictionary", underlyingError: .MVServerResponseParseError)
           logger.warning("Unable to sync event \(eventId): \(error.localizedDescription)")
         }
       },

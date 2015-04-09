@@ -20,10 +20,10 @@ class MessageRepository: MVCoreDataRepository {
     // Create a new fetch request using the Message entity
     let fetchRequest = NSFetchRequest(entityName: MessageConstants.ClassName)
     fetchRequest.fetchBatchSize = MessageConstants.BatchSize
-    let sortDescriptor = NSSortDescriptor(key: MessageConstants.TimestampField, ascending: true)
+    let sortDescriptor = NSSortDescriptor(key: MessageConstants.Fields.Timestamp, ascending: true)
     fetchRequest.sortDescriptors = [sortDescriptor]
     
-    let predicate = NSPredicate(format: "\(MessageConstants.DivisionField) == %@", division)
+    let predicate = NSPredicate(format: "\(MessageConstants.Fields.Division) == %@", division)
     fetchRequest.predicate = predicate
     
     // Execute the fetch request, and cast the results to an array of LogItem objects
@@ -36,7 +36,7 @@ class MessageRepository: MVCoreDataRepository {
     let fetchRequest = NSFetchRequest(entityName: MessageConstants.ClassName)
     fetchRequest.fetchBatchSize = MessageConstants.BatchSize
     
-    let predicate = NSPredicate(format: "\(MessageConstants.IdField) == %@", id)
+    let predicate = NSPredicate(format: "\(MessageConstants.Fields.Id) == %@", id)
     fetchRequest.predicate = predicate
     
     // Execute the fetch request, and cast the results to an array of LogItem objects

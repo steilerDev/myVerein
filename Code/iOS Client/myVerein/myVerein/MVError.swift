@@ -17,12 +17,14 @@ enum MVErrorCodes: Int {
   case MVMaximumLoginRetriesReached = 22
   case MVServerResponseParseError = 23
   case MVResponseHeaderError = 24
+  case MVLastSyncTooCloseError = 25
   case MVLocalDatabaseError = 50
   case MVLocalDatabaseLoadingError = 51
   case MVEntityCreationError = 60
   case MVDivisionCreationError = 61
   case MVMessageCreationError = 62
   case MVUserCreationError = 63
+  case MVEventCreationError = 64
 }
 
 class MVError {
@@ -92,6 +94,12 @@ class MVError {
           NSLocalizedFailureReasonErrorKey: "Either your credentials are wrong, or you are trying to access a protected resource",
           NSLocalizedRecoverySuggestionErrorKey: "Check your credentials and retry"
         ]
+      case .MVLastSyncTooCloseError:
+        return [
+          NSLocalizedDescriptionKey: "It has not passed enough time since the last sync",
+          NSLocalizedFailureReasonErrorKey: "The time between syncronization is too high",
+          NSLocalizedRecoverySuggestionErrorKey: "Wait the specified amount of time and try again"
+        ]
       case .MVServerResponseParseError:
         return [
           NSLocalizedDescriptionKey: "Unable to parse server response",
@@ -124,6 +132,12 @@ class MVError {
       case .MVUserCreationError:
         return [
           NSLocalizedDescriptionKey: "Unable to create user entity",
+          NSLocalizedFailureReasonErrorKey: "Unknown",
+          NSLocalizedRecoverySuggestionErrorKey: "Retry your action"
+        ]
+      case .MVEventCreationError:
+        return [
+          NSLocalizedDescriptionKey: "Unable to create event entity",
           NSLocalizedFailureReasonErrorKey: "Unknown",
           NSLocalizedRecoverySuggestionErrorKey: "Retry your action"
         ]

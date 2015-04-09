@@ -21,10 +21,9 @@ class UserRepository: MVCoreDataRepository {
     // Create a new fetch request using the Message entity
     let fetchRequest = NSFetchRequest(entityName: UserConstants.ClassName)
     
-    let predicate = NSPredicate(format: "\(UserConstants.IdField) == %@", id)
+    let predicate = NSPredicate(format: "\(UserConstants.Fields.Id) == %@", id)
     fetchRequest.predicate = predicate
     
-    // Execute the fetch request, and cast the results to an array of LogItem objects
     return executeSingleRequest(fetchRequest)
   }
   
@@ -55,7 +54,7 @@ class UserRepository: MVCoreDataRepository {
   /// This function returns the user defined through the response object. The object needs to be an array, containing the id of the user. If the user does not exist, he is created and populated asynchronously.
   func getOrCreateUserFrom(#serverResponseObject: [String: AnyObject]) -> (user: User?, error: NSError?) {
     logger.verbose("Retrieving user object from response object \(serverResponseObject)")
-    if let userId = serverResponseObject[UserConstants.IdField] as? String {
+    if let userId = serverResponseObject[UserConstants.Fields.Id] as? String {
       return getOrCreateUserFrom(id: userId)
     } else {
       let error = MVError.createError(.MVUserCreationError,

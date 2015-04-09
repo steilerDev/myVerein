@@ -1,9 +1,23 @@
 //
-//  CoreDataRepository.swift
-//  myVerein
+// Copyright (C) 2015 Frank Steiler <frank@steilerdev.de>
 //
-//  Created by Frank Steiler on 11/03/15.
-//  Copyright (c) 2015 steilerDev. All rights reserved.
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 2 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
+
+//
+//  CoreDataRepository.swift
+//  This file creates the base class for all repositories interacting with the database, providing saving and retrieving functions, as well as defining a protocol for all objects strored in the database and handled by the repository classes.
 //
 
 import Foundation
@@ -19,7 +33,7 @@ class MVCoreDataRepository {
   // Retreive the managedObjectContext from AppDelegate
   let managedObjectContext = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext!
   
-  /// This function saves the database permanently
+  /// This function saves the database permanently, if needed.
   func save() {
     if managedObjectContext.hasChanges {
       logger.verbose("Saving database changes")
@@ -34,10 +48,12 @@ class MVCoreDataRepository {
     }
   }
   
+  /// This function executes a fetch request on the database, which is only expecting a single entry to be returned.
   func executeSingleRequest<T: MVCoreDataObject>(fetchRequest: NSFetchRequest) -> T? {
     return executeListRequest(fetchRequest)?.last
   }
   
+  /// This function executes a fetch request on the database, which is expecting several entries to be returned.
   func executeListRequest<T: MVCoreDataObject>(fetchRequest: NSFetchRequest) -> [T]? {
     var error: NSError?
     if let queriedObject = managedObjectContext.executeFetchRequest(fetchRequest, error: &error) as? [T] {
@@ -54,7 +70,7 @@ class MVCoreDataRepository {
         } else {
           XCGLogger.error("Unable to check sync status: \(error?.localizedDescription)")
         }
-        }~>
+      }~>
       
       return queriedObject
     } else {
@@ -67,7 +83,7 @@ class MVCoreDataRepository {
 /// This protocol defines a core data object used within this application
 protocol MVCoreDataObject: AnyObject {
   
-  /// This function should check an object, and return true if the object needs to be synchronized. This is check is executed, everytime the object is retrieved from the database. Note: This function needs to be executed on the same queue as the one used to gather the object, which is most likely the main queue.
+  /// This computed variable should check if an object is out of sync, and return true if the object needs to be synchronized. This is check is executed, everytime the object is retrieved from the database. Note: This function needs to be executed on the same queue as the one used to gather the object, which is most likely the main queue and should therefore not be too expensive.
   var syncRequired: Bool { get }
   
   /// This function should execute the syncing of the object.

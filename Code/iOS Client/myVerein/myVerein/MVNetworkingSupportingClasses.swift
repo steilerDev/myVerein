@@ -181,7 +181,7 @@ public struct NetworkingConstants {
       static let Method = HTTPMethods.GET
       struct Parameter {
         static let LastChanged = "lastChanged"
-        static let EventID = "eventID"
+        static let EventID = "id"
       }
     }
     struct Response {

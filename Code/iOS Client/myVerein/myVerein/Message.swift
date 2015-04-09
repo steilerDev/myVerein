@@ -35,7 +35,7 @@ class Message: NSManagedObject {
   @NSManaged var content: String?
 }
 
-// MARK: - Convenience getter and setter for complex values stored in database
+// MARK: - Convenience getter and setter for complex values/relations stored in database
 extension Message {
   var isOutgoingMessage: Bool {
     if let userID = Defaults[MVUserDefaultsConstants.UserID].string{
@@ -92,15 +92,31 @@ extension Message: JSQMessageData {
   }
 }
 
-// MARK: - Constants
+// MARK: - Printable protocol function
+extension Message: Printable {
+  override var description: String {
+    if let content = content, timestamp = timestamp {
+      return "Message from \(sender) to \(division): \(content) [\(timestamp)]"
+    } else {
+      return "Message from \(sender) to \(division): \(id)"
+    }
+  }
+}
+
+// MARK: - Message object related constants
 struct MessageConstants {
   static let ClassName = "Message"
-  static let TimestampField = "timestamp"
-  static let ReadField = "read"
-  static let DivisionField = "division"
-  static let IdField = "id"
   static let BatchSize = 35
   
+  // This struct defines the names of all database columns
+  struct Fields {
+    static let Timestamp = "timestamp"
+    static let Read = "read"
+    static let Division = "division"
+    static let Id = "id"
+  }
+  
+  // This struct defines the names of the member fields on the remote object. They are used to parse the event.
   struct RemoteMessage {
     static let Content = "content"
     static let Division = "group"

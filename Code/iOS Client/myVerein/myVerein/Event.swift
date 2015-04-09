@@ -45,7 +45,7 @@ class Event: NSManagedObject {
   
 }
 
-// MARK: - Convenience getter and setter for complex values stored in database
+// MARK: - Convenience getter and setter for complex values/relations stored in database
 extension Event {
   var response: EventResponse? {
     get {
@@ -61,23 +61,23 @@ extension Event {
   }
   
   var invitedDivision: NSMutableSet {
-    return mutableSetValueForKey(EventConstants.InvitedDivision)
+    return mutableSetValueForKey(EventConstants.RawFields.InvitedDivision)
   }
   
   var goingUser: NSMutableSet {
-    return mutableSetValueForKey(EventConstants.GoingUser)
+    return mutableSetValueForKey(EventConstants.RawFields.GoingUser)
   }
   
   var maybeUser: NSMutableSet {
-    return mutableSetValueForKey(EventConstants.MaybeUser)
+    return mutableSetValueForKey(EventConstants.RawFields.MaybeUser)
   }
   
   var pendingUser: NSMutableSet {
-    return mutableSetValueForKey(EventConstants.PendingUser)
+    return mutableSetValueForKey(EventConstants.RawFields.PendingUser)
   }
   
   var declinedUser: NSMutableSet {
-    return mutableSetValueForKey(EventConstants.DeclinedUser)
+    return mutableSetValueForKey(EventConstants.RawFields.DeclinedUser)
   }
   
 }
@@ -93,7 +93,18 @@ extension Event: MVCoreDataObject {
   }
 }
 
-// MARK: - Enums
+// MARK: - Printable protocol function
+extension Event: Printable {
+  override var description: String {
+    if let startDate = startDate, endDate = endDate, name = name {
+      return "Event \(name) from \(startDate) to \(endDate)"
+    } else {
+      return "Event \(id)"
+    }
+  }
+}
+
+// MARK: - Event object related enumeration
 enum EventResponse:String {
   case Going = "GOING"
   case Mayber = "MAYBE"
@@ -101,17 +112,29 @@ enum EventResponse:String {
   case Decline = "DECLINE"
 }
 
-// MARK: - Constants
+// MARK: - Event object related constants
 struct EventConstants {
   static let ClassName = "Event"
-  static let InvitedDivision = "rawInvitedDivision"
-  static let GoingUser = "rawGoingUser"
-  static let PendingUser = "rawPendingUser"
-  static let DeclinedUser = "rawDeclinedUser"
-  static let MaybeUser = "rawMaybeUser"
-  static let IdField = "id"
-  static let BatchSize = 35
+  // This variable is defining the minimum amount of time that needs to pass until the app is updating the events of a user
+  static let MinimalSecondsBetweenEventSync = 0.0
   
+  // This struct defines the names of all database columns
+  struct Fields {
+    static let Id = "id"
+    static let EndDate = "endDate"
+    static let StartDate = "startDate"
+  }
+  
+  // This struct defines the names of all database columns/relations that should not be accessed directly
+  struct RawFields {
+    static let InvitedDivision = "rawInvitedDivision"
+    static let GoingUser = "rawGoingUser"
+    static let PendingUser = "rawPendingUser"
+    static let DeclinedUser = "rawDeclinedUser"
+    static let MaybeUser = "rawMaybeUser"
+  }
+  
+  // This struct defines the names of the member fields on the remote object. They are used to parse the event.
   struct RemoteEvent {
     static let Id = "id"
     static let Name = "name"

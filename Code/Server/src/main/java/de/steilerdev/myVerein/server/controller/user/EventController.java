@@ -78,7 +78,7 @@ public class EventController
         if (events == null || events.isEmpty())
         {
             logger.warn("[{}] No events to return", currentUser);
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(HttpStatus.OK);
         } else
         {
             logger.info("[{}] Returning {} events", currentUser, events.size());

@@ -20,7 +20,7 @@ class DivisionRepository: MVCoreDataRepository {
     // Create a new fetch request using the Message entity
     let fetchRequest = NSFetchRequest(entityName: DivisionConstants.ClassName)
     
-    let predicate = NSPredicate(format: "\(DivisionConstants.IdField) == %@", id)
+    let predicate = NSPredicate(format: "\(DivisionConstants.Fields.Id) == %@", id)
     fetchRequest.predicate = predicate
     
     // Execute the fetch request, and cast the results to an array of LogItem objects
@@ -32,7 +32,7 @@ class DivisionRepository: MVCoreDataRepository {
     // Create a new fetch request using the Message entity
     let fetchRequest = NSFetchRequest(entityName: DivisionConstants.ClassName)
     
-    let predicate = NSPredicate(format: "\(DivisionConstants.UserMembershipStatus) == %@", userMembershipStatus.rawValue)
+    let predicate = NSPredicate(format: "\(DivisionConstants.RawFields.UserMembershipStatus) == %@", userMembershipStatus.rawValue)
     fetchRequest.predicate = predicate
     
     // Execute the fetch request, and cast the results to an array of LogItem objects
@@ -53,7 +53,7 @@ class DivisionRepository: MVCoreDataRepository {
   /// This function returns the division defined through the response object. The object needs to be a dictionary, containing the id of the division. If the division does not exist, it is created and populated asynchronously.
   func getOrCreateDivisionFrom(#serverResponseObject: [String: AnyObject]) -> (division: Division?, error: NSError?) {
     logger.verbose("Retrieving division from response object \(serverResponseObject)")
-    if let divisionId = serverResponseObject[DivisionConstants.IdField] as? String {
+    if let divisionId = serverResponseObject[DivisionConstants.Fields.Id] as? String {
       if let division = findDivisionBy(id: divisionId) {
         logger.info("Returning division with ID \(divisionId) from local database")
         return (division, nil)

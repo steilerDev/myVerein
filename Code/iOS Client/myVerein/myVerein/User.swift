@@ -48,18 +48,18 @@ class User: NSManagedObject {
   @NSManaged private var rawSendMessages: NSSet
 }
 
-// MARK: - Convenience getter and setter for complex values stored in database
+// MARK: - Convenience getter and setter for complex values/relations stored in database
 extension User {
   var sendMessages: NSMutableSet {
-    return mutableSetValueForKey(UserConstants.SendMessages)
+    return mutableSetValueForKey(UserConstants.RawFields.SendMessages)
   }
   
   var divisions: NSMutableSet {
-    return mutableSetValueForKey(UserConstants.Divisions)
+    return mutableSetValueForKey(UserConstants.RawFields.Divisions)
   }
   
   var administratedDivisions: NSMutableSet {
-    return mutableSetValueForKey(UserConstants.AdministratedDivisions)
+    return mutableSetValueForKey(UserConstants.RawFields.AdministratedDivisions)
   }
   
   var gender: Gender? {
@@ -135,7 +135,18 @@ extension User: MVCoreDataObject {
   }
 }
 
-// MARK: - Enums
+// MARK: - Printable protocol function
+extension User: Printable {
+  override var description: String {
+    if let firstName = firstName, lastName = lastName, email = email {
+      return "User \(firstName) \(lastName) [\(email)]"
+    } else {
+      return "User \(id)"
+    }
+  }
+}
+
+// MARK: - User object related enumerations
 enum Gender: String {
   case Male = "MALE"
   case Female = "FEMALE"
@@ -147,14 +158,23 @@ enum MembershipStatus: String {
   case Resigned = "RESIGNED"
 }
 
-// MARK: - Constants
+// MARK: - User object related constants
 struct UserConstants {
   static let ClassName = "User"
-  static let IdField = "id"
-  static let SendMessages = "rawSendMessages"
-  static let Divisions = "rawDivisions"
-  static let AdministratedDivisions = "rawAdministratedDivisions"
   
+  // This struct defines the names of all database columns
+  struct Fields {
+    static let Id = "id"
+  }
+  
+  // This struct defines the names of all database columns/relations that should not be accessed directly
+  struct RawFields {
+    static let SendMessages = "rawSendMessages"
+    static let Divisions = "rawDivisions"
+    static let AdministratedDivisions = "rawAdministratedDivisions"
+  }
+  
+  // This struct defines the names of the member fields on the remote object. They are used to parse the event.
   struct RemoteUser {
     static let Id = "id"
     static let FirstName = "firstName"

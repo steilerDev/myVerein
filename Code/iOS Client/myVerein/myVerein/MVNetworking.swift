@@ -59,14 +59,19 @@ class MVNetworking {
         success:
         {
           _, response in
-          XCGLogger.info("Successfully executed request (URI: \(URI), parameters \(parameters), request method \(requestMethod), retry count \(retryCount)")
+          XCGLogger.info("Successfully executed request (URI: \(URI), parameters \(parameters), request method \(requestMethod), retry count \(retryCount))")
           // Executing success callback
-          success(response)
+          if response != nil {
+            success(response)
+          } else {
+            XCGLogger.warning("The response for the request (URI: \(URI), parameters \(parameters), request method \(requestMethod), retry count \(retryCount)) is empty, in general there is nothing to do")
+          }
         },
         failure:
         {
           _, error in
           XCGLogger.warning("Failed executing request (URI: \(URI), parameters \(parameters), request method \(requestMethod), retry count \(retryCount)): \(error.localizedDescription)")
+          XCGLogger.debug("Error: \(error)")
           // Handling a request error using the request failure handler. If the error was because of a 401 error, the handler is trying to log the user in before retrying
           MVNetworking.handleRequestFailure(
             error: error,
@@ -114,6 +119,10 @@ class MVNetworking {
           },
           failure: initialFailure
         )
+      } else if error.code == -1004 && error.domain == "NSURLErrorDomain" {
+        logger.warning("Unable to reach server, maybe he is offline. No need to retry at the moment")
+        /// TODO: Show some kind of warning, that the server is not available
+        initialFailure(error)
       } else {
         logger.warning("Handling error of unknown kind: \(error.localizedDescription). Retrying.")
         MVNetworking.handleRequest(
@@ -125,7 +134,7 @@ class MVNetworking {
           failure: initialFailure
         )
       }
-      /// Todo: Exclude stuff like unavailable network connection & Handle unaccepted credentials
+      /// TODO: Exclude stuff like unavailable network connection & Handle unaccepted credentials
     } else if error.code == 401 || // If we are dealing with a simple HTTP error, the code will be 401
       error.code == -1011 && // If we are dealing with a serialization error, whose underlying error is 401 things get tricky
       error.domain == AFURLResponseSerializationErrorDomain &&
@@ -333,13 +342,24 @@ extension MVNetworking {
 
 // MARK: - Event
 extension MVNetworking {
-  /// This function is syncing all events changed since the last sync and updates the last synced information in the user defaults. The callbacks are not guaranteed to be executed on the main queue.
+  /// This function is syncing all events changed since the last sync and updates the last synced information in the user defaults. If the last sync is not The callbacks are not guaranteed to be executed on the main queue.
   class func eventSyncAction(#success: (AnyObject) -> (), failure: (NSError?) -> ()) {
     logger.verbose("Starting to sync events")
     var parameters: [String: String]?
-    if let lastChanged = Defaults[MVUserDefaultsConstants.LastSynced.Event].date {
-      logger.debug("Last changed events \(lastChanged)")
-      parameters = [NetworkingConstants.Event.Sync.Parameter.LastChanged: MVDateParser.stringFromDate(lastChanged)]
+    if let lastSynced = Defaults[MVUserDefaultsConstants.LastSynced.Event].date {
+      logger.debug("Last synced events \(lastSynced)")
+      
+      // Checking if the last sync is not older than the defined MinimalSecondsBetweenEventSync and aborting the sync if so
+      if NSDate().compare(lastSynced.dateByAddingTimeInterval(EventConstants.MinimalSecondsBetweenEventSync)) == .OrderedAscending {
+        let error = MVError.createError(.MVLastSyncTooCloseError)
+        logger.warning("Last sync is not \(EventConstants.MinimalSecondsBetweenEventSync) seconds up. Not syncing: \(error.localizedDescription)")
+        failure(error)
+        return
+      } else {
+        logger.debug("Last sync is longer than \(EventConstants.MinimalSecondsBetweenEventSync) seconds up")
+      }
+      
+      parameters = [NetworkingConstants.Event.Sync.Parameter.LastChanged: MVDateParser.stringFromDate(lastSynced)]
     }
     
     Defaults[MVUserDefaultsConstants.LastSynced.Event] = NSDate()

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="7525" systemVersion="14D113c" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="anG-Qv-Hwh">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="7531" systemVersion="14D131" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="anG-Qv-Hwh">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7516"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7520"/>
         <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
         <capability name="Constraints with non-1.0 multipliers" minToolsVersion="5.1"/>
@@ -188,31 +188,52 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="WjX-pm-TWJ" customClass="JTCalendarMenuView">
-                                <rect key="frame" x="16" y="28" width="568" height="57"/>
+                                <rect key="frame" x="0.0" y="28" width="600" height="43"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                             </view>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ztp-J8-e6v" customClass="JTCalendarContentView">
-                                <rect key="frame" x="16" y="93" width="568" height="458"/>
+                                <rect key="frame" x="0.0" y="79" width="600" height="342"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                             </view>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" translatesAutoresizingMaskIntoConstraints="NO" id="eq9-c7-Err">
+                                <rect key="frame" x="0.0" y="429" width="600" height="114"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <sections/>
+                            </tableView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstItem="ztp-J8-e6v" firstAttribute="leading" secondItem="WjX-pm-TWJ" secondAttribute="trailing" constant="8" symbolic="YES" id="1iU-4Y-wZi"/>
+                            <constraint firstItem="ztp-J8-e6v" firstAttribute="height" secondItem="eq9-c7-Err" secondAttribute="height" multiplier="3" id="2Hy-XB-t3m"/>
+                            <constraint firstItem="ztp-J8-e6v" firstAttribute="width" secondItem="NC2-qi-Fus" secondAttribute="width" id="4Lq-WY-76u"/>
                             <constraint firstItem="ztp-J8-e6v" firstAttribute="leading" secondItem="NC2-qi-Fus" secondAttribute="leadingMargin" id="AtQ-sx-otz"/>
+                            <constraint firstItem="eq9-c7-Err" firstAttribute="leading" secondItem="NC2-qi-Fus" secondAttribute="leadingMargin" id="CFu-OJ-yuk"/>
                             <constraint firstItem="WjX-pm-TWJ" firstAttribute="top" secondItem="h5X-RU-ARb" secondAttribute="bottom" constant="8" symbolic="YES" id="MbI-hT-JYM"/>
                             <constraint firstItem="ztp-J8-e6v" firstAttribute="height" secondItem="WjX-pm-TWJ" secondAttribute="height" multiplier="8" id="OMm-C8-f7A"/>
+                            <constraint firstItem="eq9-c7-Err" firstAttribute="top" secondItem="ztp-J8-e6v" secondAttribute="bottom" constant="8" symbolic="YES" id="RAT-u7-Oyj"/>
                             <constraint firstItem="ztp-J8-e6v" firstAttribute="top" secondItem="WjX-pm-TWJ" secondAttribute="bottom" constant="8" symbolic="YES" id="S6q-ev-1xG"/>
                             <constraint firstItem="WjX-pm-TWJ" firstAttribute="leading" secondItem="NC2-qi-Fus" secondAttribute="leadingMargin" id="Xv8-50-E08"/>
                             <constraint firstItem="WjX-pm-TWJ" firstAttribute="top" secondItem="h5X-RU-ARb" secondAttribute="bottom" constant="8" symbolic="YES" id="YBw-rm-XXy"/>
-                            <constraint firstItem="H6o-GO-hLc" firstAttribute="top" secondItem="ztp-J8-e6v" secondAttribute="bottom" id="Zrt-EN-QRz"/>
                             <constraint firstAttribute="trailingMargin" secondItem="WjX-pm-TWJ" secondAttribute="trailing" id="aZA-oq-2b5"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="eq9-c7-Err" secondAttribute="trailing" id="dh4-S5-xdY"/>
+                            <constraint firstAttribute="centerX" secondItem="ztp-J8-e6v" secondAttribute="centerX" id="jfr-Gj-xbS"/>
+                            <constraint firstItem="H6o-GO-hLc" firstAttribute="top" secondItem="eq9-c7-Err" secondAttribute="bottom" constant="8" symbolic="YES" id="lwD-dX-tvo"/>
+                            <constraint firstItem="WjX-pm-TWJ" firstAttribute="width" secondItem="NC2-qi-Fus" secondAttribute="width" id="mek-si-1jj"/>
                             <constraint firstAttribute="trailingMargin" secondItem="ztp-J8-e6v" secondAttribute="trailing" id="q8o-qW-dvz"/>
+                            <constraint firstAttribute="width" secondItem="eq9-c7-Err" secondAttribute="width" id="xTA-U8-0xy"/>
+                            <constraint firstAttribute="centerX" secondItem="WjX-pm-TWJ" secondAttribute="centerX" id="y10-rz-B9k"/>
+                            <constraint firstAttribute="centerX" secondItem="eq9-c7-Err" secondAttribute="centerX" id="zo5-aN-p15"/>
                         </constraints>
                         <variation key="default">
                             <mask key="constraints">
                                 <exclude reference="MbI-hT-JYM"/>
+                                <exclude reference="Xv8-50-E08"/>
+                                <exclude reference="aZA-oq-2b5"/>
                                 <exclude reference="1iU-4Y-wZi"/>
+                                <exclude reference="AtQ-sx-otz"/>
+                                <exclude reference="q8o-qW-dvz"/>
+                                <exclude reference="CFu-OJ-yuk"/>
+                                <exclude reference="dh4-S5-xdY"/>
                             </mask>
                         </variation>
                     </view>
@@ -220,6 +241,7 @@
                     <tabBarItem key="tabBarItem" title="Calendar" image="Calendar" id="QyH-k7-AwZ"/>
                     <connections>
                         <outlet property="contentView" destination="ztp-J8-e6v" id="wv5-We-ROI"/>
+                        <outlet property="eventTableView" destination="eq9-c7-Err" id="O3Z-XD-S7h"/>
                         <outlet property="menuView" destination="WjX-pm-TWJ" id="6cz-A3-OJ5"/>
                     </connections>
                 </viewController>
@@ -251,8 +273,8 @@
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstItem="1Or-vI-t5k" firstAttribute="leading" secondItem="AQr-el-HOK" secondAttribute="leading" constant="277" id="Qev-Rm-DnF"/>
-                            <constraint firstItem="1Or-vI-t5k" firstAttribute="top" secondItem="fb0-N9-kUt" secondAttribute="bottom" constant="241" id="WnH-l4-C6B"/>
+                            <constraint firstAttribute="centerX" secondItem="1Or-vI-t5k" secondAttribute="centerX" constant="-4.5" id="9Jq-C3-JpZ"/>
+                            <constraint firstAttribute="centerY" secondItem="1Or-vI-t5k" secondAttribute="centerY" constant="-0.5" id="zjE-xT-1l3"/>
                         </constraints>
                     </view>
                     <tabBarItem key="tabBarItem" title="Settings" image="Settings" id="qME-n2-c3J"/>
@@ -360,7 +382,7 @@
         <scene sceneID="DcL-gZ-hnU">
             <objects>
                 <tabBarController id="anG-Qv-Hwh" customClass="MenuController" customModule="myVerein" customModuleProvider="target" sceneMemberID="viewController">
-                    <simulatedTabBarMetrics key="simulatedBottomBarMetrics" translucent="NO"/>
+                    <nil key="simulatedBottomBarMetrics"/>
                     <tabBar key="tabBar" contentMode="scaleToFill" translucent="NO" id="bE8-SZ-oKk">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="49"/>
                         <autoresizingMask key="autoresizingMask"/>

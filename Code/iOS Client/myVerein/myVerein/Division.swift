@@ -37,7 +37,7 @@ class Division: NSManagedObject {
   @NSManaged var rawUserMembershipStatus: String
 }
 
-// MARK: - Convenience getter and setter for complex values stored in database
+// MARK: - Convenience getter and setter for complex values/relations stored in database
 extension Division {
   var userMembershipStatus: UserMembershipStatus {
     get {
@@ -60,24 +60,40 @@ extension Division: MVCoreDataObject {
   }
 }
 
-// MARK: - Enums
+// MARK: - Printable protocol function 
+extension Division: Printable {
+  override var description: String {
+    return "Division \(name ?? id)"
+  }
+}
+
+// MARK: - Division object related enumerations
 enum UserMembershipStatus: String {
   case Member = "MEMBER"
   case FormerMember = "FORMERMEMBER"
   case NoMember = "NOMEMBER"
 }
 
-// MARK: - Constants
+// MARK: - Division object related constants
 struct DivisionConstants {
   static let ClassName = "Division"
-  static let IdField = "id"
-  static let UserMembershipStatus = "rawUserMembershipStatus"
-  static let Name = "name"
-  static let Messages = "rawChatMessage"
-  static let LatestMessage = "latestMessage"
-  static let ChatMessages = "rawChatMessage"
-  static let EnrolledUser = "rawEnrolledUser"
   
+  // This struct defines the names of all database columns
+  struct Fields {
+    static let Id = "id"
+    static let Name = "name"
+    static let LatestMessage = "latestMessage"
+  }
+  
+  // This struct defines the names of all database columns/relations that should not be accessed directly
+  struct RawFields {
+    static let UserMembershipStatus = "rawUserMembershipStatus"
+    static let Messages = "rawChatMessage"
+    static let ChatMessages = "rawChatMessage"
+    static let EnrolledUser = "rawEnrolledUser"
+  }
+  
+  // This struct defines the names of the member fields on the remote object. They are used to parse the event.
   struct RemoteDivision {
     static let Id = "id"
     static let Name = "name"

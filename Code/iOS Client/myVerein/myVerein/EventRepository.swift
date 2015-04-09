@@ -17,16 +17,68 @@ class EventRepository: MVCoreDataRepository {
   /// This function gathers the event object with the corresponding id from the database and returns it. The object is nil if the program was unable to find it.
   private func findEventBy(#id: String) -> Event? {
     logger.verbose("Retrieving event with ID \(id) from database")
-    // Create a new fetch request using the Message entity
+    // Create a new fetch request using the event entity
     let fetchRequest = NSFetchRequest(entityName: EventConstants.ClassName)
     
-    let predicate = NSPredicate(format: "\(EventConstants.IdField) == %@", id)
+    let predicate = NSPredicate(format: "\(EventConstants.Fields.Id) == %@", id)
     fetchRequest.predicate = predicate
     
     // Execute the fetch request, and cast the results to an array of LogItem objects
     return executeSingleRequest(fetchRequest)
   }
   
+
+  /// This function gathers all events that take place on the date or span over the date.
+  ///
+  /// :param: date The date should specify the moment on the start of the day. The function checks the database for event.startDate <= date && event.endDate >= date + 24h
+  func findEventsBy(date startDate: NSDate) -> [Event]? {
+    logger.verbose("Retrieving all events on \(startDate) from database")
+    
+    let fetchRequest = NSFetchRequest(entityName: EventConstants.ClassName)
+    
+    let endDate = startDate.dateByAddingTimeInterval(86400)
+    
+    // There are three cases how an event could span over the date, either it is completly during the day (end and start between day boundaries), or starts before the start of the day and ends after the start of the day, or starts before the end of the day and ends after the end of the day.
+    
+    let startAndEndBetweenBoundariesPredicate = NSCompoundPredicate(type: .AndPredicateType,
+      subpredicates: [
+        NSPredicate(format: "\(EventConstants.Fields.StartDate) >= %@ && \(EventConstants.Fields.StartDate) <= %@", startDate, endDate),
+        NSPredicate(format: "\(EventConstants.Fields.EndDate) >= %@ && \(EventConstants.Fields.EndDate) <= %@", startDate, endDate),
+      ]
+    )
+    
+    let startBeforeAndEndAfterStartOfDatePredicate = NSCompoundPredicate(type: .AndPredicateType,
+      subpredicates: [
+        NSPredicate(format: "\(EventConstants.Fields.StartDate) < %@", startDate),
+        NSPredicate(format: "\(EventConstants.Fields.EndDate) > %@", startDate)
+      ]
+    )
+    
+    let startBeforeAndEndAfterEndOfDatePredicate = NSCompoundPredicate(type: .AndPredicateType,
+      subpredicates: [
+        NSPredicate(format: "\(EventConstants.Fields.StartDate) < %@", endDate),
+        NSPredicate(format: "\(EventConstants.Fields.EndDate) > %@", endDate)
+      ]
+    )
+    
+    fetchRequest.predicate = NSCompoundPredicate(type: .OrPredicateType, subpredicates: [startAndEndBetweenBoundariesPredicate, startBeforeAndEndAfterStartOfDatePredicate, startBeforeAndEndAfterEndOfDatePredicate])
+    
+    return executeListRequest(fetchRequest)
+  }
+  
+  /// This function returns true if there is an event on the date or spans over the date, otherwise it return false.
+  ///
+  /// :param: date The date should specify the moment on the start of the day. The function checks the database for event.startDate <= date && event.endDate >= date + 24h
+  func isEventOn(#date: NSDate) -> Bool {
+    logger.verbose("Checking if there is an event on \(date)")
+    if let eventsOnDate = findEventsBy(date: date) where !eventsOnDate.isEmpty {
+      logger.debug("Found events spanning over \(date): \(eventsOnDate)")
+      return true
+    } else {
+      logger.debug("There is no event on \(date)")
+      return false
+    }
+  }
   
   // MARK: - Creation and population of event
   
@@ -48,14 +100,14 @@ class EventRepository: MVCoreDataRepository {
         return (nil, error)
       }
     }
-    logger.info("Returning \(newEvents.count) new user")
+    logger.info("Returning \(newEvents.count) new events")
     return (newEvents, nil)
   }
   
   /// This function returns the event defined through the response object. The object needs to be an array, containing the id of the event. If the event does not exist, he is created and populated asynchronously.
   func getOrCreateEventFrom(#serverResponseObject: [String: AnyObject]) -> (event: Event?, error: NSError?) {
     logger.verbose("Retrieving event object from response object \(serverResponseObject)")
-    if let eventId = serverResponseObject[DivisionConstants.IdField] as? String {
+    if let eventId = serverResponseObject[EventConstants.Fields.Id] as? String {
       return getOrCreateEventFrom(id: eventId)
     } else {
       let error = MVError.createError(.MVUserCreationError,
@@ -93,8 +145,8 @@ class EventRepository: MVCoreDataRepository {
       logger.debug("Parsing event properties")
       if let event = event,
         name = serverResponseObject[EventConstants.RemoteEvent.Name] as? String,
-        startDateTime = MVDateParser.parseDate(serverResponseObject[EventConstants.RemoteEvent.StartDateTime] as? [String: AnyObject]),
-        endDateTime = MVDateParser.parseDate(serverResponseObject[EventConstants.RemoteEvent.EndDateTime] as? [String: AnyObject])
+        startDateTime = MVDateParser.parseDateTime(serverResponseObject[EventConstants.RemoteEvent.StartDateTime] as? [String: AnyObject]),
+        endDateTime = MVDateParser.parseDateTime(serverResponseObject[EventConstants.RemoteEvent.EndDateTime] as? [String: AnyObject])
       {
         //Parsing invited division
         if let invitedDivisionArray = serverResponseObject[EventConstants.RemoteEvent.InvitedDivision] as? [AnyObject] {
@@ -119,7 +171,7 @@ class EventRepository: MVCoreDataRepository {
         event.startDate = startDateTime
         event.endDate = endDateTime
         
-        logger.info("Succesfully parsed and populaterd user")
+        logger.info("Succesfully parsed and populaterd event")
         return (event, nil)
       } else {
         let error = MVError.createError(.MVServerResponseParseError)

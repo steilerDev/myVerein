@@ -17,8 +17,8 @@ class ChatViewController: JSQMessagesViewController {
   struct ChatViewConstants {
     static let BatchSize = 20
     static let Entity = MessageConstants.ClassName
-    static let PredicateField = MessageConstants.DivisionField
-    static let SortField = MessageConstants.TimestampField
+    static let PredicateField = MessageConstants.Fields.Division
+    static let SortField = MessageConstants.Fields.Timestamp
     static let CacheName = "myVerein.ChatViewCache."
   }
   
@@ -41,7 +41,7 @@ class ChatViewController: JSQMessagesViewController {
     var controller = NSFetchedResultsController(fetchRequest: fetchRequest,
       managedObjectContext: (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext!,
       sectionNameKeyPath: nil,
-      cacheName: ChatViewConstants.CacheName + self.division.id
+      cacheName: ChatViewConstants.CacheName + NSUUID().UUIDString
     )
     
     controller.delegate = self
