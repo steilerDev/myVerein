@@ -80,6 +80,16 @@ extension Event {
     return mutableSetValueForKey(EventConstants.RawFields.DeclinedUser)
   }
   
+  var multiDate: Bool {
+    if let startDate = startDate, endDate = endDate {
+      let calendar = NSCalendar.currentCalendar()
+      let startDateComponent = calendar.components(.CalendarUnitMonth | .CalendarUnitDay | .CalendarUnitYear, fromDate: startDate)
+      let endDateComponent = calendar.components(.CalendarUnitMonth | .CalendarUnitDay | .CalendarUnitYear, fromDate: endDate)
+      return !((startDateComponent.day == endDateComponent.day) && (startDateComponent.month == endDateComponent.month) && (startDateComponent.year == endDateComponent.year))
+    } else {
+      return false
+    }
+  }
 }
 
 // MARK: - MVCoreDataObject protocol functions
@@ -101,6 +111,31 @@ extension Event: Printable {
     } else {
       return "Event \(id)"
     }
+  }
+}
+
+// MARK: - Variables converting the event into text for table view
+extension Event {
+  var title: String {
+    return name ?? id
+  }
+  
+  var subTitle: String {
+    var result: String = String()
+    if let startDate = startDate, endDate = endDate {
+      let formatter = NSDateFormatter()
+      if multiDate {
+        formatter.dateStyle = .ShortStyle
+        formatter.timeStyle = .ShortStyle
+      } else {
+        formatter.timeStyle = .ShortStyle
+      }
+      result += "\(formatter.stringFromDate(startDate)) - \(formatter.stringFromDate(endDate)) "
+    }
+    if let location = locationName where !location.isEmpty {
+      result += "@ \(location)"
+    }
+    return result
   }
 }
 

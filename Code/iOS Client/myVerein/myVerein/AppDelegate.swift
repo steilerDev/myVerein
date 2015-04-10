@@ -9,6 +9,7 @@
 import UIKit
 import CoreData
 import XCGLogger
+import SwiftyUserDefaults
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -69,14 +70,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     // The directory the application uses to store the Core Data store file. This code uses a directory named "de.steilerdev.myverein.ios.myVerein" in the application's documents Application Support directory.
     let urls = NSFileManager.defaultManager().URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask)
     return urls[urls.count-1] as! NSURL
-    }()
+  }()
   
   lazy var managedObjectModel: NSManagedObjectModel = {
     XCGLogger.verbose("Loading managed object model")
     // The managed object model for the application. This property is not optional. It is a fatal error for the application not to be able to find and load its model.
     let modelURL = NSBundle.mainBundle().URLForResource("myVereinModel", withExtension: "momd")!
     return NSManagedObjectModel(contentsOfURL: modelURL)!
-    }()
+  }()
   
   lazy var persistentStoreCoordinator: NSPersistentStoreCoordinator? = createPersistentStoreCoordinator(self)()
   
@@ -115,8 +116,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   
   func flushDatabase() {
     logger.debug("Flushing database")
-    
-    
     if let managedObjectContext = managedObjectContext {
       if let persistentStoreCoordinator = self.persistentStoreCoordinator, stores = persistentStoreCoordinator.persistentStores as? [NSPersistentStore] {
         for store in stores {
@@ -145,6 +144,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     persistentStoreCoordinator = createPersistentStoreCoordinator()
     managedObjectContext = createManagedObjectContext()
     logger.info("Successfully flushed database")
+    
+    logger.debug("Resetting user defaults storing last sync timestamps")
+    Defaults[MVUserDefaultsConstants.LastSynced.Event] = nil
   }
   
   func saveContext () {

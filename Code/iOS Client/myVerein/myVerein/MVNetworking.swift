@@ -209,6 +209,8 @@ extension MVNetworking {
               Defaults[MVUserDefaultsConstants.SystemID].string! != newSystemID
             {
               logger.info("System ID or User ID did change or this is the first log in. Storing and resetting database")
+              logger.debug("SystemID Old: \(Defaults[MVUserDefaultsConstants.UserID].string), new: \(newUserID)")
+              logger.debug("UserID Old: \(Defaults[MVUserDefaultsConstants.SystemID].string), new: \(newSystemID)")
               Defaults[MVUserDefaultsConstants.UserID] = newUserID
               Defaults[MVUserDefaultsConstants.SystemID] = newSystemID
               (UIApplication.sharedApplication().delegate as! AppDelegate).flushDatabase()

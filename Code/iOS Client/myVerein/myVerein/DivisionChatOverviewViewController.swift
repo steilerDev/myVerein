@@ -1,26 +1,32 @@
 //
-//  DivisionChatOverview.swift
-//  myVerein
+// Copyright (C) 2015 Frank Steiler <frank@steilerdev.de>
 //
-//  Created by Frank Steiler on 03/03/15.
-//  Copyright (c) 2015 steilerDev. All rights reserved.
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 2 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
+
+//
+//  DivisionChatOverview.swift
+//  This file holds all information related to the chat overview, including appearance modifications, data source for the collection view and delegate methods for click events.
+//  The chat overview is the page presenting all division in a descending order starting with the chat with the most recent message. The picture above the chat's name shows either the avatar of the most recent user or his initials.
 //
 
 import UIKit
 import CoreData
 import XCGLogger
 
+// MARK: - All variables and outlets needed by the controller
 class DivisionChatOverviewViewController: UICollectionViewController {
-  
-  struct DivisionChatOverviewConstants {
-    static let BatchSize = 20
-    static let Entity = DivisionConstants.ClassName
-    static let PredicateField = DivisionConstants.RawFields.UserMembershipStatus
-    static let SortField = DivisionConstants.Fields.LatestMessage + "." + MessageConstants.Fields.Timestamp
-    static let CacheName = "myVerein.ChatOverviewCache"
-    static let ReuseCellIdentifier = "ChatCell"
-    static let SegueToChat = "showChatView"
-  }
   
   let logger = XCGLogger.defaultInstance()
   
@@ -52,7 +58,30 @@ class DivisionChatOverviewViewController: UICollectionViewController {
     return controller
   }()
   
+  // MARK: Variables needed by NSFetchedResultsControllerDelegate 
   
+  /// Dictionary used to collect section changes
+  private lazy var sectionChanges: [NSFetchedResultsChangeType: NSMutableIndexSet] = {
+    // Setting up objects in dict
+    var dict = [NSFetchedResultsChangeType: NSMutableIndexSet]()
+    dict[.Insert] = NSMutableIndexSet() as NSMutableIndexSet
+    dict[.Delete] = NSMutableIndexSet() as NSMutableIndexSet
+    return dict
+    }()
+  
+  /// Dictionary used to collect object changes
+  private lazy var objectChanges: [NSFetchedResultsChangeType: [NSIndexPath]] = {
+    // Setting up objects in dict
+    var dict = [NSFetchedResultsChangeType: [NSIndexPath]]()
+    dict[.Insert] = [NSIndexPath]()
+    dict[.Delete] = [NSIndexPath]()
+    dict[.Update] = [NSIndexPath]()
+    return dict
+    }()
+}
+
+// MARK: - UICollectionViewController lifecycle methods
+extension DivisionChatOverviewViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
     
@@ -96,27 +125,6 @@ class DivisionChatOverviewViewController: UICollectionViewController {
       logger.error("Unable to get segue identifier")
     }
   }
-  
-  // MARK: NSFetchedResultsControllerDelegate (Needed variables)
-  
-  /// Dictionary used to collect section changes
-  private lazy var sectionChanges: [NSFetchedResultsChangeType: NSMutableIndexSet] = {
-    // Setting up objects in dict
-    var dict = [NSFetchedResultsChangeType: NSMutableIndexSet]()
-    dict[.Insert] = NSMutableIndexSet() as NSMutableIndexSet
-    dict[.Delete] = NSMutableIndexSet() as NSMutableIndexSet
-    return dict
-    }()
-  
-  /// Dictionary used to collect object changes
-  private lazy var objectChanges: [NSFetchedResultsChangeType: [NSIndexPath]] = {
-    // Setting up objects in dict
-    var dict = [NSFetchedResultsChangeType: [NSIndexPath]]()
-    dict[.Insert] = [NSIndexPath]()
-    dict[.Delete] = [NSIndexPath]()
-    dict[.Update] = [NSIndexPath]()
-    return dict
-    }()
 }
 
 // MARK: - UICollectionViewDataSource
@@ -303,4 +311,15 @@ extension DivisionChatOverviewViewController: NSFetchedResultsControllerDelegate
       objectChanges[.Update] = [NSIndexPath]()
     }
   }
+}
+
+// MARK: - DivisionChatOverview related constants
+struct DivisionChatOverviewConstants {
+  static let BatchSize = 20
+  static let Entity = DivisionConstants.ClassName
+  static let PredicateField = DivisionConstants.RawFields.UserMembershipStatus
+  static let SortField = DivisionConstants.Fields.LatestMessage + "." + MessageConstants.Fields.Timestamp
+  static let CacheName = "myVerein.ChatOverviewCache"
+  static let ReuseCellIdentifier = "ChatCell"
+  static let SegueToChat = "showChatView"
 }

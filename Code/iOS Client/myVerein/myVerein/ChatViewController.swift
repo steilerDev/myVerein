@@ -1,9 +1,24 @@
 //
-//  ChatViewController.swift
-//  myVerein
+// Copyright (C) 2015 Frank Steiler <frank@steilerdev.de>
 //
-//  Created by Frank Steiler on 13/03/15.
-//  Copyright (c) 2015 steilerDev. All rights reserved.
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 2 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
+
+//
+//  ChatViewController.swift
+//  This file holds all information related to the chat view, including appearance modifications, data source for the JSQMessageViewController and delegate methods for click events.
+//  The chat view is the page presenting the messages of a division chat in descending order starting with the oldest message. The user's avatar either shows the user's avatar or his initials.
 //
 
 import UIKit
@@ -12,15 +27,8 @@ import XCGLogger
 import CoreData
 import SwiftyUserDefaults
 
+//MARK: - Plain ChatsViewController holding all variables and outlets for the class
 class ChatViewController: JSQMessagesViewController {
-  
-  struct ChatViewConstants {
-    static let BatchSize = 20
-    static let Entity = MessageConstants.ClassName
-    static let PredicateField = MessageConstants.Fields.Division
-    static let SortField = MessageConstants.Fields.Timestamp
-    static let CacheName = "myVerein.ChatViewCache."
-  }
   
   let logger = XCGLogger.defaultInstance()
   
@@ -48,7 +56,7 @@ class ChatViewController: JSQMessagesViewController {
     return controller
   }()
   
-  // MARK: NSFetchedResultsControllerDelegate (Needed variables)
+  // MARK: Variables needed by the NSFetchedResultsControllerDelegate
   
   /// Dictionary used to collect object changes
   private lazy var objectChanges: [NSFetchedResultsChangeType: [NSIndexPath]] = {
@@ -57,8 +65,11 @@ class ChatViewController: JSQMessagesViewController {
     dict[.Insert] = [NSIndexPath]()
     dict[.Delete] = [NSIndexPath]()
     return dict
-    }()
-  
+  }()
+}
+
+// MARK: - UIViewController lifecycle methods
+extension ChatViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
     
@@ -94,7 +105,7 @@ class ChatViewController: JSQMessagesViewController {
   }
   
   /*
-  // MARK: - Navigation
+  // MARK: Navigation
   
   // In a storyboard-based application, you will often want to do a little preparation before navigation
   override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
@@ -272,7 +283,8 @@ extension ChatViewController: NSFetchedResultsControllerDelegate {
   }
 }
 
-
+// MARK: - Extension for the avatar image factory
+/// This extension for the avatar image factory creates an avatar for a user either by using his stored picture or his initials.
 extension JSQMessagesAvatarImageFactory {
   class func avatarImageForUser(user: User) -> JSQMessagesAvatarImage! {
     let constDiameter = UInt(34)
@@ -282,4 +294,13 @@ extension JSQMessagesAvatarImageFactory {
       return avatarImageWithUserInitials(user.initials, backgroundColor: UIColor(hex: MVColor.Primary.Light), textColor: UIColor.whiteColor(), font: UIFont.systemFontOfSize(14), diameter: constDiameter)
     }
   }
+}
+
+// MARK: - ChatView related constants
+struct ChatViewConstants {
+  static let BatchSize = 20
+  static let Entity = MessageConstants.ClassName
+  static let PredicateField = MessageConstants.Fields.Division
+  static let SortField = MessageConstants.Fields.Timestamp
+  static let CacheName = "myVerein.ChatViewCache."
 }

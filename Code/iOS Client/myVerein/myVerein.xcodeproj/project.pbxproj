@@ -16,6 +16,7 @@
 		3020CBBB1A9E128A005AAEEF /* myVereinTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3020CBBA1A9E128A005AAEEF /* myVereinTests.swift */; };
 		302BE8C21AA642EB001D0FE7 /* DivisionChatCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 302BE8C11AA642EB001D0FE7 /* DivisionChatCell.swift */; };
 		302BE8C41AA64599001D0FE7 /* DivisionChatOverviewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 302BE8C31AA64599001D0FE7 /* DivisionChatOverviewViewController.swift */; };
+		3032A9F51AD70B9100EEEAF4 /* EventViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3032A9F41AD70B9100EEEAF4 /* EventViewController.swift */; };
 		3035D66C1AC086E800C5C0FB /* MVColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3035D66B1AC086E800C5C0FB /* MVColor.swift */; };
 		303EB9551AD03BF500B14B2F /* EventRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 303EB9541AD03BF500B14B2F /* EventRepository.swift */; };
 		304C577F1AACA3CC00B221D7 /* MVSecurity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 304C577E1AACA3CC00B221D7 /* MVSecurity.swift */; };
@@ -24,7 +25,7 @@
 		3068A4A41ACBEDBA00A3F53D /* MVUserDefaultsConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3068A4A31ACBEDBA00A3F53D /* MVUserDefaultsConstants.swift */; };
 		306FD7321AAA356000719B82 /* MVNetworkingHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 306FD7311AAA356000719B82 /* MVNetworkingHelper.swift */; };
 		306FD7341AAB0F4400719B82 /* MVError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 306FD7331AAB0F4400719B82 /* MVError.swift */; };
-		3079B1DA1AAF242600ACD793 /* MarshalOperator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3079B1D91AAF242600ACD793 /* MarshalOperator.swift */; };
+		3079B1DA1AAF242600ACD793 /* SupportingClasses.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3079B1D91AAF242600ACD793 /* SupportingClasses.swift */; };
 		30916FFB1AA8B9D0004D30D1 /* MenuController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30916FFA1AA8B9D0004D30D1 /* MenuController.swift */; };
 		3091702F1AA8C097004D30D1 /* myVereinModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 3091702D1AA8C097004D30D1 /* myVereinModel.xcdatamodeld */; };
 		309170341AA8D2B4004D30D1 /* MessageRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 309170331AA8D2B4004D30D1 /* MessageRepository.swift */; };
@@ -83,6 +84,7 @@
 		3026FE8D1AADE71F0006ABA8 /* XCGLogger.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCGLogger.framework; path = "XCGLogger/build/Debug-iphoneos/XCGLogger.framework"; sourceTree = "<group>"; };
 		302BE8C11AA642EB001D0FE7 /* DivisionChatCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DivisionChatCell.swift; sourceTree = "<group>"; };
 		302BE8C31AA64599001D0FE7 /* DivisionChatOverviewViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DivisionChatOverviewViewController.swift; sourceTree = "<group>"; };
+		3032A9F41AD70B9100EEEAF4 /* EventViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EventViewController.swift; sourceTree = "<group>"; };
 		3035D66B1AC086E800C5C0FB /* MVColor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MVColor.swift; sourceTree = "<group>"; };
 		303EB9541AD03BF500B14B2F /* EventRepository.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EventRepository.swift; sourceTree = "<group>"; };
 		304C577E1AACA3CC00B221D7 /* MVSecurity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MVSecurity.swift; sourceTree = "<group>"; };
@@ -91,7 +93,7 @@
 		3068A4A31ACBEDBA00A3F53D /* MVUserDefaultsConstants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MVUserDefaultsConstants.swift; sourceTree = "<group>"; };
 		306FD7311AAA356000719B82 /* MVNetworkingHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MVNetworkingHelper.swift; sourceTree = "<group>"; };
 		306FD7331AAB0F4400719B82 /* MVError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MVError.swift; sourceTree = "<group>"; };
-		3079B1D91AAF242600ACD793 /* MarshalOperator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MarshalOperator.swift; sourceTree = "<group>"; };
+		3079B1D91AAF242600ACD793 /* SupportingClasses.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SupportingClasses.swift; sourceTree = "<group>"; };
 		30916FFA1AA8B9D0004D30D1 /* MenuController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MenuController.swift; sourceTree = "<group>"; };
 		3091702E1AA8C097004D30D1 /* myVereinModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = myVereinModel.xcdatamodel; sourceTree = "<group>"; };
 		309170331AA8D2B4004D30D1 /* MessageRepository.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MessageRepository.swift; sourceTree = "<group>"; };
@@ -216,7 +218,7 @@
 				3020CBAB1A9E1289005AAEEF /* Images.xcassets */,
 				3091702D1AA8C097004D30D1 /* myVereinModel.xcdatamodeld */,
 				3020CBA31A9E1289005AAEEF /* Info.plist */,
-				3079B1D91AAF242600ACD793 /* MarshalOperator.swift */,
+				3079B1D91AAF242600ACD793 /* SupportingClasses.swift */,
 				3035D66B1AC086E800C5C0FB /* MVColor.swift */,
 				3068A4A31ACBEDBA00A3F53D /* MVUserDefaultsConstants.swift */,
 			);
@@ -294,6 +296,7 @@
 			isa = PBXGroup;
 			children = (
 				30F254E71AC7271A00E10CB9 /* CalendarViewController.swift */,
+				3032A9F41AD70B9100EEEAF4 /* EventViewController.swift */,
 			);
 			name = Calendar;
 			sourceTree = "<group>";
@@ -478,6 +481,7 @@
 				3035D66C1AC086E800C5C0FB /* MVColor.swift in Sources */,
 				30916FFB1AA8B9D0004D30D1 /* MenuController.swift in Sources */,
 				3091702F1AA8C097004D30D1 /* myVereinModel.xcdatamodeld in Sources */,
+				3032A9F51AD70B9100EEEAF4 /* EventViewController.swift in Sources */,
 				302BE8C41AA64599001D0FE7 /* DivisionChatOverviewViewController.swift in Sources */,
 				30FB44BD1AACC096003E4512 /* UserRepository.swift in Sources */,
 				304C577F1AACA3CC00B221D7 /* MVSecurity.swift in Sources */,
@@ -488,7 +492,7 @@
 				30FB44BB1AACC088003E4512 /* DivisionRepository.swift in Sources */,
 				302BE8C21AA642EB001D0FE7 /* DivisionChatCell.swift in Sources */,
 				30F254E61AC7224E00E10CB9 /* SettingsViewController.swift in Sources */,
-				3079B1DA1AAF242600ACD793 /* MarshalOperator.swift in Sources */,
+				3079B1DA1AAF242600ACD793 /* SupportingClasses.swift in Sources */,
 				3012715A1AA5C83C00C23AEF /* MVNetworkingSessionFactory.swift in Sources */,
 				306FD7321AAA356000719B82 /* MVNetworkingHelper.swift in Sources */,
 				303EB9551AD03BF500B14B2F /* EventRepository.swift in Sources */,

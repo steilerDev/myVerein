@@ -1,9 +1,23 @@
 //
-//  MarshalOperator.swift
-//  myVerein
+// Copyright (C) 2015 Frank Steiler <frank@steilerdev.de>
 //
-//  Created by Frank Steiler on 10/03/15.
-//  Copyright (c) 2015 steilerDev. All rights reserved.
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 2 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
+
+//
+//  SupportingClasses.swift
+//  This file holds independent reusable classes written by myself, including an improved multi-tasking operator and an extension for bound-save array access.
 //
 
 import Foundation
@@ -22,18 +36,22 @@ postfix operator ~> {}
 private let queue = dispatch_queue_create("serial-worker", DISPATCH_QUEUE_SERIAL)
 
 /// Using the Marshal operator as a prefix operator, means that the closure is executed on the main thread.
+///
 /// :param: mainClosure The closure executed on the main thread.
 prefix func ~> (mainClosure: () -> ()) {
   dispatch_async(dispatch_get_main_queue(), mainClosure)
 }
 
 /// Using the Marshal operator as a postfix operator, means that the closure is executed on a background thread.
+///
 /// :param: backgroundClosure The closure executed on a background thread.
 postfix func ~> (backgroundClosure: () -> ()) {
   dispatch_async(queue, backgroundClosure)
 }
 
 // Using the Marshal operator as a postfix operator, means that the closure is executed on a background thread. This operator provides a managed object context created on the background queue and can therefore be used without any concurency problems.
+///
+/// :param: backgroundClosure The closure executed on a background thread providing a managed context usable on this thread.
 postfix func ~> (backgroundClosure: (NSManagedObjectContext) -> ()) {
   dispatch_async(queue) {
     var backgroundContext = NSManagedObjectContext()
@@ -43,6 +61,7 @@ postfix func ~> (backgroundClosure: (NSManagedObjectContext) -> ()) {
 }
 
 /// Executes the left-hand closure on the background thread, upon completion the right-hand closure is executed on the main thread.
+///
 /// :param: backgroundClosure The closure executed on a background thread.
 /// :param: mainClosure The closure executed on the main thread, after the background thread is finished.
 func ~> (backgroundClosure: () -> (), mainClosure: () -> ()) {
@@ -53,6 +72,7 @@ func ~> (backgroundClosure: () -> (), mainClosure: () -> ()) {
 }
 
 /// Executes the left-hand closure on the background thread, upon completion the right-hand closure is executed on the main thread using the return value of the left-hand closure.
+///
 /// :param: backgroundClosure The closure executed on a background thread.
 /// :param: mainClosure The closure executed on the main thread.
 func ~> <R> (backgroundClosure: () -> (R), mainClosure: (R) -> ()) {
@@ -61,5 +81,18 @@ func ~> <R> (backgroundClosure: () -> (R), mainClosure: (R) -> ()) {
     dispatch_async(dispatch_get_main_queue()) {
       mainClosure(result)
     }
+  }
+}
+
+/// An array extension providing a bound-save getter using swift's optionals
+extension Array {
+  
+  /// This function returns the object at the provided index. If the index is out of bounds nil is returned.
+  ///
+  /// :param: index The index of the object, the user wants to retrieve.
+  ///
+  /// :returns: The object, if the index is not out of bounds, nil otherwise.
+  func get(index: Int) -> T? {
+    return 0 <= index && index < count ? self[index]: nil
   }
 }
