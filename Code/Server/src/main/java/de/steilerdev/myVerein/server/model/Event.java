@@ -375,7 +375,6 @@ public class Event
      */
     public void updateInvitedUser(DivisionRepository divisionRepository)
     {
-
         if(invitedDivision == null || (invitedDivision = Division.getExpandedSetOfDivisions(invitedDivision, divisionRepository)) == null)
         {
             logger.error("Unable to update invited user, because invited divisions are null!");

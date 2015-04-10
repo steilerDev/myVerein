@@ -8,11 +8,14 @@
     <name>myVerein_Server</name>
 
     <properties>
+        <!-- Variables -->
         <server.id>myVereinRemoteServer</server.id>
         <server.url>http://it14-myverein.dhbw-stuttgart.de:8080</server.url>
         <!--server.id>myVereinLocalServer</server.id>
         <server.url>http://localhost:8080</server.url-->
+        <webroot>WEB-INF</webroot>
 
+        <!-- Central controlling of dependency versions-->
         <java.version>1.8</java.version>
 
         <!-- Spring Framework -->
@@ -204,6 +207,12 @@
 
     <build>
         <finalName>${project.name}</finalName>
+        <resources>
+            <resource>
+                <directory>resources</directory>
+            </resource>
+        </resources>
+
         <plugins>
             <plugin>
                 <groupId>org.apache.tomcat.maven</groupId>
@@ -237,7 +246,7 @@
                         <configuration>
                             <charset>UTF-8</charset>
 
-                            <cssSourceDir>WEB-INF/resources/css</cssSourceDir>
+                            <cssSourceDir>${webroot}/resources/css</cssSourceDir>
                             <cssSourceFiles>
                                 <cssSourceFile>base/magic-bootstrap.1.0.0.css</cssSourceFile>
                                 <cssSourceFile>base/bootstrap-validator.0.5.3.css</cssSourceFile>
@@ -257,7 +266,7 @@
                             </cssSourceFiles>
                             <cssFinalFile>myVerein.css</cssFinalFile>
 
-                            <jsSourceDir>WEB-INF/resources/js</jsSourceDir>
+                            <jsSourceDir>${webroot}/resources/js</jsSourceDir>
                             <jsSourceFiles>
                                 <jsSourceFile>base/jquery.2.1.1.js</jsSourceFile>
                                 <jsSourceFile>base/jquery-cookie.1.4.1.js</jsSourceFile>
@@ -304,7 +313,7 @@
                         <configuration>
                             <charset>UTF-8</charset>
 
-                            <cssSourceDir>WEB-INF/resources/css</cssSourceDir>
+                            <cssSourceDir>${webroot}/resources/css</cssSourceDir>
                             <cssSourceFiles>
                                 <cssSourceFile>base/magic-bootstrap.1.0.0.css</cssSourceFile>
                                 <cssSourceFile>base/elegant-icons.1.0.0.css</cssSourceFile>
@@ -325,7 +334,7 @@
                         <configuration>
                             <charset>UTF-8</charset>
 
-                            <cssSourceDir>WEB-INF/resources/css</cssSourceDir>
+                            <cssSourceDir>${webroot}/resources/css</cssSourceDir>
                             <cssSourceFiles>
                                 <cssSourceFile>base/magic-bootstrap.1.0.0.css</cssSourceFile>
                                 <cssSourceFile>base/elegant-icons.1.0.0.css</cssSourceFile>
@@ -336,7 +345,7 @@
                             </cssSourceFiles>
                             <cssFinalFile>myVerein.init.css</cssFinalFile>
 
-                            <jsSourceDir>WEB-INF/resources/js</jsSourceDir>
+                            <jsSourceDir>${webroot}/resources/js</jsSourceDir>
                             <jsSourceFiles>
                                 <jsSourceFile>base/jquery.2.1.1.js</jsSourceFile>
                                 <jsSourceFile>base/bootstrap.3.3.1.js</jsSourceFile>
