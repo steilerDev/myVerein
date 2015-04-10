@@ -10,10 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -24,25 +21,10 @@ import java.util.*;
  */
 @Controller
 @RequestMapping("/")
-public class IndexController
-{
-    @Autowired
-    private MongoTemplate mongoTemplate;
-
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private DivisionRepository divisionRepository;
-
-    @Autowired
-    private EventRepository eventRepository;
+public class IndexController {
 
     @Autowired
     private SettingsRepository settingsRepository;
-
-    @Autowired
-    private MessageRepository messageRepository;
 
     private static Logger logger = LoggerFactory.getLogger(IndexController.class);
 
@@ -67,11 +49,6 @@ public class IndexController
     }
 
     /**
-     *
-     * @return The path to the view for the login page.
-     */
-
-    /**
      * This request mapping is processing the request to view the login page. If the initial flag is set within the settings file, the initial configuration page is returned.
      * @param error This parameter is present if a login error occurred.
      * @param logout This parameter is present if a user logged out of the application and got redirected to this page.
@@ -82,7 +59,6 @@ public class IndexController
     @RequestMapping(value = "login", method = RequestMethod.GET)
     public String login(@RequestParam(required = false) String error, @RequestParam(required = false) String logout, @RequestParam(required = false) String cookieTheft, Model model)
     {
-        createDatabaseExample();
         logger.trace("Getting login page.");
         if (Settings.loadSettings(settingsRepository).isInitialSetup())
         {
@@ -150,139 +126,5 @@ public class IndexController
         }
         System.err.print("\n");
         return new ResponseEntity<>("No", HttpStatus.OK);
-    }
-
-    /**
-     * This function is clearing the current database and creates a new set of test data.
-     */
-    private void createDatabaseExample()
-    {
-        logger.debug("Deleting old database and reloading database example.");
-        resetDatabase();
-
-        User user1 = new User("Frank", "Steiler", "frank@steiler.eu", "asdf");
-        user1.setBirthday(LocalDate.of(1994, 6, 28));
-        user1.setActiveSince(LocalDate.of(2000, 1, 1));
-        user1.setIban("DE46500700100927353010");
-        user1.setBic("BYLADEM1001");
-        user1.setCity("Stuttgart");
-        user1.setZipCode("70190");
-        user1.setStreetNumber("27");
-        user1.setStreet("Metzstraße");
-        user1.setCountry("Germany");
-        user1.setGender(User.Gender.MALE);
-        User user2 = new User("John", "Doe", "john@doe.com", "asdf");
-        user2.setActiveSince(LocalDate.of(1999, 1, 1));
-        user2.setPassiveSince(LocalDate.of(2000, 6, 1));
-        User user3 = new User("Peter", "Enis", "peter@enis.com", "asdf");
-        User user4 = new User("Luke", "Skywalker", "luke@skywalker.com", "asdf");
-        user4.setGender(User.Gender.MALE);
-        User user5 = new User("Marty", "McFly", "marty@mcfly.com", "asdf");
-        User user6 = new User("Tammo", "Schwindt", "tammo@tammon.de", "asdf");
-
-        userRepository.save(user1);
-        userRepository.save(user2);
-        userRepository.save(user3);
-        userRepository.save(user4);
-        userRepository.save(user5);
-        userRepository.save(user6);
-
-        Division div1 = new Division("myVerein", null, user1, null);
-        Division div2 = new Division("Rugby", null, user2, div1);
-        Division div3 = new Division("Soccer", null, null, div1);
-        Division div4 = new Division("Rugby - 1st team", null, user2, div2);
-        Division div5 = new Division("Rugby - 2nd team", null, user3, div2);
-
-        divisionRepository.save(div1);
-        divisionRepository.save(div2);
-        divisionRepository.save(div3);
-        divisionRepository.save(div4);
-        divisionRepository.save(div5);
-
-        Event event1 = new Event();
-        event1.setStartDateTime(LocalDateTime.of(2015, 1, 20, 13, 0));
-        event1.setEndDateTime(LocalDateTime.of(2015, 1, 20, 14, 0));
-        event1.setName("Super Event 1");
-        event1.setLocation("Awesome location");
-        event1.setLocationLat(12.1);
-        event1.setLocationLng(12.1);
-        event1.setDescription("Super event at awesome location with great people");
-        event1.addDivision(div2);
-        event1.setEventAdmin(user1);
-        event1.updateMultiDate();
-        event1.setLastChanged(LocalDateTime.now());
-
-        Event event2 = new Event();
-        event2.setStartDateTime(LocalDateTime.of(2015, 1, 20, 13, 0));
-        event2.setEndDateTime(LocalDateTime.of(2015, 1, 21, 13, 0));
-        event2.setName("Super Event 2");
-        event2.addDivision(div3);
-        event2.setEventAdmin(user4);
-        event2.updateMultiDate();
-        event2.setLastChanged(LocalDateTime.now());
-
-        Event event3 = new Event();
-        event3.setStartDateTime(LocalDateTime.of(2015, 1, 21, 13, 0));
-        event3.setEndDateTime(LocalDateTime.of(2015, 1, 21, 13, 5));
-        event3.setName("Super Event 3");
-        event3.addDivision(div1);
-        event3.setEventAdmin(user1);
-        event3.updateMultiDate();
-        event3.setLastChanged(LocalDateTime.now());
-
-        Event event4 = new Event();
-        event4.setStartDateTime(LocalDateTime.of(2015, 1, 11, 13, 0));
-        event4.setEndDateTime(LocalDateTime.of(2015, 1, 15, 13, 5));
-        event4.setName("Super Event 4");
-        event4.addDivision(div1);
-        event4.setEventAdmin(user2);
-        event4.updateMultiDate();
-        event4.setLastChanged(LocalDateTime.now());
-
-        eventRepository.save(event1);
-        eventRepository.save(event2);
-        eventRepository.save(event3);
-        eventRepository.save(event4);
-
-        user1.replaceDivisions(divisionRepository, eventRepository, div1);
-        user2.replaceDivisions(divisionRepository, eventRepository, div2, div4);
-        user3.replaceDivisions(divisionRepository, eventRepository, div2);
-        user4.replaceDivisions(divisionRepository, eventRepository, div3);
-        user5.replaceDivisions(divisionRepository, eventRepository, div2, div4);
-
-        userRepository.save(user1);
-        userRepository.save(user2);
-        userRepository.save(user3);
-        userRepository.save(user4);
-        userRepository.save(user5);
-
-        Message message1 = new Message("Hello world", user1, divisionRepository.findById(div1.getId()));
-        Message message2 = new Message("Hello world, too", user2, divisionRepository.findById(div1.getId()));
-        messageRepository.save(message1);
-        messageRepository.save(message2);
-
-        Settings systemSettings = new Settings();
-        systemSettings.setClubName("myVerein");
-        List<String> customUserFields = new ArrayList<>();
-        customUserFields.add("Membership number");
-        systemSettings.setCustomUserFields(customUserFields);
-        settingsRepository.save(systemSettings);
-    }
-
-    /**
-     * This function is resetting the complete database.
-     */
-    private void resetDatabase()
-    {
-        new Thread(() -> {
-            try
-            {
-                logger.debug("Trying to drop the current collection.");
-                mongoTemplate.getDb().dropDatabase();
-                logger.debug("Successfully dropped current collection");
-            } catch (MongoTimeoutException e)
-            {
-                logger.debug("Unable to drop database, because the database is not available.");
-            }}).run();
     }
 }

@@ -17,14 +17,13 @@
 package de.steilerdev.myVerein.server.controller.init;
 
 import com.mongodb.*;
-import de.steilerdev.myVerein.server.model.Division;
-import de.steilerdev.myVerein.server.model.Settings;
-import de.steilerdev.myVerein.server.model.User;
+import de.steilerdev.myVerein.server.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,15 +31,32 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/init")
 public class InitController
 {
+    @Autowired
+    private MongoTemplate mongoTemplate;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private DivisionRepository divisionRepository;
+
+    @Autowired
+    private EventRepository eventRepository;
+
+    @Autowired
+    private SettingsRepository settingsRepository;
+
+    @Autowired
+    private MessageRepository messageRepository;
+
     @Autowired
     private ReloadableResourceBundleMessageSource messageSource;
 
@@ -61,7 +77,6 @@ public class InitController
      * @param databaseUser The user used to authenticate against the MongoDB server (may be empty if not needed).
      * @param databasePassword The password used to authenticate against the MongoDB server (may be empty if not needed).
      * @param databaseCollection The name of the database collection (Default myVerein).
-     * @param rememberMeTokenKey A secret key used to secure the remember me cookies.
      * @param locale The current locale of the user.
      * @return An HTTP response with a status code. If an error occurred an error message is bundled into the response, otherwise a success message is available.
      */
@@ -328,5 +343,146 @@ public class InitController
             logger.warn("Unable to save super admin and new root division, because the new MongoDB connection is not available");
             return false;
         }
+    }
+
+    /**
+     * This function is clearing the current database and creates a new set of test data. This function is called by POSTing the URI '/'
+     * @return In general it should just return okay. No error checking is done!
+     */
+    @RequestMapping(value = "database", method = RequestMethod.POST)
+    public ResponseEntity<String> createDatabaseExample()
+    {
+        logger.debug("Deleting old database and reloading database example.");
+        resetDatabase();
+
+        User user1 = new User("Frank", "Steiler", "frank@steiler.eu", "asdf");
+        user1.setBirthday(LocalDate.of(1994, 6, 28));
+        user1.setActiveSince(LocalDate.of(2000, 1, 1));
+        user1.setIban("DE46500700100927353010");
+        user1.setBic("BYLADEM1001");
+        user1.setCity("Stuttgart");
+        user1.setZipCode("70190");
+        user1.setStreetNumber("27");
+        user1.setStreet("Metzstraße");
+        user1.setCountry("Germany");
+        user1.setGender(User.Gender.MALE);
+        User user2 = new User("John", "Doe", "john@doe.com", "asdf");
+        user2.setActiveSince(LocalDate.of(1999, 1, 1));
+        user2.setPassiveSince(LocalDate.of(2000, 6, 1));
+        User user3 = new User("Peter", "Enis", "peter@enis.com", "asdf");
+        User user4 = new User("Luke", "Skywalker", "luke@skywalker.com", "asdf");
+        user4.setGender(User.Gender.MALE);
+        User user5 = new User("Marty", "McFly", "marty@mcfly.com", "asdf");
+        User user6 = new User("Tammo", "Schwindt", "tammo@tammon.de", "asdf");
+
+        userRepository.save(user1);
+        userRepository.save(user2);
+        userRepository.save(user3);
+        userRepository.save(user4);
+        userRepository.save(user5);
+        userRepository.save(user6);
+
+        Division div1 = new Division("myVerein", null, user1, null);
+        Division div2 = new Division("Rugby", null, user2, div1);
+        Division div3 = new Division("Soccer", null, null, div1);
+        Division div4 = new Division("Rugby - 1st team", null, user2, div2);
+        Division div5 = new Division("Rugby - 2nd team", null, user3, div2);
+
+        divisionRepository.save(div1);
+        divisionRepository.save(div2);
+        divisionRepository.save(div3);
+        divisionRepository.save(div4);
+        divisionRepository.save(div5);
+
+        int thisMonth = LocalDateTime.now().getMonthValue();
+        int thisYear = LocalDateTime.now().getYear();
+
+        Event event1 = new Event();
+        event1.setStartDateTime(LocalDateTime.of(thisYear, thisMonth, 20, 13, 0));
+        event1.setEndDateTime(LocalDateTime.of(thisYear, thisMonth, 20, 14, 0));
+        event1.setName("Super Event 1");
+        event1.setLocation("DHBW Stuttgart");
+        event1.setLocationLat(48.7735272);
+        event1.setLocationLng(9.171102399999995);
+        event1.setDescription("Super event at awesome location with great people");
+        event1.addDivision(div2);
+        event1.setEventAdmin(user1);
+        event1.updateMultiDate();
+        event1.setLastChanged(LocalDateTime.now());
+
+        Event event2 = new Event();
+        event2.setStartDateTime(LocalDateTime.of(thisYear, thisMonth, 20, 13, 0));
+        event2.setEndDateTime(LocalDateTime.of(thisYear, thisMonth, 21, 13, 0));
+        event2.setName("Super Event 2");
+        event2.addDivision(div3);
+        event2.setEventAdmin(user4);
+        event2.updateMultiDate();
+        event2.setLastChanged(LocalDateTime.now());
+
+        Event event3 = new Event();
+        event3.setStartDateTime(LocalDateTime.of(thisYear, thisMonth, 21, 13, 0));
+        event3.setEndDateTime(LocalDateTime.of(thisYear, thisMonth, 21, 13, 5));
+        event3.setName("Super Event 3");
+        event3.addDivision(div1);
+        event3.setEventAdmin(user1);
+        event3.updateMultiDate();
+        event3.setLastChanged(LocalDateTime.now());
+
+        Event event4 = new Event();
+        event4.setStartDateTime(LocalDateTime.of(thisYear, thisMonth, 11, 13, 0));
+        event4.setEndDateTime(LocalDateTime.of(thisYear, thisMonth, 15, 13, 5));
+        event4.setName("Super Event 4");
+        event4.addDivision(div1);
+        event4.setEventAdmin(user2);
+        event4.updateMultiDate();
+        event4.setLastChanged(LocalDateTime.now());
+
+        eventRepository.save(event1);
+        eventRepository.save(event2);
+        eventRepository.save(event3);
+        eventRepository.save(event4);
+
+        user1.replaceDivisions(divisionRepository, eventRepository, div1);
+        user2.replaceDivisions(divisionRepository, eventRepository, div2, div4);
+        user3.replaceDivisions(divisionRepository, eventRepository, div2);
+        user4.replaceDivisions(divisionRepository, eventRepository, div3);
+        user5.replaceDivisions(divisionRepository, eventRepository, div2, div4);
+
+        userRepository.save(user1);
+        userRepository.save(user2);
+        userRepository.save(user3);
+        userRepository.save(user4);
+        userRepository.save(user5);
+
+        Message message1 = new Message("Hello world", user1, divisionRepository.findById(div1.getId()));
+        Message message2 = new Message("Hello world, too", user2, divisionRepository.findById(div1.getId()));
+        messageRepository.save(message1);
+        messageRepository.save(message2);
+
+        Settings systemSettings = new Settings();
+        systemSettings.setClubName("myVerein");
+        List<String> customUserFields = new ArrayList<>();
+        customUserFields.add("Membership number");
+        systemSettings.setCustomUserFields(customUserFields);
+        settingsRepository.save(systemSettings);
+
+        return new ResponseEntity<>("Successfully reset database to example", HttpStatus.OK);
+    }
+
+    /**
+     * This function is resetting the complete database.
+     */
+    private void resetDatabase()
+    {
+        new Thread(() -> {
+            try
+            {
+                logger.debug("Trying to drop the current collection.");
+                mongoTemplate.getDb().dropDatabase();
+                logger.debug("Successfully dropped current collection");
+            } catch (MongoTimeoutException e)
+            {
+                logger.debug("Unable to drop database, because the database is not available.");
+            }}).run();
     }
 }
