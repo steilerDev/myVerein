@@ -21,6 +21,7 @@
 //
 
 import Foundation
+import MapKit
 import CoreData
 
 // MARK: - Pure database object, holding only information stored in database
@@ -122,6 +123,17 @@ extension Event {
   
   var subTitle: String {
     var result: String = String()
+    if let dateString = dateString {
+      result += dateString
+    }
+    if let location = locationName where !location.isEmpty {
+      result += "@ \(location)"
+    }
+    return result
+  }
+  
+  /// Returns a string representation of the dates. If the event is not multidate, only the formatted times are returned, otherwise startdatetime and enddatetime are returned.
+  var dateString: String? {
     if let startDate = startDate, endDate = endDate {
       let formatter = NSDateFormatter()
       if multiDate {
@@ -130,19 +142,52 @@ extension Event {
       } else {
         formatter.timeStyle = .ShortStyle
       }
-      result += "\(formatter.stringFromDate(startDate)) - \(formatter.stringFromDate(endDate)) "
+      return "\(formatter.stringFromDate(startDate)) - \(formatter.stringFromDate(endDate)) "
+    } else {
+      return nil
     }
-    if let location = locationName where !location.isEmpty {
-      result += "@ \(location)"
+  }
+  
+  /// Returns a string representation of the dates. The string is always giving the full event date and time
+  var dateStringLong: String? {
+    if let startDate = startDate, endDate = endDate {
+      if multiDate {
+        let formatter = NSDateFormatter()
+        formatter.dateStyle = .ShortStyle
+        formatter.timeStyle = .ShortStyle
+        return "\(formatter.stringFromDate(startDate)) - \(formatter.stringFromDate(endDate)) "
+      } else {
+        let timeFormatter = NSDateFormatter()
+        let dateFormatter = NSDateFormatter()
+        timeFormatter.timeStyle = .ShortStyle
+        dateFormatter.dateStyle = .ShortStyle
+        return "\(dateFormatter.stringFromDate(startDate)): \(timeFormatter.stringFromDate(startDate)) - \(timeFormatter.stringFromDate(endDate)) "
+      }
+    } else {
+      return nil
     }
-    return result
+  }
+}
+
+// MARK: - MKAnnotation protocol to enable the event to be shown on a map
+extension Event: MKAnnotation {
+  var coordinate: CLLocationCoordinate2D {
+    if let locationLat = locationLat, locationLng = locationLng {
+      return CLLocationCoordinate2D(latitude: locationLat.doubleValue, longitude: locationLng.doubleValue)
+    } else {
+      return CLLocationCoordinate2D()
+    }
+  }
+  
+  var subtitle: String! {
+    return String()
   }
 }
 
 // MARK: - Event object related enumeration
-enum EventResponse:String {
+enum EventResponse: String {
   case Going = "GOING"
-  case Mayber = "MAYBE"
+  case Maybe = "MAYBE"
   case Pending = "PENDING"
   case Decline = "DECLINE"
 }

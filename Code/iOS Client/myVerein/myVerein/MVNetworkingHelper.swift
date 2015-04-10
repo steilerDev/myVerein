@@ -287,4 +287,25 @@ extension MVNetworkingHelper {
       }
     )
   }
+  
+  class func sendEventResponse(event: Event) {
+    if let response = event.response {
+      logger.verbose("Sending response for event \(event): \(event.response)")
+      MVNetworking.eventResponseAction(
+        eventID: event.id,
+        response: response,
+        success: {
+          _ in
+          XCGLogger.info("Successfully send response for event \(event), saving to database")
+          EventRepository().save()
+        },
+        failure: {
+          error in
+          XCGLogger.error("Unable to send response for event \(event): \(error?.description)")
+        }
+      )
+    } else {
+      logger.error("Unable to send response for event \(event), because there is no event response")
+    }
+  }
 }

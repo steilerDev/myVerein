@@ -83,10 +83,23 @@ extension CalendarViewController {
   
   // In a storyboard-based application, you will often want to do a little preparation before navigation
   override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-  // Get the new view controller using segue.destinationViewController.
-  // Pass the selected object to the new view controller.
+    if let identifier = segue.identifier {
+      switch identifier {
+      case CalendarViewControllerConstants.SegueToEvent:
+        logger.debug("Preparing segue to event")
+        if let senderEvent = sender as? Event,
+          destinationViewController = (segue.destinationViewController as? UINavigationController)?.topViewController as? EventViewController
+        {
+          destinationViewController.event = senderEvent
+        } else {
+          logger.error("Unable to get sender event or destination view controller")
+        }
+      default: break;
+      }
+    } else {
+      logger.error("Unable to get segue identifier")
+    }
   }
-  
 }
 
 // MARK: - JTCalendarDataSource protocol methods
@@ -142,6 +155,7 @@ extension CalendarViewController: UITableViewDataSource {
 // MARK: - UITableViewDelegate protocol methods
 extension CalendarViewController: UITableViewDelegate {
   func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+    tableView.cellForRowAtIndexPath(indexPath)?.selected = false
     if let selectedEvent = eventsOfSelectedDate?.get(indexPath.row) {
       logger.debug("Performing segue to event \(selectedEvent)")
       performSegueWithIdentifier(CalendarViewControllerConstants.SegueToEvent, sender: selectedEvent)

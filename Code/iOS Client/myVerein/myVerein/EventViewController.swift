@@ -22,14 +22,33 @@
 
 import UIKit
 import XCGLogger
+import MapKit
 
 class EventViewController: UITableViewController {
   let logger = XCGLogger.defaultInstance()
+  
+  @IBOutlet weak var titleBar: UINavigationItem!
+  @IBOutlet weak var eventTitle: UILabel!
+  @IBOutlet weak var eventLocation: UILabel!
+  @IBOutlet weak var eventTimes: UILabel!
+  
+  @IBOutlet weak var mapView: MKMapView!
+  
+  @IBOutlet weak var goingCell: UITableViewCell!
+  @IBOutlet weak var maybeCell: UITableViewCell!
+  @IBOutlet weak var declineCell: UITableViewCell!
+  
+  var event: Event?
 }
 
 // MARK: - Delegate methods for click events
 extension EventViewController {  
   @IBAction func doneButonPressed(sender: UIBarButtonItem) {
+    if let event = event {
+      MVNetworkingHelper.sendEventResponse(event)
+    } else {
+      logger.warning("Not sending any event response, because event is nil")
+    }
     dismissViewControllerAnimated(true, completion: {})
   }
 }
@@ -38,52 +57,122 @@ extension EventViewController {
 extension EventViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
-    
-    // Uncomment the following line to preserve selection between presentations
-    // self.clearsSelectionOnViewWillAppear = false
-    
-    // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-    // self.navigationItem.rightBarButtonItem = self.editButtonItem()
+    if let event = event {
+      logger.debug("Succesfully loaded event, populating view")
+      titleBar.title = event.title
+      eventTitle.text = event.title
+      eventTimes.text = event.dateStringLong
+      eventLocation.text = event.locationName
+      if let response = event.response {
+        switch response {
+        case .Going:
+          goingCell.accessoryType = .Checkmark
+        case .Maybe:
+          maybeCell.accessoryType = .Checkmark
+        case .Decline:
+          declineCell.accessoryType = .Checkmark
+        default: break;
+        }
+      }
+      if event.locationLat != nil && event.locationLng != nil {
+        mapView.addAnnotation(event)
+        mapView.showAnnotations([event], animated: false)
+        mapView.selectAnnotation(event, animated: false)
+      }
+    } else {
+      logger.warning("Unable to load event for event detail view, dismissing view controller")
+      dismissViewControllerAnimated(true, completion: {})
+    }
   }
   
-  override func didReceiveMemoryWarning() {
-    super.didReceiveMemoryWarning()
-    // Dispose of any resources that can be recreated.
-  }
   
-  /*
   // MARK: Navigation
-  
-  // In a storyboard-based application, you will often want to do a little preparation before navigation
   override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-  // Get the new view controller using [segue destinationViewController].
-  // Pass the selected object to the new view controller.
+    if let identifier = segue.identifier {
+      switch identifier {
+      case EventViewControllerConstants.SegueToParticipants:
+        logger.debug("Preparing segue to participant list")
+        if let destinationViewController = segue.destinationViewController as? UITableViewController {
+          // Do stuff
+        } else {
+          logger.error("Unable to get destination view controller")
+        }
+      default: break;
+      }
+    } else {
+      logger.error("Unable to get segue identifier")
+    }
   }
-  */
 }
 
-// MARK: - Table view data source
+// MARK: - Table view methods
 extension EventViewController {
-  
-//  override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
-//    // #warning Potentially incomplete method implementation.
-//    // Return the number of sections.
-//    return 0
-//  }
-//  
-//  override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-//    // #warning Incomplete method implementation.
-//    // Return the number of rows in the section.
-//    return 0
-//  }
-  
-  /*
-  override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-  let cell = tableView.dequeueReusableCellWithIdentifier("reuseIdentifier", forIndexPath: indexPath) as! UITableViewCell
-  
-  // Configure the cell...
-  
-  return cell
+  override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+    logger.debug("Did select row at index path: \(indexPath)")
+    if indexPath.length == 2 {
+      if indexPath.indexAtPosition(0) == 0 && indexPath.indexAtPosition(1) == 1 {
+        logger.info("Selected participants cell, performing segue for event \(event)")
+        performSegueWithIdentifier(EventViewControllerConstants.SegueToParticipants, sender: nil)
+      } else if indexPath.indexAtPosition(0) == 2 {
+        maybeCell.accessoryType = .None
+        goingCell.accessoryType = .None
+        declineCell.accessoryType = .None
+        switch indexPath.indexAtPosition(1) {
+        case 0:
+          logger.info("Selected going response cell")
+          goingCell.accessoryType = .Checkmark
+          event?.response = .Going
+          goingCell.selected = false
+        case 1:
+          logger.info("Selected maybe response cell")
+          maybeCell.accessoryType = .Checkmark
+          event?.response = EventResponse.Maybe
+          maybeCell.selected = false
+        case 2:
+          logger.info("Selected decline response cell")
+          declineCell.accessoryType = .Checkmark
+          event?.response = .Decline
+          declineCell.selected = false
+        default:
+          logger.warning("Selected unintended cell!")
+          event?.response = .Pending
+        }
+      } else {
+        logger.warning("Selected unintended cell!")
+      }
+    } else {
+      logger.warning("Length of index path does not fit \(indexPath.length)")
+    }
   }
-  */
+}
+
+extension EventViewController: MKMapViewDelegate {
+  func mapView(mapView: MKMapView!, viewForAnnotation annotation: MKAnnotation!) -> MKAnnotationView! {
+    var view = mapView.dequeueReusableAnnotationViewWithIdentifier(EventViewControllerConstants.ReuseAnnotationIdentifier)
+    
+    if view == nil {
+      view = MKPinAnnotationView(annotation: annotation, reuseIdentifier: EventViewControllerConstants.ReuseAnnotationIdentifier)
+      view.canShowCallout = true
+      view.rightCalloutAccessoryView = UIButton.buttonWithType(.DetailDisclosure) as! UIButton
+    } else {
+      view.annotation = annotation
+    }
+    return view
+  }
+  
+  
+  func mapView(mapView: MKMapView!, annotationView view: MKAnnotationView!, calloutAccessoryControlTapped control: UIControl!) {
+    if let event = event {
+      logger.info("Opening event in maps app")
+      let placemark = MKPlacemark(coordinate: event.coordinate, addressDictionary: nil)
+      let mapItem = MKMapItem(placemark: placemark)
+      mapItem.name = event.title
+      mapItem.openInMapsWithLaunchOptions(nil)
+    }
+  }
+}
+// MARK: - EventViewController related constants
+struct EventViewControllerConstants {
+  static let ReuseAnnotationIdentifier = "annotation"
+  static let SegueToParticipants = "showParticipants"
 }
