@@ -1,9 +1,23 @@
 //
-//  MenuController.swift
-//  myVerein
+// Copyright (C) 2015 Frank Steiler <frank@steilerdev.de>
 //
-//  Created by Frank Steiler on 05/03/15.
-//  Copyright (c) 2015 steilerDev. All rights reserved.
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 2 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
+
+//
+//  MenuController.swift
+//  This file holds all information related to the tab bar view of the main menu. It modifies the appearance to match the experience as well as validating the stored credentials.
 //
 
 import UIKit
@@ -14,12 +28,13 @@ class MenuController: UITabBarController {
   
   let logger = XCGLogger.defaultInstance()
   
+  /// Changing the color of the tab bar icons
   override func viewDidLoad() {
     super.viewDidLoad()
     UITabBar.appearance().tintColor = UIColor(hex: MVColor.Primary.Normal)
   }
   
-  // After the view appeared check if there are any credentials stored
+  /// After the view appeared check if there are any credentials stored and if they are still valid. If they are not the login view is presented
   override func viewDidAppear(animated: Bool) {
     let (currentUsername, currentPassword, currentDomain) = MVSecurity.instance().currentKeychain()
     

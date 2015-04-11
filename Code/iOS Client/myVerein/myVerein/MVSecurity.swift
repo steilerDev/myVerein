@@ -1,10 +1,25 @@
 //
+// Copyright (C) 2015 Frank Steiler <frank@steilerdev.de>
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 2 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
+
+//
 //  MVSecurity.swift
-//  myVerein
+//  This file holds all information related with parsing and retrieving a division.
 //
-//  Created by Frank Steiler on 08/03/15.
-//  Copyright (c) 2015 steilerDev. All rights reserved.
-//
+
 
 import Foundation
 import Locksmith
@@ -27,6 +42,7 @@ class MVSecurity {
   private var currentPassword: String?
   private var currentDomain: String?
   
+  /// This function either creates a new security instance or returns the shared one.
   class func instance() -> MVSecurity {
     if let currentSecurity = security {
       return currentSecurity
@@ -36,6 +52,7 @@ class MVSecurity {
     }
   }
   
+  /// This initializer gets the current credentials from the keychain. The shared instance is always in sync with the keychain.
   init() {
     logger.verbose("Initializing security instance")
     if let keychainData = Locksmith.loadDataForUserAccount(SecurityConstants.UserAccount).0 {
@@ -72,6 +89,7 @@ class MVSecurity {
     }
   }
   
+  /// This function returns the current state of the keychain. If a property is not set nil is returned.
   func currentKeychain() -> (username: String?, password: String?, domain: String?) {
     logger.debug("Returning current keychain credentials")
     return (currentUsername, currentPassword, currentDomain)
