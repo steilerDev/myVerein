@@ -98,6 +98,15 @@ extension DivisionChatOverviewViewController {
       logger.error("Unable to initiate division chat overview data source: \(error?.localizedDescription)")
     }
     
+    let refreshControl = UIRefreshControl()
+    refreshControl.addTarget(self, action: "startRefresh:", forControlEvents: .ValueChanged)
+    refreshControl.attributedTitle = NSAttributedString(string: "Pull to refresh")
+    self.collectionView?.addSubview(refreshControl)
+    refreshControl.beginRefreshing()
+    refreshControl.endRefreshing()
+    self.collectionView?.alwaysBounceVertical = true
+    
+    
     // Uncomment the following line to preserve selection between presentations
     // self.clearsSelectionOnViewWillAppear = false
   }
@@ -310,6 +319,15 @@ extension DivisionChatOverviewViewController: NSFetchedResultsControllerDelegate
       objectChanges[.Delete] = [NSIndexPath]()
       objectChanges[.Update] = [NSIndexPath]()
     }
+  }
+}
+
+// MARK: - Delegate method for pull to refresh method
+extension DivisionChatOverviewViewController {
+  func startRefresh(refreshControl: UIRefreshControl) {
+    logger.info("Refresh started")
+    collectionView?.reloadData()
+    refreshControl.endRefreshing()
   }
 }
 

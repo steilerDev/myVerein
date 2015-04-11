@@ -67,6 +67,13 @@ extension CalendarViewController {
     calendar.contentView = contentView
     
     calendar.reloadData()
+    
+    let refreshControl = UIRefreshControl()
+    refreshControl.addTarget(self, action: "startRefresh:", forControlEvents: .ValueChanged)
+    refreshControl.attributedTitle = NSAttributedString(string: "Pull to refresh")
+    self.eventTableView.addSubview(refreshControl)
+    refreshControl.beginRefreshing()
+    refreshControl.endRefreshing()
   }
   
   override func viewWillAppear(animated: Bool) {
@@ -162,6 +169,16 @@ extension CalendarViewController: UITableViewDelegate {
     } else {
       logger.error("Unable to perform segue to chat because the tapped cell was not found")
     }
+  }
+}
+
+// MARK: - Delegate method for pull to refresh method
+extension CalendarViewController {
+  func startRefresh(refreshControl: UIRefreshControl) {
+    logger.info("Refresh started")
+    MVNetworkingHelper.syncUserEvent()
+    calendar.reloadData()
+    refreshControl.endRefreshing()
   }
 }
 

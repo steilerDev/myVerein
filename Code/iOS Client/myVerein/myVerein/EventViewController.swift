@@ -107,6 +107,8 @@ extension EventViewController {
 
 // MARK: - Table view methods
 extension EventViewController {
+  
+  /// This function handles the click on the participants row or the click on an answer about the user's participation
   override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
     logger.debug("Did select row at index path: \(indexPath)")
     if indexPath.length == 2 {

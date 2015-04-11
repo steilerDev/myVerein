@@ -6,7 +6,6 @@ pod 'pop', '~> 1.0'
 pod 'AFNetworking', '~> 2.0'
 pod 'SwiftyUserDefaults'
 pod '1PasswordExtension'
-#pod '1PasswordExtension', :git => 'https://github.com/AgileBits/onepassword-app-extension.git', :branch => 'master'
 pod 'Locksmith'
 pod 'JSQMessagesViewController'
 pod "UIImageView-Letters"

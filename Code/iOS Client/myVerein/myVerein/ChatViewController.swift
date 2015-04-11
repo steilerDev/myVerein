@@ -73,35 +73,38 @@ extension ChatViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
     
-    title = division.name
-    inputToolbar.contentView.rightBarButtonItem.setToDefaultColor()
-    inputToolbar.contentView.leftBarButtonItem = nil
-    
-    logger.debug("Loading user")
-    let userRepository = UserRepository()
-    if let senderId = Defaults[MVUserDefaultsConstants.UserID].string,
-      sender = userRepository.getOrCreateUserFrom(id: senderId).user
-    {
-      logger.debug("Successfully loaded user")
-      self.senderId = senderId
-      senderDisplayName = sender.displayName
+    if division == nil {
+      dismissViewControllerAnimated(true, completion: {})
     } else {
-      logger.error("Unable to load user")
-      logger.debugExec { abort() }
+      title = division.name
+      inputToolbar.contentView.rightBarButtonItem.setToDefaultColor()
+      inputToolbar.contentView.leftBarButtonItem = nil
       
-      senderDisplayName = "42"
-      senderId = "42"
+      logger.debug("Loading user")
+      let userRepository = UserRepository()
+      if let senderId = Defaults[MVUserDefaultsConstants.UserID].string,
+        sender = userRepository.getOrCreateUserFrom(id: senderId).user
+      {
+        logger.debug("Successfully loaded user")
+        self.senderId = senderId
+        senderDisplayName = sender.displayName
+      } else {
+        logger.error("Unable to load user")
+        logger.debugExec { abort() }
+        
+        senderDisplayName = "42"
+        senderId = "42"
+      }
+      
+      // Accessing fetched result controller and therfore initiating it if it did not happen yet
+      var error: NSError? = nil
+      if fetchedResultController.performFetch(&error) {
+        logger.info("Successfully initiated chat view data source for division \(division.id)")
+      } else {
+        logger.error("Unable to initiate chat view data source for division \(division.id): \(error?.localizedDescription)")
+      }
+      collectionView.collectionViewLayout.outgoingAvatarViewSize = CGSizeZero
     }
-    
-    // Accessing fetched result controller and therfore initiating it if it did not happen yet
-    var error: NSError? = nil
-    if fetchedResultController.performFetch(&error) {
-      logger.info("Successfully initiated chat view data source for division \(division.id)")
-    } else {
-      logger.error("Unable to initiate chat view data source for division \(division.id): \(error?.localizedDescription)")
-    }
-    
-    collectionView.collectionViewLayout.outgoingAvatarViewSize = CGSizeZero
   }
   
   /*

@@ -188,15 +188,15 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="WjX-pm-TWJ" customClass="JTCalendarMenuView">
-                                <rect key="frame" x="0.0" y="28" width="600" height="43"/>
+                                <rect key="frame" x="0.0" y="28" width="600" height="35"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                             </view>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ztp-J8-e6v" customClass="JTCalendarContentView">
-                                <rect key="frame" x="0.0" y="79" width="600" height="342"/>
+                                <rect key="frame" x="0.0" y="71" width="600" height="278"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                             </view>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" translatesAutoresizingMaskIntoConstraints="NO" id="eq9-c7-Err">
-                                <rect key="frame" x="0.0" y="429" width="600" height="114"/>
+                                <rect key="frame" x="0.0" y="357" width="600" height="186"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <prototypes>
                                     <tableViewCell contentMode="scaleToFill" selectionStyle="blue" accessoryType="detailButton" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="eventCell" textLabel="X3y-Zp-clA" detailTextLabel="FMy-q2-5y0" style="IBUITableViewCellStyleSubtitle" id="uWS-Fs-jYX">
@@ -230,7 +230,7 @@
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstItem="ztp-J8-e6v" firstAttribute="leading" secondItem="WjX-pm-TWJ" secondAttribute="trailing" constant="8" symbolic="YES" id="1iU-4Y-wZi"/>
-                            <constraint firstItem="ztp-J8-e6v" firstAttribute="height" secondItem="eq9-c7-Err" secondAttribute="height" multiplier="3" id="2Hy-XB-t3m"/>
+                            <constraint firstItem="ztp-J8-e6v" firstAttribute="height" secondItem="eq9-c7-Err" secondAttribute="height" multiplier="1.5" id="2Hy-XB-t3m"/>
                             <constraint firstItem="ztp-J8-e6v" firstAttribute="width" secondItem="NC2-qi-Fus" secondAttribute="width" id="4Lq-WY-76u"/>
                             <constraint firstItem="ztp-J8-e6v" firstAttribute="leading" secondItem="NC2-qi-Fus" secondAttribute="leadingMargin" id="AtQ-sx-otz"/>
                             <constraint firstItem="eq9-c7-Err" firstAttribute="leading" secondItem="NC2-qi-Fus" secondAttribute="leadingMargin" id="CFu-OJ-yuk"/>
@@ -444,7 +444,7 @@
             <objects>
                 <tableViewController id="LiS-6T-BIP" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="R2J-fi-xA8">
-                        <rect key="frame" x="0.0" y="0.0" width="600" height="487"/>
+                        <rect key="frame" x="0.0" y="64" width="600" height="487"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <prototypes>
@@ -477,7 +477,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ltl-U5-anR" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="4438" y="860"/>
+            <point key="canvasLocation" x="4436" y="860"/>
         </scene>
         <!--Settings-->
         <scene sceneID="ibg-bl-ulV">
