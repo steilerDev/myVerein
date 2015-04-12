@@ -37,32 +37,35 @@ class EventViewController: UITableViewController {
   @IBOutlet weak var goingCell: UITableViewCell!
   @IBOutlet weak var maybeCell: UITableViewCell!
   @IBOutlet weak var declineCell: UITableViewCell!
+  @IBOutlet weak var participantCell: UITableViewCell!
   
   var event: Event?
-}
-
-// MARK: - Delegate methods for click events
-extension EventViewController {  
-  @IBAction func doneButonPressed(sender: UIBarButtonItem) {
-    if let event = event {
-      MVNetworkingHelper.sendEventResponse(event)
-    } else {
-      logger.warning("Not sending any event response, because event is nil")
-    }
-    dismissViewControllerAnimated(true, completion: {})
-  }
 }
 
 // MARK: - UIViewController lifecycle methods
 extension EventViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
+    
+    // Hiding title on back button for ParticipantViewController (See http://justabeech.com/2014/02/24/empty-back-button-on-ios7/ for reference)
+    let backButton = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
+    navigationItem.backBarButtonItem = backButton
+    
+    // Populating view using event
     if let event = event {
       logger.debug("Succesfully loaded event, populating view")
       titleBar.title = event.title
       eventTitle.text = event.title
-      eventTimes.text = event.dateStringLong
-      eventLocation.text = event.locationName
+      if let dateString = event.dateStringLong {
+        eventTimes.text = dateString
+      } else {
+        eventTimes.text = "No time provided"
+      }
+      if let locationString = event.locationName {
+        eventLocation.text = locationString
+      } else {
+        eventLocation.text = "No location provided"
+      }
       if let response = event.response {
         switch response {
         case .Going:
@@ -80,11 +83,20 @@ extension EventViewController {
         mapView.selectAnnotation(event, animated: false)
       }
     } else {
-      logger.warning("Unable to load event for event detail view, dismissing view controller")
-      dismissViewControllerAnimated(true, completion: {})
+      logger.error("Unable to load event for event detail view, dismissing view controller")
+      navigationController?.popViewControllerAnimated(true)
     }
   }
   
+  override func viewDidDisappear(animated: Bool) {
+    super.viewDidDisappear(animated)
+    logger.debug("View did disappear, sending response for event")
+    if let event = event {
+      MVNetworkingHelper.sendEventResponse(event)
+    } else {
+      logger.warning("Not sending any event response, because event is nil")
+    }
+  }
   
   // MARK: Navigation
   override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
@@ -92,8 +104,8 @@ extension EventViewController {
       switch identifier {
       case EventViewControllerConstants.SegueToParticipants:
         logger.debug("Preparing segue to participant list")
-        if let destinationViewController = segue.destinationViewController as? UITableViewController {
-          // Do stuff
+        if let destinationViewController = segue.destinationViewController as? ParticipantViewController {
+          destinationViewController.event = event
         } else {
           logger.error("Unable to get destination view controller")
         }
@@ -115,6 +127,7 @@ extension EventViewController {
       if indexPath.indexAtPosition(0) == 0 && indexPath.indexAtPosition(1) == 1 {
         logger.info("Selected participants cell, performing segue for event \(event)")
         performSegueWithIdentifier(EventViewControllerConstants.SegueToParticipants, sender: nil)
+        participantCell.selected = false
       } else if indexPath.indexAtPosition(0) == 2 {
         maybeCell.accessoryType = .None
         goingCell.accessoryType = .None

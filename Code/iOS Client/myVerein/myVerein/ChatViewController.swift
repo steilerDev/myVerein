@@ -46,6 +46,7 @@ class ChatViewController: JSQMessagesViewController {
     let predicate = NSPredicate(format: "\(ChatViewConstants.PredicateField) == %@", self.division)
     
     fetchRequest.predicate = predicate
+    // The cache name should be unique so it does not conflict with other chats
     var controller = NSFetchedResultsController(fetchRequest: fetchRequest,
       managedObjectContext: (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext!,
       sectionNameKeyPath: nil,

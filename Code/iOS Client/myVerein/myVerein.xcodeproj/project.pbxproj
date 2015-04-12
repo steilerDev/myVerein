@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		3012715A1AA5C83C00C23AEF /* MVNetworkingSessionFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 301271591AA5C83C00C23AEF /* MVNetworkingSessionFactory.swift */; };
+		30159BF91AD980010018419D /* ParticipantViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30159BF81AD980010018419D /* ParticipantViewController.swift */; };
 		3020CBA51A9E1289005AAEEF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3020CBA41A9E1289005AAEEF /* AppDelegate.swift */; };
 		3020CBA71A9E1289005AAEEF /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3020CBA61A9E1289005AAEEF /* LoginViewController.swift */; };
 		3020CBAA1A9E1289005AAEEF /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3020CBA81A9E1289005AAEEF /* Main.storyboard */; };
@@ -71,6 +72,7 @@
 
 /* Begin PBXFileReference section */
 		301271591AA5C83C00C23AEF /* MVNetworkingSessionFactory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MVNetworkingSessionFactory.swift; sourceTree = "<group>"; };
+		30159BF81AD980010018419D /* ParticipantViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ParticipantViewController.swift; sourceTree = "<group>"; };
 		3020CB9F1A9E1289005AAEEF /* myVerein.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = myVerein.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3020CBA31A9E1289005AAEEF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		3020CBA41A9E1289005AAEEF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -297,6 +299,7 @@
 			children = (
 				30F254E71AC7271A00E10CB9 /* CalendarViewController.swift */,
 				3032A9F41AD70B9100EEEAF4 /* EventViewController.swift */,
+				30159BF81AD980010018419D /* ParticipantViewController.swift */,
 			);
 			name = Calendar;
 			sourceTree = "<group>";
@@ -485,6 +488,7 @@
 				302BE8C41AA64599001D0FE7 /* DivisionChatOverviewViewController.swift in Sources */,
 				30FB44BD1AACC096003E4512 /* UserRepository.swift in Sources */,
 				304C577F1AACA3CC00B221D7 /* MVSecurity.swift in Sources */,
+				30159BF91AD980010018419D /* ParticipantViewController.swift in Sources */,
 				309170341AA8D2B4004D30D1 /* MessageRepository.swift in Sources */,
 				3068A4A21ACBE9A900A3F53D /* Event.swift in Sources */,
 				309A8A7C1AB374040087CBC5 /* ChatViewController.swift in Sources */,

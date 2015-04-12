@@ -173,7 +173,7 @@ public struct NetworkingConstants {
       static let URI = Event.BaseURI
       static let Method = HTTPMethods.GET
       struct Parameter {
-        static let EventID = "eventID"
+        static let EventID = "id"
       }
     }
     struct Sync {
@@ -181,15 +181,24 @@ public struct NetworkingConstants {
       static let Method = HTTPMethods.GET
       struct Parameter {
         static let LastChanged = "lastChanged"
-        static let EventID = "id"
       }
     }
     struct Response {
-      static let URI = Event.BaseURI
-      static let Method = HTTPMethods.POST
-      struct Paramter {
-        static let EventID = "eventID"
-        static let Response = "response"
+      struct Send {
+        static let URI = Event.BaseURI
+        static let Method = HTTPMethods.POST
+        struct Paramter {
+          static let EventID = "id"
+          static let Response = "response"
+        }
+      }
+      struct Get {
+        static let URI = Event.BaseURI
+        static let Method = HTTPMethods.GET
+        struct Paramter {
+          static let EventID = "id"
+          static let Response = "response"
+        }
       }
     }
   }

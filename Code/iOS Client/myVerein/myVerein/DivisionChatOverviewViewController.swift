@@ -98,12 +98,10 @@ extension DivisionChatOverviewViewController {
       logger.error("Unable to initiate division chat overview data source: \(error?.localizedDescription)")
     }
     
+    // Add pull to refresh controls and enable scrolling
     let refreshControl = UIRefreshControl()
     refreshControl.addTarget(self, action: "startRefresh:", forControlEvents: .ValueChanged)
-    refreshControl.attributedTitle = NSAttributedString(string: "Pull to refresh")
     self.collectionView?.addSubview(refreshControl)
-    refreshControl.beginRefreshing()
-    refreshControl.endRefreshing()
     self.collectionView?.alwaysBounceVertical = true
     
     
@@ -114,8 +112,6 @@ extension DivisionChatOverviewViewController {
   // MARK: Navigation
   
   override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
     if let identifier = segue.identifier {
       switch identifier {
       case DivisionChatOverviewConstants.SegueToChat:

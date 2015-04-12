@@ -291,7 +291,7 @@ extension MVNetworkingHelper {
   class func sendEventResponse(event: Event) {
     if let response = event.response {
       logger.verbose("Sending response for event \(event): \(event.response)")
-      MVNetworking.eventResponseAction(
+      MVNetworking.eventSendResponseAction(
         eventID: event.id,
         response: response,
         success: {

@@ -32,7 +32,9 @@ import org.springframework.web.bind.annotation.RestController;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/user/event")
@@ -105,13 +107,13 @@ public class EventController
             } else
             {
                 logger.info("[{}] Returning event {}", currentUser, event);
-                return new ResponseEntity<>(event.getSendingObjectInternalSync(), HttpStatus.OK);
+                return new ResponseEntity<>(event.getSendingObjectInternalSync(currentUser), HttpStatus.OK);
             }
         }
     }
 
     @RequestMapping(produces = "application/json", method = RequestMethod.POST)
-    public ResponseEntity respondToEvent(@RequestParam(value = "response") String responseString, @RequestParam String eventID, @CurrentUser User currentUser)
+    public ResponseEntity respondToEvent(@RequestParam(value = "response") String responseString, @RequestParam(value = "id") String eventID, @CurrentUser User currentUser)
     {
         logger.debug("[{}] Responding to event {} with {}", currentUser, eventID, responseString);
         Event event;
@@ -145,6 +147,47 @@ public class EventController
                 eventRepository.save(event);
                 logger.info("[{}] Successfully responded to event {} with response {}", currentUser, event, response);
                 return new ResponseEntity(HttpStatus.OK);
+            }
+        }
+    }
+
+    @RequestMapping(produces = "application/json", params = {"id", "response"}, method = RequestMethod.GET)
+    public ResponseEntity<List<String>> getResponsesOfEvent(@RequestParam(value = "response") String responseString, @RequestParam(value = "id") String eventID, @CurrentUser User currentUser)
+    {
+        logger.debug("[{}] Finding all responses of type {} to event {}", currentUser, responseString, eventID);
+        Event event;
+        if(eventID.isEmpty())
+        {
+            logger.warn("[{}] The event id is not allowed to be empty", currentUser);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        } else if((event = eventRepository.findEventById(eventID)) == null)
+        {
+            logger.warn("[{}] Unable to gather the specified event with id {}", currentUser, eventID);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        } else
+        {
+            EventStatus response;
+            try
+            {
+                response = EventStatus.valueOf(responseString.toUpperCase());
+            } catch (IllegalArgumentException e)
+            {
+                logger.warn("[{}] Unable to parse response: {}", currentUser, e.getLocalizedMessage());
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+
+            if(!event.getInvitedUser().containsKey(currentUser.getId()))
+            {
+                logger.warn("[{}] User is not invited to the event");
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            } else
+            {
+                // Filtering invited user matching the response
+                HashMap<String, EventStatus> invitedUser = new HashMap<>(event.getInvitedUser());
+                List<String> matchingUser = invitedUser.keySet().stream().filter(userID -> invitedUser.get(userID) == response).collect(Collectors.toList());
+
+                logger.info("[{}] Successfully gathered all user matching the response {} for event {}", currentUser, response, event);
+                return new ResponseEntity<>(matchingUser, HttpStatus.OK);
             }
         }
     }

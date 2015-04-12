@@ -381,9 +381,9 @@ extension MVNetworking {
     logger.verbose("Syncing event \(eventID)")
     
     handleRequest(
-      URI: NetworkingConstants.Event.Sync.URI,
-      parameters: [NetworkingConstants.Event.Sync.Parameter.EventID: eventID],
-      requestMethod: NetworkingConstants.Event.Sync.Method,
+      URI: NetworkingConstants.Event.Get.URI,
+      parameters: [NetworkingConstants.Event.Get.Parameter.EventID: eventID],
+      requestMethod: NetworkingConstants.Event.Get.Method,
       retryCount: 0,
       success: success,
       failure: failure
@@ -391,17 +391,35 @@ extension MVNetworking {
   }
   
   /// This function is sending a response of the user about a specific event to the server. The callbacks are not guaranteed to be executed on the main queue.
-  class func eventResponseAction(#eventID: String, response: EventResponse, success: (AnyObject) -> (), failure: (NSError?) -> ()) {
+  class func eventSendResponseAction(#eventID: String, response: EventResponse, success: (AnyObject) -> (), failure: (NSError?) -> ()) {
     logger.verbose("Starting to send response \(response) for event \(eventID)")
     let parameter = [
-      NetworkingConstants.Event.Response.Paramter.EventID: eventID,
-      NetworkingConstants.Event.Response.Paramter.Response: response.rawValue
+      NetworkingConstants.Event.Response.Send.Paramter.EventID: eventID,
+      NetworkingConstants.Event.Response.Send.Paramter.Response: response.rawValue
     ]
     
     handleRequest(
-      URI: NetworkingConstants.Event.Response.URI,
+      URI: NetworkingConstants.Event.Response.Send.URI,
       parameters: parameter,
-      requestMethod: NetworkingConstants.Event.Response.Method,
+      requestMethod: NetworkingConstants.Event.Response.Send.Method,
+      retryCount: 0,
+      success: success,
+      failure: failure
+    )
+  }
+  
+  /// This function is getting all responses of users from a specific event from the server. The callbacks are not guaranteed to be executed on the main queue.
+  class func eventGetResponseAction(#eventID: String, response: EventResponse, success: (AnyObject) -> (), failure: (NSError?) -> ()) {
+    logger.verbose("Starting to send response \(response) for event \(eventID)")
+    let parameter = [
+      NetworkingConstants.Event.Response.Get.Paramter.EventID: eventID,
+      NetworkingConstants.Event.Response.Get.Paramter.Response: response.rawValue
+    ]
+    
+    handleRequest(
+      URI: NetworkingConstants.Event.Response.Get.URI,
+      parameters: parameter,
+      requestMethod: NetworkingConstants.Event.Response.Get.Method,
       retryCount: 0,
       success: success,
       failure: failure

@@ -207,6 +207,7 @@ struct EventConstants {
   
   // This struct defines the names of all database columns/relations that should not be accessed directly
   struct RawFields {
+    static let UserResponse = "rawResponse"
     static let InvitedDivision = "rawInvitedDivision"
     static let GoingUser = "rawGoingUser"
     static let PendingUser = "rawPendingUser"
@@ -224,6 +225,7 @@ struct EventConstants {
     
     static let InvitedDivision = "invitedDivision"
     static let InvitedUser = "invitedUser"
+    static let UserResponse = "userResponse"
     
     static let StartDateTime = "startDateTime"
     static let EndDateTime = "endDateTime"

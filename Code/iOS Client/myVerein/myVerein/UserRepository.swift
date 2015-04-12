@@ -49,7 +49,16 @@ class UserRepository: MVCoreDataRepository {
     var newUsers = [User]()
     for user in serverResponseObject {
       if let userDict = user as? [String: AnyObject] {
+        logger.debug("The response object is a dictionary of id's")
         let (newUser, error) = getOrCreateUserFrom(serverResponseObject: userDict)
+        if error != nil && newUser == nil {
+          return (nil, error)
+        } else {
+          newUsers.append(newUser!)
+        }
+      } else if let user = user as? String {
+        logger.debug("The response object is a list of id's")
+        let (newUser, error) = getOrCreateUserFrom(id: user)
         if error != nil && newUser == nil {
           return (nil, error)
         } else {
@@ -85,6 +94,9 @@ class UserRepository: MVCoreDataRepository {
     logger.debug("Get or create user from id \(id)")
     if let user = findUserBy(id: id) {
       logger.info("Returning user with ID \(id) from local database")
+      if user.syncRequired {
+        user.sync()
+      }
       return (user, nil)
     } else {
       logger.info("Creating new user with ID \(id)")

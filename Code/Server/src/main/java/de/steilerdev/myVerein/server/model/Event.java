@@ -144,6 +144,10 @@ public class Event
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private User eventAdmin;
 
+    @Transient
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private EventStatus userResponse;
+
     public Event() {}
 
     public String getId()
@@ -358,6 +362,16 @@ public class Event
         invitedUser.put(user.getId(), EventStatus.REMOVED);
     }
 
+    public EventStatus getUserResponse()
+    {
+        return userResponse;
+    }
+
+    public void setUserResponse(EventStatus userResponse)
+    {
+        this.userResponse = userResponse;
+    }
+
     /**
      * This function is removing unnecessary divisions from the invited division set.
      */
@@ -442,13 +456,16 @@ public class Event
 
     /**
      * This function removes all fields that the other users of the app are not allowed to see.
+     * @param receivingUser The user who is receiving the event.
      * @return A copied message object, without the fields, other users are not allowed to see.
      */
     @JsonIgnore
     @Transient
-    public Event getSendingObjectInternalSync()
+    public Event getSendingObjectInternalSync(User receivingUser)
     {
-        return getSendingObject();
+        Event sendingObject = getSendingObject();
+        sendingObject.userResponse = invitedUser.get(receivingUser.getId());
+        return sendingObject;
     }
 
     /**

@@ -41,6 +41,25 @@ class EventRepository: MVCoreDataRepository {
     return executeSingleRequest(fetchRequest)
   }
   
+  /// This function gathers all events, where the user responded with the provided event response
+  func findEventsBy(userResponse: EventResponse) -> [Event]? {
+    logger.verbose("Retrieving event with user response \(userResponse)")
+    // Create a new fetch request using the event entity
+    let fetchRequest = NSFetchRequest(entityName: EventConstants.ClassName)
+    
+    let predicate = NSPredicate(format: "\(EventConstants.RawFields.UserResponse) == %@", userResponse.rawValue)
+    fetchRequest.predicate = predicate
+    
+    // Execute the fetch request, and cast the results to an array of LogItem objects
+    return executeListRequest(fetchRequest)
+  }
+  
+  /// This function returns the amount of times the user responded with a specific event response
+  func countEventsWith(userResponse: EventResponse) -> Int {
+    logger.verbose("Checking how often the user responded with \(userResponse) on an event")
+    return findEventsBy(userResponse)?.count ?? 0
+  }
+  
 
   /// This function gathers all events that take place on the date or span over the date.
   ///
@@ -179,6 +198,12 @@ class EventRepository: MVCoreDataRepository {
         event.locationLat = serverResponseObject[EventConstants.RemoteEvent.Location.Lat] as? Double
         event.locationLng = serverResponseObject[EventConstants.RemoteEvent.Location.Lng] as? Double
         event.eventDescription = serverResponseObject[EventConstants.RemoteEvent.Description] as? String
+        
+        if let userResponseString = serverResponseObject[EventConstants.RemoteEvent.UserResponse] as? String,
+          userResponse = EventResponse(rawValue: userResponseString)
+        {
+          event.response = userResponse
+        }
         
         //Parsing non-optionals
         event.name = name

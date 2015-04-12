@@ -24,14 +24,18 @@ import UIKit
 import JTCalendar
 import XCGLogger
 import CoreData
+import RKNotificationHub
 
 // MARK: - All variables and outlets needed by the controller
 class CalendarViewController: UIViewController {
 
+  var notificationBadge: RKNotificationHub!
+  
   // Outlets from the storyboard
   @IBOutlet weak var menuView: JTCalendarMenuView!
   @IBOutlet weak var contentView: JTCalendarContentView!
   @IBOutlet weak var eventTableView: UITableView!
+  @IBOutlet weak var openInvitations: UIBarButtonItem!
   
   let logger = XCGLogger.defaultInstance()
   let calendar = JTCalendar.new()
@@ -43,6 +47,16 @@ class CalendarViewController: UIViewController {
 extension CalendarViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
+    
+    // Hiding title on back button for EventViewController (See http://justabeech.com/2014/02/24/empty-back-button-on-ios7/ for reference)
+    let backButton = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
+    navigationItem.backBarButtonItem = backButton
+    
+    // Adding pull to refresh controll to table view
+    let refreshControl = UIRefreshControl()
+    refreshControl.addTarget(self, action: "startRefresh:", forControlEvents: .ValueChanged)
+    self.eventTableView.addSubview(refreshControl)
+    
     logger.debug("CalendarView did load, modifying the appearance")
     // All modifications on calendarAppearance have to be done before setMenuMonthsView and setContentView or you will have to call reloadAppearance
     calendar.calendarAppearance.calendar().firstWeekday = 2
@@ -66,24 +80,31 @@ extension CalendarViewController {
     calendar.menuMonthsView = menuView
     calendar.contentView = contentView
     
-    calendar.reloadData()
     
-    let refreshControl = UIRefreshControl()
-    refreshControl.addTarget(self, action: "startRefresh:", forControlEvents: .ValueChanged)
-    refreshControl.attributedTitle = NSAttributedString(string: "Pull to refresh")
-    self.eventTableView.addSubview(refreshControl)
-    refreshControl.beginRefreshing()
-    refreshControl.endRefreshing()
+    let imageView = UIImageView(image: openInvitations.image)
+    notificationBadge = RKNotificationHub(view: imageView)
+    notificationBadge.scaleCircleSizeBy(0.7)
+    openInvitations.customView = imageView
   }
   
   override func viewWillAppear(animated: Bool) {
+    super.viewWillAppear(animated)
     logger.debug("CalendarView will appear, syncing events")
     MVNetworkingHelper.syncUserEvent()
+    //notificationBadge.incrementBy(3)
   }
   
   override func viewDidLayoutSubviews() {
     super.viewDidLayoutSubviews()
     calendar.repositionViews()
+  }
+  
+  /// Moving loading of calendar data to view did appear, in hope to be more responsive
+  override func viewDidAppear(animated: Bool) {
+    super.viewDidAppear(animated)
+    logger.debug("CalendarView did appear, loading calendar data")
+    calendar.reloadData()
+    
   }
   
   // MARK: Navigation
@@ -95,7 +116,7 @@ extension CalendarViewController {
       case CalendarViewControllerConstants.SegueToEvent:
         logger.debug("Preparing segue to event")
         if let senderEvent = sender as? Event,
-          destinationViewController = (segue.destinationViewController as? UINavigationController)?.topViewController as? EventViewController
+          destinationViewController = segue.destinationViewController as? EventViewController
         {
           destinationViewController.event = senderEvent
         } else {
@@ -172,7 +193,7 @@ extension CalendarViewController: UITableViewDelegate {
   }
 }
 
-// MARK: - Delegate method for pull to refresh method
+// MARK: - Delegate methods for control elements
 extension CalendarViewController {
   func startRefresh(refreshControl: UIRefreshControl) {
     logger.info("Refresh started")

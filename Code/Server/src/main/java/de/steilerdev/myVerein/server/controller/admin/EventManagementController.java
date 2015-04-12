@@ -188,7 +188,7 @@ public class EventManagementController
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             } else
             {
-                selectedEvent = selectedEvent.getSendingObjectInternalSync();
+                selectedEvent = selectedEvent.getSendingObjectInternalSync(currentUser);
                 if (!currentUser.isAllowedToAdministrate(selectedEvent))
                 {
                     logger.debug("[" + currentUser + "] The user is not allowed to edit the event " + id);
