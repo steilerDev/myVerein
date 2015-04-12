@@ -165,6 +165,8 @@ struct UserConstants {
   // This struct defines the names of all database columns
   struct Fields {
     static let Id = "id"
+    static let FirstName = "firstName"
+    static let LastName = "lastName"
   }
   
   // This struct defines the names of all database columns/relations that should not be accessed directly
@@ -172,6 +174,10 @@ struct UserConstants {
     static let SendMessages = "rawSendMessages"
     static let Divisions = "rawDivisions"
     static let AdministratedDivisions = "rawAdministratedDivisions"
+    static let GoingEvents = "rawGoingEvents"
+    static let MaybeEvents = "rawMaybeEvents"
+    static let DeclinedEvents = "rawDeclinedEvents"
+    static let PendingEvents = "rawPendingEvents"
   }
   
   // This struct defines the names of the member fields on the remote object. They are used to parse the event.
