@@ -25,6 +25,7 @@ import Foundation
 struct MVUserDefaultsConstants {
   static let UserID = "userId"
   static let SystemID = "systemId"
+  static let DeviceToken = "deviceToken"
   struct LastSynced {
     static let Event = "eventLastSynced"
   }

@@ -45,7 +45,7 @@ public class DivisionController
     private DivisionRepository divisionRepository;
 
     @RequestMapping(method = RequestMethod.GET, produces = "application/json")
-    public ResponseEntity<Division> getDivision(@RequestParam String divisionID, @CurrentUser User currentUser)
+    public ResponseEntity<Division> getDivision(@RequestParam(value = "id") String divisionID, @CurrentUser User currentUser)
     {
         logger.trace("[" + currentUser + "] Loading division with ID " + divisionID);
         Division searchedDivision;

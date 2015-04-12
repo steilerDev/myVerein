@@ -132,6 +132,9 @@ public class User implements UserDetails
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private MembershipStatus membershipStatus;
 
+    @JsonIgnore
+    private String deviceToken;
+
     @Transient
     @JsonIgnore
     Collection<? extends GrantedAuthority> authorities;
@@ -396,6 +399,16 @@ public class User implements UserDetails
     public void setMembershipStatus(MembershipStatus membershipStatus)
     {
         this.membershipStatus = membershipStatus;
+    }
+
+    public String getDeviceToken()
+    {
+        return deviceToken;
+    }
+
+    public void setDeviceToken(String deviceToken)
+    {
+        this.deviceToken = deviceToken;
     }
 
     /*

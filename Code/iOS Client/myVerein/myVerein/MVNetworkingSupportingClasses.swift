@@ -147,7 +147,16 @@ public struct NetworkingConstants {
       static let URI = User.BaseURI
       static let Method = HTTPMethods.GET
       struct Parameter {
-        static let UserID = "userID"
+        static let UserID = "id"
+      }
+    }
+    struct Update {
+      struct DeviceToken {
+        static let URI = User.BaseURI
+        static let Method = HTTPMethods.POST
+        struct Parameter {
+          static let DeviceToken = "deviceToken"
+        }
       }
     }
   }
@@ -158,7 +167,7 @@ public struct NetworkingConstants {
       static let URI = Division.BaseURI
       static let Method = HTTPMethods.GET
       struct Parameter {
-        static let DivisionID = "divisionID"
+        static let DivisionID = "id"
       }
     }
     struct Sync {

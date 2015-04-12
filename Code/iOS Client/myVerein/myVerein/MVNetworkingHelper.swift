@@ -323,3 +323,23 @@ extension MVNetworkingHelper {
     }
   }
 }
+
+// MARK: - Remote notifications
+/// This extension handles the registration for remote notifications
+extension MVNetworkingHelper {
+  class func updateDeviceToken(deviceToken: NSData) {
+    Defaults[MVUserDefaultsConstants.DeviceToken] = deviceToken
+    // TODO: Proper encoding of device token
+    MVNetworking.updateDeviceTokenAction(
+      deviceToken.description,
+      success: {
+        _ in
+        XCGLogger.debug("Successfully updated device token")
+      },
+      failure: {
+        error in
+        XCGLogger.error("Unable to update device token: \(error?.description)")
+      }
+    )
+  }
+}

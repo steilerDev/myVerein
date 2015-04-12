@@ -36,19 +36,31 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     // Setting up the logger
     logger.setup(logLevel: .Debug, showLogLevel: true, showFileNames: true, showLineNumbers: true, writeToFile: nil)
     
-    logger.debug("Trying to register for notification")
-    UIApplication.sharedApplication().registerForRemoteNotifications()
+    // Registering notification
+    logger.debug("Trying to register for notification/checking if notifications are still available")
+    let notificationSettings = UIUserNotificationSettings(forTypes: .Alert | .Sound | .Alert, categories: nil)
+    UIApplication.sharedApplication().registerUserNotificationSettings(notificationSettings)
+    //UIApplication.sharedApplication().registerForRemoteNotifications()
     return true
   }
   
+  func application(application: UIApplication, didRegisterUserNotificationSettings notificationSettings: UIUserNotificationSettings) {
+    logger.info("Application did register user notification settings: \(notificationSettings)")
+    if notificationSettings.types == .None {
+      logger.error("No notifications allowed!")
+    } else {
+      logger.info("Application allows notification, updating device token")
+      application.registerForRemoteNotifications()
+    }
+  }
+  
   func application(application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: NSData) {
-    println("####################################################")
-    println("Device token: \(deviceToken)")
+    logger.info("Application did register for remote notifications, updating device token (\(deviceToken))")
+    MVNetworkingHelper.updateDeviceToken(deviceToken)
   }
   
   func application(application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: NSError) {
-    println("####################################################")
-    println("Unable to register remote notification: \(error)")
+    logger.error("Application failed to register for remote notification: \(error.description)")
   }
   
   func applicationWillResignActive(application: UIApplication) {

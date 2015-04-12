@@ -428,3 +428,18 @@ extension MVNetworking {
     )
   }
 }
+
+// MARK: - Remote notifications
+extension MVNetworking {
+  class func updateDeviceTokenAction(encodedDeviceToken: String, success: (AnyObject) -> (), failure: (NSError?) -> ()) {
+    logger.verbose("Updating device token \(encodedDeviceToken)")
+    handleRequest(
+      URI: NetworkingConstants.User.Update.DeviceToken.URI,
+      parameters: [NetworkingConstants.User.Update.DeviceToken.Parameter.DeviceToken: encodedDeviceToken],
+      requestMethod: NetworkingConstants.User.Update.DeviceToken.Method,
+      retryCount: 0,
+      success: success,
+      failure: failure
+    )
+  }
+}

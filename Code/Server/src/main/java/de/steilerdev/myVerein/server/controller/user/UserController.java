@@ -40,9 +40,9 @@ public class UserController
     private UserRepository userRepository;
 
     @RequestMapping(method = RequestMethod.GET, produces = "application/json")
-    public ResponseEntity<User> getUser(@RequestParam String userID, @CurrentUser User currentUser)
+    public ResponseEntity<User> getUser(@RequestParam(value = "id") String userID, @CurrentUser User currentUser)
     {
-        logger.trace("[" + currentUser + "] Loading user with ID " + userID);
+        logger.trace("[{}] Loading user with ID {}", currentUser, userID);
         User searchedUser;
         if(userID.isEmpty())
         {
@@ -58,4 +58,22 @@ public class UserController
             return new ResponseEntity<>(searchedUser.getSendingObjectInternalSync(), HttpStatus.OK);
         }
     }
+
+    @RequestMapping(method = RequestMethod.POST)
+    public ResponseEntity updateDeviceToken(@RequestParam String deviceToken, @CurrentUser User currentUser)
+    {
+        logger.trace("[{}] Updating device token", currentUser);
+        if(deviceToken.isEmpty())
+        {
+            logger.warn("[{}] The device token is empty", currentUser);
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        } else
+        {
+            logger.info("[{}] Updating device token to {}", currentUser, deviceToken);
+            currentUser.setDeviceToken(deviceToken);
+            userRepository.save(currentUser);
+            return new ResponseEntity(HttpStatus.OK);
+        }
+    }
+
 }
