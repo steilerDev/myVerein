@@ -103,8 +103,7 @@ public class UserManagementController
                                            @CurrentUser User currentUser)
     {
         logger.trace("[" + currentUser + "] Starting to save a user.");
-        User newUserObject;
-        User oldUserObject = null;
+        User userObject;
 
         logger.debug("[" + currentUser + "] Loading user");
 
@@ -117,14 +116,14 @@ public class UserManagementController
             logger.info("[" + currentUser + "] A new user is created using the email " + email);
             if (userRepository.findByEmail(email) == null)
             {
-                newUserObject = new User();
+                userObject = new User();
                 if (password.isEmpty())
                 {
                     logger.warn("[" + currentUser + "] The password of the new user " + email + " can not be empty");
                     return new ResponseEntity<>("The password can not be empty", HttpStatus.BAD_REQUEST);
                 } else
                 {
-                    newUserObject.setPassword(password);
+                    userObject.setPassword(password);
                 }
             } else
             {
@@ -134,25 +133,20 @@ public class UserManagementController
         } else
         {
             logger.info("[" + currentUser + "] An existing user " + userFlag + " is modified");
-            if (userFlag.equals(email) && userRepository.findByEmail(email) != null)
+            if((userObject = userRepository.findByEmail(userFlag)) == null)
             {
-                logger.debug("[" + currentUser + "] The identifier of the user " + userFlag + " did not change");
-                newUserObject = userRepository.findByEmail(userFlag);
-            } else if (userRepository.findByEmail(userFlag) != null && userRepository.findByEmail(email) == null)
+                logger.warn("[{}] Unable to find existing user object", currentUser);
+                return new ResponseEntity<>("Unable to retrieve the user", HttpStatus.BAD_REQUEST);
+            } else if(!userObject.getEmail().equals(email) && userRepository.findByEmail(email) != null)
             {
-                logger.debug("[" + currentUser + "] The user changed his email from " + userFlag + " to " + email);
-                oldUserObject = userRepository.findByEmail(userFlag);
-                newUserObject = userRepository.findByEmail(userFlag);
-            } else
-            {
-                logger.warn("[" + currentUser + "] Unable to modify user " + userFlag + ", either the existing user could not be located or the new email " + email + " is already taken");
-                return new ResponseEntity<>("A problem occurred while retrieving the user, either the existing user could not be located or the new email is already taken", HttpStatus.BAD_REQUEST);
+                logger.warn("[{}] The new email {} is already taken", currentUser, email);
+                return new ResponseEntity<>("The new email is already taken", HttpStatus.BAD_REQUEST);
             }
         }
 
         logger.debug("[" + currentUser + "] Checking permissions");
 
-        if (!currentUser.isAllowedToAdministrate(newUserObject, divisionRepository))
+        if (!currentUser.isAllowedToAdministrate(userObject, divisionRepository))
         {
             logger.warn("[" + currentUser + "] The user is not allowed to save the user");
             return new ResponseEntity<>("You are not allowed to perform these changes.", HttpStatus.FORBIDDEN);
@@ -160,21 +154,21 @@ public class UserManagementController
 
         logger.debug("[" + currentUser + "] Parsing parameters and updating user");
 
-        if (newUserObject == null || firstName.isEmpty() || lastName.isEmpty())
+        if (firstName.isEmpty() || lastName.isEmpty())
         {
             logger.warn("[" + currentUser + "] Required parameter missing");
             return new ResponseEntity<>("Required parameter missing", HttpStatus.BAD_REQUEST);
         }
-        newUserObject.setFirstName(firstName);
-        newUserObject.setLastName(lastName);
-        newUserObject.setEmail(email);
+        userObject.setFirstName(firstName);
+        userObject.setLastName(lastName);
+        userObject.setEmail(email);
 
         if (!birthday.isEmpty())
         {
-            logger.debug("[" + currentUser + "] Parsing birthday for " + newUserObject.getEmail());
+            logger.debug("[" + currentUser + "] Parsing birthday for " + userObject.getEmail());
             try
             {
-                newUserObject.setBirthday(LocalDate.parse(birthday, DateTimeFormatter.ofPattern("d/MM/y")));
+                userObject.setBirthday(LocalDate.parse(birthday, DateTimeFormatter.ofPattern("d/MM/y")));
             } catch (DateTimeParseException e)
             {
                 logger.warn("[" + currentUser + "] Unrecognized date format (" + birthday + ")");
@@ -182,16 +176,16 @@ public class UserManagementController
             }
         } else
         {
-            logger.debug("[" + currentUser + "] Clearing birthday field for " + newUserObject.getEmail());
-            newUserObject.setBirthday(null);
+            logger.debug("[" + currentUser + "] Clearing birthday field for " + userObject.getEmail());
+            userObject.setBirthday(null);
         }
 
         if (gender != null && !gender.isEmpty() && !gender.equals("default"))
         {
-            logger.debug("[" + currentUser + "] Parsing gender for " + newUserObject.getEmail());
+            logger.debug("[" + currentUser + "] Parsing gender for " + userObject.getEmail());
             try
             {
-                newUserObject.setGender(User.Gender.valueOf(gender));
+                userObject.setGender(User.Gender.valueOf(gender));
             } catch (IllegalArgumentException e)
             {
                 logger.warn("[" + currentUser + "] Unable to parse gender: " + e.getMessage());
@@ -199,22 +193,22 @@ public class UserManagementController
             }
         } else
         {
-            logger.debug("[" + currentUser + "] Clearing gender field for " + newUserObject.getEmail());
-            newUserObject.setGender(null);
+            logger.debug("[" + currentUser + "] Clearing gender field for " + userObject.getEmail());
+            userObject.setGender(null);
         }
 
-        newUserObject.setStreet(street);
-        newUserObject.setStreetNumber(streetNumber);
-        newUserObject.setZipCode(zip);
-        newUserObject.setCity(city);
-        newUserObject.setCountry(country);
+        userObject.setStreet(street);
+        userObject.setStreetNumber(streetNumber);
+        userObject.setZipCode(zip);
+        userObject.setCity(city);
+        userObject.setCountry(country);
 
         if(!activeMemberSince.isEmpty())
         {
-            logger.debug("[" + currentUser + "] Parsing active member field for " + newUserObject.getEmail());
+            logger.debug("[" + currentUser + "] Parsing active member field for " + userObject.getEmail());
             try
             {
-                newUserObject.setActiveSince(LocalDate.parse(activeMemberSince, DateTimeFormatter.ofPattern("d/MM/y")));
+                userObject.setActiveSince(LocalDate.parse(activeMemberSince, DateTimeFormatter.ofPattern("d/MM/y")));
             } catch (DateTimeParseException e)
             {
                 logger.warn("[" + currentUser + "] Unrecognized date format (" + activeMemberSince + ")");
@@ -222,16 +216,16 @@ public class UserManagementController
             }
         } else
         {
-            logger.debug("[" + currentUser + "] Clearing active member field for " + newUserObject.getEmail());
-            newUserObject.setActiveSince(null);
+            logger.debug("[" + currentUser + "] Clearing active member field for " + userObject.getEmail());
+            userObject.setActiveSince(null);
         }
 
         if(!passiveMemberSince.isEmpty())
         {
-            logger.debug("[" + currentUser + "] Parsing passive member field for " + newUserObject.getEmail());
+            logger.debug("[" + currentUser + "] Parsing passive member field for " + userObject.getEmail());
             try
             {
-                newUserObject.setPassiveSince(LocalDate.parse(passiveMemberSince, DateTimeFormatter.ofPattern("d/MM/y")));
+                userObject.setPassiveSince(LocalDate.parse(passiveMemberSince, DateTimeFormatter.ofPattern("d/MM/y")));
             } catch (DateTimeParseException e)
             {
                 logger.warn("[" + currentUser + "] Unrecognized date format (" + passiveMemberSince + ")");
@@ -239,16 +233,16 @@ public class UserManagementController
             }
         } else
         {
-            logger.debug("[" + currentUser + "] Clearing passive member field for " + newUserObject.getEmail());
-            newUserObject.setPassiveSince(null);
+            logger.debug("[" + currentUser + "] Clearing passive member field for " + userObject.getEmail());
+            userObject.setPassiveSince(null);
         }
 
         if(!resignationDate.isEmpty())
         {
-            logger.debug("[" + currentUser + "] Parsing resignation date field for " + newUserObject.getEmail());
+            logger.debug("[" + currentUser + "] Parsing resignation date field for " + userObject.getEmail());
             try
             {
-                newUserObject.setResignationDate(LocalDate.parse(resignationDate, DateTimeFormatter.ofPattern("d/MM/y")));
+                userObject.setResignationDate(LocalDate.parse(resignationDate, DateTimeFormatter.ofPattern("d/MM/y")));
             } catch (DateTimeParseException e)
             {
                 logger.warn("[" + currentUser + "] Unrecognized date format (" + resignationDate + ")");
@@ -256,16 +250,16 @@ public class UserManagementController
             }
         } else
         {
-            logger.debug("[" + currentUser + "] Clearing resignation date field for " + newUserObject.getEmail());
-            newUserObject.setResignationDate(null);
+            logger.debug("[" + currentUser + "] Clearing resignation date field for " + userObject.getEmail());
+            userObject.setResignationDate(null);
         }
 
-        newUserObject.setIban(iban);
-        newUserObject.setBic(bic);
+        userObject.setIban(iban);
+        userObject.setBic(bic);
 
         if (!divisions.isEmpty())
         {
-            logger.debug("[" + currentUser + "] Parsing divisions for " + newUserObject.getEmail());
+            logger.debug("[" + currentUser + "] Parsing divisions for " + userObject.getEmail());
             String[] divArray = divisions.split(",");
             List<Division> divisionList = new ArrayList<>();
             for (String division : divArray)
@@ -280,34 +274,30 @@ public class UserManagementController
                     divisionList.add(div);
                 }
             }
-            newUserObject.replaceDivisions(divisionRepository, eventRepository, divisionList);
+            userObject.replaceDivisions(divisionRepository, eventRepository, divisionList);
         } else
         {
-            logger.debug("[" + currentUser + "] Clearing divisions for " + newUserObject.getEmail());
-            newUserObject.replaceDivisions(divisionRepository, eventRepository, (List<Division>)null);
+            logger.debug("[" + currentUser + "] Clearing divisions for " + userObject.getEmail());
+            userObject.replaceDivisions(divisionRepository, eventRepository, (List<Division>)null);
         }
 
         logger.debug("[" + currentUser + "] Parsing and setting custom user fields");
-        newUserObject.setCustomUserField(parameters.keySet().parallelStream().filter(key -> key.startsWith("cuf_") && !parameters.get(key).trim().isEmpty()) //Filtering all custom user fields, which are not empty
+        userObject.setCustomUserField(parameters.keySet().parallelStream().filter(key -> key.startsWith("cuf_") && !parameters.get(key).trim().isEmpty()) //Filtering all custom user fields, which are not empty
                 .collect(Collectors.toMap(key -> key.substring(4), key -> parameters.get(key).trim()))); //Creating map of all fields
 
-        logger.debug("[" + currentUser + "] Saving user " + newUserObject.getEmail());
+        logger.debug("[" + currentUser + "] Saving user " + userObject.getEmail());
 
         try
         {
-            userRepository.save(newUserObject);
-            if(oldUserObject != null)
-            {
-                logger.debug("[" + currentUser + "] Deleting old user " + oldUserObject.getEmail() + ", because identifier changed");
-                userRepository.delete(oldUserObject);
-            }
+            logger.debug("[{}] Saving user {}", currentUser, userObject);
+            userRepository.save(userObject);
+            logger.info("[" + currentUser + "] Successfully saved user " + userObject.getEmail());
+            return new ResponseEntity<>("Successfully saved user", HttpStatus.OK);
         } catch (ConstraintViolationException e)
         {
             logger.warn("[" + currentUser + "] A database constraint was violated while saving the user: " + e.getMessage());
             return new ResponseEntity<>("A database constraint was violated while saving the user.", HttpStatus.BAD_REQUEST);
         }
-        logger.info("[" + currentUser + "] Successfully saved user " + newUserObject.getEmail());
-        return new ResponseEntity<>("Successfully saved user", HttpStatus.OK);
     }
 
     /**
