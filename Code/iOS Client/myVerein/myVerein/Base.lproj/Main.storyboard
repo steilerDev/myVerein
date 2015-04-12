@@ -265,13 +265,19 @@
                     </view>
                     <extendedEdge key="edgesForExtendedLayout"/>
                     <navigationItem key="navigationItem" title="Club Calendar" id="FnT-n7-dcs">
-                        <barButtonItem key="leftBarButtonItem" image="Mail" style="plain" id="eX0-fi-ZAL"/>
+                        <barButtonItem key="leftBarButtonItem" image="Mail" id="eX0-fi-ZAL"/>
+                        <barButtonItem key="rightBarButtonItem" systemItem="refresh" id="KOd-bc-Lgd">
+                            <connections>
+                                <action selector="startRefresh" destination="a28-zv-3eW" id="ddu-5z-cdZ"/>
+                            </connections>
+                        </barButtonItem>
                     </navigationItem>
                     <connections>
                         <outlet property="contentView" destination="ztp-J8-e6v" id="wv5-We-ROI"/>
                         <outlet property="eventTableView" destination="eq9-c7-Err" id="O3Z-XD-S7h"/>
                         <outlet property="menuView" destination="WjX-pm-TWJ" id="6cz-A3-OJ5"/>
                         <outlet property="openInvitations" destination="eX0-fi-ZAL" id="2wU-JS-DCV"/>
+                        <outlet property="refreshButton" destination="KOd-bc-Lgd" id="vJJ-G2-cUg"/>
                         <segue destination="Jca-TX-67z" kind="show" identifier="showEventDetails" id="VhO-Nh-GRb"/>
                     </connections>
                 </viewController>

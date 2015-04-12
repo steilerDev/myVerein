@@ -23,17 +23,25 @@
 import Foundation
 
 enum MVErrorCodes: Int {
+  // Security related errors
   case MVSecurityError = 10
   case MVKeychainEmptyError = 11
   case MVKeychainParseError = 12
+  
+  // Networking related errors
   case MVNetworkingError = 20
   case MVSessionLoadingError = 21
   case MVMaximumLoginRetriesReached = 22
   case MVServerResponseParseError = 23
   case MVResponseHeaderError = 24
   case MVLastSyncTooCloseError = 25
+  case MVEmptyResponse = 26
+  
+  // CoreData related errors
   case MVLocalDatabaseError = 50
   case MVLocalDatabaseLoadingError = 51
+  
+  // Response parsing errors
   case MVEntityCreationError = 60
   case MVDivisionCreationError = 61
   case MVMessageCreationError = 62
@@ -165,6 +173,12 @@ class MVError {
           NSLocalizedDescriptionKey: "Failed to initialize the application's saved data",
           NSLocalizedFailureReasonErrorKey: "There was an error creating or loading the application's saved data.",
           NSLocalizedRecoverySuggestionErrorKey: "If the error persists, remove the application and re-install it"
+        ]
+      case .MVEmptyResponse:
+        return [
+          NSLocalizedDescriptionKey: "The server response does not contain any data",
+          NSLocalizedFailureReasonErrorKey: "In general this means that the task does not have anything to do",
+          NSLocalizedRecoverySuggestionErrorKey: "If this behaviour is not an options retry your action"
         ]
     default: return nil
     }

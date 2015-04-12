@@ -231,8 +231,8 @@ extension MVNetworkingHelper {
 /// This extension is centralizing all event related networking tasks in a user friendly way, as well as handling interactions with the persistent store.
 extension MVNetworkingHelper {
   
-  /// This function is gathering all events that changed since the last time, the user synced his events. If the user never synced his events all events are synced.
-  class func syncUserEvent() {
+  /// This function is gathering all events that changed since the last time, the user synced his events. If the user never synced his events all events are synced. The callback function is optional and guaranteed to be executed on the main thread.
+  class func syncUserEvent(callback: (() -> ())?) {
     logger.verbose("Syncing events for user")
     MVNetworking.eventSyncAction(
       success: {
@@ -251,10 +251,24 @@ extension MVNetworkingHelper {
           let error = MVError.createError(.MVMessageCreationError, failureReason: "Unable to parse response array", underlyingError: .MVServerResponseParseError)
           logger.warning("Unable to sync events: \(error.localizedDescription)")
         }
+        
+        if let callback = callback {
+          logger.debug("Callback available, executing on main queue")
+          ~>callback
+        } else {
+          logger.info("No callback available")
+        }
       },
       failure: {
         error in
-        XCGLogger.warning("Unable to sync user's events: \(error?.localizedDescription)")
+        let logger = XCGLogger.defaultInstance()
+        logger.warning("Unable to sync user's events: \(error?.localizedDescription)")
+        if let callback = callback {
+          logger.debug("Callback available, executing on main queue")
+          ~>callback
+        } else {
+          logger.info("No callback available")
+        }
       }
     )
   }

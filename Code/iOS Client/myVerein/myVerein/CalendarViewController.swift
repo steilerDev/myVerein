@@ -36,6 +36,7 @@ class CalendarViewController: UIViewController {
   @IBOutlet weak var contentView: JTCalendarContentView!
   @IBOutlet weak var eventTableView: UITableView!
   @IBOutlet weak var openInvitations: UIBarButtonItem!
+  @IBOutlet weak var refreshButton: UIBarButtonItem!
   
   let logger = XCGLogger.defaultInstance()
   let calendar = JTCalendar.new()
@@ -51,11 +52,6 @@ extension CalendarViewController {
     // Hiding title on back button for EventViewController (See http://justabeech.com/2014/02/24/empty-back-button-on-ios7/ for reference)
     let backButton = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
     navigationItem.backBarButtonItem = backButton
-    
-    // Adding pull to refresh controll to table view
-    let refreshControl = UIRefreshControl()
-    refreshControl.addTarget(self, action: "startRefresh:", forControlEvents: .ValueChanged)
-    self.eventTableView.addSubview(refreshControl)
     
     logger.debug("CalendarView did load, modifying the appearance")
     // All modifications on calendarAppearance have to be done before setMenuMonthsView and setContentView or you will have to call reloadAppearance
@@ -87,13 +83,7 @@ extension CalendarViewController {
     openInvitations.customView = imageView
   }
   
-  override func viewWillAppear(animated: Bool) {
-    super.viewWillAppear(animated)
-    logger.debug("CalendarView will appear, syncing events")
-    MVNetworkingHelper.syncUserEvent()
-    //notificationBadge.incrementBy(3)
-  }
-  
+  /// Positioning calendar view to the current month
   override func viewDidLayoutSubviews() {
     super.viewDidLayoutSubviews()
     calendar.repositionViews()
@@ -102,14 +92,11 @@ extension CalendarViewController {
   /// Moving loading of calendar data to view did appear, in hope to be more responsive
   override func viewDidAppear(animated: Bool) {
     super.viewDidAppear(animated)
-    logger.debug("CalendarView did appear, loading calendar data")
-    calendar.reloadData()
-    
+    logger.debug("CalendarView did appear, loading calendar data and syncing events")
+    startRefresh()
   }
   
   // MARK: Navigation
-  
-  // In a storyboard-based application, you will often want to do a little preparation before navigation
   override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
     if let identifier = segue.identifier {
       switch identifier {
@@ -195,11 +182,53 @@ extension CalendarViewController: UITableViewDelegate {
 
 // MARK: - Delegate methods for control elements
 extension CalendarViewController {
-  func startRefresh(refreshControl: UIRefreshControl) {
-    logger.info("Refresh started")
-    MVNetworkingHelper.syncUserEvent()
-    calendar.reloadData()
-    refreshControl.endRefreshing()
+  
+  @IBAction func startRefresh() {
+    logger.info("Calendar refresh started")
+    startAnimatingRefreshButton()
+    // In general the networking task of syncing the user's events takes longer than the calendar's reloading of data, so the refresh button's animation will stop after the networking task finished
+    MVNetworkingHelper.syncUserEvent({
+      self.calendar.reloadData()
+      self.stopAnimatingRefreshButton()
+    })
+    
+  }
+  
+  /// This function starts the animation of the refresh UIBarButtonItem. It uses keyframes to spin it until the animation is stopped by calling 'stopAnimationUIBarButtonItem:'.
+  func startAnimatingRefreshButton() {
+    UIView.animateKeyframesWithDuration(2.0,
+      delay: 0.0,
+      options: .CalculationModePaced | .Repeat,
+      animations: {
+        //The animation needs to be splitted in three parts, because otherwise the system does not know hot to apply the transformation matrix
+        let buttonItemView = self.refreshButton.valueForKey("view") as! UIView // The animated view
+        UIView.addKeyframeWithRelativeStartTime(0,
+          relativeDuration: 1/3,
+          animations: {
+            buttonItemView.transform = CGAffineTransformMakeRotation(CGFloat(M_PI * 2/3)) // A third of the full rotation
+          }
+        )
+        UIView.addKeyframeWithRelativeStartTime(1/3,
+          relativeDuration: 1/3,
+          animations: {
+            buttonItemView.transform = CGAffineTransformMakeRotation(CGFloat(M_PI * 4/3)) // Two thirds of the full rotation
+          }
+        )
+        UIView.addKeyframeWithRelativeStartTime(2/3,
+          relativeDuration: 1/3,
+          animations: {
+            buttonItemView.transform = CGAffineTransformMakeRotation(CGFloat(M_PI * 2)) // Full rotation
+          }
+        )
+      },
+      completion: nil
+    )
+  }
+  
+  /// This function stops the animation of the refresh button and resets his position to its initial value.
+  func stopAnimatingRefreshButton() {
+    let buttonItemView = refreshButton.valueForKey("view") as! UIView // The animated view
+    buttonItemView.layer.removeAllAnimations()
   }
 }
 

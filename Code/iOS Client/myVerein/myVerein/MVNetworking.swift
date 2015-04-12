@@ -64,7 +64,9 @@ class MVNetworking {
           if response != nil {
             success(response)
           } else {
-            XCGLogger.warning("The response for the request (URI: \(URI), parameters \(parameters), request method \(requestMethod), retry count \(retryCount)) is empty, in general there is nothing to do")
+            let error = MVError.createError(.MVEmptyResponse)
+            XCGLogger.warning("The response for the request (URI: \(URI), parameters \(parameters), request method \(requestMethod), retry count \(retryCount)) is empty, in general there is nothing to do, executing failure function anyway")
+            failure(error)
           }
         },
         failure:
