@@ -42,7 +42,7 @@ class EventRepository: MVCoreDataRepository {
   }
   
   /// This function gathers all events, where the user responded with the provided event response
-  func findEventsBy(userResponse: EventResponse) -> [Event]? {
+  func findEventsBy(#userResponse: EventResponse) -> [Event]? {
     logger.verbose("Retrieving event with user response \(userResponse)")
     // Create a new fetch request using the event entity
     let fetchRequest = NSFetchRequest(entityName: EventConstants.ClassName)
@@ -57,9 +57,13 @@ class EventRepository: MVCoreDataRepository {
   /// This function returns the amount of times the user responded with a specific event response
   func countEventsWith(userResponse: EventResponse) -> Int {
     logger.verbose("Checking how often the user responded with \(userResponse) on an event")
-    return findEventsBy(userResponse)?.count ?? 0
+    return findEventsBy(userResponse: userResponse)?.count ?? 0
   }
   
+  /// This function returns the amount of events the user did not respond to
+  func countPendingEvents() -> Int {
+    return countEventsWith(.Pending)
+  }
 
   /// This function gathers all events that take place on the date or span over the date.
   ///

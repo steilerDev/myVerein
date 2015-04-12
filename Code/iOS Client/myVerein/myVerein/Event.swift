@@ -117,23 +117,25 @@ extension Event: Printable {
 
 // MARK: - Variables converting the event into text for table view
 extension Event {
+  /// This variable gives the title for the event (either the name or the id)
   var title: String {
     return name ?? id
   }
   
+  /// This variable gives a subtitle for the event (dateString and locationString, ignoring default values)
   var subTitle: String {
     var result: String = String()
-    if let dateString = dateString {
-      result += dateString
+    if dateString != EventConstants.Placeholder.Time {
+      result += "\(dateString) "
     }
-    if let location = locationName where !location.isEmpty {
-      result += "@ \(location)"
+    if locationString != EventConstants.Placeholder.Location {
+      result += "@ \(locationString)"
     }
     return result
   }
   
-  /// Returns a string representation of the dates. If the event is not multidate, only the formatted times are returned, otherwise startdatetime and enddatetime are returned.
-  var dateString: String? {
+  /// Returns a string representation of the dates. If the event is not multidate, only the formatted times are returned, otherwise startdatetime and enddatetime are returned. If the times are not provided the placeholder is returned.
+  var dateString: String {
     if let startDate = startDate, endDate = endDate {
       let formatter = NSDateFormatter()
       if multiDate {
@@ -142,29 +144,38 @@ extension Event {
       } else {
         formatter.timeStyle = .ShortStyle
       }
-      return "\(formatter.stringFromDate(startDate)) - \(formatter.stringFromDate(endDate)) "
+      return "\(formatter.stringFromDate(startDate)) - \(formatter.stringFromDate(endDate))"
     } else {
-      return nil
+      return EventConstants.Placeholder.Time
     }
   }
   
-  /// Returns a string representation of the dates. The string is always giving the full event date and time
-  var dateStringLong: String? {
+  /// Returns a string representation of the dates. The string is always giving the full event date and time. If the times are not provided the placeholder is returned.
+  var dateStringLong: String {
     if let startDate = startDate, endDate = endDate {
       if multiDate {
         let formatter = NSDateFormatter()
         formatter.dateStyle = .ShortStyle
         formatter.timeStyle = .ShortStyle
-        return "\(formatter.stringFromDate(startDate)) - \(formatter.stringFromDate(endDate)) "
+        return "\(formatter.stringFromDate(startDate)) - \(formatter.stringFromDate(endDate))"
       } else {
         let timeFormatter = NSDateFormatter()
         let dateFormatter = NSDateFormatter()
         timeFormatter.timeStyle = .ShortStyle
         dateFormatter.dateStyle = .ShortStyle
-        return "\(dateFormatter.stringFromDate(startDate)): \(timeFormatter.stringFromDate(startDate)) - \(timeFormatter.stringFromDate(endDate)) "
+        return "\(dateFormatter.stringFromDate(startDate)): \(timeFormatter.stringFromDate(startDate)) - \(timeFormatter.stringFromDate(endDate))"
       }
     } else {
-      return nil
+      return EventConstants.Placeholder.Time
+    }
+  }
+  
+  /// Returns a string representation of the location. If the location name is not provided the placeholder is returned.
+  var locationString: String {
+    if let locationName = locationName {
+      return locationName
+    } else {
+      return EventConstants.Placeholder.Location
     }
   }
 }
@@ -197,6 +208,12 @@ struct EventConstants {
   static let ClassName = "Event"
   // This variable is defining the minimum amount of time that needs to pass until the app is updating the events of a user
   static let MinimalSecondsBetweenEventSync = 0.0
+  
+  // This struct defines placeholder if specific variables are not available
+  struct Placeholder {
+    static let Time = "No time provided"
+    static let Location = "No location provided"
+  }
   
   // This struct defines the names of all database columns
   struct Fields {

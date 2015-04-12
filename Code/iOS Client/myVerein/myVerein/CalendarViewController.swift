@@ -29,7 +29,7 @@ import RKNotificationHub
 // MARK: - All variables and outlets needed by the controller
 class CalendarViewController: UIViewController {
 
-  var notificationBadge: RKNotificationHub!
+  lazy var notificationBadge: RKNotificationHub = RKNotificationHub(barButtonItem: self.openInvitations)
   
   // Outlets from the storyboard
   @IBOutlet weak var menuView: JTCalendarMenuView!
@@ -75,12 +75,6 @@ extension CalendarViewController {
     calendar.dataSource = self
     calendar.menuMonthsView = menuView
     calendar.contentView = contentView
-    
-    
-    let imageView = UIImageView(image: openInvitations.image)
-    notificationBadge = RKNotificationHub(view: imageView)
-    notificationBadge.scaleCircleSizeBy(0.7)
-    openInvitations.customView = imageView
   }
   
   /// Positioning calendar view to the current month
@@ -101,13 +95,20 @@ extension CalendarViewController {
     if let identifier = segue.identifier {
       switch identifier {
       case CalendarViewControllerConstants.SegueToEvent:
-        logger.debug("Preparing segue to event")
+        logger.debug("Preparing segue to event detail view")
         if let senderEvent = sender as? Event,
           destinationViewController = segue.destinationViewController as? EventViewController
         {
           destinationViewController.event = senderEvent
         } else {
           logger.error("Unable to get sender event or destination view controller")
+        }
+      case CalendarViewControllerConstants.SegueToInvitedEvents:
+        logger.debug("Preparing segue to open invitations list")
+        if let destinationViewController = (segue.destinationViewController as? UINavigationController)?.topViewController as? InvitationViewController {
+          destinationViewController.delegate = self
+        } else {
+          logger.error("Unable to get destination view controller")
         }
       default: break;
       }
@@ -175,7 +176,7 @@ extension CalendarViewController: UITableViewDelegate {
       logger.debug("Performing segue to event \(selectedEvent)")
       performSegueWithIdentifier(CalendarViewControllerConstants.SegueToEvent, sender: selectedEvent)
     } else {
-      logger.error("Unable to perform segue to chat because the tapped cell was not found")
+      logger.error("Unable to perform segue to event because the tapped cell was not found")
     }
   }
 }
@@ -183,11 +184,14 @@ extension CalendarViewController: UITableViewDelegate {
 // MARK: - Delegate methods for control elements
 extension CalendarViewController {
   
+  /// This function starts the refresh of the page. This includes syncing of events, refreshing calendar view and setting amount of invited divisions.
   @IBAction func startRefresh() {
     logger.info("Calendar refresh started")
     startAnimatingRefreshButton()
     // In general the networking task of syncing the user's events takes longer than the calendar's reloading of data, so the refresh button's animation will stop after the networking task finished
     MVNetworkingHelper.syncUserEvent({
+      self.notificationBadge.setCount(Int32(EventRepository().countPendingEvents()))
+      self.notificationBadge.pop()
       self.calendar.reloadData()
       self.stopAnimatingRefreshButton()
     })
@@ -230,6 +234,20 @@ extension CalendarViewController {
     let buttonItemView = refreshButton.valueForKey("view") as! UIView // The animated view
     buttonItemView.layer.removeAllAnimations()
   }
+  
+  /// This function is called by pressing on the invitations icon and segues to the list of events.
+  @IBAction func openInvitationsPressed() {
+    logger.debug("Open invitations pressed, performing segue to modal view")
+    performSegueWithIdentifier(CalendarViewControllerConstants.SegueToInvitedEvents, sender: openInvitations)
+  }
+}
+
+// MARK: - InvitationViewDelegate protocol methods
+extension CalendarViewController: InvitationViewDelegate {
+  func decrementOpenInvitationCount(decrement: Int) {
+    notificationBadge.decrementBy(Int32(decrement))
+    notificationBadge.pop()
+  }
 }
 
 // MARK: - CalendarViewController related constants
@@ -239,5 +257,15 @@ struct CalendarViewControllerConstants {
   static let PredicateField = EventConstants.Fields.StartDate
   static let SortField = EventConstants.Fields.StartDate
   static let ReuseCellIdentifier = "eventCell"
-  static let SegueToEvent = "showEventDetails"
+  static let SegueToEvent = "showEventDetailsFromCalendarView"
+  static let SegueToInvitedEvents = "showInvitedEvents"
+}
+
+// MARK: - Extension for notification hub to support bar button item
+extension RKNotificationHub {
+  convenience init(barButtonItem: UIBarButtonItem) {
+    self.init(view: barButtonItem.valueForKey("view") as! UIView)
+    scaleCircleSizeBy(0.7)
+    moveCircleByX(-5, y: 0)
+  }
 }

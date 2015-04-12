@@ -196,7 +196,7 @@ extension ParticipantViewController {
   }
 }
 
-// MARK: - TableView data source functions
+// MARK: - UITableView data source functions
 extension ParticipantViewController {
   override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
     return fetchedResultController.sections?.count ?? 1

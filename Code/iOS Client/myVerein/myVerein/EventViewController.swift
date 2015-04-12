@@ -20,6 +20,8 @@
 //  This file holds all information related to the event view, including event loading and delegate methods for click events.
 //
 
+// TODO: Add description field
+
 import UIKit
 import XCGLogger
 import MapKit
@@ -56,16 +58,10 @@ extension EventViewController {
       logger.debug("Succesfully loaded event, populating view")
       titleBar.title = event.title
       eventTitle.text = event.title
-      if let dateString = event.dateStringLong {
-        eventTimes.text = dateString
-      } else {
-        eventTimes.text = "No time provided"
-      }
-      if let locationString = event.locationName {
-        eventLocation.text = locationString
-      } else {
-        eventLocation.text = "No location provided"
-      }
+      
+      eventTimes.text = event.dateStringLong
+      eventLocation.text = event.locationString
+      
       if let response = event.response {
         switch response {
         case .Going:
@@ -117,7 +113,7 @@ extension EventViewController {
   }
 }
 
-// MARK: - Table view methods
+// MARK: - UITableView delegate methods
 extension EventViewController {
   
   /// This function handles the click on the participants row or the click on an answer about the user's participation
@@ -161,6 +157,7 @@ extension EventViewController {
   }
 }
 
+// MARK: - MapView delegate methods
 extension EventViewController: MKMapViewDelegate {
   func mapView(mapView: MKMapView!, viewForAnnotation annotation: MKAnnotation!) -> MKAnnotationView! {
     var view = mapView.dequeueReusableAnnotationViewWithIdentifier(EventViewControllerConstants.ReuseAnnotationIdentifier)
@@ -174,7 +171,6 @@ extension EventViewController: MKMapViewDelegate {
     }
     return view
   }
-  
   
   func mapView(mapView: MKMapView!, annotationView view: MKAnnotationView!, calloutAccessoryControlTapped control: UIControl!) {
     if let event = event {

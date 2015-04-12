@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		3012715A1AA5C83C00C23AEF /* MVNetworkingSessionFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 301271591AA5C83C00C23AEF /* MVNetworkingSessionFactory.swift */; };
 		30159BF91AD980010018419D /* ParticipantViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30159BF81AD980010018419D /* ParticipantViewController.swift */; };
+		3016A03F1ADACFE800778769 /* InvitationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3016A03E1ADACFE800778769 /* InvitationViewController.swift */; };
+		3016A0411ADAE17000778769 /* InvitationCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3016A0401ADAE17000778769 /* InvitationCell.swift */; };
 		3020CBA51A9E1289005AAEEF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3020CBA41A9E1289005AAEEF /* AppDelegate.swift */; };
 		3020CBA71A9E1289005AAEEF /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3020CBA61A9E1289005AAEEF /* LoginViewController.swift */; };
 		3020CBAA1A9E1289005AAEEF /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3020CBA81A9E1289005AAEEF /* Main.storyboard */; };
@@ -73,6 +75,8 @@
 /* Begin PBXFileReference section */
 		301271591AA5C83C00C23AEF /* MVNetworkingSessionFactory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MVNetworkingSessionFactory.swift; sourceTree = "<group>"; };
 		30159BF81AD980010018419D /* ParticipantViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ParticipantViewController.swift; sourceTree = "<group>"; };
+		3016A03E1ADACFE800778769 /* InvitationViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InvitationViewController.swift; sourceTree = "<group>"; };
+		3016A0401ADAE17000778769 /* InvitationCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InvitationCell.swift; sourceTree = "<group>"; };
 		3020CB9F1A9E1289005AAEEF /* myVerein.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = myVerein.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3020CBA31A9E1289005AAEEF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		3020CBA41A9E1289005AAEEF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -300,6 +304,8 @@
 				30F254E71AC7271A00E10CB9 /* CalendarViewController.swift */,
 				3032A9F41AD70B9100EEEAF4 /* EventViewController.swift */,
 				30159BF81AD980010018419D /* ParticipantViewController.swift */,
+				3016A03E1ADACFE800778769 /* InvitationViewController.swift */,
+				3016A0401ADAE17000778769 /* InvitationCell.swift */,
 			);
 			name = Calendar;
 			sourceTree = "<group>";
@@ -496,6 +502,7 @@
 				30FB44BB1AACC088003E4512 /* DivisionRepository.swift in Sources */,
 				302BE8C21AA642EB001D0FE7 /* DivisionChatCell.swift in Sources */,
 				30F254E61AC7224E00E10CB9 /* SettingsViewController.swift in Sources */,
+				3016A03F1ADACFE800778769 /* InvitationViewController.swift in Sources */,
 				3079B1DA1AAF242600ACD793 /* SupportingClasses.swift in Sources */,
 				3012715A1AA5C83C00C23AEF /* MVNetworkingSessionFactory.swift in Sources */,
 				306FD7321AAA356000719B82 /* MVNetworkingHelper.swift in Sources */,
@@ -504,6 +511,7 @@
 				306FD7341AAB0F4400719B82 /* MVError.swift in Sources */,
 				3068A4A01ACBDD9F00A3F53D /* MVNetworkingSupportingClasses.swift in Sources */,
 				3020CBA51A9E1289005AAEEF /* AppDelegate.swift in Sources */,
+				3016A0411ADAE17000778769 /* InvitationCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
