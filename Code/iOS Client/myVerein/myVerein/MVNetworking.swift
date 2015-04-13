@@ -73,7 +73,7 @@ class MVNetworking {
         {
           _, error in
           XCGLogger.warning("Failed executing request (URI: \(URI), parameters \(parameters), request method \(requestMethod), retry count \(retryCount)): \(error.localizedDescription)")
-          XCGLogger.debug("Error: \(error)")
+          XCGLogger.debug("Detailed error:\n\t Domain: \(error.domain) \n\t Code: \(error.code) \n\t Description: \(error.description)")
           // Handling a request error using the request failure handler. If the error was because of a 401 error, the handler is trying to log the user in before retrying
           MVNetworking.handleRequestFailure(
             error: error,

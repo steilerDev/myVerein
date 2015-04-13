@@ -27,7 +27,7 @@ import XCGLogger
 class InvitationViewController: UITableViewController {
 
   /// The delegate for this view controller, which gets notified if the amount of open invitation changed
-  var delegate: InvitationViewDelegate?
+  var delegate: NotificationCountDelegate?
   
   let logger = XCGLogger.defaultInstance()
   
@@ -177,7 +177,7 @@ extension InvitationViewController {
       event.response = response
       MVNetworkingHelper.sendEventResponse(event)
     }
-    delegate?.decrementOpenInvitationCount(newResponses.count)
+    delegate?.decrementNotificationCountBy(newResponses.count, sender: self)
     cancelButtonPressed()
   }
 }
@@ -222,12 +222,6 @@ extension InvitationViewController: NSFetchedResultsControllerDelegate {
   func controllerDidChangeContent(controller: NSFetchedResultsController) {
     tableView.endUpdates()
   }
-}
-
-// MARK: - InvitationViewDelegate protocol definition, enabling to update of the amount of unanswered invitations
-protocol InvitationViewDelegate {
-  /// This function is called after the view controller is dismissed. It tells the delegate how many invitations have received a response.
-  func decrementOpenInvitationCount(decrement: Int) -> ()
 }
 
 // MARK: - InvitationViewController related constants

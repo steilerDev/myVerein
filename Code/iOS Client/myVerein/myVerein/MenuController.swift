@@ -60,3 +60,37 @@ class MenuController: UITabBarController {
     }
   }
 }
+
+// MARK: - Convenience getter for tabbar items
+extension MenuController {
+  var calendarViewControllerItem: UITabBarItem {
+    return tabBar.items![1] as! UITabBarItem
+  }
+  
+  var chatViewControllerItem: UITabBarItem {
+    return tabBar.items![0] as! UITabBarItem
+  }
+}
+
+// MARK: - NotificationCountDelegate
+extension MenuController: NotificationCountDelegate {
+  func incrementNotificationCountBy(amount: Int, sender: AnyObject?) {
+    if sender is CalendarViewController {
+      calendarViewControllerItem.incrementBadgeCountBy(amount)
+    } else if sender is DivisionChatOverviewViewController {
+      chatViewControllerItem.incrementBadgeCountBy(amount)
+    }
+  }
+  
+  func decrementNotificationCountBy(amount: Int, sender: AnyObject?) {
+    incrementNotificationCountBy(-amount, sender: sender)
+  }
+  
+  func updateNotificationCountTo(newCount: Int, sender: AnyObject?) {
+    if sender is CalendarViewController {
+      calendarViewControllerItem.updateBadgeCount(newCount)
+    } else if sender is DivisionChatOverviewViewController {
+      chatViewControllerItem.updateBadgeCount(newCount)
+    }
+  }
+}

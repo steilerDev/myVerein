@@ -31,6 +31,8 @@ class CalendarViewController: UIViewController {
 
   lazy var notificationBadge: RKNotificationHub = RKNotificationHub(barButtonItem: self.openInvitations)
   
+  lazy var notificationDelegate: NotificationCountDelegate? = { self.tabBarController as? NotificationCountDelegate }()
+  
   // Outlets from the storyboard
   @IBOutlet weak var menuView: JTCalendarMenuView!
   @IBOutlet weak var contentView: JTCalendarContentView!
@@ -190,7 +192,7 @@ extension CalendarViewController {
     startAnimatingRefreshButton()
     // In general the networking task of syncing the user's events takes longer than the calendar's reloading of data, so the refresh button's animation will stop after the networking task finished
     MVNetworkingHelper.syncUserEvent({
-      self.notificationBadge.setCount(Int32(EventRepository().countPendingEvents()))
+      self.updateNotificationCountTo(EventRepository().countPendingEvents(), sender: self)
       self.notificationBadge.pop()
       self.calendar.reloadData()
       self.stopAnimatingRefreshButton()
@@ -242,10 +244,26 @@ extension CalendarViewController {
   }
 }
 
-// MARK: - InvitationViewDelegate protocol methods
-extension CalendarViewController: InvitationViewDelegate {
-  func decrementOpenInvitationCount(decrement: Int) {
-    notificationBadge.decrementBy(Int32(decrement))
+// MARK: - NotificationCountDelegate protocol methods
+extension CalendarViewController: NotificationCountDelegate {
+  
+  func decrementNotificationCountBy(amount: Int, sender: AnyObject?) {
+    incrementNotificationCountBy(-amount, sender: sender)
+  }
+  
+  func incrementNotificationCountBy(amount: Int, sender: AnyObject?) {
+    if let notificationDelegate = notificationDelegate {
+      notificationDelegate.incrementNotificationCountBy(amount, sender: self)
+    }
+    notificationBadge.incrementBy(Int32(amount))
+    notificationBadge.pop()
+  }
+  
+  func updateNotificationCountTo(newCount: Int, sender: AnyObject?) {
+    if let notificationDelegate = notificationDelegate {
+      notificationDelegate.updateNotificationCountTo(newCount, sender: self)
+    }
+    notificationBadge.setCount(Int32(newCount))
     notificationBadge.pop()
   }
 }
