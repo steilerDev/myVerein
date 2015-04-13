@@ -16,6 +16,9 @@
  */
 package de.steilerdev.myVerein.server.security.rest;
 
+import de.steilerdev.myVerein.server.security.SecurityHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 
@@ -26,9 +29,12 @@ import java.io.IOException;
 
 public class RestAuthenticationFailureHandler extends SimpleUrlAuthenticationFailureHandler
 {
+    private static Logger logger = LoggerFactory.getLogger(RestAuthenticationFailureHandler.class);
+
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException
     {
+        logger.warn("[{}] Authentication failed: {}", SecurityHelper.getClientIpAddr(request), exception.getMessage());
         if(!response.isCommitted())
         {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Authentication failed: " + exception.getMessage());

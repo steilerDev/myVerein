@@ -16,6 +16,10 @@
  */
 package de.steilerdev.myVerein.server.security.rest;
 
+import de.steilerdev.myVerein.server.model.User;
+import de.steilerdev.myVerein.server.security.SecurityHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.SimpleUrlLogoutSuccessHandler;
 
@@ -26,9 +30,13 @@ import java.io.IOException;
 
 public class RestLogoutSuccessHandler extends SimpleUrlLogoutSuccessHandler
 {
+    private static Logger logger = LoggerFactory.getLogger(RestLogoutSuccessHandler.class);
+
     @Override
     public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException
     {
+        User currentUser = (User)authentication.getPrincipal();
+        logger.info("[{}] Successfully logged user out from IP {}", currentUser, SecurityHelper.getClientIpAddr(request));
         if(!response.isCommitted())
         {
             response.sendError(HttpServletResponse.SC_OK, "Successfully logged out");

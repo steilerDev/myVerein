@@ -19,6 +19,9 @@ package de.steilerdev.myVerein.server.security.rest;
 import de.steilerdev.myVerein.server.model.Settings;
 import de.steilerdev.myVerein.server.model.SettingsRepository;
 import de.steilerdev.myVerein.server.model.User;
+import de.steilerdev.myVerein.server.security.SecurityHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
@@ -30,6 +33,7 @@ import java.io.IOException;
 
 public class RestAuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler
 {
+    private static Logger logger = LoggerFactory.getLogger(RestAuthenticationSuccessHandler.class);
 
     @Autowired
     SettingsRepository settingsRepository;
@@ -38,13 +42,15 @@ public class RestAuthenticationSuccessHandler extends SimpleUrlAuthenticationSuc
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
                                         Authentication authentication) throws ServletException, IOException
     {
+        User currentUser = (User)authentication.getPrincipal();
+        logger.info("[{}] Successfully authenticated user from IP {}", currentUser, SecurityHelper.getClientIpAddr(request));
         clearAuthenticationAttributes(request);
         if(!response.isCommitted())
         {
             Settings settings =  Settings.loadSettings(settingsRepository);
             response.setHeader("System-ID", settings.getId());
             response.setHeader("System-Version", settings.getSystemVersion());
-            response.setHeader("User-ID", ((User)authentication.getPrincipal()).getId());
+            response.setHeader("User-ID", currentUser.getId());
             response.sendError(HttpServletResponse.SC_OK, "Successfully logged in");
         }
     }
