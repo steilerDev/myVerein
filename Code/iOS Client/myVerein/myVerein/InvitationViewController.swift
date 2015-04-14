@@ -31,6 +31,9 @@ class InvitationViewController: UITableViewController {
   
   let logger = XCGLogger.defaultInstance()
   
+  /// The token handed over by the notification subscription, stored to be able to release resources.
+  var notificationObserverToken: NSObjectProtocol?
+  
   /// This variable stores the new responses of a user in a map where the key is the eventID and the value is the selected response
   var newResponses = [Event: EventResponse]()
   
@@ -78,6 +81,27 @@ extension InvitationViewController {
     }
   }
   
+  /// Within this function the notification observer subscribes to the notification system.
+  override func viewDidAppear(animated: Bool) {
+    super.viewDidAppear(animated)
+    // This observer is monitoring all events. As soon as the notification without a sender is received the controller is starting to reload its view.
+    logger.debug("Invitation view controller subscribed to notification system")
+    notificationObserverToken = MVNotification.subscribeToCalendarSyncCompletedNotificationForEvent(nil) {
+      notification in
+      if notification.object == nil {
+        self.tableView.reloadData()
+      }
+    }
+  }
+  
+  /// Within this function the notification observer un-subscribes from the notification system.
+  override func viewWillDisappear(animated: Bool) {
+    super.viewWillDisappear(animated)
+    if let notificationObserverToken = notificationObserverToken {
+      logger.debug("Invitation view controller un-subscribed from notification system")
+      MVNotification.unSubscribeFromNotification(notificationObserverToken)
+    }
+  }
   
   // MARK:  Navigation
   

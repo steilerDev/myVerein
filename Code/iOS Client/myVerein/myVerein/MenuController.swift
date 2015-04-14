@@ -34,6 +34,20 @@ class MenuController: UITabBarController {
   override func viewDidLoad() {
     super.viewDidLoad()
     UITabBar.appearance().tintColor = UIColor(hex: MVColor.Primary.Normal)
+    
+    // Subscribing to notifications, no need to un-subscribe since this view controller is always around
+    MVNotification.subscribeToCalendarSyncCompletedNotificationForEvent(nil) {
+      notification in
+      if notification.object == nil {
+        self.calendarViewControllerItem.updateBadgeCount(EventRepository().countPendingEvents())
+      }
+    }
+    MVNotification.subscribeToMessageSyncCompletedNotificationForDivisionChat(nil){
+      notification in
+      if notification.object == nil {
+        self.chatViewControllerItem.updateBadgeCount(MessageRepository().countUnreadMessages())
+      }
+    }
   }
   
   /// After the view appeared perform actions to update UI and check log in status

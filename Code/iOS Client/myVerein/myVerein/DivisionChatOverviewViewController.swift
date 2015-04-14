@@ -32,6 +32,9 @@ class DivisionChatOverviewViewController: UICollectionViewController {
   
   lazy var notificationDelegate: NotificationCountDelegate? = { self.tabBarController as? NotificationCountDelegate }()
   
+  /// The token handed over by the notification subscription, stored to be able to release resources.
+  var notificationObserverToken: NSObjectProtocol?
+  
   // Lazily initiating fetched result controller
   lazy var fetchedResultController: NSFetchedResultsController = {
     //Initializing data source (NSFetchedResultController)
@@ -79,7 +82,7 @@ class DivisionChatOverviewViewController: UICollectionViewController {
     dict[.Delete] = [NSIndexPath]()
     dict[.Update] = [NSIndexPath]()
     return dict
-    }()
+  }()
 }
 
 // MARK: - UICollectionViewController lifecycle methods
@@ -109,6 +112,28 @@ extension DivisionChatOverviewViewController {
     
     // Uncomment the following line to preserve selection between presentations
     // self.clearsSelectionOnViewWillAppear = false
+  }
+  
+  /// Within this function the notification observer subscribes to the notification system.
+  override func viewDidAppear(animated: Bool) {
+    super.viewDidAppear(animated)
+    // This observer is monitoring all divisions. As soon as the notification without a sender is received the controller is starting to reload its view.
+    logger.debug("Division chat overview controller subscribed to notification system")
+    notificationObserverToken = MVNotification.subscribeToDivisionSyncCompletedNotificationForDivision(nil) {
+      notification in
+      if notification.object == nil {
+        self.collectionView?.reloadData()
+      }
+    }
+  }
+  
+  /// Within this funciton the notification observer un-subscribes from the notification system.
+  override func viewWillDisappear(animated: Bool) {
+    super.viewWillDisappear(animated)
+    if let notificationObserverToken = notificationObserverToken {
+      logger.debug("Division chat overview controller un-subscribed from notification system")
+      MVNotification.unSubscribeFromNotification(notificationObserverToken)
+    }
   }
   
   // MARK: Navigation
@@ -187,7 +212,6 @@ extension DivisionChatOverviewViewController: UICollectionViewDelegate {
   override func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
     if let selectedCell = collectionView.cellForItemAtIndexPath(indexPath) as? DivisionChatCell {
       performSegueWithIdentifier(DivisionChatOverviewConstants.SegueToChat, sender: selectedCell)
-      selectedCell.notificationCount = 0
     } else {
       logger.error("Unable to perform segue to chat because the tapped cell was not found")
     }
