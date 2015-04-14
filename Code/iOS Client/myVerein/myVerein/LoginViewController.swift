@@ -60,7 +60,15 @@ class LoginViewController: UIViewController {
     return NSLayoutConstraint(item: self.loginBox, attribute: .CenterY, relatedBy: .Equal, toItem: self.view, attribute: .Top, multiplier: 1, constant: 0)
   }()
   
-  // MARK: - Password management extension
+  // Variables used to store the notification observer, to be able to remove them as soon as they are no longer needed
+  private var keyboardWillShowObserver: NSObjectProtocol?
+  private var keyboardDidShowObserver: NSObjectProtocol?
+  private var keyboardWillHideObserver: NSObjectProtocol?
+  private var keyboardDidHideObserver: NSObjectProtocol?
+}
+
+// MARK: - Password management extension
+extension LoginViewController {
   @IBAction func openPasswordManager(sender: UIButton) {
     logger.verbose("Opening password manager extension")
     if OnePasswordExtension.sharedExtension().isAppExtensionAvailable() {
@@ -101,9 +109,10 @@ class LoginViewController: UIViewController {
       logger.info("Unable to find any password manager")
     }
   }
-  
-  // MARK: - Log in
-  
+}
+
+// MARK: - Log in functions
+extension LoginViewController {
   /// This function stores the current text fields within the keychain and then validates them using the validate login method
   @IBAction func loginAction() {
     logger.verbose("Trying to log in user")
@@ -168,31 +177,10 @@ class LoginViewController: UIViewController {
       hostTextField.text = nil
     }
   }
-  
-  private func animateInvalidLogin() {
-    logger.verbose("Animating invalid login")
-    usernameTextField.enabled = true
-    passwordTextField.enabled = true
-    hostTextField.enabled = true
-    loginButton.enabled = true
-    
-    // Create animation in case of log-in failure
-    let shake = POPSpringAnimation(propertyNamed: kPOPLayerPositionX)
-    shake.springBounciness = 20
-    shake.velocity = 3000
-    
-    
-    if(usernameTextField.isFirstResponder() || passwordTextField.isFirstResponder() || hostTextField.isFirstResponder()) {
-      logger.debug("Shaking text field")
-      loginBox.pop_addAnimation(shake, forKey: LoginViewControllerConstants.WrongPasswordAnimationKey)
-    } else {
-      usernameTextField.becomeFirstResponder()
-    }
-    activityIndicator.stopAnimating()
-  }
-  
-  // MARK: - Text field animation and keyboard management
-  
+}
+
+// MARK: - Keyboard management/tab recognition
+extension LoginViewController {
   @IBAction func recogniseTap(sender: UITapGestureRecognizer) {
     dismissKeyboard()
   }
@@ -208,9 +196,12 @@ class LoginViewController: UIViewController {
       hostTextField.resignFirstResponder()
     }
   }
-  
+}
+
+// MARK: - Login box animation functions
+extension LoginViewController {
   /// This function is invoked when the notification center fires the keyboard did show notification
-  func moveLoginBoxUp(notification: NSNotification) {
+  func moveLoginBoxUp(notification: NSNotification!) {
     var computedLoginPosition: CGFloat
     if let keyboardSize = notification.userInfo?[UIKeyboardFrameEndUserInfoKey]?.CGRectValue().size.height where (view.frame.size.height - keyboardSize) >= loginBox.frame.size.height {
       computedLoginPosition = (view.frame.size.height - keyboardSize)/2
@@ -222,7 +213,7 @@ class LoginViewController: UIViewController {
   }
   
   /// This function is invoked when the notification center fires the keyboard did hide notification
-  func moveLoginBoxDown() {
+  func moveLoginBoxDown(notification: NSNotification!) {
     logger.debug("Moving login box down")
     moveLoginBox(nil)
   }
@@ -248,18 +239,65 @@ class LoginViewController: UIViewController {
     loginBox.pop_addAnimation(moveAnimation, forKey: LoginViewControllerConstants.LoginBoxAnimationKey)
   }
   
-  // MARK: - ViewController Lifecycle
-  
-  /// The function registers gesture recognizer dismissing the keyboard
+  private func animateInvalidLogin() {
+    logger.verbose("Animating invalid login")
+    usernameTextField.enabled = true
+    passwordTextField.enabled = true
+    hostTextField.enabled = true
+    loginButton.enabled = true
+    
+    // Create animation in case of log-in failure
+    let shake = POPSpringAnimation(propertyNamed: kPOPLayerPositionX)
+    shake.springBounciness = 20
+    shake.velocity = 3000
+    
+    
+    if(usernameTextField.isFirstResponder() || passwordTextField.isFirstResponder() || hostTextField.isFirstResponder()) {
+      logger.debug("Shaking text field")
+      loginBox.pop_addAnimation(shake, forKey: LoginViewControllerConstants.WrongPasswordAnimationKey)
+    } else {
+      usernameTextField.becomeFirstResponder()
+    }
+    activityIndicator.stopAnimating()
+  }
+}
+
+// MARK: - ViewController lifecycle methods
+extension LoginViewController {
   override func viewDidLoad() {
-    logger.verbose("Login view did load")
     super.viewDidLoad()
-    NSNotificationCenter.defaultCenter().addObserver(self, selector: "moveLoginBoxUp:", name: UIKeyboardWillShowNotification, object: nil)
-    NSNotificationCenter.defaultCenter().addObserver(self, selector: "moveLoginBoxUp:", name: UIKeyboardDidShowNotification, object: nil)
-    NSNotificationCenter.defaultCenter().addObserver(self, selector: "moveLoginBoxDown", name: UIKeyboardDidHideNotification, object: nil)
-    NSNotificationCenter.defaultCenter().addObserver(self, selector: "moveLoginBoxDown", name: UIKeyboardWillHideNotification, object: nil)
+    logger.verbose("Login view did load")
     initialLoginPosition = loginBox.center
     validateCurrentLogin()
+  }
+  
+  override func viewDidAppear(animated: Bool) {
+    super.viewDidAppear(animated)
+    logger.debug("Registering observer for keyboard notification")
+    let notificationCenter = NSNotificationCenter.defaultCenter()
+    let mainQueue = NSOperationQueue.mainQueue()
+    keyboardWillShowObserver = notificationCenter.addObserverForName(UIKeyboardWillShowNotification, object: nil, queue: mainQueue, usingBlock: moveLoginBoxUp)
+    keyboardDidShowObserver = notificationCenter.addObserverForName(UIKeyboardDidShowNotification, object: nil, queue: mainQueue, usingBlock: moveLoginBoxUp)
+    keyboardWillHideObserver = notificationCenter.addObserverForName(UIKeyboardWillHideNotification, object: nil, queue: mainQueue, usingBlock: moveLoginBoxDown)
+    keyboardDidHideObserver = notificationCenter.addObserverForName(UIKeyboardDidHideNotification, object: nil, queue: mainQueue, usingBlock: moveLoginBoxDown)
+  }
+  
+  override func viewWillDisappear(animated: Bool) {
+    super.viewWillDisappear(animated)
+    logger.debug("Un-registering observer for keyboard notification to free up resources and prevent memory leaks")
+    let notificationCenter = NSNotificationCenter.defaultCenter()
+    if let keyboardWillShowObserver = keyboardWillShowObserver {
+      notificationCenter.removeObserver(keyboardWillShowObserver)
+    }
+    if let keyboardDidShowObserver = keyboardDidShowObserver {
+      notificationCenter.removeObserver(keyboardDidShowObserver)
+    }
+    if let keyboardWillHideObserver = keyboardWillHideObserver {
+      notificationCenter.removeObserver(keyboardWillHideObserver)
+    }
+    if let keyboardDidHideObserver = keyboardDidHideObserver {
+      notificationCenter.removeObserver(keyboardDidHideObserver)
+    }
   }
 }
 

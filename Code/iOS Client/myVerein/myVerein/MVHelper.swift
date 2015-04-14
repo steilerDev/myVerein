@@ -16,7 +16,7 @@
 //
 
 //
-//  SupportingClasses.swift
+//  MVHelper.swift
 //  This file holds independent reusable classes written by myself, including an improved multi-tasking operator and an extension for bound-save array access.
 //
 
@@ -112,7 +112,7 @@ extension Array {
   }
 }
 
-// MARK: = NSError extension
+// MARK: - NSError extension
 /// An NSError extension providing a unified and concise string representation of the error
 extension NSError {
   /// This variable provides an extended string representation of the ocurred error.
@@ -212,5 +212,20 @@ extension UIImageView {
   /// :param: division The division, which should be represented within the UIImageView.
   func setImageWithDivision(division: Division?) {
     self.setImageWithString(division?.name ?? "N/A", color: UIColor(hex: MVColor.Primary.Normal))
+  }
+}
+
+// MARK: - UIViewController extension
+/// This UIViewController extension provides a way to retrieve the currently shown viewcontroller inside a navigation view controller, or the viewcontroller itself, if the view controller is not a navigation view controller
+extension UIViewController {
+  /// This function returns the content view controller of the specified view controller. This means that a view controller, which is embedded in an navigation controller would be returned instead of the root navigation view controller. The same holds for a tab bar controller.
+  var contentViewController: UIViewController {
+    if let parentNavigationViewController = self as? UINavigationController {
+      return parentNavigationViewController.visibleViewController
+    } else if let parentTabBarViewController = self as? UITabBarController {
+      return parentTabBarViewController.selectedViewController!
+    } else {
+      return self
+    }
   }
 }

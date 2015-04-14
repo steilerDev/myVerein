@@ -28,7 +28,8 @@
 		3068A4A41ACBEDBA00A3F53D /* MVUserDefaultsConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3068A4A31ACBEDBA00A3F53D /* MVUserDefaultsConstants.swift */; };
 		306FD7321AAA356000719B82 /* MVNetworkingHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 306FD7311AAA356000719B82 /* MVNetworkingHelper.swift */; };
 		306FD7341AAB0F4400719B82 /* MVError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 306FD7331AAB0F4400719B82 /* MVError.swift */; };
-		3079B1DA1AAF242600ACD793 /* SupportingClasses.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3079B1D91AAF242600ACD793 /* SupportingClasses.swift */; };
+		3079B1DA1AAF242600ACD793 /* MVHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3079B1D91AAF242600ACD793 /* MVHelper.swift */; };
+		308270D61ADD81DA00ED5782 /* MVNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 308270D51ADD81DA00ED5782 /* MVNotification.swift */; };
 		30916FFB1AA8B9D0004D30D1 /* MenuController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30916FFA1AA8B9D0004D30D1 /* MenuController.swift */; };
 		3091702F1AA8C097004D30D1 /* myVereinModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 3091702D1AA8C097004D30D1 /* myVereinModel.xcdatamodeld */; };
 		309170341AA8D2B4004D30D1 /* MessageRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 309170331AA8D2B4004D30D1 /* MessageRepository.swift */; };
@@ -96,7 +97,8 @@
 		3068A4A31ACBEDBA00A3F53D /* MVUserDefaultsConstants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MVUserDefaultsConstants.swift; sourceTree = "<group>"; };
 		306FD7311AAA356000719B82 /* MVNetworkingHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MVNetworkingHelper.swift; sourceTree = "<group>"; };
 		306FD7331AAB0F4400719B82 /* MVError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MVError.swift; sourceTree = "<group>"; };
-		3079B1D91AAF242600ACD793 /* SupportingClasses.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SupportingClasses.swift; sourceTree = "<group>"; };
+		3079B1D91AAF242600ACD793 /* MVHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MVHelper.swift; sourceTree = "<group>"; };
+		308270D51ADD81DA00ED5782 /* MVNotification.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MVNotification.swift; sourceTree = "<group>"; };
 		30916FFA1AA8B9D0004D30D1 /* MenuController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MenuController.swift; sourceTree = "<group>"; };
 		3091702E1AA8C097004D30D1 /* myVereinModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = myVereinModel.xcdatamodel; sourceTree = "<group>"; };
 		309170331AA8D2B4004D30D1 /* MessageRepository.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MessageRepository.swift; sourceTree = "<group>"; };
@@ -169,7 +171,7 @@
 		3012715C1AA5C86400C23AEF /* ViewController */ = {
 			isa = PBXGroup;
 			children = (
-				30F254E91AC7271F00E10CB9 /* Calendar */,
+				30F254E91AC7271F00E10CB9 /* Events */,
 				30F254E41AC7222D00E10CB9 /* Settings */,
 				30916FF91AA79F1E004D30D1 /* Chat */,
 				30916FF81AA79F0A004D30D1 /* Login */,
@@ -205,8 +207,7 @@
 				309170321AA8C7E4004D30D1 /* Model */,
 				3012715B1AA5C85500C23AEF /* Networking */,
 				30FB44BF1AACD212003E4512 /* View */,
-				30FB44BE1AACD203003E4512 /* Error */,
-				304C57801AACA3D200B221D7 /* Security */,
+				308270D41ADD812900ED5782 /* Supporting Classes */,
 				3020CBA21A9E1289005AAEEF /* Supporting Files */,
 			);
 			path = myVerein;
@@ -220,9 +221,6 @@
 				3020CBAB1A9E1289005AAEEF /* Images.xcassets */,
 				3091702D1AA8C097004D30D1 /* myVereinModel.xcdatamodeld */,
 				3020CBA31A9E1289005AAEEF /* Info.plist */,
-				3079B1D91AAF242600ACD793 /* SupportingClasses.swift */,
-				3035D66B1AC086E800C5C0FB /* MVColor.swift */,
-				3068A4A31ACBEDBA00A3F53D /* MVUserDefaultsConstants.swift */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -244,12 +242,35 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		304C57801AACA3D200B221D7 /* Security */ = {
+		308270D41ADD812900ED5782 /* Supporting Classes */ = {
 			isa = PBXGroup;
 			children = (
+				306FD7331AAB0F4400719B82 /* MVError.swift */,
+				3035D66B1AC086E800C5C0FB /* MVColor.swift */,
 				304C577E1AACA3CC00B221D7 /* MVSecurity.swift */,
+				3079B1D91AAF242600ACD793 /* MVHelper.swift */,
+				3068A4A31ACBEDBA00A3F53D /* MVUserDefaultsConstants.swift */,
+				308270D51ADD81DA00ED5782 /* MVNotification.swift */,
 			);
-			name = Security;
+			name = "Supporting Classes";
+			sourceTree = "<group>";
+		};
+		308270D71ADD81F400ED5782 /* DivisionChatOverviewView */ = {
+			isa = PBXGroup;
+			children = (
+				302BE8C31AA64599001D0FE7 /* DivisionChatOverviewViewController.swift */,
+				302BE8C11AA642EB001D0FE7 /* DivisionChatCell.swift */,
+			);
+			name = DivisionChatOverviewView;
+			sourceTree = "<group>";
+		};
+		308270D81ADD821300ED5782 /* InvitationView */ = {
+			isa = PBXGroup;
+			children = (
+				3016A03E1ADACFE800778769 /* InvitationViewController.swift */,
+				3016A0401ADAE17000778769 /* InvitationCell.swift */,
+			);
+			name = InvitationView;
 			sourceTree = "<group>";
 		};
 		30916FF81AA79F0A004D30D1 /* Login */ = {
@@ -263,8 +284,7 @@
 		30916FF91AA79F1E004D30D1 /* Chat */ = {
 			isa = PBXGroup;
 			children = (
-				302BE8C31AA64599001D0FE7 /* DivisionChatOverviewViewController.swift */,
-				302BE8C11AA642EB001D0FE7 /* DivisionChatCell.swift */,
+				308270D71ADD81F400ED5782 /* DivisionChatOverviewView */,
 				309A8A7B1AB374040087CBC5 /* ChatViewController.swift */,
 			);
 			name = Chat;
@@ -294,24 +314,15 @@
 			name = Settings;
 			sourceTree = "<group>";
 		};
-		30F254E91AC7271F00E10CB9 /* Calendar */ = {
+		30F254E91AC7271F00E10CB9 /* Events */ = {
 			isa = PBXGroup;
 			children = (
+				308270D81ADD821300ED5782 /* InvitationView */,
 				30F254E71AC7271A00E10CB9 /* CalendarViewController.swift */,
 				3032A9F41AD70B9100EEEAF4 /* EventViewController.swift */,
 				30159BF81AD980010018419D /* ParticipantViewController.swift */,
-				3016A03E1ADACFE800778769 /* InvitationViewController.swift */,
-				3016A0401ADAE17000778769 /* InvitationCell.swift */,
 			);
-			name = Calendar;
-			sourceTree = "<group>";
-		};
-		30FB44BE1AACD203003E4512 /* Error */ = {
-			isa = PBXGroup;
-			children = (
-				306FD7331AAB0F4400719B82 /* MVError.swift */,
-			);
-			name = Error;
+			name = Events;
 			sourceTree = "<group>";
 		};
 		30FB44BF1AACD212003E4512 /* View */ = {
@@ -499,9 +510,10 @@
 				302BE8C21AA642EB001D0FE7 /* DivisionChatCell.swift in Sources */,
 				30F254E61AC7224E00E10CB9 /* SettingsViewController.swift in Sources */,
 				3016A03F1ADACFE800778769 /* InvitationViewController.swift in Sources */,
-				3079B1DA1AAF242600ACD793 /* SupportingClasses.swift in Sources */,
+				3079B1DA1AAF242600ACD793 /* MVHelper.swift in Sources */,
 				3012715A1AA5C83C00C23AEF /* MVNetworkingSessionFactory.swift in Sources */,
 				306FD7321AAA356000719B82 /* MVNetworkingHelper.swift in Sources */,
+				308270D61ADD81DA00ED5782 /* MVNotification.swift in Sources */,
 				303EB9551AD03BF500B14B2F /* EventRepository.swift in Sources */,
 				30FB44C31AACD897003E4512 /* User.swift in Sources */,
 				306FD7341AAB0F4400719B82 /* MVError.swift in Sources */,
