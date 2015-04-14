@@ -62,7 +62,7 @@ class MVSecurity {
       logger.debug("Successfully initialized security instance")
     } else {
       let error = MVError.createError(.MVKeychainEmptyError)
-      logger.warning("Unable to initialize security instance: \(error.localizedDescription)")
+      logger.warning("Unable to initialize security instance: \(error.extendedDescription)")
     }
   }
   

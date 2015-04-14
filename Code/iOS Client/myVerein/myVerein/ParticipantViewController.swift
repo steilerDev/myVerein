@@ -121,7 +121,7 @@ extension ParticipantViewController {
     if fetchedResultController.performFetch(&error) {
       logger.info("Successfully performed fetch request for new participant predicate")
     } else {
-      logger.error("Unable to performed fetch request for new participant predicate: \(error?.description)")
+      logger.error("Unable to performed fetch request for new participant predicate: \(error?.extendedDescription)")
     }
     tableView.dataSource = self
     tableView.reloadData()
@@ -165,7 +165,7 @@ extension ParticipantViewController {
         if let responseObject = responseObject as? [String] {
           let (user, error) = userRepository.getOrCreateUsersFrom(serverResponseObject: responseObject)
           if error != nil && user == nil {
-            logger.error("Unable to get participants, because response object could not be read: \(error?.description)")
+            logger.error("Unable to get participants, because response object could not be read: \(error!.extendedDescription)")
           } else {
             logger.info("Successfully parsed participants with \(response) response for \(self.event)")
             switch response! {
@@ -189,7 +189,7 @@ extension ParticipantViewController {
       },
       failure: {
         error in
-        XCGLogger.error("Unable to get participants with \(response) response for \(self.event): \(error?.description)")
+        XCGLogger.error("Unable to get participants with \(response) response for \(self.event): \(error.extendedDescription)")
         self.refreshControlElement.endRefreshing()
       }
     )

@@ -60,7 +60,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   }
   
   func application(application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: NSError) {
-    logger.error("Application failed to register for remote notification: \(error.description)")
+    logger.error("Application failed to register for remote notification: \(error.extendedDescription)")
   }
   
   func applicationWillResignActive(application: UIApplication) {
@@ -111,13 +111,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     // Create the coordinator and store
     var coordinator: NSPersistentStoreCoordinator? = NSPersistentStoreCoordinator(managedObjectModel: managedObjectModel)
     let url = applicationDocumentsDirectory.URLByAppendingPathComponent("myVereinModel.sqlite")
-    var error: NSError? = nil
+    var error: NSError?
     let mOptions = [NSMigratePersistentStoresAutomaticallyOption: true,
       NSInferMappingModelAutomaticallyOption: true]
     if coordinator!.addPersistentStoreWithType(NSSQLiteStoreType, configuration: nil, URL: url, options: mOptions, error: &error) == nil {
       // Report any error we got.
       error = MVError.createError(.MVLocalDatabaseLoadingError, failureReason: nil, underlyingError: error)
-      XCGLogger.severe("Unresolved error during application initialization: \(error), \(error!.userInfo)")
+      XCGLogger.severe("Unresolved error during application initialization: \(error!.extendedDescription)")
       XCGLogger.debugExec { abort() } // abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
       return nil
     } else {
@@ -146,13 +146,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         for store in stores {
           var error: NSError?
           if !persistentStoreCoordinator.removePersistentStore(store, error: &error) {
-            logger.error("Unable to remove persistent store \(error?.localizedDescription)")
+            logger.error("Unable to remove persistent store \(error?.extendedDescription)")
           } else {
             logger.debug("Successfully removed persistent store \(store)")
           }
           if let storeURL = store.URL?.path {
             if !NSFileManager.defaultManager().removeItemAtPath(storeURL, error: &error) {
-              logger.error("Unable to remove item at path \(storeURL): \(error?.localizedDescription)")
+              logger.error("Unable to remove item at path \(storeURL): \(error?.extendedDescription)")
             } else {
               logger.debug("Successfully removed item at path \(storeURL)")
             }
@@ -176,9 +176,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   
   func saveContext () {
     if let moc = self.managedObjectContext {
-      var error: NSError? = nil
+      var error: NSError?
       if moc.hasChanges && !moc.save(&error) {
-        logger.severe("Unresolved error \(error), \(error!.userInfo)")
+        logger.severe("Unresolved error \(error?.extendedDescription)")
         logger.debugExec { abort() } // abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
       }
     }

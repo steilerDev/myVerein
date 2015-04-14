@@ -80,7 +80,7 @@ class DivisionRepository: MVCoreDataRepository {
         failureReason: "Division could not be created, because the server response object could not be parsed",
         underlyingError: .MVServerResponseParseError
       )
-      logger.error("Unable to retrieve division object: \(error.localizedDescription)")
+      logger.error("Unable to retrieve division object: \(error.extendedDescription)")
       return (nil, error)
     }
   }
@@ -99,7 +99,7 @@ class DivisionRepository: MVCoreDataRepository {
         }
       } else {
         let error = MVError.createError(.MVServerResponseParseError)
-        logger.error("Unable to parse division: \(error.localizedDescription)")
+        logger.error("Unable to parse division: \(error.extendedDescription)")
         return (nil, error)
       }
     }
@@ -115,7 +115,7 @@ class DivisionRepository: MVCoreDataRepository {
     let (division, error) = getOrCreateDivisionFrom(serverResponseObject: serverResponseObject)
     
     if division == nil && error != nil {
-      logger.debug("Unable to get existing dvision object \(error?.localizedDescription)")
+      logger.debug("Unable to get existing dvision object \(error!.extendedDescription)")
       return (nil, error)
     } else {
       logger.debug("Parsing division properties")
@@ -128,10 +128,11 @@ class DivisionRepository: MVCoreDataRepository {
           let (adminUser, error) = userRepository.getOrCreateUserFrom(serverResponseObject: adminUserDict)
           
           if error != nil {
-            logger.warning("Unable to parse admin user for division: \(error?.localizedDescription)")
+            logger.warning("Unable to parse admin user for division: \(error!.extendedDescription)")
             return (nil, error)
+          } else {
+            division.admin = adminUser
           }
-          division.admin = adminUser
         } else {
           logger.debug("No admin user for division")
         }
@@ -144,7 +145,7 @@ class DivisionRepository: MVCoreDataRepository {
         return (division, nil)
       } else {
         let error = MVError.createError(.MVServerResponseParseError)
-        logger.error("Unable to parse user: \(error.localizedDescription)")
+        logger.error("Unable to parse user: \(error.extendedDescription)")
         return (nil, error)
       }
     }

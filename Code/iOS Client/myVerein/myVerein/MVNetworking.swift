@@ -72,8 +72,7 @@ class MVNetworking {
         failure:
         {
           _, error in
-          XCGLogger.warning("Failed executing request (URI: \(URI), parameters \(parameters), request method \(requestMethod), retry count \(retryCount)): \(error.localizedDescription)")
-          XCGLogger.debug("Detailed error:\n\t Domain: \(error.domain) \n\t Code: \(error.code) \n\t Description: \(error.description)")
+          XCGLogger.warning("Failed executing request (URI: \(URI), parameters \(parameters), request method \(requestMethod), retry count \(retryCount)): \(error.extendedDescription)")
           // Handling a request error using the request failure handler. If the error was because of a 401 error, the handler is trying to log the user in before retrying
           MVNetworking.handleRequestFailure(
             error: error,
@@ -88,14 +87,14 @@ class MVNetworking {
       )
     } else {
       let error = MVError.createError(.MVSessionLoadingError)
-      logger.warning("Unable to execute request: \(error.localizedDescription)")
+      logger.warning("Unable to execute request: \(error.extendedDescription)")
       failure(error)
     }
   }
   
   /// This function is used to handle a failure during a request. If the failure is due to the fact that the user was not logged in the function is going to try to log the user in. In case of a successfully log in, the initial function is executed again. The retry count is tracking how often the request tried to re-log in, to prevent an infinite loop, in case of a forbidden resource.
   private class func handleRequestFailure(#error: NSError, URI: String, parameters: [String: String]?, requestMethod: HTTPMethods, retryCount: Int, initialSuccess: (AnyObject) -> (), initialFailure: (NSError) -> ()) {
-    logger.verbose("Handling request failure (URI: \(URI), parameters \(parameters), request method \(requestMethod), retry count \(retryCount)): \(error.localizedDescription)")
+    logger.verbose("Handling request failure (URI: \(URI), parameters \(parameters), request method \(requestMethod), retry count \(retryCount)): \(error.extendedDescription)")
     
     
     if retryCount < NetworkingConstants.MaxLoginRetries {
@@ -106,7 +105,7 @@ class MVNetworking {
         error.domain == AFURLResponseSerializationErrorDomain &&
         (error.userInfo?[AFNetworkingOperationFailingURLResponseErrorKey] as? NSHTTPURLResponse)?.statusCode == 401
       {
-        logger.info("Error occured because user was not logged in: \(error.localizedDescription)")
+        logger.info("Error occured because user was not logged in: \(error.extendedDescription)")
         // Since the error occured because the user was not logged in, the log in function is called with the original function with all callbacks as success handler object. Concluding if the log in is successfull the original function is called again and should succeed, otherwise the initial failure handler is executed.
         loginAction(
           success: {
@@ -122,11 +121,11 @@ class MVNetworking {
           failure: initialFailure
         )
       } else if error.code == -1004 && error.domain == "NSURLErrorDomain" {
-        logger.warning("Unable to reach server, maybe he is offline. No need to retry at the moment")
+        logger.warning("Unable to reach server, maybe he is offline. No need to retry at the moment: \(error.extendedDescription)")
         /// TODO: Show some kind of warning, that the server is not available
         initialFailure(error)
       } else {
-        logger.warning("Handling error of unknown kind: \(error.localizedDescription). Retrying.")
+        logger.warning("Handling error of unknown kind, retrying: \(error.extendedDescription)")
         MVNetworking.handleRequest(
           URI: URI,
           parameters: parameters,
@@ -142,11 +141,11 @@ class MVNetworking {
       error.domain == AFURLResponseSerializationErrorDomain &&
       (error.userInfo?[AFNetworkingOperationFailingURLResponseErrorKey] as? NSHTTPURLResponse)?.statusCode == 401
     {
-      logger.error("Reached maximum amount of log in retries \(NetworkingConstants.MaxLoginRetries) and they occured because user credentials cannot be validated. Requesting re-login")
+      logger.error("Reached maximum amount of log in retries \(NetworkingConstants.MaxLoginRetries) and they occured because user credentials cannot be validated. Requesting re-login: \(error.extendedDescription)")
       (UIApplication.sharedApplication().delegate as! AppDelegate).showLoginView()
       initialFailure(MVError.createError(.MVMaximumLoginRetriesReached))
     } else {
-      logger.severe("Reached maximum amount of retries \(NetworkingConstants.MaxLoginRetries)")
+      logger.severe("Reached maximum amount of retries \(NetworkingConstants.MaxLoginRetries): \(error.extendedDescription)")
       initialFailure(MVError.createError(.MVMaximumLoginRetriesReached))
     }
   }
@@ -172,7 +171,7 @@ extension MVNetworking {
       loginAction(username, password: password, success: success, failure: failure)
     } else {
       let error = MVError.createError(.MVSessionLoadingError)
-      logger.warning("Unable to log in: \(error.localizedDescription)")
+      logger.warning("Unable to log in: \(error.extendedDescription)")
       failure(error)
     }
   }
@@ -233,7 +232,7 @@ extension MVNetworking {
         failure:
         {
           _, error in
-          XCGLogger.warning("Unable to log in: \(error.localizedDescription)")
+          XCGLogger.warning("Unable to log in: \(error.extendedDescription)")
           
           // Invaliating the session in case the user changes the domain
           MVNetworkingSessionFactory.invalidateInstance()
@@ -244,7 +243,7 @@ extension MVNetworking {
       )
     } else {
       let error = MVError.createError(MVErrorCodes.MVSessionLoadingError)
-      logger.warning("Unable to log in: \(error.localizedDescription)")
+      logger.warning("Unable to log in: \(error.extendedDescription)")
       failure(error)
     }
   }
@@ -254,7 +253,7 @@ extension MVNetworking {
 /// This extension is centralizing all message related networking actions.
 extension MVNetworking {
   /// This function is gathering all unread messages. The callbacks are not guaranteed to be executed on the main queue.
-  class func messageSyncAction(#success: (AnyObject) -> (), failure: (NSError?) -> ()) {
+  class func messageSyncAction(#success: (AnyObject) -> (), failure: (NSError) -> ()) {
     logger.verbose("Started message sync action")
     handleRequest(
       URI: NetworkingConstants.Message.Sync.URI,
@@ -267,7 +266,7 @@ extension MVNetworking {
   }
   
   /// This function is gathering all unread messages. The callbacks are not guaranteed to be executed on the main queue.
-  class func allMessageSyncAction(#success: (AnyObject) -> (), failure: (NSError?) -> ()) {
+  class func allMessageSyncAction(#success: (AnyObject) -> (), failure: (NSError) -> ()) {
     logger.verbose("Started all messages sync action")
     handleRequest(
       URI: NetworkingConstants.Message.Sync.URI,
@@ -280,7 +279,7 @@ extension MVNetworking {
   }
   
   /// This function is sending a specific message to the server. The callbacks are not guaranteed to be executed on the main queue.
-  class func sendMessageAction(#success: (AnyObject) -> (), failure: (NSError?) -> (), message: Message) {
+  class func sendMessageAction(#success: (AnyObject) -> (), failure: (NSError) -> (), message: Message) {
     logger.verbose("Started sending message action")
     handleRequest(
       URI: NetworkingConstants.Message.Send.URI,
@@ -300,7 +299,7 @@ extension MVNetworking {
 /// This extension is centralizing all user related networking actions.
 extension MVNetworking {
   /// This function is gathering all information available about a user. The callbacks are not guaranteed to be executed on the main queue.
-  class func userSyncAction(#userId: String, success: (AnyObject) -> (), failure: (NSError?) -> ()) {
+  class func userSyncAction(#userId: String, success: (AnyObject) -> (), failure: (NSError) -> ()) {
     logger.verbose("Syncing user with id \(userId)")
     
     handleRequest(
@@ -318,7 +317,7 @@ extension MVNetworking {
 /// This extension is centralizing all division related networking actions.
 extension MVNetworking {
   /// This function is gathering all information available about a division. The callbacks are not guaranteed to be executed on the main queue.
-  class func divisionSyncAction(#divisionId: String, success: (AnyObject) -> (), failure: (NSError?) -> ()) {
+  class func divisionSyncAction(#divisionId: String, success: (AnyObject) -> (), failure: (NSError) -> ()) {
     logger.verbose("Syncing division with id \(divisionId)")
     handleRequest(
       URI: NetworkingConstants.Division.Get.URI,
@@ -331,7 +330,7 @@ extension MVNetworking {
   }
   
   /// This function is gathering all dvisiions the user is subscribed to. The callbacks are not guaranteed to be executed on the main queue.
-  class func userDivisionSyncAction(#success: (AnyObject) -> (), failure: (NSError?) -> ()) {
+  class func userDivisionSyncAction(#success: (AnyObject) -> (), failure: (NSError) -> ()) {
     logger.verbose("Starting to sync list of divisions the user is part of")
     handleRequest(
       URI: NetworkingConstants.Division.Sync.URI,
@@ -347,7 +346,7 @@ extension MVNetworking {
 // MARK: - Event
 extension MVNetworking {
   /// This function is syncing all events changed since the last sync and updates the last synced information in the user defaults. If the last sync is not The callbacks are not guaranteed to be executed on the main queue.
-  class func eventSyncAction(#success: (AnyObject) -> (), failure: (NSError?) -> ()) {
+  class func eventSyncAction(#success: (AnyObject) -> (), failure: (NSError) -> ()) {
     logger.verbose("Starting to sync events")
     var parameters: [String: String]?
     if let lastSynced = Defaults[MVUserDefaultsConstants.LastSynced.Event].date {
@@ -356,7 +355,7 @@ extension MVNetworking {
       // Checking if the last sync is not older than the defined MinimalSecondsBetweenEventSync and aborting the sync if so
       if NSDate().compare(lastSynced.dateByAddingTimeInterval(EventConstants.MinimalSecondsBetweenEventSync)) == .OrderedAscending {
         let error = MVError.createError(.MVLastSyncTooCloseError)
-        logger.warning("Last sync is not \(EventConstants.MinimalSecondsBetweenEventSync) seconds up. Not syncing: \(error.localizedDescription)")
+        logger.warning("Last sync is not \(EventConstants.MinimalSecondsBetweenEventSync) seconds up. Not syncing: \(error.extendedDescription)")
         failure(error)
         return
       } else {
@@ -379,7 +378,7 @@ extension MVNetworking {
   }
   
   /// This function is gathering all information about the specified event. The callbacks are not guaranteed to be executed on the main queue.
-  class func eventSyncAction(#eventID: String, success: (AnyObject) -> (), failure: (NSError?) -> ()) {
+  class func eventSyncAction(#eventID: String, success: (AnyObject) -> (), failure: (NSError) -> ()) {
     logger.verbose("Syncing event \(eventID)")
     
     handleRequest(
@@ -393,7 +392,7 @@ extension MVNetworking {
   }
   
   /// This function is sending a response of the user about a specific event to the server. The callbacks are not guaranteed to be executed on the main queue.
-  class func eventSendResponseAction(#eventID: String, response: EventResponse, success: (AnyObject) -> (), failure: (NSError?) -> ()) {
+  class func eventSendResponseAction(#eventID: String, response: EventResponse, success: (AnyObject) -> (), failure: (NSError) -> ()) {
     logger.verbose("Starting to send response \(response) for event \(eventID)")
     let parameter = [
       NetworkingConstants.Event.Response.Send.Paramter.EventID: eventID,
@@ -411,7 +410,7 @@ extension MVNetworking {
   }
   
   /// This function is getting all responses of users from a specific event from the server. The callbacks are not guaranteed to be executed on the main queue.
-  class func eventGetResponseAction(#eventID: String, response: EventResponse, success: (AnyObject) -> (), failure: (NSError?) -> ()) {
+  class func eventGetResponseAction(#eventID: String, response: EventResponse, success: (AnyObject) -> (), failure: (NSError) -> ()) {
     logger.verbose("Starting to send response \(response) for event \(eventID)")
     let parameter = [
       NetworkingConstants.Event.Response.Get.Paramter.EventID: eventID,
@@ -431,7 +430,7 @@ extension MVNetworking {
 
 // MARK: - Remote notifications
 extension MVNetworking {
-  class func updateDeviceTokenAction(encodedDeviceToken: String, success: (AnyObject) -> (), failure: (NSError?) -> ()) {
+  class func updateDeviceTokenAction(encodedDeviceToken: String, success: (AnyObject) -> (), failure: (NSError) -> ()) {
     logger.verbose("Updating device token \(encodedDeviceToken)")
     handleRequest(
       URI: NetworkingConstants.User.Update.DeviceToken.URI,

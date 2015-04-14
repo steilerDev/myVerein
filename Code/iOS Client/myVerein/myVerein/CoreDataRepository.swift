@@ -41,7 +41,7 @@ class MVCoreDataRepository {
       if managedObjectContext.save(&error) {
         logger.info("Successfully saved database")
       } else {
-        logger.error("Unable to save database: \(error?.localizedDescription)")
+        logger.error("Unable to save database: \(error?.extendedDescription)")
       }
     } else {
       logger.info("No need to save the database")
@@ -68,13 +68,13 @@ class MVCoreDataRepository {
             object.sync()
           }
         } else {
-          XCGLogger.error("Unable to check sync status: \(error?.localizedDescription)")
+          XCGLogger.error("Unable to check sync status: \(error?.extendedDescription)")
         }
       }~>
       
       return queriedObject
     } else {
-      logger.error("Unable to execute fetch request: \(error?.localizedDescription)")
+      logger.error("Unable to execute fetch request: \(error?.extendedDescription)")
       return nil
     }
   }

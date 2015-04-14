@@ -85,9 +85,9 @@ class LoginViewController: UIViewController {
             }
           } else {
             if (error.code != Int(AppExtensionErrorCodeCancelledByUser)) {
-              logger.warning("Unable to load credentials from password manager: \(error.localizedDescription)")
+              logger.warning("Unable to load credentials from password manager: \(error.extendedDescription)")
             } else {
-              logger.info("Retrieving credentials from password manager cancelled by user: \(error.localizedDescription)")
+              logger.info("Retrieving credentials from password manager cancelled by user: \(error.extendedDescription)")
             }
           }
       }
@@ -154,13 +154,13 @@ class LoginViewController: UIViewController {
           failure:
           {
             error in
-            XCGLogger.error("Login was unsuccessfully: \(error.localizedDescription)")
+            XCGLogger.error("Login was unsuccessfully: \(error.extendedDescription)")
             self.animateInvalidLogin()
           }
         )
     } else {
       let error = MVError.createError(MVErrorCodes.MVKeychainEmptyError)
-      logger.error("Unable to perform login: \(error.localizedDescription)")
+      logger.error("Unable to perform login: \(error.extendedDescription)")
       animateInvalidLogin()
       
       usernameTextField.text = nil

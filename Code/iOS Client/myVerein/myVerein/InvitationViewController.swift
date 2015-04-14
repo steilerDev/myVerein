@@ -70,11 +70,11 @@ extension InvitationViewController {
     navigationItem.backBarButtonItem = backButton
     
     // Accessing fetched result controller and therfore initiating it if it did not happen yet
-    var error: NSError? = nil
+    var error: NSError?
     if fetchedResultController.performFetch(&error) {
       logger.info("Successfully initiated invitation view data source")
     } else {
-      logger.error("Unable to initiate invitation view data source: \(error?.description)")
+      logger.error("Unable to initiate invitation view data source: \(error?.extendedDescription)")
     }
   }
   

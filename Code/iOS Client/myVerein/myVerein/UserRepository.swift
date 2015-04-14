@@ -66,7 +66,7 @@ class UserRepository: MVCoreDataRepository {
         }
       } else {
         let error = MVError.createError(.MVServerResponseParseError)
-        logger.error("Unable to parse user: \(error.localizedDescription)")
+        logger.error("Unable to parse user: \(error.extendedDescription)")
         return (nil, error)
       }
     }
@@ -84,7 +84,7 @@ class UserRepository: MVCoreDataRepository {
         failureReason: "User could not be created, because the server response object could not be parsed",
         underlyingError: .MVServerResponseParseError
       )
-      logger.warning("Unable to create user from request object \(serverResponseObject): \(error.localizedDescription)")
+      logger.warning("Unable to create user from request object \(serverResponseObject): \(error.extendedDescription)")
       return (nil, error)
     }
   }
@@ -112,7 +112,7 @@ class UserRepository: MVCoreDataRepository {
     let (wrappedUser, error) = getOrCreateUserFrom(serverResponseObject: serverResponseObject)
     
     if wrappedUser == nil && error != nil {
-      logger.debug("Unable to get existing user object \(error?.localizedDescription)")
+      logger.debug("Unable to get existing user object \(error!.extendedDescription)")
       return (nil, error)
     } else {
       logger.debug("Parsing user properties")
@@ -130,7 +130,7 @@ class UserRepository: MVCoreDataRepository {
           let (divisions, error) = divisionRepository.getOrCreateDivisionsFrom(serverResponseObject: divisionArray)
           
           if error != nil && divisions == nil {
-            logger.warning("Unable to parse divisions for user: \(error?.localizedDescription)")
+            logger.warning("Unable to parse divisions for user: \(error!.extendedDescription)")
             return (nil, error)
           } else {
             for division in divisions! {
@@ -165,7 +165,7 @@ class UserRepository: MVCoreDataRepository {
         return (user, nil)
       } else {
         let error = MVError.createError(.MVServerResponseParseError)
-        logger.error("Unable to parse user: \(error.localizedDescription)")
+        logger.error("Unable to parse user: \(error.extendedDescription)")
         return (nil, error)
       }
     }

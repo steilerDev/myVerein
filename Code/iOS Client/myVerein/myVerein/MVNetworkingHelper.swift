@@ -45,19 +45,19 @@ extension MVNetworkingHelper {
           let messageRepository = MessageRepository()
           let (messages, error) = messageRepository.getOrCreateMessagesFrom(serverResponseObject: responseArray)
           if messages == nil && error != nil {
-            logger.warning("Unable to sync messages \(error?.localizedDescription)")
+            logger.warning("Unable to sync messages \(error!.extendedDescription)")
           } else {
             messageRepository.save()
             logger.info("Successfully synced and saved messages")
           }
         } else {
           let error = MVError.createError(.MVMessageCreationError, failureReason: "Unable to parse response array", underlyingError: .MVServerResponseParseError)
-          logger.warning("Unable to sync messages: \(error.localizedDescription)")
+          logger.warning("Unable to sync messages: \(error.extendedDescription)")
         }
       },
       failure: {
         error in
-        XCGLogger.warning("Unable to sync messages: \(error?.localizedDescription)")
+        XCGLogger.warning("Unable to sync messages: \(error.extendedDescription)")
       }
     )
   }
@@ -73,19 +73,19 @@ extension MVNetworkingHelper {
           let messageRepository = MessageRepository()
           let (messages, error) = messageRepository.getOrCreateMessagesFrom(serverResponseObject: responseArray)
           if messages == nil && error != nil {
-            logger.warning("Unable to sync all messages \(error?.localizedDescription)")
+            logger.warning("Unable to sync all messages \(error!.extendedDescription)")
           } else {
             messageRepository.save()
             logger.info("Successfully synced and saved all messages")
           }
         } else {
           let error = MVError.createError(.MVMessageCreationError, failureReason: "Unable to parse response array", underlyingError: .MVServerResponseParseError)
-          logger.warning("Unable to sync all messages: \(error.localizedDescription)")
+          logger.warning("Unable to sync all messages: \(error.extendedDescription)")
         }
       },
       failure: {
         error in
-        XCGLogger.warning("Unable to sync all messages: \(error?.localizedDescription)")
+        XCGLogger.warning("Unable to sync all messages: \(error.extendedDescription)")
       }
     )
   }
@@ -108,7 +108,7 @@ extension MVNetworkingHelper {
       },
       failure: {
         error in
-        XCGLogger.warning("Unable to send message: \(error?.localizedDescription)")
+        XCGLogger.warning("Unable to send message: \(error.extendedDescription)")
         // TODO: Implement some fallback queue that keeps on trying
       },
       message: message
@@ -131,19 +131,19 @@ extension MVNetworkingHelper {
           let userRepository = UserRepository()
           let (user, error) = userRepository.syncUserWith(serverResponseObject: responseDict)
           if user == nil && error != nil {
-            logger.warning("Unable to sync user \(userId): \(error?.localizedDescription)")
+            logger.warning("Unable to sync user \(userId): \(error!.extendedDescription)")
           } else {
             userRepository.save()
             logger.info("Successfully saved user \(userId)")
           }
         } else {
           let error = MVError.createError(.MVUserCreationError, failureReason: "Unable to parse response dictionary", underlyingError: .MVServerResponseParseError)
-          logger.warning("Unable to sync user \(userId): \(error.localizedDescription)")
+          logger.warning("Unable to sync user \(userId): \(error.extendedDescription)")
         }
       },
       failure: {
         error in
-        XCGLogger.warning("Unable to sync user \(userId): \(error?.localizedDescription)")
+        XCGLogger.warning("Unable to sync user \(userId): \(error.extendedDescription)")
       }
     )
   }
@@ -164,19 +164,19 @@ extension MVNetworkingHelper {
           let divisionRepository = DivisionRepository()
           let (division, error) = divisionRepository.syncDivisionWith(serverResponseObject: responseDict)
           if division == nil && error != nil {
-            logger.warning("Unable to sync division \(divisionId): \(error?.localizedDescription)")
+            logger.warning("Unable to sync division \(divisionId): \(error!.extendedDescription)")
           } else {
             divisionRepository.save()
             logger.info("Successfully saved division \(divisionId)")
           }
         } else {
           let error = MVError.createError(.MVDivisionCreationError, failureReason: "Unable to parse response dictionary", underlyingError: .MVServerResponseParseError)
-          logger.warning("Unable to sync division \(divisionId): \(error.localizedDescription)")
+          logger.warning("Unable to sync division \(divisionId): \(error.extendedDescription)")
         }
       },
       failure: {
         error in
-        XCGLogger.warning("Unable to sync division \(divisionId): \(error?.localizedDescription)")
+        XCGLogger.warning("Unable to sync division \(divisionId): \(error.extendedDescription)")
       }
     )
   }
@@ -194,7 +194,7 @@ extension MVNetworkingHelper {
           let oldDivisions = divisionRepository.findDivisionBy(userMembershipStatus: .Member) ?? [Division]()
           
           if error != nil || wrappedDivisions == nil {
-            logger.warning("Unable to sync user's divisions: \(error?.localizedDescription)")
+            logger.warning("Unable to sync user's divisions: \(error!.extendedDescription)")
           } else if let currentDivisions = wrappedDivisions {
             // If a former subscribed division is no longer part of the list it needs to be removed
             let formerMembers = oldDivisions.filter {!contains(currentDivisions, $0)}
@@ -216,12 +216,12 @@ extension MVNetworkingHelper {
           }
         } else {
           let error = MVError.createError(.MVServerResponseParseError)
-          logger.warning("Unable to sync user's divisions: \(error.localizedDescription)")
+          logger.warning("Unable to sync user's divisions: \(error.extendedDescription)")
         }
       },
       failure: {
         error in
-        XCGLogger.warning("Unable to sync user's divisions: \(error?.localizedDescription)")
+        XCGLogger.warning("Unable to sync user's divisions: \(error.extendedDescription)")
       }
     )
   }
@@ -242,14 +242,14 @@ extension MVNetworkingHelper {
           let eventRepository = EventRepository()
           let (events, error) = eventRepository.getOrCreateEventsFrom(serverResponseObject: responseArray)
           if events == nil && error != nil {
-            logger.warning("Unable to sync events \(error?.localizedDescription)")
+            logger.warning("Unable to sync events \(error!.extendedDescription)")
           } else {
             eventRepository.save()
             logger.info("Successfully synced and saved events")
           }
         } else {
           let error = MVError.createError(.MVMessageCreationError, failureReason: "Unable to parse response array", underlyingError: .MVServerResponseParseError)
-          logger.warning("Unable to sync events: \(error.localizedDescription)")
+          logger.warning("Unable to sync events: \(error.extendedDescription)")
         }
         
         if let callback = callback {
@@ -262,7 +262,7 @@ extension MVNetworkingHelper {
       failure: {
         error in
         let logger = XCGLogger.defaultInstance()
-        logger.warning("Unable to sync user's events: \(error?.localizedDescription)")
+        logger.warning("Unable to sync user's events: \(error.extendedDescription)")
         if let callback = callback {
           logger.debug("Callback available, executing on main queue")
           ~>callback
@@ -285,19 +285,19 @@ extension MVNetworkingHelper {
           let eventRepository = EventRepository()
           let (event, error) = eventRepository.syncEventWith(serverResponseObject: responseDict)
           if event == nil && error != nil {
-            logger.warning("Unable to sync event \(eventId): \(error?.localizedDescription)")
+            logger.warning("Unable to sync event \(eventId): \(error!.extendedDescription)")
           } else {
             eventRepository.save()
             logger.info("Successfully saved event \(eventId)")
           }
         } else {
           let error = MVError.createError(.MVEventCreationError, failureReason: "Unable to parse response dictionary", underlyingError: .MVServerResponseParseError)
-          logger.warning("Unable to sync event \(eventId): \(error.localizedDescription)")
+          logger.warning("Unable to sync event \(eventId): \(error.extendedDescription)")
         }
       },
       failure: {
         error in
-        XCGLogger.warning("Unable to event division \(eventId): \(error?.localizedDescription)")
+        XCGLogger.warning("Unable to event division \(eventId): \(error.extendedDescription)")
       }
     )
   }
@@ -315,7 +315,7 @@ extension MVNetworkingHelper {
         },
         failure: {
           error in
-          XCGLogger.error("Unable to send response for event \(event): \(error?.description)")
+          XCGLogger.error("Unable to send response for event \(event): \(error.extendedDescription)")
         }
       )
     } else {
@@ -338,7 +338,7 @@ extension MVNetworkingHelper {
       },
       failure: {
         error in
-        XCGLogger.error("Unable to update device token: \(error?.description)")
+        XCGLogger.error("Unable to update device token: \(error.extendedDescription)")
       }
     )
   }

@@ -91,11 +91,11 @@ extension DivisionChatOverviewViewController {
     MVNetworkingHelper.syncUserDivision()
     
     // Accessing fetched result controller and therfore initiating it if it did not happen yet
-    var error: NSError? = nil
+    var error: NSError?
     if fetchedResultController.performFetch(&error) {
       logger.info("Successfully initiated division chat overview data source")
     } else {
-      logger.error("Unable to initiate division chat overview data source: \(error?.localizedDescription)")
+      logger.error("Unable to initiate division chat overview data source: \(error?.extendedDescription)")
     }
     
     // Add pull to refresh controls and enable scrolling

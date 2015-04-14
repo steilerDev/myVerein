@@ -74,7 +74,7 @@ class MessageRepository: MVCoreDataRepository {
         }
       } else {
         let error = MVError.createError(.MVServerResponseParseError)
-        logger.error("Unable to parse messages: \(error.localizedDescription)")
+        logger.error("Unable to parse messages: \(error.extendedDescription)")
         return (nil, error)
       }
     }
@@ -99,10 +99,10 @@ class MessageRepository: MVCoreDataRepository {
         let (senderOptional, senderError) = userRepository.getOrCreateUserFrom(serverResponseObject: senderDict)
         
         if senderError != nil {
-          logger.error("Unable to create message because an error ocurred while getting sender: \(senderError?.localizedDescription)")
+          logger.error("Unable to create message because an error ocurred while getting sender: \(senderError!.extendedDescription)")
           return (nil, senderError)
         } else if divisionError != nil {
-          logger.error("Unable to create message because an error ocurred while getting receiving division: \(divisionError?.localizedDescription)")
+          logger.error("Unable to create message because an error ocurred while getting receiving division: \(divisionError!.extendedDescription)")
           return (nil, divisionError)
         } else if let division = divisionOptional,
           sender = senderOptional
@@ -111,17 +111,17 @@ class MessageRepository: MVCoreDataRepository {
           return (createMessage(content, id: id, timestamp: timestamp, division: division, sender: sender), nil)
         } else {
           let error = MVError.createError(MVErrorCodes.MVMessageCreationError)
-          logger.error("Unable to create message: \(error.localizedDescription)")
+          logger.error("Unable to create message: \(error.extendedDescription)")
           return (nil , error)
         }
       } else {
         let error = MVError.createError(.MVServerResponseParseError)
-        logger.error("Unable to create message: \(error.localizedDescription)")
+        logger.error("Unable to create message: \(error.extendedDescription)")
         return (nil, error)
       }
     } else {
       let error = MVError.createError(.MVServerResponseParseError)
-      logger.error("Unable to read message id: \(error.localizedDescription)")
+      logger.error("Unable to read message id: \(error.extendedDescription)")
       return (nil, error)
     }
   }

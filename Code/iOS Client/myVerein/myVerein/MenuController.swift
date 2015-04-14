@@ -54,7 +54,7 @@ class MenuController: UITabBarController {
         failure:
         {
           error in
-          XCGLogger.error("Login was unsuccessfully: \(error.localizedDescription)")
+          XCGLogger.error("Login was unsuccessfully: \(error.extendedDescription)")
         }
       )
     }

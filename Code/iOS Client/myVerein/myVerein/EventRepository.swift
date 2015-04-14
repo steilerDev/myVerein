@@ -133,7 +133,7 @@ class EventRepository: MVCoreDataRepository {
         }
       } else {
         let error = MVError.createError(.MVServerResponseParseError)
-        logger.error("Unable to parse event: \(error.localizedDescription)")
+        logger.error("Unable to parse event: \(error.extendedDescription)")
         return (nil, error)
       }
     }
@@ -151,7 +151,7 @@ class EventRepository: MVCoreDataRepository {
         failureReason: "Event could not be created, because the server response object could not be parsed",
         underlyingError: .MVServerResponseParseError
       )
-      logger.warning("Unable to create event from request object \(serverResponseObject): \(error.localizedDescription)")
+      logger.warning("Unable to create event from request object \(serverResponseObject): \(error.extendedDescription)")
       return (nil, error)
     }
   }
@@ -176,7 +176,7 @@ class EventRepository: MVCoreDataRepository {
     let (event, error) = getOrCreateEventFrom(serverResponseObject: serverResponseObject)
     
     if event == nil && error != nil {
-      logger.severe("Unable to get existing event object: \(error?.localizedDescription)")
+      logger.severe("Unable to get existing event object: \(error!.extendedDescription)")
       return (nil, error)
     } else {
       logger.debug("Parsing event properties")
@@ -190,7 +190,7 @@ class EventRepository: MVCoreDataRepository {
           let divisionRepository = DivisionRepository()
           let (invitedDivision, error) = divisionRepository.getOrCreateDivisionsFrom(serverResponseObject: invitedDivisionArray)
           if error != nil && invitedDivision == nil {
-            logger.severe("Unable to gather invited division: \(error?.localizedDescription)")
+            logger.severe("Unable to gather invited division: \(error!.extendedDescription)")
             return (nil, error)
           } else {
             event.invitedDivision.addObjectsFromArray(invitedDivision!)
@@ -218,7 +218,7 @@ class EventRepository: MVCoreDataRepository {
         return (event, nil)
       } else {
         let error = MVError.createError(.MVServerResponseParseError)
-        logger.error("Unable to parse event: \(error.localizedDescription)")
+        logger.error("Unable to parse event: \(error.extendedDescription)")
         return (nil, error)
       }
     }

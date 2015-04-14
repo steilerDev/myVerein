@@ -98,11 +98,11 @@ extension ChatViewController {
       }
       
       // Accessing fetched result controller and therfore initiating it if it did not happen yet
-      var error: NSError? = nil
+      var error: NSError?
       if fetchedResultController.performFetch(&error) {
         logger.info("Successfully initiated chat view data source for division \(division.id)")
       } else {
-        logger.error("Unable to initiate chat view data source for division \(division.id): \(error?.localizedDescription)")
+        logger.error("Unable to initiate chat view data source for division \(division.id): \(error?.extendedDescription)")
       }
       collectionView.collectionViewLayout.outgoingAvatarViewSize = CGSizeZero
     }
