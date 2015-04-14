@@ -28,7 +28,21 @@ class MessageRepository: MVCoreDataRepository {
   
   // MARK: - Functions used to query the database
   
-  // This function gathers all messages send through the division's chat
+  /// This function gathers the message by it's id
+  func findMessageBy(#id: String) -> Message? {
+    logger.verbose("Getting message with id \(id)")
+    // Create a new fetch request using the Message entity
+    let fetchRequest = NSFetchRequest(entityName: MessageConstants.ClassName)
+    fetchRequest.fetchBatchSize = MessageConstants.BatchSize
+    
+    let predicate = NSPredicate(format: "\(MessageConstants.Fields.Id) == %@", id)
+    fetchRequest.predicate = predicate
+    
+    // Execute the fetch request, and cast the results to an array of LogItem objects
+    return executeSingleRequest(fetchRequest)
+  }
+  
+  /// This function gathers all messages send through the division's chat
   func findMessagesBy(#division: Division) -> [Message]? {
     logger.verbose("Getting all messages from database by division \(division.id)")
     // Create a new fetch request using the Message entity
@@ -44,17 +58,50 @@ class MessageRepository: MVCoreDataRepository {
     return executeListRequest(fetchRequest)
   }
   
-  func findMessageBy(#id: String) -> Message? {
-    logger.verbose("Getting message with id \(id)")
+  /// This function gathers all messages, read or unread by the user and send through the division's chat
+  func findMessagesBy(#division: Division, andReadFlag readFlag: Bool) -> [Message]? {
+    logger.verbose("Getting all messages from database by division \(division.id)")
     // Create a new fetch request using the Message entity
     let fetchRequest = NSFetchRequest(entityName: MessageConstants.ClassName)
     fetchRequest.fetchBatchSize = MessageConstants.BatchSize
     
-    let predicate = NSPredicate(format: "\(MessageConstants.Fields.Id) == %@", id)
+    let sortDescriptor = NSSortDescriptor(key: MessageConstants.Fields.Timestamp, ascending: true)
+    fetchRequest.sortDescriptors = [sortDescriptor]
+    
+    let predicate = NSCompoundPredicate(type: .AndPredicateType,
+      subpredicates: [
+        NSPredicate(format: "\(MessageConstants.Fields.Division) == %@", division),
+        NSPredicate(format: "\(MessageConstants.Fields.Read) == %@", readFlag)
+      ]
+    )
     fetchRequest.predicate = predicate
     
     // Execute the fetch request, and cast the results to an array of LogItem objects
-    return executeListRequest(fetchRequest)?.last
+    return executeListRequest(fetchRequest)
+  }
+  
+  /// This function counts the unread messages of the user send through the division's chat
+  func countUnreadMessagesIn(#division: Division) -> Int {
+    return findMessagesBy(division: division, andReadFlag: false)?.count ?? 0
+  }
+  
+  /// This function gathers all messages, read or unread by the user.
+  func findMessagesBy(#readFlag: Bool) -> [Message]? {
+    logger.verbose("Getting message with read flag set to \(readFlag)")
+    // Create a new fetch request using the Message entity
+    let fetchRequest = NSFetchRequest(entityName: MessageConstants.ClassName)
+    fetchRequest.fetchBatchSize = MessageConstants.BatchSize
+    
+    let predicate = NSPredicate(format: "\(MessageConstants.Fields.Read) == %@", readFlag)
+    fetchRequest.predicate = predicate
+    
+    // Execute the fetch request, and cast the results to an array of LogItem objects
+    return executeListRequest(fetchRequest)
+  }
+  
+  /// This function counts the unread messages of the user
+  func countUnreadMessages() -> Int {
+    return findMessagesBy(readFlag: false)?.count ?? 0
   }
   
   // MARK: - Creation and population of message
@@ -135,7 +182,8 @@ class MessageRepository: MVCoreDataRepository {
     newItem.timestamp = timestamp
     newItem.division = division
     newItem.sender = sender
-    newItem.read = false
+    // Setting read flag of a new item only if the message was not send by the user
+    newItem.read = !newItem.isOutgoingMessage
     
     // If this is the first message, or the message is newer use it
     if division.latestMessage == nil || division.latestMessage?.timestamp?.compare(timestamp) == NSComparisonResult.OrderedAscending {

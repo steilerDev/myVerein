@@ -30,6 +30,8 @@ class DivisionChatOverviewViewController: UICollectionViewController {
   
   let logger = XCGLogger.defaultInstance()
   
+  lazy var notificationDelegate: NotificationCountDelegate? = { self.tabBarController as? NotificationCountDelegate }()
+  
   // Lazily initiating fetched result controller
   lazy var fetchedResultController: NSFetchedResultsController = {
     //Initializing data source (NSFetchedResultController)
@@ -158,27 +160,25 @@ extension DivisionChatOverviewViewController: UICollectionViewDataSource {
   override func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
     logger.verbose("Gathering cell for index path \(indexPath)")
     let cell = collectionView.dequeueReusableCellWithReuseIdentifier(DivisionChatOverviewConstants.ReuseCellIdentifier, forIndexPath: indexPath) as! DivisionChatCell
-    
     // Configure the cell
-    configureCell(indexPath, cell: cell)
-    
+    configureCell(cell, atIndexPath: indexPath)
     return cell
   }
   
-  private func configureCell(indexPath: [NSIndexPath]) {
-    for path in indexPath {
-      if let currentCell = collectionView?.cellForItemAtIndexPath(path) as? DivisionChatCell {
-        configureCell(path, cell: currentCell)
+  private func configureCellAt(indexPaths: [NSIndexPath]) {
+    for indexPath in indexPaths {
+      if let currentCell = collectionView?.cellForItemAtIndexPath(indexPath) as? DivisionChatCell {
+        configureCell(currentCell, atIndexPath: indexPath)
       } else {
-        logger.error("Unable to get cell for item path \(path)")
+        logger.error("Unable to get cell for item path \(indexPath)")
       }
     }
   }
   
-  private func configureCell(indexPath: NSIndexPath, cell: DivisionChatCell) {
+  private func configureCell(cell: DivisionChatCell, atIndexPath indexPath: NSIndexPath) {
     logger.debug("Configuring cell for index path \(indexPath)")
-    cell.division = fetchedResultController.objectAtIndexPath(indexPath) as? Division
-    cell.updateAvatarView()
+    let division = fetchedResultController.objectAtIndexPath(indexPath) as? Division
+    cell.configureCell(division)
   }
 }
 
@@ -295,7 +295,7 @@ extension DivisionChatOverviewViewController: NSFetchedResultsControllerDelegate
             case .Delete:
               currentCollectionView.deleteItemsAtIndexPaths(indexPath)
             case .Update:
-              self.configureCell(indexPath)
+              self.configureCellAt(indexPath)
             default:
               XCGLogger.debugExec {abort()}
               XCGLogger.error("Reached default case while applying object changes. This should not happen: Type \(type.rawValue)")
@@ -324,6 +324,21 @@ extension DivisionChatOverviewViewController {
     logger.info("Refresh started")
     collectionView?.reloadData()
     refreshControl.endRefreshing()
+  }
+}
+
+// MARK: - NotificationCountDelegate protocol methods
+extension DivisionChatOverviewViewController: NotificationCountDelegate {
+  func incrementNotificationCountBy(amount: Int, sender: AnyObject?) {
+    notificationDelegate?.incrementNotificationCountBy(amount, sender: self)
+  }
+  
+  func decrementNotificationCountBy(amount: Int, sender: AnyObject?) {
+    notificationDelegate?.decrementNotificationCountBy(amount, sender: self)
+  }
+  
+  func updateNotificationCountTo(newCount: Int, sender: AnyObject?) {
+    notificationDelegate?.updateNotificationCountTo(newCount, sender: self)
   }
 }
 

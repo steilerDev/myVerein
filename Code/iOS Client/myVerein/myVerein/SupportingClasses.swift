@@ -61,6 +61,19 @@ postfix func ~> (backgroundClosure: (NSManagedObjectContext) -> ()) {
   }
 }
 
+/// Executes the left-hand closure on the background thread, upon completion the right-hand closure is executed on the main thread. This operator provides a managed object context created on the background queue and can therefore be used without any concurency problems.
+///
+/// :param: backgroundClosure The closure executed on a background thread, providing a managed context usable on this thread.
+/// :param: mainClosure The closure executed on the main thread, after the background thread is finished.
+func ~> (backgroundClosure: (NSManagedObjectContext) -> (), mainClosure: () -> ()) {
+  dispatch_async(queue) {
+    var backgroundContext = NSManagedObjectContext()
+    backgroundContext.persistentStoreCoordinator = (UIApplication.sharedApplication().delegate as! AppDelegate).persistentStoreCoordinator!
+    backgroundClosure(backgroundContext)
+    dispatch_async(dispatch_get_main_queue(), mainClosure)
+  }
+}
+
 /// Executes the left-hand closure on the background thread, upon completion the right-hand closure is executed on the main thread.
 ///
 /// :param: backgroundClosure The closure executed on a background thread.
@@ -177,5 +190,27 @@ extension UITabBarItem {
     } else {
       badgeValue = String(newValue)
     }
+  }
+}
+
+// MARK: - UIImageView extension
+/// This UIImageView extension implements the possible assignment of an object's image representation to an UIImageView
+extension UIImageView {
+  /// This function assigns the image representation of the user to the UIImageView.
+  ///
+  /// :param: user The user, who should be represented within the UIImageView.
+  func setImageWithUser(user: User?) {
+    if let userAvatar = user?.avatar {
+      self.image = userAvatar
+    } else {
+      self.setImageWithString(user?.displayName ?? "N/A", color: UIColor(hex: MVColor.Primary.Normal))
+    }
+  }
+  
+  /// This function assigns the image representation of the division to the UIImageView.
+  ///
+  /// :param: division The division, which should be represented within the UIImageView.
+  func setImageWithDivision(division: Division?) {
+    self.setImageWithString(division?.name ?? "N/A", color: UIColor(hex: MVColor.Primary.Normal))
   }
 }

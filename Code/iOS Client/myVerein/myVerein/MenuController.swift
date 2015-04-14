@@ -20,6 +20,8 @@
 //  This file holds all information related to the tab bar view of the main menu. It modifies the appearance to match the experience as well as validating the stored credentials.
 //
 
+// TODO: Accept notification about synced messages
+
 import UIKit
 import SwiftyUserDefaults
 import XCGLogger
@@ -34,8 +36,9 @@ class MenuController: UITabBarController {
     UITabBar.appearance().tintColor = UIColor(hex: MVColor.Primary.Normal)
   }
   
-  /// After the view appeared check if there are any credentials stored and if they are still valid. If they are not the login view is presented
+  /// After the view appeared perform actions to update UI and check log in status
   override func viewDidAppear(animated: Bool) {
+    //Check current credentials
     let (currentUsername, currentPassword, currentDomain) = MVSecurity.instance().currentKeychain()
     
     if !Defaults.hasKey(MVUserDefaultsConstants.UserID) ||
@@ -58,6 +61,9 @@ class MenuController: UITabBarController {
         }
       )
     }
+    // Update count on tabbar items
+    calendarViewControllerItem.updateBadgeCount(EventRepository().countPendingEvents())
+    chatViewControllerItem.updateBadgeCount(MessageRepository().countUnreadMessages())
   }
 }
 

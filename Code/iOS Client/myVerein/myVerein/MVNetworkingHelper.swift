@@ -36,6 +36,7 @@ class MVNetworkingHelper {
 extension MVNetworkingHelper {
   /// This function is used to gather all new messages for the user and store them persistent.
   class func syncMessages() {
+    // TODO: Send out notification
     logger.verbose("Syncing messages")
     MVNetworking.messageSyncAction(
       success: {

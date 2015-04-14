@@ -43,54 +43,48 @@ class DivisionChatCell: UICollectionViewCell {
     }
   }
   
-  @IBOutlet weak var divisionImageView: UIImageView! {
-    didSet {
-      
-    }
-  }
-  
   @IBOutlet weak var divisionLabel: UILabel!
   
-  var division: Division? {
+  @IBOutlet weak var divisionImageView: UIImageView! {
     didSet {
-      if let division = division {
-        if let divisionName = division.name {
-          divisionLabel.text = divisionName
-        } else {
-          division.sync()
-        }
-      } else {
-        XCGLogger.error("Unable to configure cell using default values")
-        divisionLabel.text = "Division"
-      }
+      // Adjusting image view (Round image with primary border color)
+      divisionImageView.layer.borderWidth = 2
+      divisionImageView.layer.borderColor = UIColor(hex: MVColor.Primary.Normal).CGColor
+      divisionImageView.layer.cornerRadius = divisionImageView.layer.bounds.size.width/2
+      divisionImageView.layer.masksToBounds = true
+      // If this attribute is not set a bunch of auto layout warnings will appear
+      divisionImageView.superview?.superview?.setTranslatesAutoresizingMaskIntoConstraints(false)
     }
   }
   
-  func updateAvatarView() {
-    logger.debug("Updating avatar view")
-    if let message = division?.latestMessage
-    {
-      logger.debug("Succesfully parsed latest message")
-      if let userAvatar = message.sender.avatar {
-        logger.debug("Using avatar image")
-        divisionImageView.image = userAvatar
-      } else {
-        logger.debug("Using initials")
-        divisionImageView.setImageWithString(message.sender.displayName, color: UIColor(hex: MVColor.Primary.Normal))
+  private(set) var division: Division?
+  
+  /// This function is configuring the cell using the provided division. It sets the label and updates the image view.
+  func configureCell(division: Division?) {
+    self.division = division
+    if let division = division {
+      if division.syncRequired {
+        division.sync()
       }
-    } else if let divisionName = division?.name {
-      logger.error("Unable to get latest message, using division initials")
-      divisionImageView.setImageWithString(divisionName, color: UIColor(hex: MVColor.Primary.Normal))
+      
+      // This is going to be empty if sync is required, but should be filled as soon as the sync returns
+      divisionLabel.text = division.name
+      
+      // Setting message bubble
+      if let message = division.latestMessage {
+        logger.debug("Succesfully parsed latest message of division \(division): \(message)")
+        divisionImageView.setImageWithUser(message.sender)
+      } else {
+        logger.error("Unable to get latest message of division \(division), showing division in image view")
+        divisionImageView.setImageWithDivision(division)
+      }
+      
+      // Getting notification count
+      notificationCount = MessageRepository().countUnreadMessagesIn(division: division)
     } else {
-      logger.error("Unable to get division name")
-      divisionImageView.setImageWithString("N/A", color: UIColor(hex: MVColor.Primary.Normal))
+      logger.error("Unable to get division, using default values")
+      divisionLabel.text = "Division"
+      divisionImageView.setImageWithDivision(nil)
     }
-    divisionImageView.layer.borderWidth = 2
-    divisionImageView.layer.borderColor = UIColor(hex: MVColor.Primary.Normal).CGColor
-    divisionImageView.layer.cornerRadius = divisionImageView.layer.bounds.size.width/2
-    divisionImageView.layer.masksToBounds = true
-    // If this attribute is not set a bunch of auto layout warnings will appear
-    divisionImageView.superview?.superview?.setTranslatesAutoresizingMaskIntoConstraints(false)
   }
-  
 }

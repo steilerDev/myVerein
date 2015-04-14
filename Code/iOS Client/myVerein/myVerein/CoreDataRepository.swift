@@ -35,10 +35,15 @@ class MVCoreDataRepository {
   
   /// This function saves the database permanently, if needed.
   func save() {
-    if managedObjectContext.hasChanges {
+    save(self.managedObjectContext)
+  }
+  
+  // This function saves the database permanently, if needed, using the provided managed object context. This function should be used in a multithreaded environment.
+  func save(independentManagedObjectContext: NSManagedObjectContext) {
+    if independentManagedObjectContext.hasChanges {
       logger.verbose("Saving database changes")
       var error : NSError?
-      if managedObjectContext.save(&error) {
+      if independentManagedObjectContext.save(&error) {
         logger.info("Successfully saved database")
       } else {
         logger.error("Unable to save database: \(error?.extendedDescription)")

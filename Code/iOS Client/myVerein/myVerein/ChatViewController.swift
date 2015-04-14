@@ -34,6 +34,8 @@ class ChatViewController: JSQMessagesViewController {
   
   var division: Division!
   
+  lazy var notificationDelegate: NotificationCountDelegate? = { self.presentingViewController as? NotificationCountDelegate }()
+  
   // Lazily initiating fetched result controller
   lazy var fetchedResultController: NSFetchedResultsController = {
     //Initializing data source (NSFetchedResultController)
@@ -142,7 +144,16 @@ extension ChatViewController {
 // MARK: - JSQMessagesCollectionViewDataSource
 extension ChatViewController {
   override func collectionView(collectionView: JSQMessagesCollectionView!, messageDataForItemAtIndexPath indexPath: NSIndexPath!) -> JSQMessageData! {
-    return fetchedResultController.objectAtIndexPath(indexPath) as! Message
+    let message = fetchedResultController.objectAtIndexPath(indexPath) as! Message
+    if !message.read {
+      //Updating read flag and notification count on a background thread
+      { (managedContext) -> () in
+        XCGLogger.debug("Setting read flag for message \(message)")
+        message.read = true
+        MessageRepository().save(managedContext)
+      }~>{ () -> () in self.notificationDelegate?.decrementNotificationCountBy(1, sender: self) }
+    }
+    return message
   }
   
   override func collectionView(collectionView: JSQMessagesCollectionView!, messageBubbleImageDataForItemAtIndexPath indexPath: NSIndexPath!) -> JSQMessageBubbleImageDataSource! {
