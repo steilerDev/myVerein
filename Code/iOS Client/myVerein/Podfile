@@ -11,4 +11,5 @@ pod 'JSQMessagesViewController'
 pod "UIImageView-Letters"
 pod 'RKNotificationHub'
 pod 'JTCalendar'
+pod 'XCGLogger'
 #pod 'Alamofire', '~> 1.1'

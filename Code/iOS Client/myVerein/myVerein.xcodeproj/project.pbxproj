@@ -36,8 +36,6 @@
 		309A8A7C1AB374040087CBC5 /* ChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 309A8A7B1AB374040087CBC5 /* ChatViewController.swift */; };
 		30A4F7D91AA97D400064EA2C /* MVNetworking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30A4F7D81AA97D400064EA2C /* MVNetworking.swift */; };
 		30BAFEE51AA52828000D18EF /* ca-cert.cer in Resources */ = {isa = PBXBuildFile; fileRef = 30BAFEE11AA518EA000D18EF /* ca-cert.cer */; };
-		30D4E8EC1AB45939000F2C90 /* XCGLogger.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 30D4E8EB1AB45939000F2C90 /* XCGLogger.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
-		30D4E8ED1AB45939000F2C90 /* XCGLogger.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 30D4E8EB1AB45939000F2C90 /* XCGLogger.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		30F254E61AC7224E00E10CB9 /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30F254E51AC7224E00E10CB9 /* SettingsViewController.swift */; };
 		30F254E81AC7271A00E10CB9 /* CalendarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30F254E71AC7271A00E10CB9 /* CalendarViewController.swift */; };
 		30FB44BB1AACC088003E4512 /* DivisionRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30FB44BA1AACC088003E4512 /* DivisionRepository.swift */; };
@@ -65,7 +63,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				30D4E8ED1AB45939000F2C90 /* XCGLogger.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -126,7 +123,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				669D9154C16CB2C002A6D28F /* Pods.framework in Frameworks */,
-				30D4E8EC1AB45939000F2C90 /* XCGLogger.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

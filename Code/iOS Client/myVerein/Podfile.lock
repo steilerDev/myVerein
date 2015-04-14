@@ -30,6 +30,7 @@ PODS:
   - RKNotificationHub (1.0.5)
   - SwiftyUserDefaults (1.0.0)
   - UIImageView-Letters (1.0)
+  - XCGLogger (2.0)
 
 DEPENDENCIES:
   - 1PasswordExtension
@@ -41,6 +42,7 @@ DEPENDENCIES:
   - RKNotificationHub
   - SwiftyUserDefaults
   - UIImageView-Letters
+  - XCGLogger
 
 SPEC CHECKSUMS:
   1PasswordExtension: fcf300204bda5b5c78936dbb937a7d661f1ca796
@@ -53,5 +55,6 @@ SPEC CHECKSUMS:
   RKNotificationHub: 529ee3c92564738d3e489057968bfbc4ffd3e942
   SwiftyUserDefaults: 76cb548fdbcb0d28c27bfa01e261fd78df65e38f
   UIImageView-Letters: 41432060262e9e19ac2ff24fd633e1a31bdcc5d2
+  XCGLogger: 90570901ddf86d5479672d61a1b0a639235b851a
 
 COCOAPODS: 0.36.3
