@@ -17,86 +17,12 @@
 
 //
 //  MVHelper.swift
-//  This file holds independent reusable classes written by myself, including an improved multi-tasking operator and an extension for bound-save array access.
+//  This file holds independent reusable classes written by myself, including extensions for existing classes, e.g. an extension for bound-save array access, or delegate protocol definitions.
 //
 
 import Foundation
 import CoreData
 import UIKit
-
-/// MARK: - Marshal operator
-
-// This part introduces a new infix operator: '~>'. It will be called the marshal operator. It defines the execution of two closures after each other on different threads. The operator is implemented according to Josh Smith's suggestion: http://ijoshsmith.com/2014/07/05/custom-threading-operator-in-swift/
-
-// The operator can be used infix, prefix and postfix, where infix defines a background task followed by a main queue task, prefix defines a main queue tast and postfix defines a background task. Therefore the operator handles all threading tasks.
-infix operator ~> {}
-prefix operator ~> {}
-postfix operator ~> {}
-
-// Serial dispatched queue used by ~>
-private let queue = dispatch_queue_create("serial-worker", DISPATCH_QUEUE_SERIAL)
-
-/// Using the Marshal operator as a prefix operator, means that the closure is executed on the main thread.
-///
-/// :param: mainClosure The closure executed on the main thread.
-prefix func ~> (mainClosure: () -> ()) {
-  dispatch_async(dispatch_get_main_queue(), mainClosure)
-}
-
-/// Using the Marshal operator as a postfix operator, means that the closure is executed on a background thread.
-///
-/// :param: backgroundClosure The closure executed on a background thread.
-postfix func ~> (backgroundClosure: () -> ()) {
-  dispatch_async(queue, backgroundClosure)
-}
-
-// Using the Marshal operator as a postfix operator, means that the closure is executed on a background thread. This operator provides a managed object context created on the background queue and can therefore be used without any concurency problems.
-///
-/// :param: backgroundClosure The closure executed on a background thread providing a managed context usable on this thread.
-postfix func ~> (backgroundClosure: (NSManagedObjectContext) -> ()) {
-  dispatch_async(queue) {
-    var backgroundContext = NSManagedObjectContext()
-    backgroundContext.persistentStoreCoordinator = (UIApplication.sharedApplication().delegate as! AppDelegate).persistentStoreCoordinator!
-    backgroundClosure(backgroundContext)
-  }
-}
-
-/// Executes the left-hand closure on the background thread, upon completion the right-hand closure is executed on the main thread. This operator provides a managed object context created on the background queue and can therefore be used without any concurency problems.
-///
-/// :param: backgroundClosure The closure executed on a background thread, providing a managed context usable on this thread.
-/// :param: mainClosure The closure executed on the main thread, after the background thread is finished.
-func ~> (backgroundClosure: (NSManagedObjectContext) -> (), mainClosure: () -> ()) {
-  dispatch_async(queue) {
-    var backgroundContext = NSManagedObjectContext()
-    backgroundContext.persistentStoreCoordinator = (UIApplication.sharedApplication().delegate as! AppDelegate).persistentStoreCoordinator!
-    backgroundClosure(backgroundContext)
-    dispatch_async(dispatch_get_main_queue(), mainClosure)
-  }
-}
-
-/// Executes the left-hand closure on the background thread, upon completion the right-hand closure is executed on the main thread.
-///
-/// :param: backgroundClosure The closure executed on a background thread.
-/// :param: mainClosure The closure executed on the main thread, after the background thread is finished.
-func ~> (backgroundClosure: () -> (), mainClosure: () -> ()) {
-  dispatch_async(queue) {
-    backgroundClosure()
-    dispatch_async(dispatch_get_main_queue(), mainClosure)
-  }
-}
-
-/// Executes the left-hand closure on the background thread, upon completion the right-hand closure is executed on the main thread using the return value of the left-hand closure.
-///
-/// :param: backgroundClosure The closure executed on a background thread.
-/// :param: mainClosure The closure executed on the main thread.
-func ~> <R> (backgroundClosure: () -> (R), mainClosure: (R) -> ()) {
-  dispatch_async(queue) {
-    let result = backgroundClosure()
-    dispatch_async(dispatch_get_main_queue()) {
-      mainClosure(result)
-    }
-  }
-}
 
 // MARK: - Array extension
 /// An array extension providing a bound-save getter using swift's optionals
