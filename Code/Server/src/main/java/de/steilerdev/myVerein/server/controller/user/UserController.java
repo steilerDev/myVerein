@@ -89,41 +89,42 @@ public class UserController
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity sendNotification(@CurrentUser User currentUser)
     {
-        logger.info("Sending push to {}", currentUser);
-
-
-        final byte[] token = currentUser.getDeviceToken();
-
-        final ApnsPayloadBuilder payloadBuilder = new ApnsPayloadBuilder();
-
-        payloadBuilder.setAlertBody("Ring ring, Neo.");
-
-        final String payload = payloadBuilder.buildWithDefaultMaximumLength();
-
-        final PushManager<SimpleApnsPushNotification> pushManager = PushService.getInstance();
-
-        try
-        {
-            if(pushManager != null)
-            {
-                pushManager.getQueue().put(new SimpleApnsPushNotification(token, payload));
-            }
-        } catch (Exception e)
-        {
-            logger.error("Exception while sending: {}", e.getMessage());
-        }
-        logger.debug("Successfully send notification");
-
-//        byte[] payload = APNS.newPayload().alertBody("Hello world").buildBytes();
-//        if(currentUser.getDeviceToken() != null && payload != null)
+//        logger.info("Sending push to {}", currentUser);
+//
+//
+//        final byte[] token = currentUser.getDeviceToken();
+//
+//        final ApnsPayloadBuilder payloadBuilder = new ApnsPayloadBuilder();
+//
+//        payloadBuilder.setAlertBody("Ring ring, Neo.");
+//
+//        final String payload = payloadBuilder.buildWithDefaultMaximumLength();
+//
+//        final PushManager<SimpleApnsPushNotification> pushManager = PushService.getInstance();
+//
+//        try
 //        {
-//            logger.debug("Sending notification");
-//            PushService.getInstance().push(currentUser.getDeviceToken(), payload);
-            return new ResponseEntity(HttpStatus.OK);
-//        } else {
-//            logger.debug("Unable to send notification");
-//            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+//            if(pushManager != null)
+//            {
+//                pushManager.getQueue().put(new SimpleApnsPushNotification(token, payload));
+//            }
+//        } catch (Exception e)
+//        {
+//            logger.error("Exception while sending: {}", e.getMessage());
 //        }
+//        logger.debug("Successfully send notification");
+//
+////        byte[] payload = APNS.newPayload().alertBody("Hello world").buildBytes();
+////        if(currentUser.getDeviceToken() != null && payload != null)
+////        {
+////            logger.debug("Sending notification");
+////            PushService.getInstance().push(currentUser.getDeviceToken(), payload);
+//            return new ResponseEntity(HttpStatus.OK);
+////        } else {
+////            logger.debug("Unable to send notification");
+////            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+//        }
+        return null;
     }
 
 }

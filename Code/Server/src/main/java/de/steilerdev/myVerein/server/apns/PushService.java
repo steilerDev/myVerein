@@ -43,7 +43,7 @@ public class PushService
      * This function creates a new APNS instance. If the function returns null, APNS is not supported.
      * @return The current APNS instance. If null APNS is not supported by this server.
      */
-    public static PushManager<SimpleApnsPushNotification> getInstance()
+    public static PushManager<SimpleApnsPushNotification> getInstanced()
     {
         if(pushManager == null)
         {
@@ -65,7 +65,7 @@ public class PushService
                                 "ExamplePushManager");
 
                 logger.debug("Created new APNS instance, starting");
-                pushManager.start();
+                //pushManager.start();
             } catch (IOException e)
             {
                 logger.warn("Unable to load APNS settings file: {}", e.getMessage());
