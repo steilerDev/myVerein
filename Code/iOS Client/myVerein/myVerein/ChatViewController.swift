@@ -34,8 +34,8 @@ class ChatViewController: JSQMessagesViewController {
   
   var division: Division!
   
-  // The presenting view controller (DivisionChatOverviewViewController) as the notification delegate to notify about read messages
-  lazy var notificationDelegate: NotificationCountDelegate? = { self.presentingViewController as? NotificationCountDelegate }()
+  // The presenting view controller (DivisionChatOverviewViewController) and cell of the overview as the notification delegate to notify about read messages
+  var notificationDelegates = [NotificationCountDelegate?]()
   
   /// The token handed over by the notification subscription, stored to be able to release resources.
   var notificationObserverToken: NSObjectProtocol?
@@ -180,16 +180,29 @@ extension ChatViewController {
 // MARK: - JSQMessagesCollectionViewDataSource
 extension ChatViewController {
   override func collectionView(collectionView: JSQMessagesCollectionView!, messageDataForItemAtIndexPath indexPath: NSIndexPath!) -> JSQMessageData! {
-    let message = fetchedResultController.objectAtIndexPath(indexPath) as! Message
-    if !message.read {
-      //Updating read flag and notification count on a background thread
-      { (managedContext) -> () in
-        XCGLogger.debug("Setting read flag for message \(message)")
+    if let message = fetchedResultController.objectAtIndexPath(indexPath) as? Message {
+      if !message.read {
+        //Updating read flag and notification count
+        logger.debug("Setting read flag for message \(message)")
         message.read = true
-        MessageRepository().save(managedContext)
-      }~>{ () -> () in self.notificationDelegate?.decrementNotificationCountBy(1, sender: self) }
+        MessageRepository().save()
+        for delegate in notificationDelegates {
+          if delegate == nil {
+            logger.debug("Not able to delegate new count because the delegate is nil")
+          } else if let cell = delegate as? DivisionChatCell where cell.division != self.division {
+            logger.warning("Not able delegate new count to cell because divisions are different")
+          } else {
+            delegate!.decrementNotificationCountBy(1, sender: self)
+          }
+        }
+      }
+      return message
+    } else {
+      logger.severe("Unable to get message")
+      logger.debugExec { abort() }
+      dismissViewControllerAnimated(true, completion: nil)
+      return nil
     }
-    return message
   }
   
   override func collectionView(collectionView: JSQMessagesCollectionView!, messageBubbleImageDataForItemAtIndexPath indexPath: NSIndexPath!) -> JSQMessageBubbleImageDataSource! {
@@ -203,6 +216,7 @@ extension ChatViewController {
     } else {
       logger.severe("Unable to get message")
       logger.debugExec { abort() }
+      dismissViewControllerAnimated(true, completion: nil)
       return nil
     }
   }

@@ -44,6 +44,7 @@ class MenuController: UITabBarController {
     }
     MVNotification.subscribeToMessageSyncCompletedNotificationForDivisionChat(nil){
       notification in
+      XCGLogger.debug("Sync completed notification received")
       if notification.object == nil {
         self.chatViewControllerItem.updateBadgeCount(MessageRepository().countUnreadMessages())
       }

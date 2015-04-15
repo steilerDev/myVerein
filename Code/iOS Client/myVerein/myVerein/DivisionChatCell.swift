@@ -88,3 +88,18 @@ class DivisionChatCell: UICollectionViewCell {
     }
   }
 }
+
+// MARK: - NotificationCountDelegate methods
+extension DivisionChatCell: NotificationCountDelegate {
+  func decrementNotificationCountBy(amount: Int, sender: AnyObject?) {
+    notificationCount--
+  }
+  
+  func incrementNotificationCountBy(amount: Int, sender: AnyObject?) {
+    notificationCount++
+  }
+  
+  func updateNotificationCountTo(newCount: Int, sender: AnyObject?) {
+    notificationCount = newCount
+  }
+}

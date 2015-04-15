@@ -148,6 +148,7 @@ extension DivisionChatOverviewViewController {
           destinationViewController = segue.destinationViewController as? ChatViewController
         {
           destinationViewController.division = senderDivision
+          destinationViewController.notificationDelegates = [self, senderCell]
         } else {
           logger.error("Unable to determine sender of segue, sender division or destination view controller")
         }

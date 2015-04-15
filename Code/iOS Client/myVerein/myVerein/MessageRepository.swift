@@ -182,8 +182,8 @@ class MessageRepository: MVCoreDataRepository {
     newItem.timestamp = timestamp
     newItem.division = division
     newItem.sender = sender
-    // Setting read flag of a new item only if the message was not send by the user
-    newItem.read = !newItem.isOutgoingMessage
+    // Setting read flag to false, since messages send by the user are not re-synced.
+    newItem.read = false
     
     // If this is the first message, or the message is newer use it
     if division.latestMessage == nil || division.latestMessage?.timestamp?.compare(timestamp) == NSComparisonResult.OrderedAscending {
