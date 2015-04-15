@@ -72,10 +72,10 @@ class DivisionChatCell: UICollectionViewCell {
       
       // Setting message bubble
       if let message = division.latestMessage {
-        logger.debug("Succesfully parsed latest message of division \(division): \(message)")
+        logger.debug("Succesfully parsed latest message of division \(self.division): \(message)")
         divisionImageView.setImageWithUser(message.sender)
       } else {
-        logger.error("Unable to get latest message of division \(division), showing division in image view")
+        logger.error("Unable to get latest message of division \(self.division), showing division in image view")
         divisionImageView.setImageWithDivision(division)
       }
       
