@@ -30,6 +30,7 @@ class DivisionChatOverviewViewController: UICollectionViewController {
   
   let logger = XCGLogger.defaultInstance()
   
+  // The menu controller (root view controller) as notification delegate to notify about a changed notification count.
   lazy var notificationDelegate: NotificationCountDelegate? = { self.tabBarController as? NotificationCountDelegate }()
   
   /// The token handed over by the notification subscription, stored to be able to release resources.
@@ -72,7 +73,7 @@ class DivisionChatOverviewViewController: UICollectionViewController {
     dict[.Insert] = NSMutableIndexSet() as NSMutableIndexSet
     dict[.Delete] = NSMutableIndexSet() as NSMutableIndexSet
     return dict
-    }()
+  }()
   
   /// Dictionary used to collect object changes
   private lazy var objectChanges: [NSFetchedResultsChangeType: [NSIndexPath]] = {
@@ -82,7 +83,7 @@ class DivisionChatOverviewViewController: UICollectionViewController {
     dict[.Delete] = [NSIndexPath]()
     dict[.Update] = [NSIndexPath]()
     return dict
-  }()
+    }()
 }
 
 // MARK: - UICollectionViewController lifecycle methods
@@ -120,8 +121,7 @@ extension DivisionChatOverviewViewController {
     // This observer is monitoring all divisions. As soon as the notification without a sender is received the controller is starting to reload its view.
     logger.debug("Division chat overview controller subscribed to notification system")
     notificationObserverToken = MVNotification.subscribeToDivisionSyncCompletedNotificationForDivision(nil) {
-      notification in
-      if notification.object == nil {
+      if $0.object == nil {
         self.collectionView?.reloadData()
       }
     }
@@ -216,28 +216,6 @@ extension DivisionChatOverviewViewController: UICollectionViewDelegate {
       logger.error("Unable to perform segue to chat because the tapped cell was not found")
     }
   }
-  
-  /*
-  // Uncomment this method to specify if the specified item should be highlighted during tracking
-  override func collectionView(collectionView: UICollectionView, shouldHighlightItemAtIndexPath indexPath: NSIndexPath) -> Bool {
-  return true
-  }
-  */
-  
-  /*
-  // Uncomment these methods to specify if an action menu should be displayed for the specified item, and react to actions performed on the item
-  override func collectionView(collectionView: UICollectionView, shouldShowMenuForItemAtIndexPath indexPath: NSIndexPath) -> Bool {
-  return false
-  }
-  
-  override func collectionView(collectionView: UICollectionView, canPerformAction action: Selector, forItemAtIndexPath indexPath: NSIndexPath, withSender sender: AnyObject?) -> Bool {
-  return false
-  }
-  
-  override func collectionView(collectionView: UICollectionView, performAction action: Selector, forItemAtIndexPath indexPath: NSIndexPath, withSender sender: AnyObject?) {
-  
-  }
-  */
 }
 
 // MARK: - NSFetchedResultsControllerDelegate

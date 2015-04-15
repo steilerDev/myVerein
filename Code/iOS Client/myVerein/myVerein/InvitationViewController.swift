@@ -25,11 +25,11 @@ import CoreData
 import XCGLogger
 
 class InvitationViewController: UITableViewController {
-
-  /// The delegate for this view controller, which gets notified if the amount of open invitation changed
-  var delegate: NotificationCountDelegate?
   
   let logger = XCGLogger.defaultInstance()
+  
+  /// The delegate for this view controller, which gets notified if the amount of open invitation changed
+  var delegate: NotificationCountDelegate?
   
   /// The token handed over by the notification subscription, stored to be able to release resources.
   var notificationObserverToken: NSObjectProtocol?
@@ -87,8 +87,7 @@ extension InvitationViewController {
     // This observer is monitoring all events. As soon as the notification without a sender is received the controller is starting to reload its view.
     logger.debug("Invitation view controller subscribed to notification system")
     notificationObserverToken = MVNotification.subscribeToCalendarSyncCompletedNotificationForEvent(nil) {
-      notification in
-      if notification.object == nil {
+      if $0.object == nil {
         self.tableView.reloadData()
       }
     }

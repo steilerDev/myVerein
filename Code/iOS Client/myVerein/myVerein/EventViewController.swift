@@ -88,6 +88,7 @@ extension EventViewController {
       }
     } else {
       logger.error("Unable to load event for event detail view, dismissing view controller")
+      logger.debugExec { abort() }
       navigationController?.popViewControllerAnimated(true)
     }
   }
@@ -96,7 +97,7 @@ extension EventViewController {
   override func viewDidAppear(animated: Bool) {
     super.viewDidAppear(animated)
     // This observer is monitoring his events. As soon as the notification is received the controller is starting to reload its view.
-    logger.debug("Event view controller for event \(event) subscribed to notification system")
+    logger.debug("Event view controller for event \(self.event) subscribed to notification system")
     notificationObserverToken = MVNotification.subscribeToCalendarSyncCompletedNotificationForEvent(event!) { _ in self.reloadView() }
   }
   
@@ -104,7 +105,7 @@ extension EventViewController {
   override func viewWillDisappear(animated: Bool) {
     super.viewWillDisappear(animated)
     if let notificationObserverToken = notificationObserverToken {
-      logger.debug("Event view controller for event \(event) un-subscribed from notification system")
+      logger.debug("Event view controller for event \(self.event) un-subscribed from notification system")
       MVNotification.unSubscribeFromNotification(notificationObserverToken)
     }
   }
@@ -146,7 +147,7 @@ extension EventViewController {
     logger.debug("Did select row at index path: \(indexPath)")
     if indexPath.length == 2 {
       if indexPath.indexAtPosition(0) == 0 && indexPath.indexAtPosition(1) == 1 {
-        logger.info("Selected participants cell, performing segue for event \(event)")
+        logger.info("Selected participants cell, performing segue for event \(self.event)")
         performSegueWithIdentifier(EventViewControllerConstants.SegueToParticipants, sender: nil)
         participantCell.selected = false
       } else if indexPath.indexAtPosition(0) == 2 {

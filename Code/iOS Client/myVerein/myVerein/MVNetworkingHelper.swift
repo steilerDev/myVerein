@@ -17,7 +17,7 @@
 
 //
 //  NetworkingHelper.swift
-//  This file provides an extra layer of abstraction for the networking actions. 
+//  This file provides an extra layer of abstraction for the networking actions.
 //  It provides class functions allowing to gather, update and store objects from the server.
 //
 

@@ -31,7 +31,11 @@ class CalendarViewController: UIViewController {
 
   lazy var notificationBadge: RKNotificationHub = RKNotificationHub(barButtonItem: self.openInvitations)
   
+  // The menu controller (root view controller) as notification delegate to notify about a changed notification count.
   lazy var notificationDelegate: NotificationCountDelegate? = { self.tabBarController as? NotificationCountDelegate }()
+  
+  /// The token handed over by the notification subscription, stored to be able to release resources.
+  var notificationObserverToken: NSObjectProtocol?
   
   // Outlets from the storyboard
   @IBOutlet weak var menuView: JTCalendarMenuView!
@@ -44,9 +48,6 @@ class CalendarViewController: UIViewController {
   let calendar = JTCalendar.new()
   
   var eventsOfSelectedDate: [Event]?
-  
-  /// The token handed over by the notification subscription, stored to be able to release resources.
-  var notificationObserverToken: NSObjectProtocol?
 }
 
 // MARK: - UIViewController lifecycle methods
@@ -88,14 +89,20 @@ extension CalendarViewController {
     calendar.repositionViews()
   }
   
+  /// Moving loading of calendar data to view will appear, in hope to be more responsive
+  override func viewWillAppear(animated: Bool) {
+    super.viewWillAppear(animated)
+    logger.debug("CalendarView did appear, loading calendar data and syncing events")
+    startRefresh()
+  }
+  
   /// Within this function the notification observer subscribes to the notification system.
   override func viewDidAppear(animated: Bool) {
     super.viewDidAppear(animated)
     // This observer is monitoring all events. As soon as the notification without a sender is received the controller is starting to reload its view.
     logger.debug("Calendar view controller subscribed to notification system")
     notificationObserverToken = MVNotification.subscribeToCalendarSyncCompletedNotificationForEvent(nil) {
-      notification in
-      if notification.object == nil {
+      if $0.object == nil {
         self.startRefresh()
       }
     }
@@ -108,13 +115,6 @@ extension CalendarViewController {
       logger.debug("Calendar view controller un-subscribed from notification system")
       MVNotification.unSubscribeFromNotification(notificationObserverToken)
     }
-  }
-  
-  /// Moving loading of calendar data to view will appear, in hope to be more responsive
-  override func viewWillAppear(animated: Bool) {
-    super.viewWillAppear(animated)
-    logger.debug("CalendarView did appear, loading calendar data and syncing events")
-    startRefresh()
   }
   
   // MARK: Navigation
@@ -156,7 +156,7 @@ extension CalendarViewController: JTCalendarDataSource {
     logger.debug("Selected date \(date), gathering events of the date and reloading table view")
     let eventRepository = EventRepository()
     eventsOfSelectedDate = eventRepository.findEventsBy(date: date)
-    logger.debug("Retrieved events \(eventsOfSelectedDate)")
+    logger.debug("Retrieved events \(self.eventsOfSelectedDate)")
     eventTableView.reloadData()
   }
   
@@ -223,6 +223,7 @@ extension CalendarViewController {
       self.eventTableView.reloadData()
       self.stopAnimatingRefreshButton()
     })
+    
   }
   
   /// This function starts the animation of the refresh UIBarButtonItem. It uses keyframes to spin it until the animation is stopped by calling 'stopAnimationUIBarButtonItem:'.
