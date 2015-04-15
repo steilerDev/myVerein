@@ -37,8 +37,10 @@
 
 		<Logger name="org.thymeleaf.TemplateEngine" level="${third-party-log-level}" />
 
+		<Logger name="com.relayrides.pushy" level="trace" />
+
 		<Root level="error">
-			<!--AppenderRef ref="console"/-->
+			<AppenderRef ref="console"/>
 			<AppenderRef ref="tomcat-file-log"/>
 		</Root>
 	</Loggers>

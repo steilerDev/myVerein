@@ -17,6 +17,11 @@
 package de.steilerdev.myVerein.server.controller.user;
 
 
+import com.relayrides.pushy.apns.PushManager;
+import com.relayrides.pushy.apns.util.ApnsPayloadBuilder;
+import com.relayrides.pushy.apns.util.SimpleApnsPushNotification;
+import com.relayrides.pushy.apns.util.TokenUtil;
+import de.steilerdev.myVerein.server.apns.PushService;
 import de.steilerdev.myVerein.server.model.User;
 import de.steilerdev.myVerein.server.model.UserRepository;
 import de.steilerdev.myVerein.server.security.CurrentUser;
@@ -29,7 +34,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 @RestController
 @RequestMapping("/api/user/user")
 public class UserController
@@ -59,7 +63,7 @@ public class UserController
         }
     }
 
-    @RequestMapping(method = RequestMethod.POST)
+    @RequestMapping(method = RequestMethod.POST, params = "deviceToken")
     public ResponseEntity updateDeviceToken(@RequestParam String deviceToken, @CurrentUser User currentUser)
     {
         logger.trace("[{}] Updating device token", currentUser);
@@ -69,11 +73,57 @@ public class UserController
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
         } else
         {
-            logger.info("[{}] Updating device token to {}", currentUser, deviceToken);
-            currentUser.setDeviceToken(deviceToken);
-            userRepository.save(currentUser);
-            return new ResponseEntity(HttpStatus.OK);
+            if(currentUser.setDeviceTokenBase64Encoded(deviceToken))
+            {
+                logger.info("[{}] Successfully updated device token", currentUser);
+                userRepository.save(currentUser);
+                return new ResponseEntity(HttpStatus.OK);
+            } else
+            {
+                logger.warn("[{}] Unable to update device token, decoded token does not have the correct length of 32 bytes", currentUser);
+                return new ResponseEntity(HttpStatus.BAD_REQUEST);
+            }
         }
+    }
+
+    @RequestMapping(method = RequestMethod.POST)
+    public ResponseEntity sendNotification(@CurrentUser User currentUser)
+    {
+        logger.info("Sending push to {}", currentUser);
+
+
+        final byte[] token = currentUser.getDeviceToken();
+
+        final ApnsPayloadBuilder payloadBuilder = new ApnsPayloadBuilder();
+
+        payloadBuilder.setAlertBody("Ring ring, Neo.");
+
+        final String payload = payloadBuilder.buildWithDefaultMaximumLength();
+
+        final PushManager<SimpleApnsPushNotification> pushManager = PushService.getInstance();
+
+        try
+        {
+            if(pushManager != null)
+            {
+                pushManager.getQueue().put(new SimpleApnsPushNotification(token, payload));
+            }
+        } catch (Exception e)
+        {
+            logger.error("Exception while sending: {}", e.getMessage());
+        }
+        logger.debug("Successfully send notification");
+
+//        byte[] payload = APNS.newPayload().alertBody("Hello world").buildBytes();
+//        if(currentUser.getDeviceToken() != null && payload != null)
+//        {
+//            logger.debug("Sending notification");
+//            PushService.getInstance().push(currentUser.getDeviceToken(), payload);
+            return new ResponseEntity(HttpStatus.OK);
+//        } else {
+//            logger.debug("Unable to send notification");
+//            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+//        }
     }
 
 }

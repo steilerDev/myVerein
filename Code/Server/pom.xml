@@ -200,10 +200,16 @@
         </dependency>
 
         <!-- APNS service -->
+        <!--<dependency>-->
+            <!--<groupId>com.notnoop.apns</groupId>-->
+            <!--<artifactId>apns</artifactId>-->
+            <!--<version>${apns.version}</version>-->
+        <!--</dependency>-->
+
         <dependency>
-            <groupId>com.notnoop.apns</groupId>
-            <artifactId>apns</artifactId>
-            <version>${apns.version}</version>
+            <groupId>com.relayrides</groupId>
+            <artifactId>pushy</artifactId>
+            <version>0.4.3</version>
         </dependency>
 
     </dependencies>

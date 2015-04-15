@@ -133,7 +133,7 @@ public class User implements UserDetails
     private MembershipStatus membershipStatus;
 
     @JsonIgnore
-    private String deviceToken;
+    private byte[] deviceToken;
 
     @Transient
     @JsonIgnore
@@ -401,14 +401,48 @@ public class User implements UserDetails
         this.membershipStatus = membershipStatus;
     }
 
-    public String getDeviceToken()
+    public byte[] getDeviceToken()
     {
         return deviceToken;
     }
 
-    public void setDeviceToken(String deviceToken)
+    public void setDeviceToken(byte[] deviceToken)
     {
         this.deviceToken = deviceToken;
+    }
+
+    @Transient
+    @JsonIgnore
+    public boolean setDeviceTokenBase64Encoded(String deviceToken)
+    {
+        if(deviceToken != null && !deviceToken.isEmpty())
+        {
+            byte[] decodedToken = Base64.getDecoder().decode(deviceToken);
+            if(decodedToken.length == 32)
+            {
+                this.deviceToken = decodedToken;
+                return true;
+            } else
+            {
+                return false;
+            }
+        } else
+        {
+            return false;
+        }
+    }
+
+    @Transient
+    @JsonIgnore
+    public String getDeviceTokenBase64Encoded()
+    {
+        if(deviceToken != null && deviceToken.length == 32)
+        {
+            return Base64.getEncoder().encodeToString(deviceToken);
+        } else
+        {
+            return null;
+        }
     }
 
     /*

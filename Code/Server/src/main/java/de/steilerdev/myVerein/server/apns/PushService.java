@@ -14,8 +14,12 @@
  */
 package de.steilerdev.myVerein.server.apns;
 
-import com.notnoop.apns.APNS;
-import com.notnoop.apns.ApnsService;
+
+import com.relayrides.pushy.apns.ApnsEnvironment;
+import com.relayrides.pushy.apns.PushManager;
+import com.relayrides.pushy.apns.PushManagerConfiguration;
+import com.relayrides.pushy.apns.util.SSLContextUtil;
+import com.relayrides.pushy.apns.util.SimpleApnsPushNotification;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
@@ -23,24 +27,25 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 
 public class PushService
 {
     private static Logger logger = LoggerFactory.getLogger(PushService.class);
 
-    private static ApnsService service;
-    private static String apnsSettingsFile = "apns/apns.properties";
-    private static String fileKey = "file";
-    private static String passwordKey = "password";
+    private static PushManager<SimpleApnsPushNotification> pushManager;
+    private final static String apnsSettingsFile = "apns/apns.properties";
+    private final static String fileKey = "file";
+    private final static String passwordKey = "password";
 
     /**
      * This function creates a new APNS instance. If the function returns null, APNS is not supported.
      * @return The current APNS instance. If null APNS is not supported by this server.
      */
-    public static ApnsService getInstance()
+    public static PushManager<SimpleApnsPushNotification> getInstance()
     {
-        if(service == null)
+        if(pushManager == null)
         {
             logger.debug("Creating new APNS instance");
             try
@@ -48,19 +53,30 @@ public class PushService
                 Resource settingsResource = new ClassPathResource(apnsSettingsFile);
                 Properties settings = PropertiesLoaderUtils.loadProperties(settingsResource);
 
-                service = APNS.newService()
-                        .withCert(settings.getProperty(fileKey), settings.getProperty(passwordKey))
-                        .withSandboxDestination()
-                        .build();
+                InputStream certFile = Thread.currentThread().getContextClassLoader().getResourceAsStream(settings.getProperty(fileKey));
 
+                 pushManager = new PushManager<>(
+                                ApnsEnvironment.getSandboxEnvironment(),
+                                SSLContextUtil.createDefaultSSLContext(certFile, settings.getProperty(passwordKey)),
+                                null, // Optional: custom event loop group
+                                null, // Optional: custom ExecutorService for calling listeners
+                                null, // Optional: custom BlockingQueue implementation
+                                new PushManagerConfiguration(),
+                                "ExamplePushManager");
+
+                logger.debug("Created new APNS instance, starting");
+                pushManager.start();
             } catch (IOException e)
             {
-                logger.warn("Unable to load APNS settings file");
+                logger.warn("Unable to load APNS settings file: {}", e.getMessage());
                 return null;
+            }catch (Exception e)
+            {
+                logger.warn("An unknown error occurred: {}", e.getMessage());
             }
         }
         logger.info("Returning APNS instance");
-        return service;
+        return pushManager;
     }
 
     public void sendNotification()
