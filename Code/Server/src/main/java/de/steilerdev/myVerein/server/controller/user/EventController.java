@@ -131,6 +131,11 @@ public class EventController
             try
             {
                 response = EventStatus.valueOf(responseString.toUpperCase());
+                if(response == EventStatus.REMOVED || response == EventStatus.PENDING)
+                {
+                    logger.warn("[{}] Unable to select 'removed' or 'pending' as a response for an event");
+                    return new ResponseEntity(HttpStatus.BAD_REQUEST);
+                }
             } catch (IllegalArgumentException e)
             {
                 logger.warn("[{}] Unable to parse response: {}", currentUser, e.getLocalizedMessage());

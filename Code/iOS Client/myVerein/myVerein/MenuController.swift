@@ -76,9 +76,6 @@ class MenuController: UITabBarController {
         }
       )
     }
-    // Update count on tabbar items
-    calendarViewControllerItem.updateBadgeCount(EventRepository().countPendingEvents())
-    chatViewControllerItem.updateBadgeCount(MessageRepository().countUnreadMessages())
     
     // Subscribing to notifications, no need to un-subscribe since this view controller is always around
     MVNotification.subscribeToCalendarSyncCompletedNotificationForEvent(nil) {
@@ -91,6 +88,10 @@ class MenuController: UITabBarController {
         self.chatViewControllerItem.updateBadgeCount(MessageRepository().countUnreadMessages())
       }
     }
+    
+    // Update count on tabbar items
+    calendarViewControllerItem.updateBadgeCount(EventRepository().countPendingEvents())
+    chatViewControllerItem.updateBadgeCount(MessageRepository().countUnreadMessages())
   }
 }
 

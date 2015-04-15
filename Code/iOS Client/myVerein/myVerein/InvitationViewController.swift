@@ -156,8 +156,13 @@ extension InvitationViewController {
   
   /// This function re-configures the cell at the provided index path
   func configureCell(atIndexPath indexPath: NSIndexPath) -> InvitationCell {
-    let cell = tableView?.cellForRowAtIndexPath(indexPath) as! InvitationCell
-    return configureCell(cell, atIndexPath: indexPath)
+    if let cell = tableView?.cellForRowAtIndexPath(indexPath) as? InvitationCell {
+      return configureCell(cell, atIndexPath: indexPath)
+    } else {
+      logger.debugExec { abort() }
+      cancelButtonPressed()
+      return InvitationCell()
+    }
   }
   
   /// This function configures the cell at the provided index path

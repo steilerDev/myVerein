@@ -343,7 +343,6 @@ public class EventManagementController
         event.setEventAdmin(currentUser);
         event.setLastChanged(LocalDateTime.now());
         event.updateMultiDate();
-
         try
         {
             eventRepository.save(event);

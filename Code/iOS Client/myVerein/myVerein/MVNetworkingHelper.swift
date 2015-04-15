@@ -256,8 +256,12 @@ extension MVNetworkingHelper {
           if events == nil && error != nil {
             logger.warning("Unable to sync events \(error!.extendedDescription)")
           } else if let events = events where !events.isEmpty {
+            for event in events {
+              // Now we know which events changed, now we need to pull the content
+              MVNetworkingHelper.syncEvent(event.id)
+            }
+            // Checking if database changed because it is likely that there are new events but these dont have changed at all because of the sync offset
             eventRepository.save()
-            MVNotification.sendCalendarSyncCompletedNotificationForChangedEvents(events)
             logger.info("Successfully synced and saved events")
           }  else {
             logger.warning("Successfully synced events, but there are no new messages available")
@@ -301,8 +305,9 @@ extension MVNetworkingHelper {
           let (event, error) = eventRepository.syncEventWith(serverResponseObject: responseDict)
           if event == nil && error != nil {
             logger.warning("Unable to sync event \(eventId): \(error!.extendedDescription)")
-          } else {
+          } else if eventRepository.databaseDidChange {
             eventRepository.save()
+            MVNotification.sendCalendarSyncCompletedNotificationForChangedEvents([event!])
             logger.info("Successfully saved event \(eventId)")
           }
         } else {

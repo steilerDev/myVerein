@@ -87,7 +87,7 @@ public class Event
         REMOVED {
             @Override
             public String toString() {
-                return "DECLINE";
+                return "REMOVED";
             }
         }
     }
@@ -115,6 +115,10 @@ public class Event
     @JsonIgnore
     private Map<String, EventStatus> invitedUser;
 
+    /**
+     * This variable holds the information when this object was last changed in a way that the invited user should update their cached information about the event.
+     * This flag is updated every time the content is changed by an administrator or a user is removed (Because of a removed invited division or because the user was un-subscribed from a division)
+     */
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private LocalDateTime lastChanged;
 
@@ -411,6 +415,7 @@ public class Event
                 {
                     logger.debug("New set of invited user is empty and old set of invited user is not empty");
                     oldInvitedUser.stream().forEach(userID -> invitedUser.put(userID, EventStatus.REMOVED));
+                    lastChanged = LocalDateTime.now();
                 }
             } else
             {
@@ -418,6 +423,7 @@ public class Event
                 oldInvitedUser.removeAll(newInvitedUser);
                 oldInvitedUser.stream().forEach(userID -> invitedUser.put(userID, EventStatus.REMOVED));
                 newInvitedUser.stream().forEach(userID -> invitedUser.putIfAbsent(userID, EventStatus.PENDING));
+                lastChanged = LocalDateTime.now();
             }
         }
     }

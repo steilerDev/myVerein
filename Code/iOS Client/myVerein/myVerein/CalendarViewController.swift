@@ -71,6 +71,8 @@ extension CalendarViewController {
     calendar.calendarAppearance.dayTextColorTodayOtherMonth = UIColor(hex: MVColor.Primary.Normal)
     calendar.calendarAppearance.dayDotColor = UIColor.blackColor()
     calendar.calendarAppearance.dayDotColorOtherMonth = UIColor.blackColor()
+    calendar.calendarAppearance.dayDotColorToday = UIColor.blackColor()
+    calendar.calendarAppearance.dayDotColorTodayOtherMonth = UIColor.blackColor()
     calendar.calendarAppearance.monthBlock = {
       date, jt_calendar in
       let dateFormatter = NSDateFormatter()
@@ -103,7 +105,7 @@ extension CalendarViewController {
     logger.debug("Calendar view controller subscribed to notification system")
     notificationObserverToken = MVNotification.subscribeToCalendarSyncCompletedNotificationForEvent(nil) {
       if $0.object == nil {
-        self.startRefresh()
+        self.updateUI()
       }
     }
   }
@@ -217,13 +219,17 @@ extension CalendarViewController {
     startAnimatingRefreshButton()
     // In general the networking task of syncing the user's events takes longer than the calendar's reloading of data, so the refresh button's animation will stop after the networking task finished
     MVNetworkingHelper.syncUserEvent({
-      self.updateNotificationCountTo(EventRepository().countPendingEvents(), sender: self)
-      self.notificationBadge.pop()
-      self.calendar.reloadData()
-      self.eventTableView.reloadData()
+      self.updateUI()
       self.stopAnimatingRefreshButton()
     })
     
+  }
+  
+  /// This function updates the UI according to the current state of the data model.
+  func updateUI() {
+    updateNotificationCountTo(EventRepository().countPendingEvents(), sender: self)
+    calendar.reloadData()
+    eventTableView.reloadData()
   }
   
   /// This function starts the animation of the refresh UIBarButtonItem. It uses keyframes to spin it until the animation is stopped by calling 'stopAnimationUIBarButtonItem:'.

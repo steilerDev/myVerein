@@ -201,13 +201,16 @@ enum EventResponse: String {
   case Maybe = "MAYBE"
   case Pending = "PENDING"
   case Decline = "DECLINE"
+  case Removed = "REMOVED"
 }
 
 // MARK: - Event object related constants
 struct EventConstants {
   static let ClassName = "Event"
   // This variable is defining the minimum amount of time that needs to pass until the app is updating the events of a user
-  static let MinimalSecondsBetweenEventSync = 0.0
+  static let MinimalSecondsBetweenEventSync = 0.0 // TODO: Change
+  // This variable is defining the offset, substracted from the last sync time, to compensate time differences between client and server
+  static let SyncOffsetInSeconds = -900.0
   
   // This struct defines placeholder if specific variables are not available
   struct Placeholder {

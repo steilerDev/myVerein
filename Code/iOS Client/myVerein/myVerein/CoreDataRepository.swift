@@ -33,6 +33,11 @@ class MVCoreDataRepository {
   // Retreive the managedObjectContext from AppDelegate
   let managedObjectContext = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext!
   
+  /// This variable tells an application if the database changed.
+  var databaseDidChange: Bool {
+    return managedObjectContext.hasChanges
+  }
+  
   /// This function saves the database permanently, if needed.
   func save() {
     save(self.managedObjectContext)

@@ -112,7 +112,8 @@ func ~> <R> (backgroundClosure: () -> (R), mainClosure: (R) -> ()) {
 ///
 /// :returns: The threading object, that needs to be referenced as long as the execution should continue.
 postfix func <~ (repeatedClosure: () -> ()) -> MarshalThreadingObject {
-  return repeatedClosure<~/120.0
+  return repeatedClosure<~/20.0
+  // TODO: Change back to 120.0!!
 }
 
 /// Executes the provided closure every x seconds. The execution might be defered by up to 30 seconds. The closure is executed as long as the returned object is referenced by the developer. If you want to stop the execution you therefore have to set the variable holding this object to nil.

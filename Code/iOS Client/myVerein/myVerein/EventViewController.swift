@@ -57,11 +57,11 @@ extension EventViewController {
     navigationItem.backBarButtonItem = backButton
     
     // Populating view using event
-    reloadView()
+    reloadView(event)
   }
   
   /// This function (re-) loads the view using the provided event. If the event is not present, the view controller is dismissing itself.
-  func reloadView() {
+  func reloadView(event: Event?) {
     if let event = event {
       logger.debug("Succesfully loaded event, populating view")
       titleBar.title = event.title
@@ -98,7 +98,7 @@ extension EventViewController {
     super.viewDidAppear(animated)
     // This observer is monitoring his events. As soon as the notification is received the controller is starting to reload its view.
     logger.debug("Event view controller for event \(self.event) subscribed to notification system")
-    notificationObserverToken = MVNotification.subscribeToCalendarSyncCompletedNotificationForEvent(event!) { _ in self.reloadView() }
+    notificationObserverToken = MVNotification.subscribeToCalendarSyncCompletedNotificationForEvent(event!) { _ in self.reloadView(EventRepository().findEventBy(id: self.event!.id)) }
   }
   
   /// Within this function the notification observer un-subscribes from the notification system.

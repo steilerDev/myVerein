@@ -29,7 +29,7 @@ class EventRepository: MVCoreDataRepository {
   // MARK: - Functions used to query the database
   
   /// This function gathers the event object with the corresponding id from the database and returns it. The object is nil if the program was unable to find it.
-  private func findEventBy(#id: String) -> Event? {
+  func findEventBy(#id: String) -> Event? {
     logger.verbose("Retrieving event with ID \(id) from database")
     // Create a new fetch request using the event entity
     let fetchRequest = NSFetchRequest(entityName: EventConstants.ClassName)

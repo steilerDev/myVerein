@@ -362,7 +362,10 @@ extension MVNetworking {
         logger.debug("Last sync is longer than \(EventConstants.MinimalSecondsBetweenEventSync) seconds up")
       }
       
-      parameters = [NetworkingConstants.Event.Sync.Parameter.LastChanged: MVDateParser.stringFromDate(lastSynced)]
+      // Adding an offset to the last synced date, to take into account that the time of the server and the user's devices is not synchronized. Therefore removing the time defined within the constant.
+      let lastSyncedWithOffset = lastSynced.dateByAddingTimeInterval(EventConstants.SyncOffsetInSeconds)
+      logger.debug("Syncing with \(lastSyncedWithOffset), to compensate time differences with the server")
+      parameters = [NetworkingConstants.Event.Sync.Parameter.LastChanged: MVDateParser.stringFromDate(lastSyncedWithOffset)]
     }
     
     Defaults[MVUserDefaultsConstants.LastSynced.Event] = NSDate()
