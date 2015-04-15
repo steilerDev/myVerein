@@ -31,7 +31,11 @@ class CalendarViewController: UIViewController {
 
   lazy var notificationBadge: RKNotificationHub = RKNotificationHub(barButtonItem: self.openInvitations)
   
+  // The menu controller (root view controller) as notification delegate to notify about a changed notification count.
   lazy var notificationDelegate: NotificationCountDelegate? = { self.tabBarController as? NotificationCountDelegate }()
+  
+  /// The token handed over by the notification subscription, stored to be able to release resources.
+  var notificationObserverToken: NSObjectProtocol?
   
   // Outlets from the storyboard
   @IBOutlet weak var menuView: JTCalendarMenuView!
@@ -85,11 +89,32 @@ extension CalendarViewController {
     calendar.repositionViews()
   }
   
-  /// Moving loading of calendar data to view did appear, in hope to be more responsive
-  override func viewDidAppear(animated: Bool) {
-    super.viewDidAppear(animated)
+  /// Moving loading of calendar data to view will appear, in hope to be more responsive
+  override func viewWillAppear(animated: Bool) {
+    super.viewWillAppear(animated)
     logger.debug("CalendarView did appear, loading calendar data and syncing events")
     startRefresh()
+  }
+  
+  /// Within this function the notification observer subscribes to the notification system.
+  override func viewDidAppear(animated: Bool) {
+    super.viewDidAppear(animated)
+    // This observer is monitoring all events. As soon as the notification without a sender is received the controller is starting to reload its view.
+    logger.debug("Calendar view controller subscribed to notification system")
+    notificationObserverToken = MVNotification.subscribeToCalendarSyncCompletedNotificationForEvent(nil) {
+      if $0.object == nil {
+        self.startRefresh()
+      }
+    }
+  }
+  
+  /// Within this function the notification observer un-subscribes from the notification system.
+  override func viewWillDisappear(animated: Bool) {
+    super.viewWillDisappear(animated)
+    if let notificationObserverToken = notificationObserverToken {
+      logger.debug("Calendar view controller un-subscribed from notification system")
+      MVNotification.unSubscribeFromNotification(notificationObserverToken)
+    }
   }
   
   // MARK: Navigation
@@ -195,6 +220,7 @@ extension CalendarViewController {
       self.updateNotificationCountTo(EventRepository().countPendingEvents(), sender: self)
       self.notificationBadge.pop()
       self.calendar.reloadData()
+      self.eventTableView.reloadData()
       self.stopAnimatingRefreshButton()
     })
     

@@ -42,6 +42,9 @@ class EventViewController: UITableViewController {
   @IBOutlet weak var participantCell: UITableViewCell!
   
   var event: Event?
+  
+  /// The token handed over by the notification subscription, stored to be able to release resources.
+  var notificationObserverToken: NSObjectProtocol?
 }
 
 // MARK: - UIViewController lifecycle methods
@@ -54,6 +57,11 @@ extension EventViewController {
     navigationItem.backBarButtonItem = backButton
     
     // Populating view using event
+    reloadView()
+  }
+  
+  /// This function (re-) loads the view using the provided event. If the event is not present, the view controller is dismissing itself.
+  func reloadView() {
     if let event = event {
       logger.debug("Succesfully loaded event, populating view")
       titleBar.title = event.title
@@ -80,7 +88,25 @@ extension EventViewController {
       }
     } else {
       logger.error("Unable to load event for event detail view, dismissing view controller")
+      logger.debugExec { abort() }
       navigationController?.popViewControllerAnimated(true)
+    }
+  }
+  
+  /// Within this function the notification observer subscribes to the notification system.
+  override func viewDidAppear(animated: Bool) {
+    super.viewDidAppear(animated)
+    // This observer is monitoring his events. As soon as the notification is received the controller is starting to reload its view.
+    logger.debug("Event view controller for event \(self.event) subscribed to notification system")
+    notificationObserverToken = MVNotification.subscribeToCalendarSyncCompletedNotificationForEvent(event!) { _ in self.reloadView() }
+  }
+  
+  /// Within this function the notification observer un-subscribes from the notification system.
+  override func viewWillDisappear(animated: Bool) {
+    super.viewWillDisappear(animated)
+    if let notificationObserverToken = notificationObserverToken {
+      logger.debug("Event view controller for event \(self.event) un-subscribed from notification system")
+      MVNotification.unSubscribeFromNotification(notificationObserverToken)
     }
   }
   

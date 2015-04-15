@@ -34,7 +34,11 @@ class ChatViewController: JSQMessagesViewController {
   
   var division: Division!
   
+  // The presenting view controller (DivisionChatOverviewViewController) as the notification delegate to notify about read messages
   lazy var notificationDelegate: NotificationCountDelegate? = { self.presentingViewController as? NotificationCountDelegate }()
+  
+  /// The token handed over by the notification subscription, stored to be able to release resources.
+  var notificationObserverToken: NSObjectProtocol?
   
   // Lazily initiating fetched result controller
   lazy var fetchedResultController: NSFetchedResultsController = {
@@ -106,8 +110,41 @@ extension ChatViewController {
         logger.error("Unable to initiate chat view data source for division \(self.division.id): \(error?.extendedDescription)")
       }
       collectionView.collectionViewLayout.outgoingAvatarViewSize = CGSizeZero
+      
+      if !(division.userMembershipStatus == .Member) {
+        logger.info("User is not member of this chat, disabling it")
+        disableChat()
+      }
     }
   }
+  
+  /// Within this function the notification observer subscribes to the notification system.
+  override func viewDidAppear(animated: Bool) {
+    super.viewDidAppear(animated)
+    // This observer is monitoring the division this chat is associated with. If the user's membership is changing this observer will be notified and disable the chat.
+    logger.debug("Division chat for \(self.division) is subscribing to notification system")
+    notificationObserverToken = MVNotification.subscribeToDivisionSyncCompletedNotificationForDivision(division) {
+      notification in
+      if let changedDivision = notification.object as? Division {
+        let logger = XCGLogger.defaultInstance()
+        logger.debug("Received notification for \(changedDivision)")
+        if !(changedDivision.userMembershipStatus == .Member) {
+          logger.info("User is no longer member of this chat, disabling it")
+          self.disableChat()
+        }
+      }
+    }
+  }
+  
+  /// Within this funciton the notification observer un-subscribes from the notification system.
+  override func viewWillDisappear(animated: Bool) {
+    super.viewWillDisappear(animated)
+    if let notificationObserverToken = notificationObserverToken {
+      logger.debug("Division chat for \(self.division) is un-subscribing to notification system")
+      MVNotification.unSubscribeFromNotification(notificationObserverToken)
+    }
+  }
+
   
   /*
   // MARK: Navigation
@@ -294,6 +331,14 @@ extension ChatViewController: NSFetchedResultsControllerDelegate {
       objectChanges[.Insert] = [NSIndexPath]()
       objectChanges[.Delete] = [NSIndexPath]()
     }
+  }
+}
+
+// MARK: - ChatView lifecycle methods
+extension ChatViewController {
+  /// This function is called if the user is no longer part of the chat and disables any input.
+  func disableChat() {
+    // TODO: Implement
   }
 }
 

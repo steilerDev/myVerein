@@ -17,7 +17,7 @@
 
 //
 //  NetworkingHelper.swift
-//  This file provides an extra layer of abstraction for the networking actions. 
+//  This file provides an extra layer of abstraction for the networking actions.
 //  It provides class functions allowing to gather, update and store objects from the server.
 //
 
@@ -32,11 +32,10 @@ class MVNetworkingHelper {
 }
 
 // MARK: - Messages
-/// This extension is centralizing all message related networking tasks in a user friendly way, as well as handling interactions with the persistent store.
+/// This extension is centralizing all message related networking tasks in a user friendly way, as well as handling interactions with the persistent store and notification interface.
 extension MVNetworkingHelper {
-  /// This function is used to gather all new messages for the user and store them persistent.
+  /// This function is used to gather all new messages for the user and store them persistent. If there are new messages the suitable notifications are send.
   class func syncMessages() {
-    // TODO: Send out notification
     logger.verbose("Syncing messages")
     MVNetworking.messageSyncAction(
       success: {
@@ -46,10 +45,13 @@ extension MVNetworkingHelper {
           let messageRepository = MessageRepository()
           let (messages, error) = messageRepository.getOrCreateMessagesFrom(serverResponseObject: responseArray)
           if messages == nil && error != nil {
-            logger.warning("Unable to sync messages \(error!.extendedDescription)")
-          } else {
+            logger.error("Unable to sync messages \(error!.extendedDescription)")
+          } else if let messages = messages where !messages.isEmpty {
             messageRepository.save()
-            logger.info("Successfully synced and saved messages")
+            MVNotification.sendMessageSyncCompletedNotificationForNewMessages(messages)
+            logger.info("Successfully synced and saved new messages")
+          } else {
+            logger.warning("Successfully synced messages, but there are no new messages available")
           }
         } else {
           let error = MVError.createError(.MVMessageCreationError, failureReason: "Unable to parse response array", underlyingError: .MVServerResponseParseError)
@@ -63,7 +65,7 @@ extension MVNetworkingHelper {
     )
   }
   
-  /// This function is used to gather all messages for the user and store them persistent.
+  /// This function is used to gather all messages for the user and store them persistent. If there are messages the suitable notifications are send.
   class func syncAllMessages() {
     logger.verbose("Syncing all messages")
     MVNetworking.allMessageSyncAction(
@@ -75,9 +77,12 @@ extension MVNetworkingHelper {
           let (messages, error) = messageRepository.getOrCreateMessagesFrom(serverResponseObject: responseArray)
           if messages == nil && error != nil {
             logger.warning("Unable to sync all messages \(error!.extendedDescription)")
-          } else {
+          } else if let messages = messages where !messages.isEmpty {
             messageRepository.save()
+            MVNotification.sendMessageSyncCompletedNotificationForNewMessages(messages)
             logger.info("Successfully synced and saved all messages")
+          } else {
+            logger.warning("Successfully synced messages, but there are no messages available")
           }
         } else {
           let error = MVError.createError(.MVMessageCreationError, failureReason: "Unable to parse response array", underlyingError: .MVServerResponseParseError)
@@ -182,7 +187,7 @@ extension MVNetworkingHelper {
     )
   }
   
-  /// This function is used to update the list of divisions the user is part of
+  /// This function is used to update the list of divisions the user is part of. If this list changes the suitable notifications are send.
   class func syncUserDivision() {
     logger.verbose("Syncing list of divisions the user is part of")
     MVNetworking.userDivisionSyncAction(
@@ -191,27 +196,33 @@ extension MVNetworkingHelper {
         let logger = XCGLogger.defaultInstance()
         if let responseArray = response as? [AnyObject] {
           let divisionRepository = DivisionRepository()
-          let (wrappedDivisions, error) = divisionRepository.getOrCreateDivisionsFrom(serverResponseObject: responseArray)
+          let (newDivisions, error) = divisionRepository.getOrCreateDivisionsFrom(serverResponseObject: responseArray)
           let oldDivisions = divisionRepository.findDivisionBy(userMembershipStatus: .Member) ?? [Division]()
           
-          if error != nil || wrappedDivisions == nil {
+          if error != nil || newDivisions == nil {
             logger.warning("Unable to sync user's divisions: \(error!.extendedDescription)")
-          } else if let currentDivisions = wrappedDivisions {
+          } else if let newDivisions = newDivisions {
             // If a former subscribed division is no longer part of the list it needs to be removed
-            let formerMembers = oldDivisions.filter {!contains(currentDivisions, $0)}
+            let formerMembers = oldDivisions.filter {!contains(newDivisions, $0)}
             // New members were not part of the old divisions
-            let newMembers = currentDivisions.filter {!contains(oldDivisions, $0)}
+            let newMembers = newDivisions.filter {!contains(oldDivisions, $0)}
             
-            for division in formerMembers {
-              division.userMembershipStatus = .FormerMember
+            if !formerMembers.isEmpty && !newMembers.isEmpty {
+              logger.info("Division structure changed, applying changes")
+              for division in formerMembers {
+                division.userMembershipStatus = .FormerMember
+              }
+              
+              for division in newMembers {
+                division.userMembershipStatus = .Member
+              }
+              
+              divisionRepository.save()
+              MVNotification.sendDivisionSyncCompletedNotificationForChangedDivisions(formerMembers + newMembers)
+              logger.info("Successfully synced user's divisions")
+            } else {
+              logger.info("Division structure did not change, nothing to do")
             }
-            
-            for division in newMembers {
-              division.userMembershipStatus = .Member
-            }
-            
-            divisionRepository.save()
-            logger.info("Successfully synced user's divisions")
           } else {
             logger.severe("Unexpected behaviour while syncing user's divisions")
           }
@@ -232,7 +243,7 @@ extension MVNetworkingHelper {
 /// This extension is centralizing all event related networking tasks in a user friendly way, as well as handling interactions with the persistent store.
 extension MVNetworkingHelper {
   
-  /// This function is gathering all events that changed since the last time, the user synced his events. If the user never synced his events all events are synced. The callback function is optional and guaranteed to be executed on the main thread.
+  /// This function is gathering all events that changed since the last time, the user synced his events. If the user never synced his events all events are synced. The callback function is optional and guaranteed to be executed on the main thread. If there any event changed the suitable notifications are send.
   class func syncUserEvent(callback: (() -> ())?) {
     logger.verbose("Syncing events for user")
     MVNetworking.eventSyncAction(
@@ -244,9 +255,12 @@ extension MVNetworkingHelper {
           let (events, error) = eventRepository.getOrCreateEventsFrom(serverResponseObject: responseArray)
           if events == nil && error != nil {
             logger.warning("Unable to sync events \(error!.extendedDescription)")
-          } else {
+          } else if let events = events where !events.isEmpty {
             eventRepository.save()
+            MVNotification.sendCalendarSyncCompletedNotificationForChangedEvents(events)
             logger.info("Successfully synced and saved events")
+          }  else {
+            logger.warning("Successfully synced events, but there are no new messages available")
           }
         } else {
           let error = MVError.createError(.MVMessageCreationError, failureReason: "Unable to parse response array", underlyingError: .MVServerResponseParseError)
