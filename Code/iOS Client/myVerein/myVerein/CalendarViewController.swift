@@ -131,7 +131,7 @@ extension CalendarViewController: JTCalendarDataSource {
     logger.debug("Selected date \(date), gathering events of the date and reloading table view")
     let eventRepository = EventRepository()
     eventsOfSelectedDate = eventRepository.findEventsBy(date: date)
-    logger.debug("Retrieved events \(eventsOfSelectedDate)")
+    logger.debug("Retrieved events \(self.eventsOfSelectedDate)")
     eventTableView.reloadData()
   }
   

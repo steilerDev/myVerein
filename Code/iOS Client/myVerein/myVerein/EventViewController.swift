@@ -121,7 +121,7 @@ extension EventViewController {
     logger.debug("Did select row at index path: \(indexPath)")
     if indexPath.length == 2 {
       if indexPath.indexAtPosition(0) == 0 && indexPath.indexAtPosition(1) == 1 {
-        logger.info("Selected participants cell, performing segue for event \(event)")
+        logger.info("Selected participants cell, performing segue for event \(self.event)")
         performSegueWithIdentifier(EventViewControllerConstants.SegueToParticipants, sender: nil)
         participantCell.selected = false
       } else if indexPath.indexAtPosition(0) == 2 {

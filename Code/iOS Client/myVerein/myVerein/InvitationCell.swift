@@ -38,16 +38,16 @@ class InvitationCell: UITableViewCell {
     if let delegate = delegate {
       switch sender.selectedSegmentIndex {
         case 0:
-          logger.debug("Selected 'going' as response for \(event)")
+          logger.debug("Selected 'going' as response for \(self.event)")
           delegate.userRespondedTo(event: event, with: .Going)
         case 1:
-          logger.debug("Selected 'maybe' as response for \(event)")
+          logger.debug("Selected 'maybe' as response for \(self.event)")
           delegate.userRespondedTo(event: event, with: .Maybe)
         case 2:
-          logger.debug("Selected 'decline' as response for \(event)")
+          logger.debug("Selected 'decline' as response for \(self.event)")
           delegate.userRespondedTo(event: event, with: .Decline)
         default:
-          logger.error("Selected unrecognized state for \(event)")
+          logger.error("Selected unrecognized state for \(self.event)")
       }
     } else {
       logger.warning("Unable to notify delegate, because delegate could not be unwrapped")

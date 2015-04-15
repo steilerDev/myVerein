@@ -77,7 +77,7 @@ extension ChatViewController {
     super.viewDidLoad()
     
     if division == nil {
-      dismissViewControllerAnimated(true, completion: {})
+      dismissViewControllerAnimated(true, completion: nil)
     } else {
       title = division.name
       inputToolbar.contentView.rightBarButtonItem.setToDefaultColor()
@@ -94,17 +94,16 @@ extension ChatViewController {
       } else {
         logger.error("Unable to load user")
         logger.debugExec { abort() }
-        
-        senderDisplayName = "42"
-        senderId = "42"
+        dismissViewControllerAnimated(true, completion: nil)
+        return
       }
       
       // Accessing fetched result controller and therfore initiating it if it did not happen yet
       var error: NSError?
       if fetchedResultController.performFetch(&error) {
-        logger.info("Successfully initiated chat view data source for division \(division.id)")
+        logger.info("Successfully initiated chat view data source for division \(self.self.division.id)")
       } else {
-        logger.error("Unable to initiate chat view data source for division \(division.id): \(error?.extendedDescription)")
+        logger.error("Unable to initiate chat view data source for division \(self.division.id): \(error?.extendedDescription)")
       }
       collectionView.collectionViewLayout.outgoingAvatarViewSize = CGSizeZero
     }
@@ -219,7 +218,7 @@ extension ChatViewController {
   }
   
   override func didPressSendButton(button: UIButton!, withMessageText text: String!, senderId: String!, senderDisplayName: String!, date: NSDate!) {
-    logger.debug("Sending message with text \(text) and timestamp \(date) to division \(division)")
+    logger.debug("Sending message with text \(text) and timestamp \(date) to division \(self.division)")
     let messageRepository = MessageRepository()
     let message = messageRepository.createMessage(text, id: NSUUID().UUIDString, timestamp: date, division: division, sender: UserRepository.getCurrentUser()!)
     messageRepository.save()
