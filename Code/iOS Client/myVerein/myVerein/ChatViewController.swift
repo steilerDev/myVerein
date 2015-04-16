@@ -38,7 +38,8 @@ class ChatViewController: JSQMessagesViewController {
   var notificationDelegates = [NotificationCountDelegate?]()
   
   /// The token handed over by the notification subscription, stored to be able to release resources.
-  var notificationObserverToken: NSObjectProtocol?
+  var divisionNotificationObserverToken: NSObjectProtocol?
+  var messageNotificationObserverToken: NSObjectProtocol?
   
   // Lazily initiating fetched result controller
   lazy var fetchedResultController: NSFetchedResultsController = {
@@ -116,12 +117,12 @@ extension ChatViewController {
     }
   }
   
-  /// Within this function the notification observer subscribes to the notification system.
-  override func viewDidAppear(animated: Bool) {
-    super.viewDidAppear(animated)
+  /// Within this function the notification observer subscribes to the notification system. Doing this in view will appear because view did appear is somehow not called.
+  override func viewWillAppear(animated: Bool) {
+    super.viewWillAppear(animated)
     // This observer is monitoring the division this chat is associated with. If the user's membership is changing this observer will be notified and disable the chat.
     logger.debug("Division chat for \(self.division) is subscribing to notification system")
-    notificationObserverToken = MVNotification.subscribeToDivisionSyncCompletedNotificationForDivision(division) {
+    divisionNotificationObserverToken = MVNotification.subscribeToDivisionSyncCompletedNotificationForDivision(division) {
       notification in
       if let changedDivision = notification.object as? Division {
         let logger = XCGLogger.defaultInstance()
@@ -132,14 +133,23 @@ extension ChatViewController {
         }
       }
     }
+    messageNotificationObserverToken = MVNotification.subscribeToMessageSyncCompletedNotificationForDivisionChat(division){
+      notification in
+      XCGLogger.debug("Received notification token, reloading messages")
+      self.finishReceivingMessage()
+    }
   }
   
   /// Within this funciton the notification observer un-subscribes from the notification system.
   override func viewWillDisappear(animated: Bool) {
     super.viewWillDisappear(animated)
-    if let notificationObserverToken = notificationObserverToken {
-      logger.debug("Division chat for \(self.division) is un-subscribing to notification system")
-      MVNotification.unSubscribeFromNotification(notificationObserverToken)
+    
+    logger.debug("Division chat for \(self.division) is un-subscribing from notification system")
+    if let divisionNotificationObserverToken = divisionNotificationObserverToken {
+      MVNotification.unSubscribeFromNotification(divisionNotificationObserverToken)
+    }
+    if let messageNotificationObserverToken = messageNotificationObserverToken {
+      MVNotification.unSubscribeFromNotification(messageNotificationObserverToken)
     }
   }
 

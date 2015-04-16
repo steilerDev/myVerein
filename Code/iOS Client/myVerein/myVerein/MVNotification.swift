@@ -109,11 +109,26 @@ extension MVNotification {
   ///
   /// :param: responseClosure The closure that should be executed as soon as the notification is received.
   /// :param: name The name of the subscribed notification.
-  /// :param: sender The sender object, used to filter out irrelevant notifications.
+  /// :param: sender Only notfications of this object will be received. The objects are compared using the id's of the CoreDataObject protocol. If there is no sender defined, all notification will be provided.
   /// :returns: A token associated with the notification, used to unsubscribe from the notification and therefore free resources. You should always unsubscribe from notification as soon as your subscriber is no longer needed, because the notification is possibly causing memory leaks because of captured elements within the response closure.
-  private class func subscribeToNotification(name: String, sender: AnyObject?, responseClosure: (NSNotification!) -> ()) -> NSObjectProtocol {
+  private class func subscribeToNotification(name: String, sender: CoreDataObject?, responseClosure: (NSNotification!) -> ()) -> NSObjectProtocol {
     let mainQueue = NSOperationQueue.mainQueue()
-    return NSNotificationCenter.defaultCenter().addObserverForName(name, object: sender, queue: mainQueue, usingBlock: responseClosure)
+    if let sender = sender {
+      let newResponseClosure: (NSNotification!) -> () = {
+        notification in
+        if let notificationSender = notification.object as? CoreDataObject where notificationSender.id != sender.id {
+          XCGLogger.debug("Not executing notification because \(notificationSender) is not the subscribed object \(sender)")
+        } else {
+          XCGLogger.debug("Executing notification ")
+          responseClosure(notification)
+        }
+      }
+      logger.debug("Subscribing to notification, filtering with \(sender)")
+      return NSNotificationCenter.defaultCenter().addObserverForName(name, object: nil, queue: mainQueue, usingBlock: newResponseClosure)
+    } else {
+      logger.debug("Subscribing to notification, without filtering")
+      return NSNotificationCenter.defaultCenter().addObserverForName(name, object: nil, queue: mainQueue, usingBlock: responseClosure)
+    }
   }
 }
 
