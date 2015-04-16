@@ -82,11 +82,14 @@ extension ChatViewController {
     super.viewDidLoad()
     
     if division == nil {
+      logger.error("Unable to load division, dismissing view")
       dismissViewControllerAnimated(true, completion: nil)
     } else {
+      // Adjusting appearance
       title = division.name
       inputToolbar.contentView.rightBarButtonItem.setToDefaultColor()
       inputToolbar.contentView.leftBarButtonItem = nil
+      collectionView.collectionViewLayout.outgoingAvatarViewSize = CGSizeZero
       
       logger.debug("Loading user")
       if let sender = UserRepository.getCurrentUser()
@@ -101,18 +104,18 @@ extension ChatViewController {
         return
       }
       
+      // Checking if user is still allowed to post in this chat
+      if !(division.userMembershipStatus == .Member) {
+        logger.info("User is not member of this chat, disabling it")
+        disableChat()
+      }
+      
       // Accessing fetched result controller and therfore initiating it if it did not happen yet
       var error: NSError?
       if fetchedResultController.performFetch(&error) {
         logger.info("Successfully initiated chat view data source for division \(self.self.division.id)")
       } else {
         logger.error("Unable to initiate chat view data source for division \(self.division.id): \(error?.extendedDescription)")
-      }
-      collectionView.collectionViewLayout.outgoingAvatarViewSize = CGSizeZero
-      
-      if !(division.userMembershipStatus == .Member) {
-        logger.info("User is not member of this chat, disabling it")
-        disableChat()
       }
     }
   }

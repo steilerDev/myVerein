@@ -151,7 +151,7 @@ extension CalendarViewController {
 extension CalendarViewController: JTCalendarDataSource {
   
   func calendarHaveEvent(calendar: JTCalendar!, date: NSDate!) -> Bool {
-    return EventRepository().isEventOn(date: date)
+    return EventRepository().isDisplayableEventOn(date: date)
   }
   
   func calendarDidDateSelected(calendar: JTCalendar!, date: NSDate!) {
@@ -161,14 +161,6 @@ extension CalendarViewController: JTCalendarDataSource {
     logger.debug("Retrieved events \(self.eventsOfSelectedDate)")
     eventTableView.reloadData()
   }
-  
-  func calendarDidLoadNextPage() {
-    logger.debug("Did load next page")
-  }
-  
-  func calendarDidLoadPreviousPage() {
-    logger.debug("Did load previous page")
-  }
 }
 
 // MARK: - UITableViewDataSource protocol methods
@@ -177,8 +169,15 @@ extension CalendarViewController: UITableViewDataSource {
     var cell = tableView.dequeueReusableCellWithIdentifier(CalendarViewControllerConstants.ReuseCellIdentifier, forIndexPath: indexPath) as! UITableViewCell
     if let eventsOfSelectedDate = eventsOfSelectedDate, event = eventsOfSelectedDate.get(indexPath.row) {
       logger.debug("Successfully fetched event \(event)")
-      cell.textLabel?.text = event.title
-      cell.detailTextLabel?.text = event.subTitle
+      var attributes: [NSObject: AnyObject]?
+      if event.response! == .Removed || event.response! == .Decline {
+        attributes = [NSStrikethroughStyleAttributeName: 1]
+      } else if event.response! == .Pending || event.response! == .Maybe {
+        attributes = [NSForegroundColorAttributeName: UIColor(hex: MVColor.Gray.Light)]
+      }
+      
+      cell.textLabel?.attributedText = NSAttributedString(string: event.title, attributes: attributes)
+      cell.detailTextLabel?.attributedText = NSAttributedString(string: event.title, attributes: attributes)
     } else {
       logger.severe("Unable to fetch event at index path \(indexPath)")
       cell.textLabel?.text = ""

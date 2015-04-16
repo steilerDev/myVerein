@@ -114,6 +114,7 @@ extension EventViewController {
     super.viewDidDisappear(animated)
     logger.debug("View did disappear, sending response for event")
     if let event = event {
+      EventRepository().save()
       MVNetworkingHelper.sendEventResponse(event)
     } else {
       logger.warning("Not sending any event response, because event is nil")
@@ -150,7 +151,7 @@ extension EventViewController {
         logger.info("Selected participants cell, performing segue for event \(self.event)")
         performSegueWithIdentifier(EventViewControllerConstants.SegueToParticipants, sender: nil)
         participantCell.selected = false
-      } else if indexPath.indexAtPosition(0) == 2 {
+      } else if indexPath.indexAtPosition(0) == 2 && event!.response! != .Removed {
         maybeCell.accessoryType = .None
         goingCell.accessoryType = .None
         declineCell.accessoryType = .None
@@ -181,7 +182,37 @@ extension EventViewController {
       logger.warning("Length of index path does not fit \(indexPath.length)")
     }
   }
+  
+  // Manipulating view if user is no longer invited to an event
+  override func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+    if (event!.response! == .Removed && indexPath.indexAtPosition(0) == 2 && indexPath.indexAtPosition(1) != 3) ||
+      (event!.response! != .Removed && indexPath.indexAtPosition(0) == 2 && indexPath.indexAtPosition(1) == 3)
+    {
+      return CGFloat(0)
+    } else {
+      return super.tableView(tableView, heightForRowAtIndexPath: indexPath)
+    }
+  }
+  
+  // Manipulating view behaviour if user is no longer invited to an event
+  override func tableView(tableView: UITableView, shouldHighlightRowAtIndexPath indexPath: NSIndexPath) -> Bool {
+    if event!.response! == .Removed && indexPath.indexAtPosition(0) == 2 {
+      return false
+    } else {
+      return true
+    }
+  }
+  
+  // Manipulating view if user is no longer invited to an event
+  override func tableView(tableView: UITableView, willDisplayCell cell: UITableViewCell, forRowAtIndexPath indexPath: NSIndexPath) {
+    if (event!.response! == .Removed && indexPath.indexAtPosition(0) == 2 && indexPath.indexAtPosition(1) != 3) ||
+      (event!.response! != .Removed && indexPath.indexAtPosition(0) == 2 && indexPath.indexAtPosition(1) == 3)
+    {
+      cell.hidden = true
+    }
+  }
 }
+
 
 // MARK: - MapView delegate methods
 extension EventViewController: MKMapViewDelegate {

@@ -158,6 +158,8 @@ class EventRepository: CoreDataRepository {
         userResponse = EventResponse(rawValue: userResponseString)
       {
         event.response = userResponse
+      } else {
+        event.response = .Pending
       }
       
       //Parsing non-optionals
