@@ -134,7 +134,7 @@ extension CalendarViewController {
         }
       case CalendarViewControllerConstants.SegueToInvitedEvents:
         logger.debug("Preparing segue to open invitations list")
-        if let destinationViewController = (segue.destinationViewController as? UINavigationController)?.topViewController as? InvitationViewController {
+        if let destinationViewController = segue.destinationViewController.contentViewController  as? InvitationViewController {
           destinationViewController.delegate = self
         } else {
           logger.error("Unable to get destination view controller")

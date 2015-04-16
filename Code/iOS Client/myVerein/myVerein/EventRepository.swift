@@ -24,7 +24,7 @@ import Foundation
 import CoreData
 import XCGLogger
 
-class EventRepository: MVCoreDataRepository {
+class EventRepository: CoreDataRepository {
   
   // MARK: - Functions used to query the database
   

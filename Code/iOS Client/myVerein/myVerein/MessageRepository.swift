@@ -24,7 +24,7 @@ import Foundation
 import CoreData
 import XCGLogger
 
-class MessageRepository: MVCoreDataRepository {
+class MessageRepository: CoreDataRepository {
   
   // MARK: - Functions used to query the database
   

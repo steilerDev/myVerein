@@ -112,7 +112,7 @@ func ~> <R> (backgroundClosure: () -> (R), mainClosure: (R) -> ()) {
 ///
 /// :returns: The threading object, that needs to be referenced as long as the execution should continue.
 postfix func <~ (repeatedClosure: () -> ()) -> MarshalThreadingObject {
-  return repeatedClosure<~/20.0
+  return repeatedClosure<~/120.0
   // TODO: Change back to 120.0!!
 }
 

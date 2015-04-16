@@ -25,7 +25,7 @@ import CoreData
 import XCGLogger
 import SwiftyUserDefaults
 
-class UserRepository: MVCoreDataRepository {
+class UserRepository: CoreDataRepository {
   
   // MARK: - Functions used to query the database
   

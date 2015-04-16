@@ -96,7 +96,7 @@ extension UITabBarItem {
       if let badgeInt = badgeValue.toInt() {
         updateBadgeCount(badgeInt + amount)
       }
-    } else {
+    } else if amount != 0 {
       // If there is no badge string put the new amount into it
       badgeValue = String(amount)
     }

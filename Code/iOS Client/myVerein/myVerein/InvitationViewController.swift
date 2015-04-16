@@ -88,6 +88,7 @@ extension InvitationViewController {
     logger.debug("Invitation view controller subscribed to notification system")
     notificationObserverToken = MVNotification.subscribeToCalendarSyncCompletedNotificationForEvent(nil) {
       if $0.object == nil {
+        NSFetchedResultsController.deleteCacheWithName(self.fetchedResultController.cacheName) // Clearing cache
         self.tableView.reloadData()
       }
     }

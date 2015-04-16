@@ -26,15 +26,36 @@ import XCGLogger
 import SwiftyUserDefaults
 
 @UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate {
+class AppDelegate: UIResponder {
   
   var window: UIWindow?
+  let logger = XCGLogger.defaultInstance()
   
   // This variable references the threading object as long as the application should repeatedly check its messages and calendar changes
   var timerObject: MarshalThreadingObject?
   
-  let logger = XCGLogger.defaultInstance()
+  // MARK: - Core Data stack
   
+  lazy var applicationDocumentsDirectory: NSURL = {
+    // The directory the application uses to store the Core Data store file. This code uses a directory named "de.steilerdev.myverein.ios.myVerein" in the application's documents Application Support directory.
+    let urls = NSFileManager.defaultManager().URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask)
+    return urls[urls.count-1] as! NSURL
+    }()
+  
+  lazy var managedObjectModel: NSManagedObjectModel = {
+    XCGLogger.verbose("Loading managed object model")
+    // The managed object model for the application. This property is not optional. It is a fatal error for the application not to be able to find and load its model.
+    let modelURL = NSBundle.mainBundle().URLForResource("myVereinModel", withExtension: "momd")!
+    return NSManagedObjectModel(contentsOfURL: modelURL)!
+    }()
+  
+  lazy var persistentStoreCoordinator: NSPersistentStoreCoordinator? = createPersistentStoreCoordinator(self)()
+  
+  lazy var managedObjectContext: NSManagedObjectContext? = createManagedObjectContext(self)()
+}
+
+// MARK: - UIAppliationDelegate function (application lifecycle methods)
+extension AppDelegate: UIApplicationDelegate {
   func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
     // Setting up the logger
     logger.setup(logLevel: .Debug, showLogLevel: true, showFileNames: true, showLineNumbers: true, writeToFile: nil)
@@ -68,11 +89,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   func applicationDidBecomeActive(application: UIApplication) {
     logger.info("Starting background thread, which is syncing the application with the server")
     timerObject = {
-      XCGLogger.debug("Syncing system")
+      self.logger.debug("Syncing system")
       MVNetworkingHelper.syncMessages()
       MVNetworkingHelper.syncUserDivision()
       MVNetworkingHelper.syncUserEvent(nil)
-      XCGLogger.debug("Finished sync")
+      self.logger.debug("Finished sync")
     }<~
   }
   
@@ -84,23 +105,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   func applicationWillTerminate(application: UIApplication) {
     self.saveContext()
   }
-  
-  // MARK: - Core Data stack
-  
-  lazy var applicationDocumentsDirectory: NSURL = {
-    // The directory the application uses to store the Core Data store file. This code uses a directory named "de.steilerdev.myverein.ios.myVerein" in the application's documents Application Support directory.
-    let urls = NSFileManager.defaultManager().URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask)
-    return urls[urls.count-1] as! NSURL
-  }()
-  
-  lazy var managedObjectModel: NSManagedObjectModel = {
-    XCGLogger.verbose("Loading managed object model")
-    // The managed object model for the application. This property is not optional. It is a fatal error for the application not to be able to find and load its model.
-    let modelURL = NSBundle.mainBundle().URLForResource("myVereinModel", withExtension: "momd")!
-    return NSManagedObjectModel(contentsOfURL: modelURL)!
-  }()
-  
-  lazy var persistentStoreCoordinator: NSPersistentStoreCoordinator? = createPersistentStoreCoordinator(self)()
+}
+
+// MARK: - CoreData functions
+extension AppDelegate {
   
   private func createPersistentStoreCoordinator() -> NSPersistentStoreCoordinator? {
     // The persistent store coordinator for the application. This implementation creates and return a coordinator, having added the store for the application to it. This property is optional since there are legitimate error conditions that could cause the creation of the store to fail.
@@ -113,15 +121,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     if coordinator!.addPersistentStoreWithType(NSSQLiteStoreType, configuration: nil, URL: url, options: mOptions, error: &error) == nil {
       // Report any error we got.
       error = MVError.createError(.MVLocalDatabaseLoadingError, failureReason: nil, underlyingError: error)
-      XCGLogger.severe("Unresolved error during application initialization: \(error!.extendedDescription)")
-      XCGLogger.debugExec { abort() } // abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
+      logger.severe("Unresolved error during application initialization: \(error!.extendedDescription)")
+      logger.debugExec { abort() } // abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
       return nil
     } else {
       return coordinator
     }
   }
-  
-  lazy var managedObjectContext: NSManagedObjectContext? = createManagedObjectContext(self)()
   
   private func createManagedObjectContext() -> NSManagedObjectContext? {
     if let coordinator = persistentStoreCoordinator {
@@ -132,8 +138,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       return nil
     }
   }
-  
-  // MARK: - Core Data functions
   
   func flushDatabase() {
     logger.debug("Flushing database")
@@ -179,16 +183,27 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       }
     }
   }
+}
+
+// MARK: - Shared application specific functionalities
+extension AppDelegate {
   
+  /// This function is presenting the login view upon the currently shown view controller
   func showLoginView() {
     if let currentViewController = window?.rootViewController as? UITabBarController,
       loginViewController = currentViewController.storyboard?.instantiateViewControllerWithIdentifier(LoginViewController.StoryBoardID) as? LoginViewController
     {
         logger.info("Showing log in screen")
-        currentViewController.presentViewController(loginViewController, animated: true, completion: {})
+        currentViewController.presentViewController(loginViewController, animated: true, completion: nil)
     } else {
       logger.severe("Unable to show log in screen")
     }
   }
   
+  /// This function is logging out the current user (removing his credentials from the keychain) and presenting the login view.
+  func logoutUser() {
+    logger.info("Performing logout")
+    MVSecurity.instance().updateKeychain(nil, newPassword: nil, newDomain: nil)
+    showLoginView()
+  }
 }

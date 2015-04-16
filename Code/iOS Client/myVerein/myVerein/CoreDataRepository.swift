@@ -26,7 +26,7 @@ import UIKit
 import CoreData
 
 /// This class is a general core data repository holding definitions for the logger, managed context and saving mechanics.
-class MVCoreDataRepository {
+class CoreDataRepository {
   
   let logger = XCGLogger.defaultInstance()
   

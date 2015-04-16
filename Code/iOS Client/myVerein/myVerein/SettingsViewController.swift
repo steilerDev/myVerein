@@ -17,37 +17,61 @@
 
 //
 //  SettingsViewController.swift
-//  This file holds all information related to the settings view, including delegate methods for click events.
+//  This file holds all information related to the settings view, including delegate methods for click events and segues to the designed view controller.
 //
 
 import UIKit
+import XCGLogger
 
 class SettingsViewController: UITableViewController {
+  let logger = XCGLogger.defaultInstance()
+}
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
-
-        // Do any additional setup after loading the view.
+// MARK: - UITableView delegate methods 
+extension SettingsViewController {
+  override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+    logger.verbose("Selected item object \(indexPath.indexAtPosition(1)) in section \(indexPath.indexAtPosition(0))")
+    if let cell = tableView.cellForRowAtIndexPath(indexPath) {
+      cell.selected = false
+      switch indexPath.indexAtPosition(0) {
+        case 0:
+          logger.debug("Selected section 'system settings'")
+          switch indexPath.indexAtPosition(1) {
+            case 0:
+              logger.debug("Selected item 'profile")
+              performSegueWithIdentifier(SettingsViewControllerConstants.SegueTo.Profile, sender: cell)
+            case 1:
+              logger.debug("Selected item 'divisions'")
+              performSegueWithIdentifier(SettingsViewControllerConstants.SegueTo.Division, sender: cell)
+            default:
+              logger.warning("Selected unknown item")
+          }
+        case 1:
+          logger.info("Selected section 'application settings")
+          switch indexPath.indexAtPosition(1) {
+            case 0:
+              logger.debug("Selected item 'calendar'")
+              performSegueWithIdentifier(SettingsViewControllerConstants.SegueTo.Calendar, sender: cell)
+            default:
+              logger.warning("Selected unknown item")
+          }
+        case 2:
+          logger.debug("Selecte section 'log-out'")
+          (UIApplication.sharedApplication().delegate as! AppDelegate).logoutUser()
+        default:
+          logger.warning("Selected unknown section")
+      }
+    } else {
+      logger.warning("Unable to get selected cell")
     }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
-    
-  @IBAction func logoutPress() {
-    MVSecurity.instance().updateKeychain(nil, newPassword: nil, newDomain: nil)
-    (UIApplication.sharedApplication().delegate as! AppDelegate).showLoginView()
   }
+}
 
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
-    }
-    */
-
+// MARK: - Settings view related constants
+struct SettingsViewControllerConstants {
+  struct SegueTo {
+    static let Profile = "showSystemProfileSettings"
+    static let Division = "showSystemDivisionSettings"
+    static let Calendar = "showApplicationCalendarSettings"
+  }
 }

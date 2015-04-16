@@ -24,7 +24,7 @@ import Foundation
 import CoreData
 import XCGLogger
 
-class DivisionRepository: MVCoreDataRepository {
+class DivisionRepository: CoreDataRepository {
   
   // MARK: - Functions used to query the database
   
