@@ -177,7 +177,7 @@ extension CalendarViewController: UITableViewDataSource {
       }
       
       cell.textLabel?.attributedText = NSAttributedString(string: event.title, attributes: attributes)
-      cell.detailTextLabel?.attributedText = NSAttributedString(string: event.title, attributes: attributes)
+      cell.detailTextLabel?.attributedText = NSAttributedString(string: event.subTitle, attributes: attributes)
     } else {
       logger.severe("Unable to fetch event at index path \(indexPath)")
       cell.textLabel?.text = ""

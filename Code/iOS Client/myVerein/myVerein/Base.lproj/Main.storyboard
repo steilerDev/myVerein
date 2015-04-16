@@ -512,6 +512,45 @@
                                     </tableViewCell>
                                 </cells>
                             </tableViewSection>
+                            <tableViewSection headerTitle="Description" id="qBi-XF-XG9">
+                                <cells>
+                                    <tableViewCell userInteractionEnabled="NO" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="IDx-AG-njg">
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="IDx-AG-njg" id="wEB-GT-g27">
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" editable="NO" selectable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="qob-i0-4hi">
+                                                    <rect key="frame" x="8" y="8" width="584" height="27"/>
+                                                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                                    <string key="text">Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Nam liber te conscient to factor tum poen legum odioque civiuda.</string>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                                    <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                                                </textView>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="qob-i0-4hi" firstAttribute="bottom" secondItem="wEB-GT-g27" secondAttribute="bottomMargin" id="31A-co-jlP"/>
+                                                <constraint firstAttribute="bottomMargin" secondItem="qob-i0-4hi" secondAttribute="bottom" id="3iZ-34-iHw"/>
+                                                <constraint firstItem="qob-i0-4hi" firstAttribute="top" secondItem="wEB-GT-g27" secondAttribute="topMargin" id="8Q0-Sh-l1o"/>
+                                                <constraint firstAttribute="trailingMargin" secondItem="qob-i0-4hi" secondAttribute="trailing" id="NMV-aR-pa6"/>
+                                                <constraint firstItem="qob-i0-4hi" firstAttribute="top" secondItem="wEB-GT-g27" secondAttribute="topMargin" id="T2n-FV-eyZ"/>
+                                                <constraint firstAttribute="centerY" relation="greaterThanOrEqual" secondItem="qob-i0-4hi" secondAttribute="centerY" id="dhy-S5-JwR"/>
+                                                <constraint firstItem="qob-i0-4hi" firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="wEB-GT-g27" secondAttribute="trailingMargin" id="q7E-Zm-LE2"/>
+                                                <constraint firstAttribute="centerX" relation="greaterThanOrEqual" secondItem="qob-i0-4hi" secondAttribute="centerX" id="xIY-xQ-fuh"/>
+                                                <constraint firstItem="qob-i0-4hi" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="wEB-GT-g27" secondAttribute="leadingMargin" id="xLI-cD-89A"/>
+                                                <constraint firstItem="qob-i0-4hi" firstAttribute="leading" secondItem="wEB-GT-g27" secondAttribute="leadingMargin" id="xjN-eJ-dP8"/>
+                                            </constraints>
+                                            <variation key="default">
+                                                <mask key="constraints">
+                                                    <exclude reference="3iZ-34-iHw"/>
+                                                    <exclude reference="NMV-aR-pa6"/>
+                                                    <exclude reference="T2n-FV-eyZ"/>
+                                                    <exclude reference="xjN-eJ-dP8"/>
+                                                </mask>
+                                            </variation>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                </cells>
+                            </tableViewSection>
                             <tableViewSection headerTitle="Location" id="Cqj-X9-9Bc">
                                 <cells>
                                     <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" rowHeight="200" id="FtW-hx-b9t">
@@ -580,7 +619,7 @@
                                             </subviews>
                                         </tableViewCellContentView>
                                     </tableViewCell>
-                                    <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" textLabel="YDp-RN-3J3" style="IBUITableViewCellStyleDefault" id="6jc-os-Q4E">
+                                    <tableViewCell userInteractionEnabled="NO" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" textLabel="YDp-RN-3J3" style="IBUITableViewCellStyleDefault" id="6jc-os-Q4E">
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="6jc-os-Q4E" id="jyy-bO-Ipa">
                                             <autoresizingMask key="autoresizingMask"/>
@@ -606,6 +645,7 @@
                     <navigationItem key="navigationItem" title="EventDetail" id="zxl-6D-Jgp"/>
                     <connections>
                         <outlet property="declineCell" destination="fBi-X6-zTJ" id="lFB-sP-9rn"/>
+                        <outlet property="descriptionTextView" destination="qob-i0-4hi" id="l3T-VY-LiT"/>
                         <outlet property="eventLocation" destination="rJT-qf-LMG" id="3pn-Xg-Ili"/>
                         <outlet property="eventTimes" destination="epJ-Iv-AJb" id="bqx-AU-0we"/>
                         <outlet property="eventTitle" destination="txa-qQ-ekK" id="wAb-vf-oMZ"/>

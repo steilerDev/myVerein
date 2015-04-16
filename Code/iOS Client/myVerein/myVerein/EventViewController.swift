@@ -43,6 +43,8 @@ class EventViewController: UITableViewController {
   
   var event: Event?
   
+  @IBOutlet weak var descriptionTextView: UITextView!
+  
   /// The token handed over by the notification subscription, stored to be able to release resources.
   var notificationObserverToken: NSObjectProtocol?
 }
@@ -69,6 +71,8 @@ extension EventViewController {
       
       eventTimes.text = event.dateStringLong
       eventLocation.text = event.locationString
+      
+      descriptionTextView.text = event.eventDescription
       
       if let response = event.response {
         switch response {
@@ -147,11 +151,11 @@ extension EventViewController {
   override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
     logger.debug("Did select row at index path: \(indexPath)")
     if indexPath.length == 2 {
-      if indexPath.indexAtPosition(0) == 0 && indexPath.indexAtPosition(1) == 1 {
+      if indexPath.indexAtPosition(0) == EventViewControllerConstants.SectionIndexPath.Overview && indexPath.indexAtPosition(1) == 1 {
         logger.info("Selected participants cell, performing segue for event \(self.event)")
         performSegueWithIdentifier(EventViewControllerConstants.SegueToParticipants, sender: nil)
         participantCell.selected = false
-      } else if indexPath.indexAtPosition(0) == 2 && event!.response! != .Removed {
+      } else if indexPath.indexAtPosition(0) == EventViewControllerConstants.SectionIndexPath.Response && event!.response! != .Removed {
         maybeCell.accessoryType = .None
         goingCell.accessoryType = .None
         declineCell.accessoryType = .None
@@ -185,28 +189,23 @@ extension EventViewController {
   
   // Manipulating view if user is no longer invited to an event
   override func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
-    if (event!.response! == .Removed && indexPath.indexAtPosition(0) == 2 && indexPath.indexAtPosition(1) != 3) ||
-      (event!.response! != .Removed && indexPath.indexAtPosition(0) == 2 && indexPath.indexAtPosition(1) == 3)
+    if (event!.response! == .Removed && indexPath.indexAtPosition(0) == EventViewControllerConstants.SectionIndexPath.Response && indexPath.indexAtPosition(1) != 3) ||
+      (event!.response! != .Removed && indexPath.indexAtPosition(0) == EventViewControllerConstants.SectionIndexPath.Response && indexPath.indexAtPosition(1) == 3)
     {
       return CGFloat(0)
+    } else if indexPath.indexAtPosition(0) == EventViewControllerConstants.SectionIndexPath.Description {
+      logger.debug("Calculating size")
+      descriptionTextView.text = event!.eventDescription
+      return descriptionTextView.sizeThatFits(CGSize(width: descriptionTextView.frame.size.width, height: CGFloat.max)).height + CGFloat(100.0)
     } else {
       return super.tableView(tableView, heightForRowAtIndexPath: indexPath)
     }
   }
   
-  // Manipulating view behaviour if user is no longer invited to an event
-  override func tableView(tableView: UITableView, shouldHighlightRowAtIndexPath indexPath: NSIndexPath) -> Bool {
-    if event!.response! == .Removed && indexPath.indexAtPosition(0) == 2 {
-      return false
-    } else {
-      return true
-    }
-  }
-  
   // Manipulating view if user is no longer invited to an event
   override func tableView(tableView: UITableView, willDisplayCell cell: UITableViewCell, forRowAtIndexPath indexPath: NSIndexPath) {
-    if (event!.response! == .Removed && indexPath.indexAtPosition(0) == 2 && indexPath.indexAtPosition(1) != 3) ||
-      (event!.response! != .Removed && indexPath.indexAtPosition(0) == 2 && indexPath.indexAtPosition(1) == 3)
+    if (event!.response! == .Removed && indexPath.indexAtPosition(0) == EventViewControllerConstants.SectionIndexPath.Response && indexPath.indexAtPosition(1) != 3) ||
+      (event!.response! != .Removed && indexPath.indexAtPosition(0) == EventViewControllerConstants.SectionIndexPath.Response && indexPath.indexAtPosition(1) == 3)
     {
       cell.hidden = true
     }
@@ -243,4 +242,10 @@ extension EventViewController: MKMapViewDelegate {
 struct EventViewControllerConstants {
   static let ReuseAnnotationIdentifier = "annotation"
   static let SegueToParticipants = "showParticipants"
+  struct SectionIndexPath {
+    static let Overview = 0
+    static let Description = 1
+    static let Map = 2
+    static let Response = 3
+  }
 }

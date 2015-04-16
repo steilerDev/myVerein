@@ -250,11 +250,12 @@ extension ChatViewController {
   }
   
   override func collectionView(collectionView: JSQMessagesCollectionView!, attributedTextForMessageBubbleTopLabelAtIndexPath indexPath: NSIndexPath!) -> NSAttributedString! {
-    return nil
+    logger.debug("Attributed text for message bubble top label at index path \(indexPath)")
+    return NSAttributedString(string: "Hello", attributes: [NSFontAttributeName: UIFont.systemFontOfSize(12.0)])
   }
   
   override func collectionView(collectionView: JSQMessagesCollectionView!, attributedTextForCellBottomLabelAtIndexPath indexPath: NSIndexPath!) -> NSAttributedString! {
-    return nil
+    return NSAttributedString(string: "Hello")
   }
 }
 
