@@ -50,7 +50,10 @@ extension Division {
 }
 
 // MARK: - MVCoreDataObject protocol functions
-extension Division: MVCoreDataObject {
+extension Division: CoreDataObject {
+  static var remoteId: String { return DivisionConstants.RemoteDivision.Id }
+  static var className: String { return DivisionConstants.ClassName }
+  
   var syncRequired: Bool {
     return name == nil
   }

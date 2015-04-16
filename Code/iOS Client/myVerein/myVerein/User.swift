@@ -125,7 +125,10 @@ extension User {
 }
 
 // MARK: - MVCoreDataObject protocol functions
-extension User: MVCoreDataObject {
+extension User: CoreDataObject {
+  static var remoteId: String { return UserConstants.RemoteUser.Id }
+  static var className: String { return UserConstants.ClassName }
+  
   var syncRequired: Bool {
     return (email == nil || firstName == nil || lastName == nil)
   }

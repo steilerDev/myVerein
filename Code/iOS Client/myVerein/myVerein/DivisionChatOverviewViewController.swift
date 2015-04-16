@@ -93,9 +93,6 @@ extension DivisionChatOverviewViewController {
     
     logger.verbose("Initiating division chat overview data source")
     
-    //Syncing user divisions everytime the view loads
-    MVNetworkingHelper.syncUserDivision()
-    
     // Accessing fetched result controller and therfore initiating it if it did not happen yet
     var error: NSError?
     if fetchedResultController.performFetch(&error) {
@@ -325,6 +322,7 @@ extension DivisionChatOverviewViewController: NSFetchedResultsControllerDelegate
 extension DivisionChatOverviewViewController {
   func startRefresh(refreshControl: UIRefreshControl) {
     logger.info("Refresh started")
+    NSFetchedResultsController.deleteCacheWithName(fetchedResultController.cacheName)
     collectionView?.reloadData()
     refreshControl.endRefreshing()
   }

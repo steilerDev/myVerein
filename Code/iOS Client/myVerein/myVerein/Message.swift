@@ -29,17 +29,19 @@ import SwiftyUserDefaults
 class Message: NSManagedObject {
   @NSManaged var id: String
   @NSManaged var read: Bool
-  @NSManaged var timestamp: NSDate?
-  @NSManaged var sender: User
-  @NSManaged var division: Division
-  @NSManaged var content: String?
+  @NSManaged var timestamp: NSDate!
+  @NSManaged var sender: User!
+  @NSManaged var division: Division!
+  @NSManaged var content: String!
 }
 
 // MARK: - Convenience getter and setter for complex values/relations stored in database
 extension Message {
   var isOutgoingMessage: Bool {
-    if let userID = Defaults[MVUserDefaultsConstants.UserID].string{
-      return userID == sender.id
+    if let userID = Defaults[MVUserDefaultsConstants.UserID].string,
+      senderID = sender?.id
+    {
+      return userID == senderID
     } else {
       return true
     }
@@ -47,31 +49,39 @@ extension Message {
 }
 
 // MARK: - MVCoreDataObject protocol functions
-extension Message: MVCoreDataObject {
+extension Message: CoreDataObject {
+  static var remoteId: String { return MessageConstants.RemoteMessage.Id }
+  static var className: String { return MessageConstants.ClassName }
+  
   var syncRequired: Bool {
-    return false
+    return sender == nil || division == nil || timestamp == nil || content == nil
   }
   
   func sync() {
-    MVNetworkingHelper.syncMessages()
+    MVNetworkingHelper.syncMessage(id)
   }
 }
 
 // MARK: - JSQMessageData protocol functions
 extension Message: JSQMessageData {
   func date() -> NSDate {
-    return timestamp!
+    return timestamp
   }
   
   func senderDisplayName() -> String {
-    if let firstName = sender.firstName, lastName = sender.lastName {
-      return "\(firstName) \(lastName)"
-    } else if let email = sender.email {
-      sender.sync()
-      return email
+    if let sender = sender {
+      if let firstName = sender.firstName, lastName = sender.lastName {
+        return "\(firstName) \(lastName)"
+      } else if let email = sender.email {
+        sender.sync()
+        return email
+      } else {
+        sender.sync()
+        return sender.id
+      }
     } else {
-      sender.sync()
-      return sender.id
+      sync()
+      return "Sender not available"
     }
   }
   
@@ -80,7 +90,7 @@ extension Message: JSQMessageData {
   }
   
   func text() -> String {
-    return content!
+    return content
   }
   
   func isMediaMessage() -> Bool {

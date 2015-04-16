@@ -47,6 +47,9 @@ enum MVErrorCodes: Int {
   case MVMessageCreationError = 62
   case MVUserCreationError = 63
   case MVEventCreationError = 64
+  
+  // Internal errors
+  case MVFunctionNotImplemented = 100
 }
 
 class MVError {
@@ -179,6 +182,12 @@ class MVError {
           NSLocalizedDescriptionKey: "The server response does not contain any data",
           NSLocalizedFailureReasonErrorKey: "In general this means that the task does not have anything to do",
           NSLocalizedRecoverySuggestionErrorKey: "If this behaviour is not an options retry your action"
+        ]
+      case .MVFunctionNotImplemented:
+        return [
+          NSLocalizedDescriptionKey: "The used function is not implemented",
+          NSLocalizedFailureReasonErrorKey: "The function might be part of a base which needs to get overwritten",
+          NSLocalizedRecoverySuggestionErrorKey: "Overwrite the function and re-run the task"
         ]
     default: return nil
     }

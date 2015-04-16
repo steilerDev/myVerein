@@ -163,7 +163,7 @@ extension ParticipantViewController {
         let logger = XCGLogger.defaultInstance()
         let userRepository = UserRepository()
         if let responseObject = responseObject as? [String] {
-          let (user, error) = userRepository.getOrCreateUsersFrom(serverResponseObject: responseObject)
+          let (user: [User]?, error) = userRepository.getOrCreateFrom(serverResponseArray: responseObject)
           if error != nil && user == nil {
             logger.error("Unable to get participants, because response object could not be read: \(error!.extendedDescription)")
           } else {

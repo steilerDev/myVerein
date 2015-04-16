@@ -253,7 +253,7 @@ extension MVNetworking {
 /// This extension is centralizing all message related networking actions.
 extension MVNetworking {
   /// This function is gathering all unread messages. The callbacks are not guaranteed to be executed on the main queue.
-  class func messageSyncAction(#success: (AnyObject) -> (), failure: (NSError) -> ()) {
+  class func messageSyncUnreadAction(#success: (AnyObject) -> (), failure: (NSError) -> ()) {
     logger.verbose("Started message sync action")
     handleRequest(
       URI: NetworkingConstants.Message.Sync.URI,
@@ -265,8 +265,8 @@ extension MVNetworking {
     )
   }
   
-  /// This function is gathering all unread messages. The callbacks are not guaranteed to be executed on the main queue.
-  class func allMessageSyncAction(#success: (AnyObject) -> (), failure: (NSError) -> ()) {
+  /// This function is gathering all messages. The callbacks are not guaranteed to be executed on the main queue.
+  class func messageSyncAllAction(#success: (AnyObject) -> (), failure: (NSError) -> ()) {
     logger.verbose("Started all messages sync action")
     handleRequest(
       URI: NetworkingConstants.Message.Sync.URI,
@@ -278,9 +278,21 @@ extension MVNetworking {
     )
   }
   
+  class func messageSyncOneAction(messageId: String, success:(AnyObject) -> (), failure: (NSError) -> ()) {
+    logger.verbose("Syncing message with id \(messageId)")
+    handleRequest(
+      URI: NetworkingConstants.Message.Sync.URI,
+      parameters: [NetworkingConstants.Message.Sync.Parameter.MessageID: messageId],
+      requestMethod: NetworkingConstants.Message.Sync.Method,
+      retryCount: 0,
+      success: success,
+      failure: failure
+    )
+  }
+  
   /// This function is sending a specific message to the server. The callbacks are not guaranteed to be executed on the main queue.
-  class func sendMessageAction(#success: (AnyObject) -> (), failure: (NSError) -> (), message: Message) {
-    logger.verbose("Started sending message action")
+  class func sendMessageAction(message: Message, success: (AnyObject) -> (), failure: (NSError) -> ()) {
+    logger.verbose("Started sending message action with message \(message)")
     handleRequest(
       URI: NetworkingConstants.Message.Send.URI,
       parameters: [

@@ -107,7 +107,7 @@ class MVDateParser {
 
 // MARK: - Networking constants
 public struct NetworkingConstants {
-  
+  // MARK: Login
   struct Login {
     static let URI = "/api/login"
     struct Parameter {
@@ -121,7 +121,7 @@ public struct NetworkingConstants {
       static let SystemVersion = "System-Version"
     }
   }
-  
+  // MARK: Message
   struct Message {
     static let BaseURI = "/api/user/message"
     struct Sync {
@@ -129,6 +129,7 @@ public struct NetworkingConstants {
       static let Method = HTTPMethods.GET
       struct Parameter {
         static let All = "all"
+        static let MessageID = "id"
       }
     }
     struct Send {
@@ -140,7 +141,7 @@ public struct NetworkingConstants {
       }
     }
   }
-  
+  // MARK: User
   struct User {
     static let BaseURI = "/api/user/user"
     struct Get {
@@ -160,7 +161,7 @@ public struct NetworkingConstants {
       }
     }
   }
-  
+  // MARK: Division
   struct Division {
     static let BaseURI = "/api/user/division"
     struct Get {
@@ -175,7 +176,7 @@ public struct NetworkingConstants {
       static let Method = HTTPMethods.GET
     }
   }
-  
+  // MARK: Event
   struct Event {
     static let BaseURI = "/api/user/event"
     struct Get {

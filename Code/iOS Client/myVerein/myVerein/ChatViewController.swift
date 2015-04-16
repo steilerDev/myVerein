@@ -88,12 +88,10 @@ extension ChatViewController {
       inputToolbar.contentView.leftBarButtonItem = nil
       
       logger.debug("Loading user")
-      let userRepository = UserRepository()
-      if let senderId = Defaults[MVUserDefaultsConstants.UserID].string,
-        sender = userRepository.getOrCreateUserFrom(id: senderId).user
+      if let sender = UserRepository.getCurrentUser()
       {
         logger.debug("Successfully loaded user")
-        self.senderId = senderId
+        self.senderId = sender.id
         senderDisplayName = sender.displayName
       } else {
         logger.error("Unable to load user")
@@ -271,7 +269,7 @@ extension ChatViewController {
   override func didPressSendButton(button: UIButton!, withMessageText text: String!, senderId: String!, senderDisplayName: String!, date: NSDate!) {
     logger.debug("Sending message with text \(text) and timestamp \(date) to division \(self.division)")
     let messageRepository = MessageRepository()
-    let message = messageRepository.createMessage(text, id: NSUUID().UUIDString, timestamp: date, division: division, sender: UserRepository.getCurrentUser()!)
+    let message = messageRepository.createMessage(text, timestamp: date, division: division, sender: UserRepository.getCurrentUser()!)
     messageRepository.save()
     finishSendingMessage()
     

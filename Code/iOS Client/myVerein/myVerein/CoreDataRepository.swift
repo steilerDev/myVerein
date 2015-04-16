@@ -25,14 +25,50 @@ import XCGLogger
 import UIKit
 import CoreData
 
-/// This class is a general core data repository holding definitions for the logger, managed context and saving mechanics.
+/// This class is a general core data repository holding definitions for the logger, managed context and saving mechanics. On top of that it provides a general mechanism of parsing and creating objects retrieved from the server. Since a lot of these functions are using generics the error 'Cannot invode '...' with an argument list of type '...'' might appear. In this case explicit stating the type should resolve the problem.
 class CoreDataRepository {
   
   let logger = XCGLogger.defaultInstance()
   
-  // Retreive the managedObjectContext from AppDelegate
+  // Retrieve the shared managedObjectContext from AppDelegate
   let managedObjectContext = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext!
   
+  // MARK: - Synchronization of objects (Put here because you currently cannot overwrite a function that is declared in an extension
+  
+  /// This function is used to synchronize the object using the server response. If the object, identified by it's id, does not exist yet, it gets created.
+  ///
+  /// :param: serverResponseDictionary A dictionary, where the key is defined by the core data's object variable 'remoteId' and the (string) value is the object's ID. Besides the id, the other values are used to populate the item.
+  /// :returns: A core data object or nil if an error occured. In generel the provided error should then help identify the problem.
+  func syncObjectWith<T: CoreDataObject>(#serverResponseDictionary: [String: AnyObject]) -> (T?, NSError?) {
+    logger.verbose("Creating core data object from response dictionary \(serverResponseDictionary)")
+    
+    // TODO: Improve, because if object is created he gets populated again.
+    let (object: T?, error) = getOrCreateFrom(serverResponseDictionary: serverResponseDictionary)
+    
+    if object == nil || error != nil {
+      logger.debug("Unable to get existing object \(error!.extendedDescription)")
+      return (nil, error)
+    } else {
+      logger.debug("Parsing object properties")
+      return populateObject(object!, usingDictionary: serverResponseDictionary)
+    }
+  }
+  
+  /// This function is using the provided dictionary to populate the core data object. This function can be seen as an abstract function, because it does not have any functionality and should be overwritten in CoreDataRepository's subclasses.
+  ///
+  /// :param: coreDataObject The object that is going to be populated.
+  /// :param: dictionary The data used to populate the object, formatted as dictionary. The key/value pairs depend on the actual implementation.
+  /// :returns: A core data object or nil if an error occured. In generel the provided error should then help identify the problem.
+  func populateObject<T: CoreDataObject>(coreDataObject: T, usingDictionary dictionary: [String: AnyObject]) -> (T?, NSError?) {
+    let error = MVError.createError(.MVFunctionNotImplemented)
+    logger.severe("This function needs to be overwritten, because it does not have any functionality in it's base class: \(error.extendedDescription)")
+    logger.debugExec { abort() }
+    return (nil, error)
+  }
+}
+
+// MARK: - Persistent function and variables (Saving context and checking if context changed)
+extension CoreDataRepository {
   /// This variable tells an application if the database changed.
   var databaseDidChange: Bool {
     return managedObjectContext.hasChanges
@@ -57,14 +93,23 @@ class CoreDataRepository {
       logger.info("No need to save the database")
     }
   }
-  
-  /// This function executes a fetch request on the database, which is only expecting a single entry to be returned.
-  func executeSingleRequest<T: MVCoreDataObject>(fetchRequest: NSFetchRequest) -> T? {
+}
+
+// MARK: - Low level query functions
+extension CoreDataRepository {
+  /// This function executes a fetch request on the database, which is only expecting a single entry to be returned. If the object is out of sync it gets syncronized asynchrounously.
+  ///
+  /// :param: fetchRequest The fetch request that should be executed
+  /// :returns: A single object conforming the query or nil if the query was unsuccessful. If there is more than one object returned by the query, the function returns the last item of the list.
+  func executeSingleRequest<T: CoreDataObject>(fetchRequest: NSFetchRequest) -> T? {
     return executeListRequest(fetchRequest)?.last
   }
   
-  /// This function executes a fetch request on the database, which is expecting several entries to be returned.
-  func executeListRequest<T: MVCoreDataObject>(fetchRequest: NSFetchRequest) -> [T]? {
+  /// This function executes a fetch request on the database, which is expecting several entries to be returned. If the object is out of sync it gets syncronized asynchrounously.
+  ///
+  /// :param: fetchRequest The fetch request that should be executed
+  /// :returns: A list of objects conforming the query or nil if the query was unsuccessful.
+  func executeListRequest<T: CoreDataObject>(fetchRequest: NSFetchRequest) -> [T]? {
     var error: NSError?
     if let queriedObject = managedObjectContext.executeFetchRequest(fetchRequest, error: &error) as? [T] {
       
@@ -90,8 +135,122 @@ class CoreDataRepository {
   }
 }
 
+// MARK: Object creation and retrieve functions
+extension CoreDataRepository {
+  
+  /// This function returns a list of core data objects defined through the server response object. If the object was allready in the database, it's synchronisation status is checked and -if needed- an asynchronous synchronization is performed, otherwise a new object is created and populated asynchronously.
+  ///
+  /// :param: serverResponseArray A JSON formatted array, which is either a pure list of object IDs (as string) or a dictionary, where the key is defined by the core data's object variable 'remoteId' and the (string) value is the object's ID. Besides the id, other values may be part of the response object. They are going to be ignored during creation.
+  /// :returns: A list of core data objects or nil if an error occured. In generel the provided error should then help identify the problem.
+  func getOrCreateFrom<T: CoreDataObject>(#serverResponseArray: [AnyObject]) -> ([T]?, NSError?) {
+    logger.verbose("Parsing and retrieving core data object from response array: \(serverResponseArray)")
+    var objectList = [T]()
+    
+    if let serverResponseArray = serverResponseArray as? [[String: AnyObject]] {
+      logger.debug("The response object is a dictionary of id's")
+      for object in serverResponseArray {
+        let (newObject:T?, error) = getOrCreateFrom(serverResponseDictionary: object)
+        if error != nil && newObject == nil {
+          return (nil, error)
+        } else {
+          objectList.append(newObject!)
+        }
+      }
+    } else if let serverResponseArray = serverResponseArray as? [String] {
+      logger.debug("The response object is a list of id's")
+      for object in serverResponseArray {
+        let (newObject:T?, error) = getOrCreateFrom(id: object)
+        if error != nil && newObject == nil {
+          return (nil, error)
+        } else {
+          objectList.append(newObject!)
+        }
+      }
+    } else {
+      let error = MVError.createError(.MVEntityCreationError,
+        failureReason: "Object could not be created, because the server response object could not be parsed",
+        underlyingError: .MVServerResponseParseError
+      )
+      logger.warning("Unable to create object from request object \(serverResponseArray): \(error.extendedDescription)")
+    }
+    logger.info("Returning \(objectList.count) new objects")
+    return (objectList, nil)
+  }
+  
+  /// This function returns a core data object defined through the server response object. If the object was allready in the database, it's synchronisation status is checked and -if needed- an asynchronous synchronization is performed, otherwise a new object is created and populated asynchronously.
+  ///
+  /// :param: serverResponseDictionary A JSON formatted dictionary, where the key is defined by the core data's object variable 'remoteId' and the (string) value is the object's ID. Besides the id, other values may be part of the response object. They are going to be ignored during creation.
+  /// :returns: A core data object or nil if an error occured. In generel the provided error should then help identify the problem.
+  func getOrCreateFrom<T: CoreDataObject>(#serverResponseDictionary: [String: AnyObject]) -> (T?, NSError?) {
+    logger.verbose("Parsing and retrieving core data object from response dictionary: \(serverResponseDictionary)")
+    if let objectId = serverResponseDictionary["id"] as? String {
+      return getOrCreateFrom(id: objectId)
+    } else {
+      let error = MVError.createError(.MVEntityCreationError,
+        failureReason: "Object could not be created, because the server response object could not be parsed",
+        underlyingError: .MVServerResponseParseError
+      )
+      logger.warning("Unable to create object from request object \(serverResponseDictionary): \(error.extendedDescription)")
+      return (nil, error)
+    }
+  }
+  
+  /// This function returns a core data object defined through it's id. If the object was allready in the database, it's synchronisation status is checked and -if needed- an asynchronous synchronization is performed, otherwise a new object is created and populated asynchronously.
+  ///
+  /// :param: id The id representation of the object.
+  /// :returns: A core data object or nil if an error occured. In generel the provided error should then help identify the problem.
+  func getOrCreateFrom<T: CoreDataObject>(#id: String) -> (T?, NSError?) {
+    logger.debug("Get or create object from id \(id)")
+    if let object: T = findBy(id: id) {
+      if object.syncRequired {
+        object.sync()
+      }
+      logger.info("Returning object with ID \(id) from local database")
+      return (object, nil)
+    } else {
+      logger.info("Creating new object with ID \(id)")
+      let object: T = createObject(id)
+      return (object, nil)
+    }
+  }
+  
+  /// This function creates a new core data object and synchronizes it asynchronously.
+  ///
+  /// :param: id The unique identifier of the object.
+  /// :returns: A core data object, which is not fully synchronized, but should be at a later point in time.
+  func createObject<T: CoreDataObject>(id: String) -> T {
+    logger.verbose("Creating new object with id \(id)")
+    let newItem = NSEntityDescription.insertNewObjectForEntityForName(T.className, inManagedObjectContext: managedObjectContext) as! T
+    newItem.id = id
+    
+    // Getting rest of the object asynchronously
+    newItem.sync()
+    
+    return newItem
+  }
+  
+  func findBy<T: CoreDataObject>(#id: String) -> T? {
+    // Create a new fetch request
+    let fetchRequest = NSFetchRequest(entityName: T.className)
+    
+    let predicate = NSPredicate(format: "id == %@", id)
+    fetchRequest.predicate = predicate
+    
+    return executeSingleRequest(fetchRequest)
+  }
+}
+
 /// This protocol defines a core data object used within this application
-protocol MVCoreDataObject: AnyObject {
+protocol CoreDataObject: AnyObject {
+  
+  /// This static variable is returning the string, used to represent the unique identifier of the object on the server
+  static var remoteId: String { get }
+  
+  /// This static variable is returning the class name of the object, that can be used to query this kind of object
+  static var className: String { get }
+  
+  /// This variable is the unique identifier of the object within the application. It is expected to be @NSManaged, since the queries will use the string 'id' to identify objects.
+  var id: String { get set }
   
   /// This computed variable should check if an object is out of sync, and return true if the object needs to be synchronized. This is check is executed, everytime the object is retrieved from the database. Note: This function needs to be executed on the same queue as the one used to gather the object, which is most likely the main queue and should therefore not be too expensive.
   var syncRequired: Bool { get }

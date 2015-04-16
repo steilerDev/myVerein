@@ -105,79 +105,57 @@ class MessageRepository: CoreDataRepository {
   }
   
   // MARK: - Creation and population of message
-  
-  /// This function tries to parse an array of messages and inserts them temporarily into the database.
-  func getOrCreateMessagesFrom(#serverResponseObject: [AnyObject]) -> (messages: [Message]?, error: NSError?) {
-    logger.verbose("Creating message from response object: \(serverResponseObject)")
-    var newMessages = [Message]()
-    for message in serverResponseObject {
+  override func populateObject<T : CoreDataObject>(coreDataObject: T, usingDictionary dictionary: [String : AnyObject]) -> (T?, NSError?) {
+    if let message = coreDataObject as? Message,
+      id = dictionary[MessageConstants.RemoteMessage.Id] as? String,
+      content = dictionary[MessageConstants.RemoteMessage.Content] as? String,
+      timestampDict = dictionary[MessageConstants.RemoteMessage.Timestamp] as? [String: AnyObject],
+      timestamp = MVDateParser.parseDateTime(timestampDict),
+      divisionDict = dictionary[MessageConstants.RemoteMessage.Division] as? [String: AnyObject],
+      senderDict = dictionary[MessageConstants.RemoteMessage.Sender] as? [String: AnyObject]
+    {
+      let divisionRepository = DivisionRepository()
+      let userRepository = UserRepository()
+      let (division: Division?, divisionError) = divisionRepository.getOrCreateFrom(serverResponseDictionary: divisionDict)
+      let (sender: User?, senderError) = userRepository.getOrCreateFrom(serverResponseDictionary: senderDict)
       
-      if let messageDict = message as? [String: AnyObject] {
-        let (newMessage, error) = getOrCreateMessageFrom(serverResponseObject: messageDict)
-        if error != nil && newMessage == nil {
-          return (nil, error)
-        } else {
-          newMessages.append(newMessage!)
-        }
-      } else {
-        let error = MVError.createError(.MVServerResponseParseError)
-        logger.error("Unable to parse messages: \(error.extendedDescription)")
-        return (nil, error)
-      }
-    }
-    logger.info("Returning \(newMessages.count) new messages")
-    return (newMessages, nil)
-  }
-  
-  /// This function tries to parse a message and inserts it temporarily into the database.
-  func getOrCreateMessageFrom(#serverResponseObject: [String: AnyObject]) -> (message: Message?, error: NSError?) {
-    if let id = serverResponseObject[MessageConstants.RemoteMessage.Id] as? String {
-      if let message = findMessageBy(id: id) {
-        return (message, nil)
-      } else if let content = serverResponseObject[MessageConstants.RemoteMessage.Content] as? String,
-        timestampDict = serverResponseObject[MessageConstants.RemoteMessage.Timestamp] as? Dictionary<String, AnyObject>,
-        timestamp = MVDateParser.parseDateTime(timestampDict),
-        divisionDict = serverResponseObject[MessageConstants.RemoteMessage.Division] as? Dictionary<String, AnyObject>,
-        senderDict = serverResponseObject[MessageConstants.RemoteMessage.Sender] as? Dictionary<String, AnyObject>
+      if senderError != nil {
+        logger.error("Unable to create message because an error ocurred while getting sender: \(senderError!.extendedDescription)")
+        return (nil, senderError)
+      } else if divisionError != nil {
+        logger.error("Unable to create message because an error ocurred while getting receiving division: \(divisionError!.extendedDescription)")
+        return (nil, divisionError)
+      } else if let division = division,
+        sender = sender
       {
-        let divisionRepository = DivisionRepository()
-        let userRepository = UserRepository()
-        let (divisionOptional, divisionError) = divisionRepository.getOrCreateDivisionFrom(serverResponseObject: divisionDict)
-        let (senderOptional, senderError) = userRepository.getOrCreateUserFrom(serverResponseObject: senderDict)
+        message.id = id
+        message.content = content
+        message.timestamp = timestamp
+        message.sender = sender
+        message.division = division
         
-        if senderError != nil {
-          logger.error("Unable to create message because an error ocurred while getting sender: \(senderError!.extendedDescription)")
-          return (nil, senderError)
-        } else if divisionError != nil {
-          logger.error("Unable to create message because an error ocurred while getting receiving division: \(divisionError!.extendedDescription)")
-          return (nil, divisionError)
-        } else if let division = divisionOptional,
-          sender = senderOptional
-        {
-          logger.debug("Creating message with id \(id), content \(content), timestamp \(timestamp), sender \(sender.id) and division \(division.id)")
-          return (createMessage(content, id: id, timestamp: timestamp, division: division, sender: sender), nil)
-        } else {
-          let error = MVError.createError(MVErrorCodes.MVMessageCreationError)
-          logger.error("Unable to create message: \(error.extendedDescription)")
-          return (nil , error)
+        // If this is the first message, or the message is newer use it
+        if division.latestMessage == nil || division.latestMessage?.timestamp?.compare(timestamp) == NSComparisonResult.OrderedAscending {
+          logger.debug("Message \(id) is newest in division \(division.id), updating division's latest message")
+          division.latestMessage = message
         }
+        return ((message as! T), nil)
       } else {
-        let error = MVError.createError(.MVServerResponseParseError)
+        let error = MVError.createError(MVErrorCodes.MVMessageCreationError)
         logger.error("Unable to create message: \(error.extendedDescription)")
-        return (nil, error)
+        return (nil , error)
       }
     } else {
       let error = MVError.createError(.MVServerResponseParseError)
-      logger.error("Unable to read message id: \(error.extendedDescription)")
+      logger.error("Unable to create message: \(error.extendedDescription)")
       return (nil, error)
     }
   }
   
   /// This function creates a new message using the provided information.
-  func createMessage(content: String, id: String, timestamp: NSDate, division: Division, sender: User) -> Message {
-    logger.verbose("Creating message with id \(id), content \(content), timestamp \(timestamp), sender \(sender.id) and division \(division.id)")
-    let newItem = NSEntityDescription.insertNewObjectForEntityForName(MessageConstants.ClassName, inManagedObjectContext: managedObjectContext) as! Message
-    newItem.id = id
+  func createMessage(content: String, timestamp: NSDate, division: Division, sender: User) -> Message {
+    logger.verbose("Creating message with content \(content), timestamp \(timestamp), sender \(sender.id) and division \(division.id)")
+    let newItem: Message = createObject(NSUUID().UUIDString)
     newItem.content = content
     newItem.timestamp = timestamp
     newItem.division = division
@@ -187,10 +165,9 @@ class MessageRepository: CoreDataRepository {
     
     // If this is the first message, or the message is newer use it
     if division.latestMessage == nil || division.latestMessage?.timestamp?.compare(timestamp) == NSComparisonResult.OrderedAscending {
-      logger.debug("Message \(id) is newest in division \(division.id), updating division's latest message")
+      logger.debug("Message \(newItem) is newest in division \(division.id), updating division's latest message")
       division.latestMessage = newItem
     }
-    
     return newItem
   }
 }

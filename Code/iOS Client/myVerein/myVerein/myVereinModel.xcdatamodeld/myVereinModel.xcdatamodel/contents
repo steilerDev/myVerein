@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="7541.6" systemVersion="14D113c" minimumToolsVersion="Xcode 4.3" macOSVersion="Automatic" iOSVersion="Automatic">
+<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="7549" systemVersion="14D131" minimumToolsVersion="Xcode 4.3" macOSVersion="Automatic" iOSVersion="Automatic">
     <entity name="Division" representedClassName="myVerein.Division" syncable="YES">
         <attribute name="desc" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="id" attributeType="String" indexed="YES" syncable="YES"/>
@@ -33,9 +33,9 @@
         <attribute name="id" attributeType="String" indexed="YES" syncable="YES"/>
         <attribute name="read" optional="YES" attributeType="Boolean" defaultValueString="NO" syncable="YES"/>
         <attribute name="timestamp" optional="YES" attributeType="Date" syncable="YES"/>
-        <relationship name="division" maxCount="1" deletionRule="Nullify" destinationEntity="Division" inverseName="rawChatMessage" inverseEntity="Division" syncable="YES"/>
+        <relationship name="division" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Division" inverseName="rawChatMessage" inverseEntity="Division" syncable="YES"/>
         <relationship name="latestMessageDivision" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Division" inverseName="latestMessage" inverseEntity="Division" syncable="YES"/>
-        <relationship name="sender" maxCount="1" deletionRule="Nullify" destinationEntity="User" inverseName="rawSendMessages" inverseEntity="User" syncable="YES"/>
+        <relationship name="sender" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="User" inverseName="rawSendMessages" inverseEntity="User" syncable="YES"/>
     </entity>
     <entity name="User" representedClassName="myVerein.User" syncable="YES">
         <attribute name="birthday" optional="YES" attributeType="Date" syncable="YES"/>
@@ -62,8 +62,8 @@
     </entity>
     <elements>
         <element name="Division" positionX="-182" positionY="188" width="128" height="30"/>
+        <element name="Event" positionX="-585" positionY="216" width="128" height="255"/>
         <element name="Message" positionX="-497" positionY="81" width="128" height="148"/>
         <element name="User" positionX="-794" positionY="81" width="128" height="360"/>
-        <element name="Event" positionX="-585" positionY="216" width="128" height="255"/>
     </elements>
 </model>

@@ -94,7 +94,10 @@ extension Event {
 }
 
 // MARK: - MVCoreDataObject protocol functions
-extension Event: MVCoreDataObject {
+extension Event: CoreDataObject {
+  static var remoteId: String { return EventConstants.RemoteEvent.Id }
+  static var className: String { return EventConstants.ClassName }
+  
   var syncRequired: Bool {
     return (endDate == nil || startDate == nil || name == nil)
   }
