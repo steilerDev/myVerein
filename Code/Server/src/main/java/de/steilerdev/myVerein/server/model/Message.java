@@ -197,6 +197,20 @@ public class Message
     }
 
     /**
+     * This function creates a new message object and copies only the id and timestamp of the current message. This is used as a response to a succesfully send message.
+     * @return A new message object only containing the id and timestamp.
+     */
+    @JsonIgnore
+    @Transient
+    public Message getSendingObjectOnlyIdAndTimestamp()
+    {
+        Message sendingObject = new Message();
+        sendingObject.setId(id);
+        sendingObject.setTimestamp(timestamp);
+        return sendingObject;
+    }
+
+    /**
      * This function creates a new message object and copies only the id of the current message.
      * @return A new message object only containing the id.
      */

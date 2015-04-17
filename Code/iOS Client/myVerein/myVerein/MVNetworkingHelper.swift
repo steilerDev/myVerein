@@ -43,12 +43,11 @@ extension MVNetworkingHelper {
         let logger = XCGLogger.defaultInstance()
         if let responseArray = response as? [AnyObject] {
           let messageRepository = MessageRepository()
-          let (messages: [Message]?, error) = messageRepository.getOrCreateFrom(serverResponseArray: responseArray)
+          let (messages: [Message]?, error) = messageRepository.getOrCreateUsingArray(responseArray, AndSync: true)
           if messages == nil || error != nil {
             logger.error("Unable to sync messages \(error!.extendedDescription)")
           } else if let messages = messages where !messages.isEmpty {
             messageRepository.save()
-            MVNotification.sendMessageSyncCompletedNotificationForNewMessages(messages)
             logger.info("Successfully synced and saved new messages")
           } else {
             logger.warning("Successfully synced messages, but there are no new messages available")
@@ -74,7 +73,7 @@ extension MVNetworkingHelper {
         let logger = XCGLogger.defaultInstance()
         if let responseArray = response as? [AnyObject] {
           let messageRepository = MessageRepository()
-          let (messages: [Message]?, error) = messageRepository.getOrCreateFrom(serverResponseArray: responseArray)
+          let (messages: [Message]?, error) = messageRepository.getOrCreateUsingArray(responseArray, AndSync: true)
           if messages == nil || error != nil {
             logger.warning("Unable to sync all messages \(error!.extendedDescription)")
           } else if let messages = messages where !messages.isEmpty {
@@ -104,7 +103,7 @@ extension MVNetworkingHelper {
         let logger = XCGLogger.defaultInstance()
         if let responseDict = response as? [String: AnyObject] {
           let messageRepository = MessageRepository()
-          let (message: Message?, error) = messageRepository.syncObjectWith(serverResponseDictionary: responseDict)
+          let (message: Message?, error) = messageRepository.syncObjectUsingDictionary(responseDict)
           if message == nil || error != nil {
             logger.warning("Unable to sync message \(messageId): \(error!.extendedDescription)")
           } else if messageRepository.databaseDidChange {
@@ -134,11 +133,14 @@ extension MVNetworkingHelper {
         response in
         let logger = XCGLogger.defaultInstance()
         if let responseDict = response as? [String: AnyObject],
-          responseId = responseDict[MessageConstants.RemoteMessage.Id] as? String
+          responseId = responseDict[MessageConstants.RemoteMessage.Id] as? String,
+          responseTimestampDict = responseDict[MessageConstants.RemoteMessage.Timestamp] as? [String: AnyObject],
+          responseTimestamp = MVDateParser.parseDateTime(responseTimestampDict)
         {
-          logger.debug("Updating message id from \(message.id) to \(responseId)")
+          logger.debug("Updating message id from \(message.id) to \(responseId), and timestamp from \(message.timestamp) to \(responseTimestamp)")
           let messageRepository = MessageRepository()
           message.id = responseId
+          message.timestamp = responseTimestamp
           messageRepository.save()
         }
       },
@@ -164,7 +166,7 @@ extension MVNetworkingHelper {
         let logger = XCGLogger.defaultInstance()
         if let responseDict = response as? [String: AnyObject] {
           let userRepository = UserRepository()
-          let (user: User?, error) = userRepository.syncObjectWith(serverResponseDictionary: responseDict)
+          let (user: User?, error) = userRepository.syncObjectUsingDictionary(responseDict)
           if user == nil || error != nil {
             logger.warning("Unable to sync user \(userId): \(error!.extendedDescription)")
           } else {
@@ -197,7 +199,7 @@ extension MVNetworkingHelper {
         let logger = XCGLogger.defaultInstance()
         if let responseDict = response as? [String: AnyObject] {
           let divisionRepository = DivisionRepository()
-          let (division: Division?, error) = divisionRepository.syncObjectWith(serverResponseDictionary: responseDict)
+          let (division: Division?, error) = divisionRepository.syncObjectUsingDictionary(responseDict)
           if division == nil || error != nil {
             logger.warning("Unable to sync division \(divisionId): \(error!.extendedDescription)")
           } else {
@@ -225,8 +227,8 @@ extension MVNetworkingHelper {
         let logger = XCGLogger.defaultInstance()
         if let responseArray = response as? [AnyObject] {
           let divisionRepository = DivisionRepository()
-          let (newDivisions: [Division]?, error) = divisionRepository.getOrCreateFrom(serverResponseArray: responseArray)
-          let oldDivisions = divisionRepository.findDivisionBy(userMembershipStatus: .Member) ?? [Division]()
+          let (newDivisions: [Division]?, error) = divisionRepository.getOrCreateUsingArray(responseArray, AndSync: true)
+          let oldDivisions = divisionRepository.findDivisionByUserMembershipStatus(.Member) ?? [Division]()
           
           if error != nil || newDivisions == nil {
             logger.warning("Unable to sync user's divisions: \(error!.extendedDescription)")
@@ -281,7 +283,7 @@ extension MVNetworkingHelper {
         let logger = XCGLogger.defaultInstance()
         if let responseArray = response as? [AnyObject] {
           let eventRepository = EventRepository()
-          let (events: [Event]?, error) = eventRepository.getOrCreateFrom(serverResponseArray: responseArray)
+          let (events: [Event]?, error) = eventRepository.getOrCreateUsingArray(responseArray, AndSync: true)
           if events == nil || error != nil {
             logger.warning("Unable to sync events \(error!.extendedDescription)")
           } else if let events = events where !events.isEmpty {
@@ -330,7 +332,7 @@ extension MVNetworkingHelper {
         let logger = XCGLogger.defaultInstance()
         if let responseDict = response as? [String: AnyObject] {
           let eventRepository = EventRepository()
-          let (event: Event?, error) = eventRepository.syncObjectWith(serverResponseDictionary: responseDict)
+          let (event: Event?, error) = eventRepository.syncObjectUsingDictionary(responseDict)
           if event == nil || error != nil {
             logger.warning("Unable to sync event \(eventId): \(error!.extendedDescription)")
           } else if eventRepository.databaseDidChange {

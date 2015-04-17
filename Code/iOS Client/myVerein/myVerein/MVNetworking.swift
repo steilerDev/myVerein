@@ -365,7 +365,7 @@ extension MVNetworking {
       logger.debug("Last synced events \(lastSynced)")
       
       // Checking if the last sync is not older than the defined MinimalSecondsBetweenEventSync and aborting the sync if so
-      if NSDate().compare(lastSynced.dateByAddingTimeInterval(EventConstants.MinimalSecondsBetweenEventSync)) == .OrderedAscending {
+      if NSDate().isBefore(lastSynced.dateByAddingTimeInterval(EventConstants.MinimalSecondsBetweenEventSync)) {
         let error = MVError.createError(.MVLastSyncTooCloseError)
         logger.warning("Last sync is not \(EventConstants.MinimalSecondsBetweenEventSync) seconds up. Not syncing: \(error.extendedDescription)")
         failure(error)

@@ -72,7 +72,7 @@ class DivisionChatCell: UICollectionViewCell {
       
       // Setting message bubble
       if let message = division.latestMessage {
-        logger.debug("Succesfully parsed latest message of division \(self.division): \(message)")
+        logger.debug("Successfully parsed latest message of division \(self.division): \(message)")
         divisionImageView.setImageWithUser(message.sender)
       } else {
         logger.error("Unable to get latest message of division \(self.division), showing division in image view")
@@ -80,7 +80,7 @@ class DivisionChatCell: UICollectionViewCell {
       }
       
       // Getting notification count
-      notificationCount = MessageRepository().countUnreadMessagesIn(division: division)
+      notificationCount = MessageRepository().countUnreadMessagesInDivision(division)
     } else {
       logger.error("Unable to get division, using default values")
       divisionLabel.text = "Division"

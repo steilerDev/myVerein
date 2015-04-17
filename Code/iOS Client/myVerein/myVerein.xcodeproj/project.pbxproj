@@ -86,7 +86,6 @@
 		3020CBB41A9E128A005AAEEF /* myVereinTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = myVereinTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		3020CBB91A9E128A005AAEEF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		3020CBBA1A9E128A005AAEEF /* myVereinTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = myVereinTests.swift; sourceTree = "<group>"; };
-		3026FE8D1AADE71F0006ABA8 /* XCGLogger.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCGLogger.framework; path = "XCGLogger/build/Debug-iphoneos/XCGLogger.framework"; sourceTree = "<group>"; };
 		302BE8C11AA642EB001D0FE7 /* DivisionChatCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DivisionChatCell.swift; sourceTree = "<group>"; };
 		302BE8C31AA64599001D0FE7 /* DivisionChatOverviewViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DivisionChatOverviewViewController.swift; sourceTree = "<group>"; };
 		3032A9F41AD70B9100EEEAF4 /* EventViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EventViewController.swift; sourceTree = "<group>"; };
@@ -108,7 +107,6 @@
 		30A4F7D81AA97D400064EA2C /* MVNetworking.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MVNetworking.swift; sourceTree = "<group>"; };
 		30BAFEE11AA518EA000D18EF /* ca-cert.cer */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ca-cert.cer"; sourceTree = "<group>"; };
 		30C2DA321ADEB440006A6143 /* MarshalOperator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MarshalOperator.swift; sourceTree = "<group>"; };
-		30D4E8EB1AB45939000F2C90 /* XCGLogger.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; name = XCGLogger.framework; path = "/Users/FrankSteiler/Library/Developer/Xcode/DerivedData/myVerein-fjumogbovoaqtlaguqenwejpzlol/Build/Products/Debug-iphoneos/XCGLogger.framework"; sourceTree = "<absolute>"; };
 		30F254E51AC7224E00E10CB9 /* SettingsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
 		30F254E71AC7271A00E10CB9 /* CalendarViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CalendarViewController.swift; sourceTree = "<group>"; };
 		30FB44BA1AACC088003E4512 /* DivisionRepository.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DivisionRepository.swift; sourceTree = "<group>"; };
@@ -143,8 +141,6 @@
 		18F6693D3B569EC6E7DBD91F /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				30D4E8EB1AB45939000F2C90 /* XCGLogger.framework */,
-				3026FE8D1AADE71F0006ABA8 /* XCGLogger.framework */,
 				FE0498950F9A959DC502856B /* Pods.framework */,
 			);
 			name = Frameworks;

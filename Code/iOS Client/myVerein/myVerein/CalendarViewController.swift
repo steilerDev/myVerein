@@ -151,13 +151,13 @@ extension CalendarViewController {
 extension CalendarViewController: JTCalendarDataSource {
   
   func calendarHaveEvent(calendar: JTCalendar!, date: NSDate!) -> Bool {
-    return EventRepository().isDisplayableEventOn(date: date)
+    return EventRepository().isDisplayableEventOnDate(date)
   }
   
   func calendarDidDateSelected(calendar: JTCalendar!, date: NSDate!) {
     logger.debug("Selected date \(date), gathering events of the date and reloading table view")
     let eventRepository = EventRepository()
-    eventsOfSelectedDate = eventRepository.findEventsBy(date: date)
+    eventsOfSelectedDate = eventRepository.findEventsByDate(date)
     logger.debug("Retrieved events \(self.eventsOfSelectedDate)")
     eventTableView.reloadData()
   }

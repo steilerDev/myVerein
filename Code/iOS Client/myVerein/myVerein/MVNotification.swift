@@ -116,11 +116,11 @@ extension MVNotification {
     if let sender = sender {
       let newResponseClosure: (NSNotification!) -> () = {
         notification in
-        if let notificationSender = notification.object as? CoreDataObject where notificationSender.id != sender.id {
-          XCGLogger.debug("Not executing notification because \(notificationSender) is not the subscribed object \(sender)")
-        } else {
-          XCGLogger.debug("Executing notification ")
+        if let notificationSender = notification.object as? CoreDataObject where notificationSender.id == sender.id {
+          XCGLogger.debug("Executing notification for \(notificationSender)")
           responseClosure(notification)
+        } else {
+          XCGLogger.debug("Not executing notification because its sender is not the subscribed object \(sender)")
         }
       }
       logger.debug("Subscribing to notification, filtering with \(sender)")

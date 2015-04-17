@@ -102,7 +102,7 @@ extension EventViewController {
     super.viewDidAppear(animated)
     // This observer is monitoring his events. As soon as the notification is received the controller is starting to reload its view.
     logger.debug("Event view controller for event \(self.event) subscribed to notification system")
-    notificationObserverToken = MVNotification.subscribeToCalendarSyncCompletedNotificationForEvent(event!) { _ in self.reloadView(EventRepository().findEventBy(id: self.event!.id)) }
+    notificationObserverToken = MVNotification.subscribeToCalendarSyncCompletedNotificationForEvent(event!) { _ in self.reloadView(EventRepository().findById(self.event!.id)) }
   }
   
   /// Within this function the notification observer un-subscribes from the notification system.

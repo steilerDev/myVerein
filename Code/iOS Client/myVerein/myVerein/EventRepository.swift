@@ -27,21 +27,8 @@ import XCGLogger
 // MARK: - Functions used to query the database
 class EventRepository: CoreDataRepository {
   
-  /// This function gathers the event object with the corresponding id from the database and returns it. The object is nil if the program was unable to find it.
-  func findEventBy(#id: String) -> Event? {
-    logger.verbose("Retrieving event with ID \(id) from database")
-    // Create a new fetch request using the event entity
-    let fetchRequest = NSFetchRequest(entityName: EventConstants.ClassName)
-    
-    let predicate = NSPredicate(format: "\(EventConstants.Fields.Id) == %@", id)
-    fetchRequest.predicate = predicate
-    
-    // Execute the fetch request, and cast the results to an array of LogItem objects
-    return executeSingleRequest(fetchRequest)
-  }
-  
   /// This function gathers all events, where the user responded with the provided event response
-  func findEventsBy(#userResponse: EventResponse) -> [Event]? {
+  func findEventsByUserResponse(userResponse: EventResponse) -> [Event]? {
     logger.verbose("Retrieving event with user response \(userResponse)")
     // Create a new fetch request using the event entity
     let fetchRequest = NSFetchRequest(entityName: EventConstants.ClassName)
@@ -54,21 +41,21 @@ class EventRepository: CoreDataRepository {
   }
   
   /// This function returns the amount of times the user responded with a specific event response
-  func countEventsWith(userResponse: EventResponse) -> Int {
+  func countEventsWithUserResponse(userResponse: EventResponse) -> Int {
     logger.verbose("Checking how often the user responded with \(userResponse) on an event")
-    return findEventsBy(userResponse: userResponse)?.count ?? 0
+    return findEventsByUserResponse(userResponse)?.count ?? 0
   }
   
   /// This function returns the amount of events the user did not respond to
   func countPendingEvents() -> Int {
-    return countEventsWith(.Pending)
+    return countEventsWithUserResponse(.Pending)
   }
 
   /// This function gathers all events that take place on the date or span over the date. The specified user responses are used for further filtering of the selection, because only events that have one of the specified user responses are considered. Pass nil
   ///
   /// :param: date The date should specify the moment on the start of the day. The function checks the database for event.startDate <= date && event.endDate >= date + 24h
   /// :param: andUserResponses Only events that have one of the specified user responses are returned. Pass nil if you don't want to filter according to the responses.
-  func findEventsBy(date startDate: NSDate, andUserResponses userResponses: [EventResponse]?) -> [Event]? {
+  func findEventsByDate(startDate: NSDate, andUserResponses userResponses: [EventResponse]?) -> [Event]? {
     logger.verbose("Retrieving all events on \(startDate) from database with user responses \(userResponses)")
     
     let fetchRequest = NSFetchRequest(entityName: EventConstants.ClassName)
@@ -112,22 +99,22 @@ class EventRepository: CoreDataRepository {
   /// This function gathers all events that take place on the date or span over the date.
   ///
   /// :param: date The date should specify the moment on the start of the day. The function checks the database for event.startDate <= date && event.endDate >= date + 24h
-  func findEventsBy(date startDate: NSDate) -> [Event]? {
-    return findEventsBy(date: startDate, andUserResponses: nil)
+  func findEventsByDate(startDate: NSDate) -> [Event]? {
+    return findEventsByDate(startDate, andUserResponses: nil)
   }
   
   /// This function returns true if there is an event on the date or spans over the date, otherwise it return false.
   ///
   /// :param: date The date should specify the moment on the start of the day. The function checks the database for event.startDate <= date && event.endDate >= date + 24h
-  func isEventOn(#date: NSDate) -> Bool {
-    return !(findEventsBy(date: date)?.isEmpty ?? true)
+  func isEventOnDate(date: NSDate) -> Bool {
+    return !(findEventsByDate(date)?.isEmpty ?? true)
   }
   
   /// This function returns true if there is an event on the date or spans over the date which has the user response 'pending', 'maybe' or 'going', otherwise it return false.
   ///
   /// :param: date The date should specify the moment on the start of the day. The function checks the database for event.startDate <= date && event.endDate >= date + 24h
-  func isDisplayableEventOn(#date: NSDate) -> Bool {
-    return !(findEventsBy(date: date, andUserResponses: [.Pending, .Maybe, .Going])?.isEmpty ?? true)
+  func isDisplayableEventOnDate(date: NSDate) -> Bool {
+    return !(findEventsByDate(date, andUserResponses: [.Pending, .Maybe, .Going])?.isEmpty ?? true)
   }
 
   override func populateObject<T: CoreDataObject>(coreDataObject: T, usingDictionary dictionary: [String : AnyObject]) -> (T?, NSError?) {
@@ -139,7 +126,7 @@ class EventRepository: CoreDataRepository {
       //Parsing invited division
       if let invitedDivisionArray = dictionary[EventConstants.RemoteEvent.InvitedDivision] as? [AnyObject] {
         let divisionRepository = DivisionRepository()
-        let (invitedDivision: [Division]?, error) = divisionRepository.getOrCreateFrom(serverResponseArray: invitedDivisionArray)
+        let (invitedDivision: [Division]?, error) = divisionRepository.getOrCreateUsingArray(invitedDivisionArray, AndSync: true)
         if error != nil && invitedDivision == nil {
           logger.severe("Unable to gather invited division: \(error!.extendedDescription)")
           return (nil, error)

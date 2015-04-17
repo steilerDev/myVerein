@@ -114,7 +114,7 @@ public class MessageController
      * @param currentUser The currently logged in user.
      * @param division The name of the division where the message is send to.
      * @param content The content of the message.
-     * @return An HTTP response with a status code. If an error occurred an error message is bundled into the response, otherwise a success message is available.
+     * @return An HTTP response with a status code. If no error occurred the system wide used id and timestamp are returned. The timestamp is set to the time or receiving on the server, to ensure the same view on the total order of messages for everyone.
      */
     @RequestMapping(produces = "application/json", method = RequestMethod.POST)
     public ResponseEntity<Message> sendMessage(@CurrentUser User currentUser, @RequestParam String division, @RequestParam String content, @RequestParam(required = false) String timestamp)
@@ -144,7 +144,7 @@ public class MessageController
                 Message message = new Message(content, currentUser, receivingDivision);
                 messageRepository.save(message);
                 logger.info("[{}] Successfully saved and send message", currentUser);
-                return new ResponseEntity<>(message.getSendingObjectOnlyId(), HttpStatus.OK);
+                return new ResponseEntity<>(message.getSendingObjectOnlyIdAndTimestamp(), HttpStatus.OK);
             }
         }
     }

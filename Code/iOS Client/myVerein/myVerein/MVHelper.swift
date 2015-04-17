@@ -155,3 +155,53 @@ extension UIViewController {
     }
   }
 }
+
+// MARK: - NSIndexPath extension
+/// This NSIndexPath extension provides function to increment and decrement the index path and check if the index path has a valid item for the provided collection view.
+extension NSIndexPath {
+  /// This function decrements the row of the index path
+  ///
+  /// :returns: A new decremented index path containing the same section as the previous one
+  func decrement() -> NSIndexPath {
+    return NSIndexPath(forRow: self.row - 1, inSection: self.section)
+  }
+  
+  /// This function increments the row of the index path
+  ///
+  /// :returns: A new incremented index path containing the same section as the previous one
+  func increment() -> NSIndexPath {
+    return NSIndexPath(forRow: self.row + 1, inSection: self.section)
+  }
+}
+
+/// MARK: - UICollectionView extension
+/// This extension adds an additional function, that can be used to safely checke if an object exists at the provided index path for this collection view.
+extension UICollectionView {
+  /// This function checks if there is an item for the provided index path. It uses the collectionView:numberOfItemsInSection: function to check the availibility.
+  ///
+  /// :param: indexPath The index path that needs to be checked
+  /// :returns: True if there is an item, false otherwise.
+  func collectionView(collectionView: UICollectionView, hasItemForIndexPath indexPath: NSIndexPath) -> Bool {
+    return indexPath.row >= 0 && ((collectionView.dataSource?.collectionView(collectionView, numberOfItemsInSection: indexPath.section) ?? 0) > indexPath.row)
+  }
+}
+
+// MARK: - NSDate extension
+/// This extension adds the functionality to check if a date is before or after another date
+extension NSDate {
+  /// This function checks if this date is before the provided date.
+  ///
+  /// :param: date The date this object is compared to.
+  /// :returns: True if this object is before the other date, false otherwise.
+  func isBefore(date: NSDate) -> Bool {
+    return self.compare(date) == .OrderedAscending
+  }
+  
+  /// This function checks if this date is after the provided date.
+  ///
+  /// :param: date The date this object is compared to.
+  /// :returns: True if this object is after the other date, false otherwise.
+  func isAfter(date: NSDate) -> Bool {
+    return self.compare(date) == .OrderedDescending
+  }
+}

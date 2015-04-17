@@ -43,7 +43,7 @@ class UserRepository: CoreDataRepository {
       
       if let divisionArray = dictionary[UserConstants.RemoteUser.Divisions] as? [AnyObject] {
         let divisionRepository = DivisionRepository()
-        let (divisions: [Division]?, error) = divisionRepository.getOrCreateFrom(serverResponseArray: divisionArray)
+        let (divisions: [Division]?, error) = divisionRepository.getOrCreateUsingArray(divisionArray, AndSync: true)
         
         if error != nil && divisions == nil {
           logger.warning("Unable to parse divisions for user: \(error!.extendedDescription)")
@@ -89,7 +89,7 @@ extension UserRepository {
   class func getCurrentUser() -> User? {
     XCGLogger.debug("Gathering current user")
     if let currentUserId = Defaults[MVUserDefaultsConstants.UserID].string {
-      return UserRepository().findBy(id: currentUserId)
+      return UserRepository().findById(currentUserId)
     } else {
       XCGLogger.warning("Unable to find current user")
       return nil

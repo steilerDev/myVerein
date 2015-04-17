@@ -122,6 +122,7 @@ extension ChatViewController {
   
   /// Within this function the notification observer subscribes to the notification system. Doing this in view will appear because view did appear is somehow not called.
   override func viewWillAppear(animated: Bool) {
+    super.viewDidAppear(animated)
     super.viewWillAppear(animated)
     // This observer is monitoring the division this chat is associated with. If the user's membership is changing this observer will be notified and disable the chat.
     logger.debug("Division chat for \(self.division) is subscribing to notification system")
@@ -139,6 +140,7 @@ extension ChatViewController {
     messageNotificationObserverToken = MVNotification.subscribeToMessageSyncCompletedNotificationForDivisionChat(division){
       notification in
       XCGLogger.debug("Received notification token, reloading messages")
+      JSQSystemSoundPlayer.jsq_playMessageReceivedSound()
       self.finishReceivingMessage()
     }
   }
@@ -216,6 +218,8 @@ extension ChatViewController {
     }
   }
   
+  // MARK: Image data
+  
   override func collectionView(collectionView: JSQMessagesCollectionView!, messageBubbleImageDataForItemAtIndexPath indexPath: NSIndexPath!) -> JSQMessageBubbleImageDataSource! {
     let factory = JSQMessagesBubbleImageFactory()
     if let message = fetchedResultController.objectAtIndexPath(indexPath) as? Message {
@@ -240,22 +244,82 @@ extension ChatViewController {
     }
   }
   
-  override func collectionView(collectionView: JSQMessagesCollectionView!, attributedTextForCellTopLabelAtIndexPath indexPath: NSIndexPath!) -> NSAttributedString! {
-    if let message = fetchedResultController.objectAtIndexPath(indexPath) as? Message {
-      if !message.isOutgoingMessage {
-        return NSAttributedString(string: message.sender.displayName)
+  // MARK: Message bubble top label (sender)
+  
+  /// This function returns the user shown on top of a message bubble. If this function returns nil the label should not be shown. The user's label is only shown if the previous message's sender is not this message's sender. The label of messages send from the application's user are never shown.
+  ///
+  /// :param: indexPath The index path of the cell.
+  /// :param: collectionView The collection view the cell is in.
+  /// :returns: The user that should be shown in the label, or nil if nothing should be shown.
+  func userLabelForMessageAtIndexPath(indexPath: NSIndexPath, inCollectionView collectionView: JSQMessagesCollectionView) -> User? {
+    if let currentMessage = self.collectionView(collectionView, messageDataForItemAtIndexPath: indexPath) as? Message where currentMessage.senderId() != senderId {
+      let prevIndexPath = indexPath.decrement()
+      if collectionView.collectionView(collectionView, hasItemForIndexPath: prevIndexPath) {
+        if let prevMessage = self.collectionView(collectionView, messageDataForItemAtIndexPath: prevIndexPath) as? Message {
+          if prevMessage.senderId() != currentMessage.senderId() {
+            return currentMessage.sender
+          }
+        }
+      } else {
+        return currentMessage.sender
       }
     }
     return nil
   }
   
   override func collectionView(collectionView: JSQMessagesCollectionView!, attributedTextForMessageBubbleTopLabelAtIndexPath indexPath: NSIndexPath!) -> NSAttributedString! {
-    logger.debug("Attributed text for message bubble top label at index path \(indexPath)")
-    return NSAttributedString(string: "Hello", attributes: [NSFontAttributeName: UIFont.systemFontOfSize(12.0)])
+    if let user = userLabelForMessageAtIndexPath(indexPath, inCollectionView: collectionView) {
+      return NSAttributedString(string: user.displayName)
+    } else {
+      return nil
+    }
   }
   
-  override func collectionView(collectionView: JSQMessagesCollectionView!, attributedTextForCellBottomLabelAtIndexPath indexPath: NSIndexPath!) -> NSAttributedString! {
-    return NSAttributedString(string: "Hello")
+  override func collectionView(collectionView: JSQMessagesCollectionView!, layout collectionViewLayout: JSQMessagesCollectionViewFlowLayout!, heightForMessageBubbleTopLabelAtIndexPath indexPath: NSIndexPath!) -> CGFloat {
+    if userLabelForMessageAtIndexPath(indexPath, inCollectionView: collectionView) != nil {
+      return kJSQMessagesCollectionViewCellLabelHeightDefault
+    } else {
+      return 0.0
+    }
+  }
+  
+  // MARK: Cell top label (timestamp)
+  
+  /// This function returns the date shown on top of a cell. If this function returns nil the label should not be shown. The timestamp is only shown if this message and the previous one are more than the value defined in the 'TimeBetweenMessagesThresholdForLable' - constant apart, or if it is the top cell.
+  ///
+  /// :param: indexPath The index path of the cell.
+  /// :param: collectionView The collection view the cell is in.
+  /// :returns: The date that should be shown in the label, or nil if nothing should be shown.
+  func timestampLabelForMessageAtIndexPath(indexPath: NSIndexPath, inCollectionView collectionView: JSQMessagesCollectionView) -> NSDate? {
+    if let currentMessage = self.collectionView(collectionView, messageDataForItemAtIndexPath: indexPath) as? Message {
+      let prevIndexPath = indexPath.decrement()
+      if collectionView.collectionView(collectionView, hasItemForIndexPath: prevIndexPath) {
+        if let prevMessage = self.collectionView(collectionView, messageDataForItemAtIndexPath: prevIndexPath) as? Message {
+          if prevMessage.timestamp.dateByAddingTimeInterval(ChatViewConstants.TimeBetweenMessagesThresholdForLabel).isBefore(currentMessage.timestamp) {
+            return currentMessage.timestamp
+          }
+        }
+      } else {
+        return currentMessage.timestamp
+      }
+    }
+    return nil
+  }
+  
+  override func collectionView(collectionView: JSQMessagesCollectionView!, attributedTextForCellTopLabelAtIndexPath indexPath: NSIndexPath!) -> NSAttributedString! {
+    if let timestamp = timestampLabelForMessageAtIndexPath(indexPath, inCollectionView: collectionView) {
+      return JSQMessagesTimestampFormatter.sharedFormatter().attributedTimestampForDate(timestamp)
+    } else {
+      return super.collectionView(collectionView, attributedTextForCellTopLabelAtIndexPath: indexPath)
+    }
+  }
+  
+  override func collectionView(collectionView: JSQMessagesCollectionView!, layout collectionViewLayout: JSQMessagesCollectionViewFlowLayout!, heightForCellTopLabelAtIndexPath indexPath: NSIndexPath!) -> CGFloat {
+    if timestampLabelForMessageAtIndexPath(indexPath, inCollectionView: collectionView) != nil {
+      return kJSQMessagesCollectionViewCellLabelHeightDefault
+    } else {
+      return 0.0
+    }
   }
 }
 
@@ -285,7 +349,9 @@ extension ChatViewController {
     let messageRepository = MessageRepository()
     let message = messageRepository.createMessage(text, timestamp: date, division: division, sender: UserRepository.getCurrentUser()!)
     messageRepository.save()
-    finishSendingMessage()
+    logger.debug("Saved prototype message and saved database, showing message in view")
+    JSQSystemSoundPlayer.jsq_playMessageSentSound()
+    self.finishSendingMessageAnimated(true)
     
     MVNetworkingHelper.sendMessage(message)
   }
@@ -297,29 +363,29 @@ extension ChatViewController: NSFetchedResultsControllerDelegate {
   func controller(controller: NSFetchedResultsController, didChangeObject anObject: AnyObject, atIndexPath indexPath: NSIndexPath?, forChangeType type: NSFetchedResultsChangeType, newIndexPath: NSIndexPath?) {
     logger.debug("Object in chat view changed.")
     if let collectionView = self.collectionView {
-      switch type {
-      case .Insert:
-        if let currentIndexPath = newIndexPath {
-          objectChanges[type]?.append(currentIndexPath)
-        } else {
-          logger.error("Unable to insert object in chat view")
-        }
-      case .Delete:
-        if let currentIndexPath = indexPath {
-          objectChanges[type]?.append(currentIndexPath)
-        } else {
-          logger.error("Unable to delete object in chat view")
-        }
-      case .Update:
-        XCGLogger.error("Reached update case while applying object changes in chat view. Ignoring changes")
-      case .Move:
-        if let currentIndexPath = newIndexPath, oldIndexPath = indexPath {
-          objectChanges[.Delete]?.append(oldIndexPath)
-          objectChanges[.Insert]?.append(currentIndexPath)
-        } else {
-          logger.error("Unable to move object in chat view")
-        }
-      }
+//      switch type {
+//      case .Insert:
+//        if let currentIndexPath = newIndexPath {
+//          objectChanges[type]?.append(currentIndexPath)
+//        } else {
+//          logger.error("Unable to insert object in chat view")
+//        }
+//      case .Delete:
+//        if let currentIndexPath = indexPath {
+//          objectChanges[type]?.append(currentIndexPath)
+//        } else {
+//          logger.error("Unable to delete object in chat view")
+//        }
+//      case .Update:
+//        XCGLogger.error("Reached update case while applying object changes in chat view. Ignoring changes")
+//      case .Move:
+//        if let currentIndexPath = newIndexPath, oldIndexPath = indexPath {
+//          objectChanges[.Delete]?.append(oldIndexPath)
+//          objectChanges[.Insert]?.append(currentIndexPath)
+//        } else {
+//          logger.error("Unable to move object in chat view")
+//        }
+//      }
     } else {
       logger.error("Unable to change object in chat view")
     }
@@ -348,7 +414,7 @@ extension ChatViewController: NSFetchedResultsControllerDelegate {
               break
             }
           }
-          }, completion: nil)
+        }, completion: nil)
       } else {
         logger.info("No need to apply batch changes because model did not change")
       }
@@ -387,5 +453,6 @@ struct ChatViewConstants {
   static let Entity = MessageConstants.ClassName
   static let PredicateField = MessageConstants.Fields.Division
   static let SortField = MessageConstants.Fields.Timestamp
+  static let TimeBetweenMessagesThresholdForLabel = 1800.0 //in seconds
   static let CacheName = "myVerein.ChatViewCache."
 }

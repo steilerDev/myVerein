@@ -28,7 +28,7 @@ class DivisionRepository: CoreDataRepository {
   
   // MARK: - Functions used to query the database
   
-  func findDivisionBy(#userMembershipStatus: UserMembershipStatus) -> [Division]? {
+  func findDivisionByUserMembershipStatus(userMembershipStatus: UserMembershipStatus) -> [Division]? {
     logger.verbose("Retrieving divisions the user's membership status is \(userMembershipStatus)")
     // Create a new fetch request using the Message entity
     let fetchRequest = NSFetchRequest(entityName: DivisionConstants.ClassName)
@@ -57,7 +57,7 @@ class DivisionRepository: CoreDataRepository {
       if let adminUserDict = dictionary[DivisionConstants.RemoteDivision.AdminUser] as? [String: AnyObject] {
         logger.debug("Found an administrator for the division")
         let userRepository = UserRepository()
-        let (adminUser: User?, error) = userRepository.getOrCreateFrom(serverResponseDictionary: adminUserDict)
+        let (adminUser: User?, error) = userRepository.getOrCreateUsingDictionary(adminUserDict, AndSync: true)
         // TODO: Or better?!
         if error != nil && adminUser == nil {
           logger.warning("Unable to parse admin user for division: \(error!.extendedDescription)")

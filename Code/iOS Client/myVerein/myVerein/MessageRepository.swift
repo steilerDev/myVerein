@@ -28,22 +28,8 @@ class MessageRepository: CoreDataRepository {
   
   // MARK: - Functions used to query the database
   
-  /// This function gathers the message by it's id
-  func findMessageBy(#id: String) -> Message? {
-    logger.verbose("Getting message with id \(id)")
-    // Create a new fetch request using the Message entity
-    let fetchRequest = NSFetchRequest(entityName: MessageConstants.ClassName)
-    fetchRequest.fetchBatchSize = MessageConstants.BatchSize
-    
-    let predicate = NSPredicate(format: "\(MessageConstants.Fields.Id) == %@", id)
-    fetchRequest.predicate = predicate
-    
-    // Execute the fetch request, and cast the results to an array of LogItem objects
-    return executeSingleRequest(fetchRequest)
-  }
-  
   /// This function gathers all messages send through the division's chat
-  func findMessagesBy(#division: Division) -> [Message]? {
+  func findMessagesByDivision(division: Division) -> [Message]? {
     logger.verbose("Getting all messages from database by division \(division.id)")
     // Create a new fetch request using the Message entity
     let fetchRequest = NSFetchRequest(entityName: MessageConstants.ClassName)
@@ -59,7 +45,7 @@ class MessageRepository: CoreDataRepository {
   }
   
   /// This function gathers all messages, read or unread by the user and send through the division's chat
-  func findMessagesBy(#division: Division, andReadFlag readFlag: Bool) -> [Message]? {
+  func findMessagesByDivision(division: Division, andReadFlag readFlag: Bool) -> [Message]? {
     logger.verbose("Getting all messages from database by division \(division.id)")
     // Create a new fetch request using the Message entity
     let fetchRequest = NSFetchRequest(entityName: MessageConstants.ClassName)
@@ -81,12 +67,12 @@ class MessageRepository: CoreDataRepository {
   }
   
   /// This function counts the unread messages of the user send through the division's chat
-  func countUnreadMessagesIn(#division: Division) -> Int {
-    return findMessagesBy(division: division, andReadFlag: false)?.count ?? 0
+  func countUnreadMessagesInDivision(division: Division) -> Int {
+    return findMessagesByDivision(division, andReadFlag: false)?.count ?? 0
   }
   
   /// This function gathers all messages, read or unread by the user.
-  func findMessagesBy(#readFlag: Bool) -> [Message]? {
+  func findMessagesByReadFlag(readFlag: Bool) -> [Message]? {
     logger.verbose("Getting message with read flag set to \(readFlag)")
     // Create a new fetch request using the Message entity
     let fetchRequest = NSFetchRequest(entityName: MessageConstants.ClassName)
@@ -101,7 +87,7 @@ class MessageRepository: CoreDataRepository {
   
   /// This function counts the unread messages of the user
   func countUnreadMessages() -> Int {
-    return findMessagesBy(readFlag: false)?.count ?? 0
+    return findMessagesByReadFlag(false)?.count ?? 0
   }
   
   // MARK: - Creation and population of message
@@ -116,8 +102,8 @@ class MessageRepository: CoreDataRepository {
     {
       let divisionRepository = DivisionRepository()
       let userRepository = UserRepository()
-      let (division: Division?, divisionError) = divisionRepository.getOrCreateFrom(serverResponseDictionary: divisionDict)
-      let (sender: User?, senderError) = userRepository.getOrCreateFrom(serverResponseDictionary: senderDict)
+      let (division: Division?, divisionError) = divisionRepository.getOrCreateUsingDictionary(divisionDict, AndSync: true)
+      let (sender: User?, senderError) = userRepository.getOrCreateUsingDictionary(senderDict, AndSync: true)
       
       if senderError != nil {
         logger.error("Unable to create message because an error ocurred while getting sender: \(senderError!.extendedDescription)")
@@ -155,7 +141,7 @@ class MessageRepository: CoreDataRepository {
   /// This function creates a new message using the provided information.
   func createMessage(content: String, timestamp: NSDate, division: Division, sender: User) -> Message {
     logger.verbose("Creating message with content \(content), timestamp \(timestamp), sender \(sender.id) and division \(division.id)")
-    let newItem: Message = createObject(NSUUID().UUIDString)
+    let newItem: Message = createObjectWithId(NSUUID().UUIDString, AndSync: false)
     newItem.content = content
     newItem.timestamp = timestamp
     newItem.division = division
