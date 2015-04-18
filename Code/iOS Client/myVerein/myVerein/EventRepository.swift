@@ -153,6 +153,7 @@ class EventRepository: CoreDataRepository {
       event.name = name
       event.startDate = startDateTime
       event.endDate = endDateTime
+      event.syncInProgress = false
       
       logger.info("Succesfully parsed and populaterd event")
       return ((event as! T), nil)

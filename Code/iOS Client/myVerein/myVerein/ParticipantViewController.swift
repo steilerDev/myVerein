@@ -155,7 +155,7 @@ extension ParticipantViewController {
     }
     
     logger.verbose("Getting user with \(response) responses for event \(self.event)")
-    MVNetworking.eventGetResponseAction(
+    MVNetworking.defaultInstance().eventGetResponseAction(
       eventID: event.id,
       response: response,
       success: {

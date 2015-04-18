@@ -323,6 +323,13 @@ extension DivisionChatOverviewViewController {
   func startRefresh(refreshControl: UIRefreshControl) {
     logger.info("Refresh started")
     NSFetchedResultsController.deleteCacheWithName(fetchedResultController.cacheName)
+    // Accessing fetched result controller and therfore initiating it if it did not happen yet
+    var error: NSError?
+    if fetchedResultController.performFetch(&error) {
+      logger.info("Successfully initiated division chat overview data source")
+    } else {
+      logger.error("Unable to initiate division chat overview data source: \(error?.extendedDescription)")
+    }
     collectionView?.reloadData()
     refreshControl.endRefreshing()
   }

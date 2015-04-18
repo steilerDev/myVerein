@@ -22,6 +22,7 @@
 
 import Foundation
 import CoreData
+import XCGLogger
 
 // MARK: - Pure database object, holding only information stored in database
 class Division: NSManagedObject {
@@ -35,6 +36,8 @@ class Division: NSManagedObject {
   
   // Raw values stored in database, convenience getter and setter are provided in an extension. This values should -in general- not be accessed directly.
   @NSManaged var rawUserMembershipStatus: String
+  
+  var syncInProgress: Bool = false
 }
 
 // MARK: - Convenience getter and setter for complex values/relations stored in database
@@ -59,7 +62,13 @@ extension Division: CoreDataObject {
   }
   
   func sync() {
-    MVNetworkingHelper.syncDivision(id)
+    if !syncInProgress {
+      XCGLogger.debug("Sync not in progress, syncing division \(self.id)")
+      syncInProgress = true
+      MVNetworkingHelper.syncDivision(id)
+    } else {
+      XCGLogger.debug("Sync in progress, not syncing division \(self.id)")
+    }
   }
 }
 

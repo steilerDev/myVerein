@@ -23,6 +23,7 @@
 import Foundation
 import CoreData
 import UIKit
+import XCGLogger
 
 // MARK: - Pure database object, holding only information stored in database
 class User: NSManagedObject {
@@ -46,6 +47,8 @@ class User: NSManagedObject {
   @NSManaged private var rawAdministratedDivisions: NSSet
   @NSManaged private var rawDivisions: NSSet
   @NSManaged private var rawSendMessages: NSSet
+  
+  var syncInProgress: Bool = false
 }
 
 // MARK: - Convenience getter and setter for complex values/relations stored in database
@@ -134,7 +137,13 @@ extension User: CoreDataObject {
   }
   
   func sync() {
-    MVNetworkingHelper.syncUser(id)
+    if !syncInProgress {
+      XCGLogger.debug("Sync not in progress, syncing user \(self.id)")
+      syncInProgress = true
+      MVNetworkingHelper.syncUser(id)
+    } else {
+      XCGLogger.debug("Sync in progress, not syncing user \(self.id)")
+    }
   }
 }
 

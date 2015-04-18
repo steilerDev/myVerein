@@ -125,6 +125,9 @@ class MessageRepository: CoreDataRepository {
           logger.debug("Message \(id) is newest in division \(division.id), updating division's latest message")
           division.latestMessage = message
         }
+        
+        message.syncInProgress = false
+        
         return ((message as! T), nil)
       } else {
         let error = MVError.createError(MVErrorCodes.MVMessageCreationError)

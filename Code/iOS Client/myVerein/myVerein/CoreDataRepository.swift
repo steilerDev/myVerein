@@ -53,15 +53,15 @@ class CoreDataRepository {
   /// :param: serverResponseDictionary A dictionary, where the key is defined by the core data's object variable 'remoteId' and the (string) value is the object's ID. Besides the id, the other values are used to populate the item.
   /// :returns: A core data object or nil if an error occured. In generel the provided error should then help identify the problem.
   func syncObjectUsingDictionary<T: CoreDataObject>(dictionary: [String: AnyObject]) -> (T?, NSError?) {
-    logger.verbose("Creating core data object from response dictionary \(dictionary)")
+    logger.verbose("Creating \(T.className) from response dictionary \(dictionary)")
     
     let (object: T?, error) = getOrCreateUsingDictionary(dictionary, AndSync: false)
     
     if object == nil || error != nil {
-      logger.debug("Unable to get existing object \(error!.extendedDescription)")
+      logger.debug("Unable to get existing \(T.className): \(error!.extendedDescription)")
       return (nil, error)
     } else {
-      logger.debug("Parsing object properties")
+      logger.debug("Parsing \(T.className) properties")
       return populateObject(object!, usingDictionary: dictionary)
     }
   }
@@ -127,18 +127,18 @@ extension CoreDataRepository {
           var error: NSError?
           if let backgroundObjects = backgroundContext.executeFetchRequest(fetchRequest, error: &error) as? [T] {
             for object in backgroundObjects.filter({$0.syncRequired}) {
-              XCGLogger.debug("Re-syncing object \(object)")
+              XCGLogger.debug("Re-syncing \(T.className) \(object)")
               object.sync()
             }
           } else {
-            XCGLogger.error("Unable to check sync status: \(error?.extendedDescription)")
+            XCGLogger.error("Unable to check sync status of \(T.className): \(error?.extendedDescription)")
           }
         }~>
       }
       
       return queriedObject
     } else {
-      logger.error("Unable to execute fetch request: \(error?.extendedDescription)")
+      logger.error("Unable to execute fetch request for \(T.className): \(error?.extendedDescription)")
       return nil
     }
   }
@@ -153,11 +153,11 @@ extension CoreDataRepository {
   /// :param: sync Tells the system if it should synchronize the object after retrieval (if needed). Note: If this flag is not set the object does not event get synced after creation.
   /// :returns: A list of core data objects or nil if an error occured. In generel the provided error should then help identify the problem.
   func getOrCreateUsingArray<T: CoreDataObject>(array: [AnyObject], AndSync sync: Bool = true) -> ([T]?, NSError?) {
-    logger.verbose("Parsing and retrieving core data object from response array: \(array) (Sync after: \(sync))")
+    logger.verbose("Parsing and retrieving \(T.className) from response array: \(array) (Sync after: \(sync))")
     var objectList = [T]()
     
     if let array = array as? [[String: AnyObject]] {
-      logger.debug("The response object is a dictionary of id's")
+      logger.debug("The response object is a list of dictionaries: \(array)")
       for object in array {
         let (newObject:T?, error) = getOrCreateUsingDictionary(object, AndSync: sync)
         if error != nil && newObject == nil {
@@ -167,7 +167,7 @@ extension CoreDataRepository {
         }
       }
     } else if let array = array as? [String] {
-      logger.debug("The response object is a list of id's")
+      logger.debug("The response object is a list of id's: \(array)")
       for object in array {
         let (newObject:T?, error) = getOrCreateUsingId(object, AndSync: sync)
         if error != nil && newObject == nil {
@@ -178,12 +178,12 @@ extension CoreDataRepository {
       }
     } else {
       let error = MVError.createError(.MVEntityCreationError,
-        failureReason: "Object could not be created, because the server response object could not be parsed",
+        failureReason: "\(T.className) could not be created, because the server response object could not be parsed",
         underlyingError: .MVServerResponseParseError
       )
-      logger.warning("Unable to create object from request object \(array): \(error.extendedDescription)")
+      logger.warning("Unable to create \(T.className) from request object \(array): \(error.extendedDescription)")
     }
-    logger.info("Returning \(objectList.count) new objects")
+    logger.info("Returning \(objectList.count) new \(T.className)")
     return (objectList, nil)
   }
   
@@ -193,15 +193,15 @@ extension CoreDataRepository {
   /// :param: sync Tells the system if it should synchronize the object after retrieval (if needed). Note: If this flag is not set the object does not event get synced after creation.
   /// :returns: A core data object or nil if an error occured. In generel the provided error should then help identify the problem.
   func getOrCreateUsingDictionary<T: CoreDataObject>(dictionary: [String: AnyObject], AndSync sync: Bool = true) -> (T?, NSError?) {
-    logger.verbose("Parsing and retrieving core data object from response dictionary: \(dictionary) (Sync after: \(sync))")
+    logger.verbose("Parsing and retrieving \(T.className) from response dictionary: \(dictionary) (Sync after: \(sync))")
     if let objectId = dictionary["id"] as? String {
       return getOrCreateUsingId(objectId, AndSync: sync)
     } else {
       let error = MVError.createError(.MVEntityCreationError,
-        failureReason: "Object could not be created, because the server response object could not be parsed",
+        failureReason: "\(T.className) could not be created, because the server response object could not be parsed",
         underlyingError: .MVServerResponseParseError
       )
-      logger.warning("Unable to create object from request object \(dictionary): \(error.extendedDescription)")
+      logger.warning("Unable to create \(T.className) from request object \(dictionary): \(error.extendedDescription)")
       return (nil, error)
     }
   }
@@ -212,15 +212,15 @@ extension CoreDataRepository {
   /// :param: sync Tells the system if it should synchronize the object after retrieval (if needed). Note: If this flag is not set the object does not event get synced after creation.
   /// :returns: A core data object or nil if an error occured. In generel the provided error should then help identify the problem.
   func getOrCreateUsingId<T: CoreDataObject>(id: String, AndSync sync: Bool = true) -> (T?, NSError?) {
-    logger.debug("Get or create object from id \(id) (Sync after: \(sync))")
+    logger.debug("Get or create \(T.className) from id \(id) (Sync after: \(sync))")
     if let object: T = findById(id, AndSync: sync) {
       if sync && object.syncRequired {
         object.sync()
       }
-      logger.info("Returning object with ID \(id) from local database")
+      logger.info("Returning \(T.className) with ID \(id) from local database")
       return (object, nil)
     } else {
-      logger.info("Creating new object with ID \(id)")
+      logger.info("Creating new \(T.className) with ID \(id)")
       let object: T = createObjectWithId(id, AndSync: sync)
       return (object, nil)
     }
@@ -232,7 +232,7 @@ extension CoreDataRepository {
   /// :param: sync Tells the system if it should synchronize the object. Note: If this flag is not set the object does not event get synced after creation.
   /// :returns: A core data object, which is not fully synchronized, but should be at a later point in time (if the sync flag is set).
   func createObjectWithId<T: CoreDataObject>(id: String, AndSync sync: Bool = true) -> T {
-    logger.verbose("Creating new object with id \(id) (Sync after: \(sync))")
+    logger.verbose("Creating new \(T.className) with id \(id) (Sync after: \(sync))")
     let newItem = NSEntityDescription.insertNewObjectForEntityForName(T.className, inManagedObjectContext: managedObjectContext) as! T
     newItem.id = id
     
@@ -269,6 +269,9 @@ protocol CoreDataObject: AnyObject {
   
   /// This computed variable should check if an object is out of sync, and return true if the object needs to be synchronized. This is check is executed, everytime the object is retrieved from the database. Note: This function needs to be executed on the same queue as the one used to gather the object, which is most likely the main queue and should therefore not be too expensive.
   var syncRequired: Bool { get }
+  
+  /// This variable tells the system if the current object is allready syncing. If this is the case the system should not start another sync action.
+  var syncInProgress: Bool { get set }
   
   /// This function should execute the syncing of the object.
   func sync() -> ()

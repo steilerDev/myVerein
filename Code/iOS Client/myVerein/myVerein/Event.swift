@@ -23,6 +23,7 @@
 import Foundation
 import MapKit
 import CoreData
+import XCGLogger
 
 // MARK: - Pure database object, holding only information stored in database
 class Event: NSManagedObject {
@@ -43,7 +44,8 @@ class Event: NSManagedObject {
   @NSManaged var rawMaybeUser: NSSet?
   @NSManaged var rawPendingUser: NSSet?
   @NSManaged var rawDeclinedUser: NSSet?
-  
+ 
+  var syncInProgress: Bool = false
 }
 
 // MARK: - Convenience getter and setter for complex values/relations stored in database
@@ -103,7 +105,13 @@ extension Event: CoreDataObject {
   }
   
   func sync() {
-    MVNetworkingHelper.syncEvent(id)
+    if !syncInProgress {
+      XCGLogger.debug("Sync not in progress, syncing event \(self.id)")
+      syncInProgress = true
+      MVNetworkingHelper.syncEvent(id)
+    } else {
+      XCGLogger.debug("Sync in progress, not syncing event \(self.id)")
+    }
   }
 }
 

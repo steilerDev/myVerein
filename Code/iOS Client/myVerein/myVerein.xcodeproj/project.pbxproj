@@ -37,6 +37,7 @@
 		309A8A7C1AB374040087CBC5 /* ChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 309A8A7B1AB374040087CBC5 /* ChatViewController.swift */; };
 		30A4F7D91AA97D400064EA2C /* MVNetworking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30A4F7D81AA97D400064EA2C /* MVNetworking.swift */; };
 		30BAFEE51AA52828000D18EF /* ca-cert.cer in Resources */ = {isa = PBXBuildFile; fileRef = 30BAFEE11AA518EA000D18EF /* ca-cert.cer */; };
+		30C1EFDA1AE2E28A00328C79 /* MVRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30C1EFD91AE2E28A00328C79 /* MVRequest.swift */; };
 		30C2DA331ADEB440006A6143 /* MarshalOperator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30C2DA321ADEB440006A6143 /* MarshalOperator.swift */; };
 		30F254E61AC7224E00E10CB9 /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30F254E51AC7224E00E10CB9 /* SettingsViewController.swift */; };
 		30F254E81AC7271A00E10CB9 /* CalendarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30F254E71AC7271A00E10CB9 /* CalendarViewController.swift */; };
@@ -106,6 +107,7 @@
 		309A8A7B1AB374040087CBC5 /* ChatViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChatViewController.swift; sourceTree = "<group>"; };
 		30A4F7D81AA97D400064EA2C /* MVNetworking.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MVNetworking.swift; sourceTree = "<group>"; };
 		30BAFEE11AA518EA000D18EF /* ca-cert.cer */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ca-cert.cer"; sourceTree = "<group>"; };
+		30C1EFD91AE2E28A00328C79 /* MVRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MVRequest.swift; sourceTree = "<group>"; };
 		30C2DA321ADEB440006A6143 /* MarshalOperator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MarshalOperator.swift; sourceTree = "<group>"; };
 		30F254E51AC7224E00E10CB9 /* SettingsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
 		30F254E71AC7271A00E10CB9 /* CalendarViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CalendarViewController.swift; sourceTree = "<group>"; };
@@ -158,6 +160,7 @@
 		3012715B1AA5C85500C23AEF /* Networking */ = {
 			isa = PBXGroup;
 			children = (
+				30C1EFD91AE2E28A00328C79 /* MVRequest.swift */,
 				30A4F7D81AA97D400064EA2C /* MVNetworking.swift */,
 				301271591AA5C83C00C23AEF /* MVNetworkingSessionFactory.swift */,
 				306FD7311AAA356000719B82 /* MVNetworkingHelper.swift */,
@@ -509,6 +512,7 @@
 				302BE8C21AA642EB001D0FE7 /* DivisionChatCell.swift in Sources */,
 				30F254E61AC7224E00E10CB9 /* SettingsViewController.swift in Sources */,
 				3016A03F1ADACFE800778769 /* InvitationViewController.swift in Sources */,
+				30C1EFDA1AE2E28A00328C79 /* MVRequest.swift in Sources */,
 				30C2DA331ADEB440006A6143 /* MarshalOperator.swift in Sources */,
 				3079B1DA1AAF242600ACD793 /* MVHelper.swift in Sources */,
 				3012715A1AA5C83C00C23AEF /* MVNetworkingSessionFactory.swift in Sources */,

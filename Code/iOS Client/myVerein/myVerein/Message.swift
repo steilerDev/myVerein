@@ -24,6 +24,7 @@ import Foundation
 import CoreData
 import JSQMessagesViewController
 import SwiftyUserDefaults
+import XCGLogger
 
 // MARK: - Pure database object, holding only information stored in database
 class Message: NSManagedObject {
@@ -33,6 +34,8 @@ class Message: NSManagedObject {
   @NSManaged var sender: User!
   @NSManaged var division: Division!
   @NSManaged var content: String!
+  
+  var syncInProgress: Bool = false
 }
 
 // MARK: - Convenience getter and setter for complex values/relations stored in database
@@ -58,7 +61,13 @@ extension Message: CoreDataObject {
   }
   
   func sync() {
-    MVNetworkingHelper.syncMessage(id)
+    if !syncInProgress {
+      XCGLogger.debug("Sync not in progress, syncing message \(self.id)")
+      syncInProgress = true
+      MVNetworkingHelper.syncMessage(id)
+    } else {
+      XCGLogger.debug("Sync in progress, not syncing message \(self.id)")
+    }
   }
 }
 

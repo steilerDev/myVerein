@@ -42,7 +42,7 @@ class MVNetworkingSessionFactory {
   }
   
   /// This function returns the shared session manager used within the whole system. The object is lazily created
-  class func instance() -> AFHTTPSessionManager? {
+  class func defaultInstance() -> AFHTTPSessionManager? {
     if sharedSessionManager == nil {
       logger.debug("Creating new session instance")
       if let baseUrlString = MVSecurity.instance().currentKeychain().domain,

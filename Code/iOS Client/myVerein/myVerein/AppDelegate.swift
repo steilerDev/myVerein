@@ -64,6 +64,7 @@ extension AppDelegate: UIApplicationDelegate {
     logger.debug("Trying to register for notification/checking if notifications are still available")
     let notificationSettings = UIUserNotificationSettings(forTypes: .Alert | .Sound | .Alert, categories: nil)
     UIApplication.sharedApplication().registerUserNotificationSettings(notificationSettings)
+    
     return true
   }
   

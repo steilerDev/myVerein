@@ -154,7 +154,7 @@ extension LoginViewController {
         passwordTextField.text = password
         hostTextField.text = domain
         
-        MVNetworking.loginActionWithCallbackOnMainQueue(
+        MVNetworking.defaultInstance().performLogIn(showLoginScreenOnFailure: false,
           success: {
             XCGLogger.info("Login successfully, performing segue to main view controller")
             self.dismissViewControllerAnimated(true, completion: {})

@@ -74,8 +74,9 @@ class UserRepository: CoreDataRepository {
       user.city = dictionary[UserConstants.RemoteUser.City] as? String
       user.country = dictionary[UserConstants.RemoteUser.Country] as? String
       user.lastSynced = NSDate()
+      user.syncInProgress = false
       
-      logger.info("Succesfully parsed and populaterd user")
+      logger.info("Successfully parsed and populated user \(user)")
       return ((user as! T), nil)
     } else {
       let error = MVError.createError(.MVServerResponseParseError)

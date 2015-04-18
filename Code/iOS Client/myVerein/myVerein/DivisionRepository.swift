@@ -72,6 +72,7 @@ class DivisionRepository: CoreDataRepository {
       division.desc = dictionary[DivisionConstants.RemoteDivision.Description] as? String
       division.name = name
       division.lastSynced = NSDate()
+      division.syncInProgress = false
       
       logger.info("Succesfully parsed and populaterd division")
       return ((division as! T), nil)

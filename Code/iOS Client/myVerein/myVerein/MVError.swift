@@ -21,6 +21,8 @@
 //
 
 import Foundation
+import XCGLogger
+import AFNetworking
 
 enum MVErrorCodes: Int {
   // Security related errors
@@ -36,6 +38,8 @@ enum MVErrorCodes: Int {
   case MVResponseHeaderError = 24
   case MVLastSyncTooCloseError = 25
   case MVEmptyResponse = 26
+  case MVNotLoggedInError = 27
+  case MVHostNotReachable = 28
   
   // CoreData related errors
   case MVLocalDatabaseError = 50
@@ -50,6 +54,7 @@ enum MVErrorCodes: Int {
   
   // Internal errors
   case MVFunctionNotImplemented = 100
+  case MVErrorNotRecognized = 101
 }
 
 class MVError {
@@ -58,6 +63,10 @@ class MVError {
   
   class func createError(errorCode: MVErrorCodes) -> NSError {
     return createError(errorCode, failureReason: nil, underlyingError: nil)
+  }
+  
+  class func createError(errorCode: MVErrorCodes, underlyingError: NSError?) -> NSError {
+    return createError(errorCode, failureReason: nil, underlyingError: underlyingError)
   }
   
   class func createError(errorCode: MVErrorCodes, failureReason: String?, underlyingError: MVErrorCodes) -> NSError {
@@ -70,12 +79,12 @@ class MVError {
   
   private class func getUserInfoForError(errorCode: MVErrorCodes, failureReason: String?, underlyingError: NSError?) -> [NSObject: AnyObject]? {
     if var userInfo = getUserInfoForError(errorCode) {
-      if let unwrappedFailureReasion = failureReason {
-        userInfo[NSLocalizedFailureReasonErrorKey] = unwrappedFailureReasion
+      if let failureReason = failureReason {
+        userInfo[NSLocalizedFailureReasonErrorKey] = failureReason
       }
       
-      if let unwrappedUnderlyingError = underlyingError {
-        userInfo[NSUnderlyingErrorKey] = unwrappedUnderlyingError
+      if let underlyingError = underlyingError {
+        userInfo[NSUnderlyingErrorKey] = underlyingError
       }
       return userInfo
     } else {
@@ -189,7 +198,42 @@ class MVError {
           NSLocalizedFailureReasonErrorKey: "The function might be part of a base which needs to get overwritten",
           NSLocalizedRecoverySuggestionErrorKey: "Overwrite the function and re-run the task"
         ]
+      case .MVNotLoggedInError:
+        return [
+          NSLocalizedDescriptionKey: "The user is currently not logged in",
+          NSLocalizedFailureReasonErrorKey: "The session might have timed out, or the user did not log in previously",
+          NSLocalizedRecoverySuggestionErrorKey: "Use the user's credentials to log in"
+        ]
+      case .MVHostNotReachable:
+        return [
+          NSLocalizedDescriptionKey: "The specified host can not be reached",
+          NSLocalizedFailureReasonErrorKey: "The host is down, the internet connection is not working or the specified host does not exist",
+          NSLocalizedRecoverySuggestionErrorKey: "Check your internet connection and retry"
+        ]
+      case .MVErrorNotRecognized:
+        return [
+          NSLocalizedDescriptionKey: "The provided error is unknown",
+          NSLocalizedFailureReasonErrorKey: "The system is not aware of this error",
+          NSLocalizedRecoverySuggestionErrorKey: "Contact the developer"
+        ]
     default: return nil
+    }
+  }
+  
+  /// This function tries to map a known error from a different domains into this domain.
+  ///
+  /// :param: error The error that should be converted.
+  /// :returns: An error in this domain. If the error is not known, the original error is wrapped into a MVErrorUnknown error.
+  class func convertToMVError(error: NSError) -> NSError {
+    XCGLogger.debug("Trying to convert \(error.extendedDescription)")
+    if error.domain == errorDomain {
+      return error
+    } else if error.code == -1011 && error.domain == AFURLResponseSerializationErrorDomain && ((error.userInfo?[AFNetworkingOperationFailingURLResponseErrorKey] as? NSHTTPURLResponse)?.statusCode ?? -1) == 401 {
+      return MVError.createError(.MVNotLoggedInError, underlyingError: error)
+    } else if error.code == -1004 && error.domain == "NSURLErrorDomain" {
+      return MVError.createError(.MVHostNotReachable, underlyingError: error)
+    } else {
+      return MVError.createError(.MVErrorNotRecognized, underlyingError: error)
     }
   }
 }
