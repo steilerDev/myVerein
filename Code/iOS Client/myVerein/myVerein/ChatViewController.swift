@@ -435,7 +435,9 @@ extension ChatViewController: NSFetchedResultsControllerDelegate {
 extension ChatViewController {
   /// This function is called if the user is no longer part of the chat and disables any input.
   func disableChat() {
-    // TODO: Implement
+    inputToolbar.toggleSendButtonEnabled()
+    inputToolbar.contentView.textView.placeHolder = "You are no longer part of this division"
+    inputToolbar.contentView.textView.editable = false
   }
   
   override func finishReceivingMessageAnimated(animated: Bool) {
