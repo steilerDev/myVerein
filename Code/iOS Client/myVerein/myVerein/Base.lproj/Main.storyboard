@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="7531" systemVersion="14D131" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="anG-Qv-Hwh">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="7531" systemVersion="14D136" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="anG-Qv-Hwh">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7520"/>
         <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
@@ -514,37 +514,33 @@
                             </tableViewSection>
                             <tableViewSection headerTitle="Description" id="qBi-XF-XG9">
                                 <cells>
-                                    <tableViewCell userInteractionEnabled="NO" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="IDx-AG-njg">
+                                    <tableViewCell contentMode="scaleToFill" selectionStyle="default" accessoryType="disclosureIndicator" indentationWidth="10" rowHeight="125" id="IDx-AG-njg">
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="IDx-AG-njg" id="wEB-GT-g27">
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" editable="NO" selectable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="qob-i0-4hi">
-                                                    <rect key="frame" x="8" y="8" width="584" height="27"/>
-                                                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                                    <string key="text">Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Nam liber te conscient to factor tum poen legum odioque civiuda.</string>
-                                                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                                    <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
-                                                </textView>
+                                                <label opaque="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" lineBreakMode="tailTruncation" numberOfLines="5" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xym-qJ-2WT">
+                                                    <rect key="frame" x="8" y="8" width="551" height="104"/>
+                                                    <mutableString key="text">Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</mutableString>
+                                                    <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                                                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
                                             </subviews>
                                             <constraints>
-                                                <constraint firstItem="qob-i0-4hi" firstAttribute="bottom" secondItem="wEB-GT-g27" secondAttribute="bottomMargin" id="31A-co-jlP"/>
-                                                <constraint firstAttribute="bottomMargin" secondItem="qob-i0-4hi" secondAttribute="bottom" id="3iZ-34-iHw"/>
-                                                <constraint firstItem="qob-i0-4hi" firstAttribute="top" secondItem="wEB-GT-g27" secondAttribute="topMargin" id="8Q0-Sh-l1o"/>
-                                                <constraint firstAttribute="trailingMargin" secondItem="qob-i0-4hi" secondAttribute="trailing" id="NMV-aR-pa6"/>
-                                                <constraint firstItem="qob-i0-4hi" firstAttribute="top" secondItem="wEB-GT-g27" secondAttribute="topMargin" id="T2n-FV-eyZ"/>
-                                                <constraint firstAttribute="centerY" relation="greaterThanOrEqual" secondItem="qob-i0-4hi" secondAttribute="centerY" id="dhy-S5-JwR"/>
-                                                <constraint firstItem="qob-i0-4hi" firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="wEB-GT-g27" secondAttribute="trailingMargin" id="q7E-Zm-LE2"/>
-                                                <constraint firstAttribute="centerX" relation="greaterThanOrEqual" secondItem="qob-i0-4hi" secondAttribute="centerX" id="xIY-xQ-fuh"/>
-                                                <constraint firstItem="qob-i0-4hi" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="wEB-GT-g27" secondAttribute="leadingMargin" id="xLI-cD-89A"/>
-                                                <constraint firstItem="qob-i0-4hi" firstAttribute="leading" secondItem="wEB-GT-g27" secondAttribute="leadingMargin" id="xjN-eJ-dP8"/>
+                                                <constraint firstAttribute="trailingMargin" secondItem="xym-qJ-2WT" secondAttribute="trailing" id="6JE-WB-Zqj"/>
+                                                <constraint firstAttribute="centerY" secondItem="xym-qJ-2WT" secondAttribute="centerY" id="975-ts-Csw"/>
+                                                <constraint firstItem="xym-qJ-2WT" firstAttribute="top" secondItem="wEB-GT-g27" secondAttribute="topMargin" id="ChX-Ps-3O2"/>
+                                                <constraint firstAttribute="bottomMargin" relation="greaterThanOrEqual" secondItem="xym-qJ-2WT" secondAttribute="bottom" id="Pnx-nd-Lza"/>
+                                                <constraint firstAttribute="centerY" relation="greaterThanOrEqual" secondItem="xym-qJ-2WT" secondAttribute="centerY" id="Zdh-5m-5dJ"/>
+                                                <constraint firstAttribute="centerX" secondItem="xym-qJ-2WT" secondAttribute="centerX" id="dcI-au-Nhk"/>
+                                                <constraint firstItem="xym-qJ-2WT" firstAttribute="leading" secondItem="wEB-GT-g27" secondAttribute="leadingMargin" id="djz-UG-ckY"/>
                                             </constraints>
                                             <variation key="default">
                                                 <mask key="constraints">
-                                                    <exclude reference="3iZ-34-iHw"/>
-                                                    <exclude reference="NMV-aR-pa6"/>
-                                                    <exclude reference="T2n-FV-eyZ"/>
-                                                    <exclude reference="xjN-eJ-dP8"/>
+                                                    <exclude reference="975-ts-Csw"/>
+                                                    <exclude reference="Zdh-5m-5dJ"/>
+                                                    <exclude reference="dcI-au-Nhk"/>
                                                 </mask>
                                             </variation>
                                         </tableViewCellContentView>
@@ -645,7 +641,8 @@
                     <navigationItem key="navigationItem" title="EventDetail" id="zxl-6D-Jgp"/>
                     <connections>
                         <outlet property="declineCell" destination="fBi-X6-zTJ" id="lFB-sP-9rn"/>
-                        <outlet property="descriptionTextView" destination="qob-i0-4hi" id="l3T-VY-LiT"/>
+                        <outlet property="descriptionCell" destination="IDx-AG-njg" id="arz-3z-Y5F"/>
+                        <outlet property="descriptionLabel" destination="xym-qJ-2WT" id="Mtr-Ks-gpz"/>
                         <outlet property="eventLocation" destination="rJT-qf-LMG" id="3pn-Xg-Ili"/>
                         <outlet property="eventTimes" destination="epJ-Iv-AJb" id="bqx-AU-0we"/>
                         <outlet property="eventTitle" destination="txa-qQ-ekK" id="wAb-vf-oMZ"/>
@@ -655,6 +652,7 @@
                         <outlet property="participantCell" destination="Qk4-Wx-kJT" id="reE-m0-ulS"/>
                         <outlet property="titleBar" destination="zxl-6D-Jgp" id="srv-6n-jQH"/>
                         <segue destination="LiS-6T-BIP" kind="show" identifier="showParticipants" id="yuX-eN-ege"/>
+                        <segue destination="QOm-4F-1eM" kind="show" identifier="showDescription" id="F69-pq-9GR"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="4rW-yN-zZg" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -693,7 +691,44 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ltl-U5-anR" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="5087" y="860"/>
+            <point key="canvasLocation" x="5152" y="361"/>
+        </scene>
+        <!--Description-->
+        <scene sceneID="uwd-yL-1LH">
+            <objects>
+                <viewController title="Description" id="QOm-4F-1eM" customClass="DescriptionViewController" customModule="myVerein" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="oGg-Zb-w0Y"/>
+                        <viewControllerLayoutGuide type="bottom" id="rto-5m-LUW"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="Erj-3V-hzC">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="536"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="iRf-MI-uKV">
+                                <rect key="frame" x="16" y="0.0" width="568" height="528"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <string key="text">Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Nam liber te conscient to factor tum poen legum odioque civiuda.</string>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            </textView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="iRf-MI-uKV" firstAttribute="top" secondItem="oGg-Zb-w0Y" secondAttribute="bottom" id="ZUd-nd-Cfy"/>
+                            <constraint firstItem="rto-5m-LUW" firstAttribute="top" secondItem="iRf-MI-uKV" secondAttribute="bottom" constant="8" symbolic="YES" id="b5e-fG-cfS"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="iRf-MI-uKV" secondAttribute="trailing" id="qnF-DO-fN7"/>
+                            <constraint firstItem="iRf-MI-uKV" firstAttribute="leading" secondItem="Erj-3V-hzC" secondAttribute="leadingMargin" id="utl-HH-cWP"/>
+                        </constraints>
+                    </view>
+                    <extendedEdge key="edgesForExtendedLayout"/>
+                    <connections>
+                        <outlet property="descriptionTextView" destination="iRf-MI-uKV" id="Noe-by-eAv"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="aFb-My-Qtz" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="5152" y="1211"/>
         </scene>
         <!--Settings-->
         <scene sceneID="HBE-MR-o85">

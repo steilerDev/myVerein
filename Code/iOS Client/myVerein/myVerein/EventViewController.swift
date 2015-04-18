@@ -41,9 +41,10 @@ class EventViewController: UITableViewController {
   @IBOutlet weak var declineCell: UITableViewCell!
   @IBOutlet weak var participantCell: UITableViewCell!
   
-  var event: Event?
+  @IBOutlet weak var descriptionCell: UITableViewCell!
+  @IBOutlet weak var descriptionLabel: UILabel!
   
-  @IBOutlet weak var descriptionTextView: UITextView!
+  var event: Event?
   
   /// The token handed over by the notification subscription, stored to be able to release resources.
   var notificationObserverToken: NSObjectProtocol?
@@ -72,7 +73,12 @@ extension EventViewController {
       eventTimes.text = event.dateStringLong
       eventLocation.text = event.locationString
       
-      descriptionTextView.text = event.eventDescription
+      if event.eventDescription?.isEmpty ?? true {
+        descriptionLabel.text = "No description available"
+      } else {
+        descriptionLabel.text = event.eventDescription
+      }
+      descriptionLabel.sizeToFit()
       
       if let response = event.response {
         switch response {
@@ -129,13 +135,20 @@ extension EventViewController {
   override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
     if let identifier = segue.identifier {
       switch identifier {
-      case EventViewControllerConstants.SegueToParticipants:
-        logger.debug("Preparing segue to participant list")
-        if let destinationViewController = segue.destinationViewController as? ParticipantViewController {
-          destinationViewController.event = event
-        } else {
-          logger.error("Unable to get destination view controller")
-        }
+        case EventViewControllerConstants.SegueToParticipants:
+          logger.debug("Preparing segue to participant list")
+          if let destinationViewController = segue.destinationViewController as? ParticipantViewController {
+            destinationViewController.event = event
+          } else {
+            logger.error("Unable to get destination view controller")
+          }
+        case EventViewControllerConstants.SegueToDescription:
+          logger.debug("Preparing segue to description list")
+          if let destinationViewController = segue.destinationViewController as? DescriptionViewController {
+              destinationViewController.event = event
+          } else {
+            logger.error("Unable to get destination view controller")
+          }
       default: break;
       }
     } else {
@@ -155,6 +168,10 @@ extension EventViewController {
         logger.info("Selected participants cell, performing segue for event \(self.event)")
         performSegueWithIdentifier(EventViewControllerConstants.SegueToParticipants, sender: nil)
         participantCell.selected = false
+      } else if indexPath.indexAtPosition(0) == EventViewControllerConstants.SectionIndexPath.Description && !(event!.eventDescription?.isEmpty ?? true) {
+        logger.info("Selected description cell, performing segue for event \(self.event)")
+        performSegueWithIdentifier(EventViewControllerConstants.SegueToDescription, sender: nil)
+        descriptionCell.selected = false
       } else if indexPath.indexAtPosition(0) == EventViewControllerConstants.SectionIndexPath.Response && event!.response! != .Removed {
         maybeCell.accessoryType = .None
         goingCell.accessoryType = .None
@@ -193,10 +210,8 @@ extension EventViewController {
       (event!.response! != .Removed && indexPath.indexAtPosition(0) == EventViewControllerConstants.SectionIndexPath.Response && indexPath.indexAtPosition(1) == 3)
     {
       return CGFloat(0)
-    } else if indexPath.indexAtPosition(0) == EventViewControllerConstants.SectionIndexPath.Description {
-      logger.debug("Calculating size")
-      descriptionTextView.text = event!.eventDescription
-      return descriptionTextView.sizeThatFits(CGSize(width: descriptionTextView.frame.size.width, height: CGFloat.max)).height + CGFloat(100.0)
+    } else if indexPath.indexAtPosition(0) == EventViewControllerConstants.SectionIndexPath.Description && event!.eventDescription?.isEmpty ?? true {
+      return CGFloat(EventViewControllerConstants.DefaultCellHeight)
     } else {
       return super.tableView(tableView, heightForRowAtIndexPath: indexPath)
     }
@@ -208,6 +223,10 @@ extension EventViewController {
       (event!.response! != .Removed && indexPath.indexAtPosition(0) == EventViewControllerConstants.SectionIndexPath.Response && indexPath.indexAtPosition(1) == 3)
     {
       cell.hidden = true
+    } else if indexPath.indexAtPosition(0) == EventViewControllerConstants.SectionIndexPath.Description && event!.eventDescription?.isEmpty ?? true {
+      descriptionLabel.enabled = false
+      cell.accessoryType = .None
+      cell.userInteractionEnabled = false
     }
   }
 }
@@ -240,8 +259,10 @@ extension EventViewController: MKMapViewDelegate {
 }
 // MARK: - EventViewController related constants
 struct EventViewControllerConstants {
+  static let DefaultCellHeight = 40.0
   static let ReuseAnnotationIdentifier = "annotation"
   static let SegueToParticipants = "showParticipants"
+  static let SegueToDescription = "showDescription"
   struct SectionIndexPath {
     static let Overview = 0
     static let Description = 1

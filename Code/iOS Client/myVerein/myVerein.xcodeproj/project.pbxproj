@@ -38,6 +38,7 @@
 		30A4F7D91AA97D400064EA2C /* MVNetworking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30A4F7D81AA97D400064EA2C /* MVNetworking.swift */; };
 		30BAFEE51AA52828000D18EF /* ca-cert.cer in Resources */ = {isa = PBXBuildFile; fileRef = 30BAFEE11AA518EA000D18EF /* ca-cert.cer */; };
 		30C1EFDA1AE2E28A00328C79 /* MVRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30C1EFD91AE2E28A00328C79 /* MVRequest.swift */; };
+		30C1EFDE1AE2FDC600328C79 /* DescriptionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30C1EFDD1AE2FDC500328C79 /* DescriptionViewController.swift */; };
 		30C2DA331ADEB440006A6143 /* MarshalOperator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30C2DA321ADEB440006A6143 /* MarshalOperator.swift */; };
 		30F254E61AC7224E00E10CB9 /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30F254E51AC7224E00E10CB9 /* SettingsViewController.swift */; };
 		30F254E81AC7271A00E10CB9 /* CalendarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30F254E71AC7271A00E10CB9 /* CalendarViewController.swift */; };
@@ -108,6 +109,7 @@
 		30A4F7D81AA97D400064EA2C /* MVNetworking.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MVNetworking.swift; sourceTree = "<group>"; };
 		30BAFEE11AA518EA000D18EF /* ca-cert.cer */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ca-cert.cer"; sourceTree = "<group>"; };
 		30C1EFD91AE2E28A00328C79 /* MVRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MVRequest.swift; sourceTree = "<group>"; };
+		30C1EFDD1AE2FDC500328C79 /* DescriptionViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DescriptionViewController.swift; sourceTree = "<group>"; };
 		30C2DA321ADEB440006A6143 /* MarshalOperator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MarshalOperator.swift; sourceTree = "<group>"; };
 		30F254E51AC7224E00E10CB9 /* SettingsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
 		30F254E71AC7271A00E10CB9 /* CalendarViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CalendarViewController.swift; sourceTree = "<group>"; };
@@ -323,6 +325,7 @@
 				30F254E71AC7271A00E10CB9 /* CalendarViewController.swift */,
 				3032A9F41AD70B9100EEEAF4 /* EventViewController.swift */,
 				30159BF81AD980010018419D /* ParticipantViewController.swift */,
+				30C1EFDD1AE2FDC500328C79 /* DescriptionViewController.swift */,
 			);
 			name = Events;
 			sourceTree = "<group>";
@@ -498,6 +501,7 @@
 				30FB44C51AACD898003E4512 /* Message.swift in Sources */,
 				3035D66C1AC086E800C5C0FB /* MVColor.swift in Sources */,
 				30916FFB1AA8B9D0004D30D1 /* MenuController.swift in Sources */,
+				30C1EFDE1AE2FDC600328C79 /* DescriptionViewController.swift in Sources */,
 				3091702F1AA8C097004D30D1 /* myVereinModel.xcdatamodeld in Sources */,
 				3032A9F51AD70B9100EEEAF4 /* EventViewController.swift in Sources */,
 				302BE8C41AA64599001D0FE7 /* DivisionChatOverviewViewController.swift in Sources */,
