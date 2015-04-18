@@ -31,7 +31,20 @@ class CoreDataRepository {
   let logger = XCGLogger.defaultInstance()
   
   // Retrieve the shared managedObjectContext from AppDelegate
-  let managedObjectContext = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext!
+  let managedObjectContext: NSManagedObjectContext
+  
+  // MARK: - Initializer
+  
+  /// This initializer initiates the repository using the default managed object context provided by the app delegate for executions on the main queue.
+  init() {
+    managedObjectContext = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext!
+  }
+  
+  /// This initializer initiates the repository using a managed object context for executions on any queue.
+  init(inContext managedObjectContext: NSManagedObjectContext) {
+    self.managedObjectContext = managedObjectContext
+  }
+  
   
   // MARK: - Synchronization of objects (Put here because you currently cannot overwrite a function that is declared in an extension
   
@@ -73,17 +86,12 @@ extension CoreDataRepository {
     return managedObjectContext.hasChanges
   }
   
-  /// This function saves the database permanently, if needed.
+  // This function saves the database permanently, if needed.
   func save() {
-    save(self.managedObjectContext)
-  }
-  
-  // This function saves the database permanently, if needed, using the provided managed object context. This function should be used in a multithreaded environment.
-  func save(independentManagedObjectContext: NSManagedObjectContext) {
-    if independentManagedObjectContext.hasChanges {
+    if managedObjectContext.hasChanges {
       logger.verbose("Saving database changes")
       var error : NSError?
-      if independentManagedObjectContext.save(&error) {
+      if managedObjectContext.save(&error) {
         logger.info("Successfully saved database")
       } else {
         logger.error("Unable to save database: \(error?.extendedDescription)")

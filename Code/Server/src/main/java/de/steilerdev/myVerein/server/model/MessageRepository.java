@@ -20,6 +20,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -29,5 +30,8 @@ import java.util.List;
 public interface MessageRepository extends MongoRepository<Message, String> {
 
     @Query(value = "{?0 : ?1 }")
-    public List<Message> findAllByPrefixedReceiverIDAndMessageStatus(String receiverID, Message.MessageStatus messageStatus);
+    List<Message> findAllByPrefixedReceiverIDAndMessageStatus(String receiverID, Message.MessageStatus messageStatus);
+
+    @Query(value = "{$and: [{?0 : { $exists: true }}, {'timestamp': {$gt: ?1}}] }")
+    List<Message> findAllByPrefixedReceiverIDAndTimestampAfter(String receiverID, LocalDateTime timestamp); //Maybe someday... (Using this method you could enable multi device)
 }

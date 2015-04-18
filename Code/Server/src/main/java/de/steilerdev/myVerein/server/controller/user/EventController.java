@@ -70,7 +70,7 @@ public class EventController
                 logger.warn("[{}] Unable to get all events for user, because the last changed format is wrong: {}", currentUser, e.getLocalizedMessage());
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
-            events = eventRepository.findAllByPrefixedInvitedUserAndLastChangedLessThan(Event.prefixedUserIDForUser(currentUser), lastChangedTime);
+            events = eventRepository.findAllByPrefixedInvitedUserAndLastChangedAfter(Event.prefixedUserIDForUser(currentUser), lastChangedTime);
         } else
         {
             logger.debug("[{}] Gathering all user events", currentUser);

@@ -80,7 +80,6 @@ class ChatViewController: JSQMessagesViewController {
     var dict = [NSFetchedResultsChangeType: [NSIndexPath]]()
     dict[.Insert] = [NSIndexPath]()
     dict[.Delete] = [NSIndexPath]()
-    dict[.Update] = [NSIndexPath]()
     return dict
   }()
 }
@@ -152,6 +151,7 @@ extension ChatViewController {
       JSQSystemSoundPlayer.jsq_playMessageReceivedSound()
       self.finishReceivingMessageAnimated(true)
     }
+    setReadFlags()
   }
   
   /// Within this funciton the notification observer un-subscribes from the notification system.
@@ -209,21 +209,11 @@ extension ChatViewController {
     
     logger.debug("Configuring cell at index path \(indexPath) with message \(currentMessage)")
     
-    // If this cell is loaded, check if it has the same sender as the next cell. If it holds true modify this cell (hide avatar and tail)
-    let prevIndexPath = indexPath.decrement()
-    if collectionView.collectionView(collectionView, hasItemForIndexPath: prevIndexPath) {
-      let prevMessage = fetchedResultController.objectAtIndexPath(prevIndexPath) as! Message
-      
-      if prevMessage.timestamp.dateByAddingTimeInterval(ChatViewConstants.TimeBetweenMessagesThresholdForLabel).isAfter(currentMessage.timestamp) {
-        configureCell(currentCell, usingMessage: currentMessage, AndHideTailAndAvatar: true)
-        return currentCell
-      } else if prevMessage.senderId() == currentMessage.senderId() {
-        configureCell(currentCell, usingMessage: currentMessage, AndHideTailAndAvatar: false)
-        return currentCell
-      }
+    if userLabelForMessageAtIndexPath(indexPath, inCollectionView: collectionView) != nil {
+      configureCell(currentCell, usingMessage: currentMessage, AndHideTailAndAvatar: false)
+    } else {
+      configureCell(currentCell, usingMessage: currentMessage, AndHideTailAndAvatar: true)
     }
-    
-    configureCell(currentCell, usingMessage: currentMessage, AndHideTailAndAvatar: false)
     
     return currentCell
   }
@@ -256,24 +246,9 @@ extension ChatViewController {
 extension ChatViewController {
   override func collectionView(collectionView: JSQMessagesCollectionView!, messageDataForItemAtIndexPath indexPath: NSIndexPath!) -> JSQMessageData! {
     if let message = fetchedResultController.objectAtIndexPath(indexPath) as? Message {
-      if !message.read {
-        //Updating read flag and notification count
-        logger.debug("Setting read flag for message \(message)")
-        message.read = true
-        MessageRepository().save()
-        for delegate in notificationDelegates {
-          if delegate == nil {
-            logger.debug("Not able to delegate new count because the delegate is nil")
-          } else if let cell = delegate as? DivisionChatCell where cell.division != self.division {
-            logger.warning("Not able delegate new count to cell because divisions are different")
-          } else {
-            delegate!.decrementNotificationCountBy(1, sender: self)
-          }
-        }
-      }
       return message
     } else {
-      logger.severe("Unable to get message")
+      logger.severe("Unable to get message at index path \(indexPath)")
       logger.debugExec { abort() }
       dismissViewControllerAnimated(true, completion: nil)
       return nil
@@ -415,7 +390,7 @@ extension ChatViewController: NSFetchedResultsControllerDelegate {
         } else {
           logger.error("Unable to insert object in chat view")
         }
-      case .Delete, .Update:
+      case .Delete:
         if let currentIndexPath = indexPath {
           objectChanges[type]?.append(currentIndexPath)
         } else {
@@ -428,6 +403,7 @@ extension ChatViewController: NSFetchedResultsControllerDelegate {
         } else {
           logger.error("Unable to move object in chat view")
         }
+      case .Update: break //Ignoring update case, because the content of messages should be inmutuble. The timestamp and id could change slighlty but that can wait till the next reload of the view
       }
     } else {
       logger.error("Unable to change object in chat view")
@@ -448,8 +424,6 @@ extension ChatViewController: NSFetchedResultsControllerDelegate {
               collectionView.insertItemsAtIndexPaths(indexPaths)
             case .Delete:
               collectionView.deleteItemsAtIndexPaths(indexPaths)
-            case .Update:
-              self.collectionView(collectionView, configureCellsForIndexPaths: indexPaths)
             default:
               XCGLogger.debugExec {abort()}
               XCGLogger.error("Reached default case while applying object changes. This should not happen: Type \(type.rawValue)")
@@ -459,7 +433,6 @@ extension ChatViewController: NSFetchedResultsControllerDelegate {
         }, completion: nil)
         objectChanges[.Insert] = [NSIndexPath]()
         objectChanges[.Delete] = [NSIndexPath]()
-        objectChanges[.Update] = [NSIndexPath]()
       } else {
         logger.info("No need to apply batch changes because model did not change")
       }
@@ -474,6 +447,36 @@ extension ChatViewController {
     inputToolbar.toggleSendButtonEnabled()
     inputToolbar.contentView.textView.placeHolder = "You are no longer part of this division"
     inputToolbar.contentView.textView.editable = false
+  }
+  
+  func setReadFlags() {
+    logger.debug("Starting to set read flag on all unread messages");
+    setReadFlagsInContext~>
+  }
+  
+  private func setReadFlagsInContext(context: NSManagedObjectContext) {
+    let messageRepository = MessageRepository(inContext: context)
+    if let messages = messageRepository.findMessagesByDivision(self.division, andReadFlag: false) {
+      logger.debug("Successully gathered \(messages.count) messages")
+      for message in messages {
+        message.read = true
+      }
+      messageRepository.save()
+      
+      // Notifying delegates
+      for delegate in notificationDelegates {
+        if delegate == nil {
+          logger.debug("Not able to delegate new count because the delegate is nil")
+        } else if let cell = delegate as? DivisionChatCell where cell.division != self.division {
+          logger.warning("Not able delegate new count to cell because divisions are different")
+        } else {
+          // Executing delegation guaranteed on main queue, since this function is most likely executed in the background.
+          logger.debug("Notifying delegate about changed notification count")
+          ~>{ delegate!.decrementNotificationCountBy(messages.count, sender: self) }
+        }
+      }
+
+    }
   }
 }
 

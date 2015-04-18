@@ -328,7 +328,7 @@ extension DivisionChatOverviewViewController {
   }
 }
 
-// MARK: - NotificationCountDelegate protocol methods
+// MARK: - NotificationCountDelegate protocol methods, handing over the new notification counts to the menu controller
 extension DivisionChatOverviewViewController: NotificationCountDelegate {
   func incrementNotificationCountBy(amount: Int, sender: AnyObject?) {
     notificationDelegate?.incrementNotificationCountBy(amount, sender: self)
