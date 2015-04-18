@@ -138,7 +138,7 @@ class MessageRepository: CoreDataRepository {
     }
   }
   
-  /// This function creates a new message using the provided information.
+  /// This function creates a new message using the provided information. This function should only be used within the context of sending a new message.
   func createMessage(content: String, timestamp: NSDate, division: Division, sender: User) -> Message {
     logger.verbose("Creating message with content \(content), timestamp \(timestamp), sender \(sender.id) and division \(division.id)")
     let newItem: Message = createObjectWithId(NSUUID().UUIDString, AndSync: false)
@@ -147,7 +147,7 @@ class MessageRepository: CoreDataRepository {
     newItem.division = division
     newItem.sender = sender
     // Setting read flag to false, since messages send by the user are not re-synced.
-    newItem.read = false
+    newItem.read = true
     
     // If this is the first message, or the message is newer use it
     if division.latestMessage == nil || division.latestMessage?.timestamp?.compare(timestamp) == NSComparisonResult.OrderedAscending {

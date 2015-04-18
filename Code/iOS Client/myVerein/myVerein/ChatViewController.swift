@@ -41,6 +41,12 @@ class ChatViewController: JSQMessagesViewController {
   var divisionNotificationObserverToken: NSObjectProtocol?
   var messageNotificationObserverToken: NSObjectProtocol?
   
+  /// The message bubble factories, for tailles message bubbles and ones with tails
+  let taillesMessageBubbleFactory = JSQMessagesBubbleImageFactory(bubbleImage: UIImage.jsq_bubbleRegularTaillessImage(), capInsets: UIEdgeInsetsZero)
+  let regularMessageBubbleFactory = JSQMessagesBubbleImageFactory(bubbleImage: UIImage.jsq_bubbleRegularImage(), capInsets: UIEdgeInsetsZero)
+  let outgoingMessageBubbleColor = UIColor(hex: MVColor.Gray.Lighter)
+  let incomingMessageBubbleColor = UIColor(hex: MVColor.Primary.Normal)
+  
   // Lazily initiating fetched result controller
   lazy var fetchedResultController: NSFetchedResultsController = {
     //Initializing data source (NSFetchedResultController)
@@ -141,7 +147,7 @@ extension ChatViewController {
       notification in
       XCGLogger.debug("Received notification token, reloading messages")
       JSQSystemSoundPlayer.jsq_playMessageReceivedSound()
-      self.finishReceivingMessage()
+      self.finishReceivingMessageAnimated(true)
     }
   }
   
@@ -186,6 +192,23 @@ extension ChatViewController {
       }
     }
     
+    // Hide avatar image if there are several messages of the same user in a row
+    cell.avatarImageView.hidden = compareNextCellAndCellAtIndexPath(indexPath, andReturnExpresionResult: { $0.senderId() == $1.senderId() && $0.senderId() != self.senderId })
+    
+    // Hide tail of cell if there are sevral messages of the same user in a row
+    if let newMessageBubbleImage = compareNextCellAndCellAtIndexPath(indexPath,
+        andReturnValue: {
+          return $0.isOutgoingMessage ?
+            self.taillesMessageBubbleFactory.outgoingMessagesBubbleImageWithColor(self.outgoingMessageBubbleColor):
+            self.taillesMessageBubbleFactory.incomingMessagesBubbleImageWithColor(self.incomingMessageBubbleColor)
+        },
+        ifExpresionHoldsTrue: { $0.senderId() == $1.senderId() }
+      )
+    {
+      cell.messageBubbleImageView.image = newMessageBubbleImage.messageBubbleImage
+      cell.messageBubbleImageView.highlightedImage = newMessageBubbleImage.messageBubbleHighlightedImage
+    }
+    
     return cell
   }
 }
@@ -224,9 +247,9 @@ extension ChatViewController {
     let factory = JSQMessagesBubbleImageFactory()
     if let message = fetchedResultController.objectAtIndexPath(indexPath) as? Message {
       if message.isOutgoingMessage {
-        return factory.outgoingMessagesBubbleImageWithColor(UIColor(hex: MVColor.Gray.Lighter))
+        return factory.outgoingMessagesBubbleImageWithColor(outgoingMessageBubbleColor)
       } else {
-        return factory.incomingMessagesBubbleImageWithColor(UIColor(hex: MVColor.Primary.Normal))
+        return factory.incomingMessagesBubbleImageWithColor(incomingMessageBubbleColor)
       }
     } else {
       logger.severe("Unable to get message")
@@ -252,26 +275,17 @@ extension ChatViewController {
   /// :param: collectionView The collection view the cell is in.
   /// :returns: The user that should be shown in the label, or nil if nothing should be shown.
   func userLabelForMessageAtIndexPath(indexPath: NSIndexPath, inCollectionView collectionView: JSQMessagesCollectionView) -> User? {
-    if let currentMessage = self.collectionView(collectionView, messageDataForItemAtIndexPath: indexPath) as? Message where currentMessage.senderId() != senderId {
-      let prevIndexPath = indexPath.decrement()
-      if collectionView.collectionView(collectionView, hasItemForIndexPath: prevIndexPath) {
-        if let prevMessage = self.collectionView(collectionView, messageDataForItemAtIndexPath: prevIndexPath) as? Message {
-          if prevMessage.senderId() != currentMessage.senderId() {
-            return currentMessage.sender
-          }
-        }
-      } else {
-        return currentMessage.sender
-      }
-    }
-    return nil
+    return comparePreviousCellAndCellAtIndexPath(indexPath,
+      andReturnValue: { $0.sender },
+      ifExpresionHoldsTrue: { $1.senderId() != self.senderId && $0.senderId() != $1.senderId() }
+    )
   }
   
   override func collectionView(collectionView: JSQMessagesCollectionView!, attributedTextForMessageBubbleTopLabelAtIndexPath indexPath: NSIndexPath!) -> NSAttributedString! {
     if let user = userLabelForMessageAtIndexPath(indexPath, inCollectionView: collectionView) {
       return NSAttributedString(string: user.displayName)
     } else {
-      return nil
+      return super.collectionView(collectionView, attributedTextForCellTopLabelAtIndexPath: indexPath)
     }
   }
   
@@ -279,7 +293,7 @@ extension ChatViewController {
     if userLabelForMessageAtIndexPath(indexPath, inCollectionView: collectionView) != nil {
       return kJSQMessagesCollectionViewCellLabelHeightDefault
     } else {
-      return 0.0
+      return super.collectionView(collectionView, layout: collectionViewLayout, heightForCellTopLabelAtIndexPath: indexPath)
     }
   }
   
@@ -291,19 +305,10 @@ extension ChatViewController {
   /// :param: collectionView The collection view the cell is in.
   /// :returns: The date that should be shown in the label, or nil if nothing should be shown.
   func timestampLabelForMessageAtIndexPath(indexPath: NSIndexPath, inCollectionView collectionView: JSQMessagesCollectionView) -> NSDate? {
-    if let currentMessage = self.collectionView(collectionView, messageDataForItemAtIndexPath: indexPath) as? Message {
-      let prevIndexPath = indexPath.decrement()
-      if collectionView.collectionView(collectionView, hasItemForIndexPath: prevIndexPath) {
-        if let prevMessage = self.collectionView(collectionView, messageDataForItemAtIndexPath: prevIndexPath) as? Message {
-          if prevMessage.timestamp.dateByAddingTimeInterval(ChatViewConstants.TimeBetweenMessagesThresholdForLabel).isBefore(currentMessage.timestamp) {
-            return currentMessage.timestamp
-          }
-        }
-      } else {
-        return currentMessage.timestamp
-      }
-    }
-    return nil
+    return comparePreviousCellAndCellAtIndexPath(indexPath,
+      andReturnValue: { $0.timestamp },
+      ifExpresionHoldsTrue: {$0.timestamp.dateByAddingTimeInterval(ChatViewConstants.TimeBetweenMessagesThresholdForLabel).isBefore($1.timestamp)}
+    )
   }
   
   override func collectionView(collectionView: JSQMessagesCollectionView!, attributedTextForCellTopLabelAtIndexPath indexPath: NSIndexPath!) -> NSAttributedString! {
@@ -318,7 +323,7 @@ extension ChatViewController {
     if timestampLabelForMessageAtIndexPath(indexPath, inCollectionView: collectionView) != nil {
       return kJSQMessagesCollectionViewCellLabelHeightDefault
     } else {
-      return 0.0
+      return super.collectionView(collectionView, layout: collectionViewLayout, heightForCellTopLabelAtIndexPath: indexPath)
     }
   }
 }
@@ -363,29 +368,29 @@ extension ChatViewController: NSFetchedResultsControllerDelegate {
   func controller(controller: NSFetchedResultsController, didChangeObject anObject: AnyObject, atIndexPath indexPath: NSIndexPath?, forChangeType type: NSFetchedResultsChangeType, newIndexPath: NSIndexPath?) {
     logger.debug("Object in chat view changed.")
     if let collectionView = self.collectionView {
-//      switch type {
-//      case .Insert:
-//        if let currentIndexPath = newIndexPath {
-//          objectChanges[type]?.append(currentIndexPath)
-//        } else {
-//          logger.error("Unable to insert object in chat view")
-//        }
-//      case .Delete:
-//        if let currentIndexPath = indexPath {
-//          objectChanges[type]?.append(currentIndexPath)
-//        } else {
-//          logger.error("Unable to delete object in chat view")
-//        }
-//      case .Update:
-//        XCGLogger.error("Reached update case while applying object changes in chat view. Ignoring changes")
-//      case .Move:
-//        if let currentIndexPath = newIndexPath, oldIndexPath = indexPath {
-//          objectChanges[.Delete]?.append(oldIndexPath)
-//          objectChanges[.Insert]?.append(currentIndexPath)
-//        } else {
-//          logger.error("Unable to move object in chat view")
-//        }
-//      }
+      switch type {
+      case .Insert:
+        if let currentIndexPath = newIndexPath {
+          objectChanges[type]?.append(currentIndexPath)
+        } else {
+          logger.error("Unable to insert object in chat view")
+        }
+      case .Delete:
+        if let currentIndexPath = indexPath {
+          objectChanges[type]?.append(currentIndexPath)
+        } else {
+          logger.error("Unable to delete object in chat view")
+        }
+      case .Update:
+        XCGLogger.error("Reached update case while applying object changes in chat view. Ignoring changes")
+      case .Move:
+        if let currentIndexPath = newIndexPath, oldIndexPath = indexPath {
+          objectChanges[.Delete]?.append(oldIndexPath)
+          objectChanges[.Insert]?.append(currentIndexPath)
+        } else {
+          logger.error("Unable to move object in chat view")
+        }
+      }
     } else {
       logger.error("Unable to change object in chat view")
     }
@@ -431,6 +436,81 @@ extension ChatViewController {
   /// This function is called if the user is no longer part of the chat and disables any input.
   func disableChat() {
     // TODO: Implement
+  }
+  
+  override func finishReceivingMessageAnimated(animated: Bool) {
+    super.finishReceivingMessageAnimated(animated)
+    // TODO: Implement checking if avatar needs to disappear & bubble image update, maybe animated? (Fade out or move down?
+  }
+}
+
+// MARK: - Utility functions
+extension ChatViewController {
+  /// This function compares the current cell identified by the index path with its predecessor using the provided closure. If the closure returns true or the message does not have a predecessor, the function will return the evaluation of the provided (auto-)closure.
+  ///
+  /// :param: indexPath The index path defining the current cell.
+  /// :param: closure The evaluation of this closure is used to decide wheter or not to return the value. The first argument is the message within the preceding cell, where the second one is the message within the current cell.
+  /// :param: returnValue The return value returned if the expresion holds true or the cell does not have a predecessor. The message of the current cell is available as paramter.
+  /// :returns: The result of the return-value-closure if the provided expresion holds true or the cell does not have a predecessor.
+  func comparePreviousCellAndCellAtIndexPath<T>(indexPath: NSIndexPath, andReturnValue returnValue:  (Message) -> T, ifExpresionHoldsTrue closure: (Message, Message) -> Bool) -> T? {
+    if let currentMessage = fetchedResultController.objectAtIndexPath(indexPath) as? Message {
+      let prevIndexPath = indexPath.decrement()
+      if collectionView.collectionView(collectionView, hasItemForIndexPath: prevIndexPath) {
+        if let prevMessage = fetchedResultController.objectAtIndexPath(prevIndexPath) as? Message {
+          if closure(prevMessage, currentMessage) {
+            return returnValue(currentMessage)
+          }
+        }
+      } else {
+        return returnValue(currentMessage)
+      }
+    }
+    return nil
+  }
+  
+  /// This function compares the current cell identified by the index path with its predecessor using the provided closure. If the closure returns true or the message does not have a predecessor, the function will return true.
+  ///
+  /// :param: indexPath The index path defining the current cell.
+  /// :param: closure The evaluation of this closure is used to decide wheter or not to return the value. The first message is one from the previous cell, where the second one is from the current cell.
+  /// :returns: True if the provided expresion holds true or the cell does not have a predecessor, false otherwise.
+  func comparePreviousCellAndCellAtIndexPath(indexPath: NSIndexPath, andReturnExpresionResult closure: (Message, Message) -> Bool) -> Bool {
+    return comparePreviousCellAndCellAtIndexPath(indexPath,
+      andReturnValue: { _ in return true },
+      ifExpresionHoldsTrue: closure
+      ) ?? false
+  }
+  
+  /// This function compares the current cell identified by the index path with its successor using the provided closure. If the closure returns true the function will return the evaluation of the provided (auto-)closure.
+  ///
+  /// :param: indexPath The index path defining the current cell.
+  /// :param: closure The evaluation of this closure is used to decide wheter or not to return the value. The first argument is the message within the current cell, the second argument is the message within the succeeding cell.
+  /// :param: returnValue The return value returned if the expresion holds true or the cell does not have a predecessor. The message of the current cell is available as paramter.
+  /// :returns: The result of the return-value-closure if the provided expresion holds true. If the cell does not have a successor the function will always return nil.
+  func compareNextCellAndCellAtIndexPath<T>(indexPath: NSIndexPath, andReturnValue returnValue:  (Message) -> T, ifExpresionHoldsTrue closure: (Message, Message) -> Bool) -> T? {
+    
+    let prevIndexPath = indexPath.increment()
+    if collectionView.collectionView(collectionView, hasItemForIndexPath: prevIndexPath) {
+      if let nextMessage = fetchedResultController.objectAtIndexPath(prevIndexPath) as? Message,
+        let currentMessage = fetchedResultController.objectAtIndexPath(indexPath) as? Message
+      {
+        if closure(currentMessage, nextMessage) {
+          return returnValue(currentMessage)
+        }
+      }
+    }
+    return nil
+  }
+  
+  /// This function compares the current cell identified by the index path with its successor using the provided closure. If the closure returns true the function will return true.
+  ///
+  /// :param: indexPath The index path defining the current cell.
+  /// :param: closure The evaluation of this closure is used to decide wheter or not to return the value. The first argument is the message within the current cell, the second argument is the message within the succeeding cell.
+  /// :returns: True if the provided expresion holds true, false otherwise. If the cell does not have a successor the function will always return false.
+  func compareNextCellAndCellAtIndexPath(indexPath: NSIndexPath, andReturnExpresionResult closure: (Message, Message) -> Bool) -> Bool {
+    return compareNextCellAndCellAtIndexPath(indexPath,
+      andReturnValue: { _ in return true },
+      ifExpresionHoldsTrue: closure
+      ) ?? false
   }
 }
 
