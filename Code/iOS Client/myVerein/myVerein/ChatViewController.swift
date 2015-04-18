@@ -46,6 +46,8 @@ class ChatViewController: JSQMessagesViewController {
   let regularMessageBubbleFactory = JSQMessagesBubbleImageFactory(bubbleImage: UIImage.jsq_bubbleRegularImage(), capInsets: UIEdgeInsetsZero)
   let outgoingMessageBubbleColor = UIColor(hex: MVColor.Gray.Lighter)
   let incomingMessageBubbleColor = UIColor(hex: MVColor.Primary.Normal)
+  let outgoingMessageTextColor = UIColor.blackColor()
+  let incomingMessageTextColor = UIColor.whiteColor()
   
   // Lazily initiating fetched result controller
   lazy var fetchedResultController: NSFetchedResultsController = {
@@ -78,6 +80,7 @@ class ChatViewController: JSQMessagesViewController {
     var dict = [NSFetchedResultsChangeType: [NSIndexPath]]()
     dict[.Insert] = [NSIndexPath]()
     dict[.Delete] = [NSIndexPath]()
+    dict[.Update] = [NSIndexPath]()
     return dict
   }()
 }
@@ -163,7 +166,6 @@ extension ChatViewController {
       MVNotification.unSubscribeFromNotification(messageNotificationObserverToken)
     }
   }
-
   
   /*
   // MARK: Navigation
@@ -183,33 +185,70 @@ extension ChatViewController {
   }
   
   override func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
+    logger.debug("Getting cell for index path \(indexPath)")
     let cell = super.collectionView(collectionView, cellForItemAtIndexPath: indexPath) as! JSQMessagesCollectionViewCell
-    if let message = fetchedResultController.objectAtIndexPath(indexPath) as? Message {
-      if message.isOutgoingMessage {
-        cell.textView.textColor = UIColor.blackColor()
-      } else {
-        cell.textView.textColor = UIColor.whiteColor()
+    return configureCell(cell, forIndexPath: indexPath)
+  }
+}
+
+// MARK: - Cell configuration and manipulation
+extension ChatViewController {
+  
+  /// This function (re-)configures all cell identified by their index paths.
+  func collectionView(collectionView: UICollectionView, configureCellsForIndexPaths indexPaths: [NSIndexPath]) {
+    logger.debug("Configuring items at index paths")
+    for indexPath in indexPaths {
+      let cell = super.collectionView(collectionView, cellForItemAtIndexPath: indexPath) as! JSQMessagesCollectionViewCell
+      configureCell(cell, forIndexPath: indexPath)
+    }
+  }
+  
+  /// This function checks if the selected cell needs to be modified and does so if needed. The function evaluates the need of modification based on the time between the message shown in this cell and the previous as well as the sender of each message.
+  func configureCell(currentCell: JSQMessagesCollectionViewCell, forIndexPath indexPath: NSIndexPath) -> JSQMessagesCollectionViewCell {
+    let currentMessage = fetchedResultController.objectAtIndexPath(indexPath) as! Message
+    
+    logger.debug("Configuring cell at index path \(indexPath) with message \(currentMessage)")
+    
+    // If this cell is loaded, check if it has the same sender as the next cell. If it holds true modify this cell (hide avatar and tail)
+    let prevIndexPath = indexPath.decrement()
+    if collectionView.collectionView(collectionView, hasItemForIndexPath: prevIndexPath) {
+      let prevMessage = fetchedResultController.objectAtIndexPath(prevIndexPath) as! Message
+      
+      if prevMessage.timestamp.dateByAddingTimeInterval(ChatViewConstants.TimeBetweenMessagesThresholdForLabel).isAfter(currentMessage.timestamp) {
+        configureCell(currentCell, usingMessage: currentMessage, AndHideTailAndAvatar: true)
+        return currentCell
+      } else if prevMessage.senderId() == currentMessage.senderId() {
+        configureCell(currentCell, usingMessage: currentMessage, AndHideTailAndAvatar: false)
+        return currentCell
       }
     }
     
-    // Hide avatar image if there are several messages of the same user in a row
-    cell.avatarImageView.hidden = compareNextCellAndCellAtIndexPath(indexPath, andReturnExpresionResult: { $0.senderId() == $1.senderId() && $0.senderId() != self.senderId })
+    configureCell(currentCell, usingMessage: currentMessage, AndHideTailAndAvatar: false)
     
-    // Hide tail of cell if there are sevral messages of the same user in a row
-    if let newMessageBubbleImage = compareNextCellAndCellAtIndexPath(indexPath,
-        andReturnValue: {
-          return $0.isOutgoingMessage ?
-            self.taillesMessageBubbleFactory.outgoingMessagesBubbleImageWithColor(self.outgoingMessageBubbleColor):
-            self.taillesMessageBubbleFactory.incomingMessagesBubbleImageWithColor(self.incomingMessageBubbleColor)
-        },
-        ifExpresionHoldsTrue: { $0.senderId() == $1.senderId() }
-      )
-    {
-      cell.messageBubbleImageView.image = newMessageBubbleImage.messageBubbleImage
-      cell.messageBubbleImageView.highlightedImage = newMessageBubbleImage.messageBubbleHighlightedImage
+    return currentCell
+  }
+  
+  /// This function modifies the visual appearance of the cell. If the hide flag is set the tail and avatar is hidden. This flag should be set if the suceeding message is send from the same user.
+  func configureCell(cell: JSQMessagesCollectionViewCell, usingMessage message: Message, AndHideTailAndAvatar hide: Bool) {
+    logger.debug("Performing update for cell with message \(message), hiding avatar and tail: \(hide)")
+    cell.avatarImageView.hidden = hide
+    
+    let messageBubbleFactory = hide ?
+      taillesMessageBubbleFactory:
+    regularMessageBubbleFactory
+    
+    let messageBubbleImage: JSQMessagesBubbleImage
+    
+    if message.isOutgoingMessage {
+      messageBubbleImage = messageBubbleFactory.outgoingMessagesBubbleImageWithColor(outgoingMessageBubbleColor)
+      cell.textView.textColor = outgoingMessageTextColor
+    } else {
+      messageBubbleImage = messageBubbleFactory.incomingMessagesBubbleImageWithColor(incomingMessageBubbleColor)
+      cell.textView.textColor = incomingMessageTextColor
     }
     
-    return cell
+    cell.messageBubbleImageView.image = messageBubbleImage.messageBubbleImage
+    cell.messageBubbleImageView.highlightedImage = messageBubbleImage.messageBubbleHighlightedImage
   }
 }
 
@@ -269,7 +308,7 @@ extension ChatViewController {
   
   // MARK: Message bubble top label (sender)
   
-  /// This function returns the user shown on top of a message bubble. If this function returns nil the label should not be shown. The user's label is only shown if the previous message's sender is not this message's sender. The label of messages send from the application's user are never shown.
+  /// This function returns the user shown on top of a message bubble. If this function returns nil the label should not be shown. The user's label is only shown if the previous message's sender is not this message's sender. The label of messages send from the application's user are never shown. If a timestamp was shown between the messages the sender's name is repeated even if the last message was from him aswell.
   ///
   /// :param: indexPath The index path of the cell.
   /// :param: collectionView The collection view the cell is in.
@@ -277,7 +316,12 @@ extension ChatViewController {
   func userLabelForMessageAtIndexPath(indexPath: NSIndexPath, inCollectionView collectionView: JSQMessagesCollectionView) -> User? {
     return comparePreviousCellAndCellAtIndexPath(indexPath,
       andReturnValue: { $0.sender },
-      ifExpresionHoldsTrue: { $1.senderId() != self.senderId && $0.senderId() != $1.senderId() }
+      ifExpresionHoldsTrue: {
+        $1.senderId() != self.senderId && (
+          $0.senderId() != $1.senderId() ||
+          $0.timestamp.dateByAddingTimeInterval(ChatViewConstants.TimeBetweenMessagesThresholdForLabel).isBefore($1.timestamp)
+        )
+      }
     )
   }
   
@@ -331,24 +375,20 @@ extension ChatViewController {
 // MARK: - JSQMessagesCollectionViewDelegateFlowLayout
 extension ChatViewController {
   override func collectionView(collectionView: JSQMessagesCollectionView!, didTapAvatarImageView avatarImageView: UIImageView!, atIndexPath indexPath: NSIndexPath!) {
-    println("Hello")
+    logger.debug("Avatar image at index path \(indexPath) pressed. Functionality not implemented yet")
   }
   
   override func collectionView(collectionView: JSQMessagesCollectionView!, didTapCellAtIndexPath indexPath: NSIndexPath!, touchLocation: CGPoint) {
-    println("Hello")
+    logger.debug("Cell at index path \(indexPath) pressed. Functionality not implemented yet")
   }
   
   override func collectionView(collectionView: JSQMessagesCollectionView!, didTapMessageBubbleAtIndexPath indexPath: NSIndexPath!) {
-    println("Hello")
+    logger.debug("Message bubble at index path \(indexPath) pressed. Functionality not implemented yet")
   }
 }
 
 // MARK: - JSQMessagesViewController click events
 extension ChatViewController {
-  override func didPressAccessoryButton(sender: UIButton!) {
-    println("Hello")
-  }
-  
   override func didPressSendButton(button: UIButton!, withMessageText text: String!, senderId: String!, senderDisplayName: String!, date: NSDate!) {
     logger.debug("Sending message with text \(text) and timestamp \(date) to division \(self.division)")
     let messageRepository = MessageRepository()
@@ -366,7 +406,7 @@ extension ChatViewController {
 extension ChatViewController: NSFetchedResultsControllerDelegate {
   /// Collecting object changes in dictionary and applying them in a batch after they have all been applied
   func controller(controller: NSFetchedResultsController, didChangeObject anObject: AnyObject, atIndexPath indexPath: NSIndexPath?, forChangeType type: NSFetchedResultsChangeType, newIndexPath: NSIndexPath?) {
-    logger.debug("Object in chat view changed.")
+    logger.debug("Object (\(anObject)) in chat view changed")
     if let collectionView = self.collectionView {
       switch type {
       case .Insert:
@@ -375,14 +415,12 @@ extension ChatViewController: NSFetchedResultsControllerDelegate {
         } else {
           logger.error("Unable to insert object in chat view")
         }
-      case .Delete:
+      case .Delete, .Update:
         if let currentIndexPath = indexPath {
           objectChanges[type]?.append(currentIndexPath)
         } else {
-          logger.error("Unable to delete object in chat view")
+          logger.error("Unable to delete/update object in chat view")
         }
-      case .Update:
-        XCGLogger.error("Reached update case while applying object changes in chat view. Ignoring changes")
       case .Move:
         if let currentIndexPath = newIndexPath, oldIndexPath = indexPath {
           objectChanges[.Delete]?.append(oldIndexPath)
@@ -399,20 +437,19 @@ extension ChatViewController: NSFetchedResultsControllerDelegate {
   /// Batch changing controller after the content finished changing. This needs to be done since CollectionView and NSFetchedResultsController don't play nicely. See https://github.com/ashfurrow/UICollectionView-NSFetchedResultsController
   func controllerDidChangeContent(controller: NSFetchedResultsController) {
     logger.debug("Applying batch changes because model changed")
-    if let currentCollectionView = collectionView {
+    if let collectionView = collectionView {
       // Apply section changes
       if !(objectChanges[.Insert]?.isEmpty ?? true) || !(objectChanges[.Delete]?.isEmpty ?? true) || !(objectChanges[.Update]?.isEmpty ?? true) { //Applying object changes only if there was no section changes
         logger.debug("Applying object changes")
-        currentCollectionView.performBatchUpdates({
-          for (type, indexPath) in self.objectChanges {
+        collectionView.performBatchUpdates({
+          for (type, indexPaths) in self.objectChanges {
             switch type {
             case .Insert:
-              currentCollectionView.insertItemsAtIndexPaths(indexPath)
+              collectionView.insertItemsAtIndexPaths(indexPaths)
             case .Delete:
-              currentCollectionView.deleteItemsAtIndexPaths(indexPath)
+              collectionView.deleteItemsAtIndexPaths(indexPaths)
             case .Update:
-              XCGLogger.debugExec {abort()}
-              XCGLogger.error("Reached update case while applying object changes in chat view. This should not happen")
+              self.collectionView(collectionView, configureCellsForIndexPaths: indexPaths)
             default:
               XCGLogger.debugExec {abort()}
               XCGLogger.error("Reached default case while applying object changes. This should not happen: Type \(type.rawValue)")
@@ -420,13 +457,12 @@ extension ChatViewController: NSFetchedResultsControllerDelegate {
             }
           }
         }, completion: nil)
+        objectChanges[.Insert] = [NSIndexPath]()
+        objectChanges[.Delete] = [NSIndexPath]()
+        objectChanges[.Update] = [NSIndexPath]()
       } else {
         logger.info("No need to apply batch changes because model did not change")
       }
-      
-      // Reset the dictionaries
-      objectChanges[.Insert] = [NSIndexPath]()
-      objectChanges[.Delete] = [NSIndexPath]()
     }
   }
 }
@@ -438,11 +474,6 @@ extension ChatViewController {
     inputToolbar.toggleSendButtonEnabled()
     inputToolbar.contentView.textView.placeHolder = "You are no longer part of this division"
     inputToolbar.contentView.textView.editable = false
-  }
-  
-  override func finishReceivingMessageAnimated(animated: Bool) {
-    super.finishReceivingMessageAnimated(animated)
-    // TODO: Implement checking if avatar needs to disappear & bubble image update, maybe animated? (Fade out or move down?
   }
 }
 
