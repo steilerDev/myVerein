@@ -125,9 +125,9 @@ class EventRepository: CoreDataRepository {
     {
       //Parsing invited division
       if let invitedDivisionArray = dictionary[EventConstants.RemoteEvent.InvitedDivision] as? [AnyObject] {
-        let divisionRepository = DivisionRepository()
+        let divisionRepository = DivisionRepository(inContext: self.managedObjectContext)
         let (invitedDivision: [Division]?, error) = divisionRepository.getOrCreateUsingArray(invitedDivisionArray, AndSync: true)
-        if error != nil && invitedDivision == nil {
+        if error != nil || invitedDivision == nil {
           logger.severe("Unable to gather invited division: \(error!.extendedDescription)")
           return (nil, error)
         } else {
@@ -153,6 +153,8 @@ class EventRepository: CoreDataRepository {
       event.name = name
       event.startDate = startDateTime
       event.endDate = endDateTime
+      
+      event.lastSynced = NSDate()
       event.syncInProgress = false
       
       logger.info("Succesfully parsed and populaterd event")

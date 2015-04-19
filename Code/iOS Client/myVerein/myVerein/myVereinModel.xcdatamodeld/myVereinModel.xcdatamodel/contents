@@ -3,7 +3,7 @@
     <entity name="Division" representedClassName="myVerein.Division" syncable="YES">
         <attribute name="desc" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="id" attributeType="String" indexed="YES" syncable="YES"/>
-        <attribute name="lastSynced" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="lastSynced" attributeType="Date" syncable="YES"/>
         <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="rawUserMembershipStatus" optional="YES" attributeType="String" defaultValueString="NOMEMBER" syncable="YES"/>
         <relationship name="admin" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="User" inverseName="rawAdministratedDivisions" inverseEntity="User" syncable="YES"/>
@@ -16,6 +16,7 @@
         <attribute name="endDate" optional="YES" attributeType="Date" syncable="YES"/>
         <attribute name="eventDescription" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="id" attributeType="String" indexed="YES" syncable="YES"/>
+        <attribute name="lastSynced" attributeType="Date" syncable="YES"/>
         <attribute name="locationLat" optional="YES" attributeType="Double" defaultValueString="0.0" syncable="YES"/>
         <attribute name="locationLng" optional="YES" attributeType="Double" defaultValueString="0.0" syncable="YES"/>
         <attribute name="locationName" optional="YES" attributeType="String" syncable="YES"/>
@@ -31,6 +32,7 @@
     <entity name="Message" representedClassName="myVerein.Message" syncable="YES">
         <attribute name="content" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="id" attributeType="String" indexed="YES" syncable="YES"/>
+        <attribute name="lastSynced" attributeType="Date" syncable="YES"/>
         <attribute name="read" optional="YES" attributeType="Boolean" defaultValueString="NO" syncable="YES"/>
         <attribute name="timestamp" optional="YES" attributeType="Date" syncable="YES"/>
         <relationship name="division" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Division" inverseName="rawChatMessage" inverseEntity="Division" syncable="YES"/>
@@ -45,7 +47,7 @@
         <attribute name="firstName" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="id" attributeType="String" indexed="YES" syncable="YES"/>
         <attribute name="lastName" optional="YES" attributeType="String" syncable="YES"/>
-        <attribute name="lastSynced" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="lastSynced" attributeType="Date" syncable="YES"/>
         <attribute name="rawAvatar" optional="YES" attributeType="Binary" allowsExternalBinaryDataStorage="YES" syncable="YES"/>
         <attribute name="rawGender" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="rawMembershipStatus" optional="YES" attributeType="String" syncable="YES"/>
@@ -62,8 +64,8 @@
     </entity>
     <elements>
         <element name="Division" positionX="-182" positionY="188" width="128" height="195"/>
-        <element name="Event" positionX="-585" positionY="216" width="128" height="255"/>
-        <element name="Message" positionX="-497" positionY="81" width="128" height="148"/>
+        <element name="Event" positionX="-585" positionY="216" width="128" height="270"/>
+        <element name="Message" positionX="-497" positionY="81" width="128" height="165"/>
         <element name="User" positionX="-794" positionY="81" width="128" height="360"/>
     </elements>
 </model>

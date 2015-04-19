@@ -28,11 +28,11 @@ import XCGLogger
 class Division: NSManagedObject {
   
   @NSManaged var id: String
-  @NSManaged var desc: String?
-  @NSManaged var name: String?
   @NSManaged var lastSynced: NSDate
-  @NSManaged var latestMessage: Message?
+  @NSManaged var name: String!
+  @NSManaged var desc: String?
   @NSManaged var admin: User?
+  @NSManaged var latestMessage: Message?
   
   // Raw values stored in database, convenience getter and setter are provided in an extension. This values should -in general- not be accessed directly.
   @NSManaged var rawUserMembershipStatus: String

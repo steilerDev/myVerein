@@ -56,10 +56,9 @@ class DivisionRepository: CoreDataRepository {
     {
       if let adminUserDict = dictionary[DivisionConstants.RemoteDivision.AdminUser] as? [String: AnyObject] {
         logger.debug("Found an administrator for the division")
-        let userRepository = UserRepository()
+        let userRepository = UserRepository(inContext: managedObjectContext)
         let (adminUser: User?, error) = userRepository.getOrCreateUsingDictionary(adminUserDict, AndSync: true)
-        // TODO: Or better?!
-        if error != nil && adminUser == nil {
+        if error != nil || adminUser == nil {
           logger.warning("Unable to parse admin user for division: \(error!.extendedDescription)")
           return (nil, error)
         } else {
@@ -71,6 +70,7 @@ class DivisionRepository: CoreDataRepository {
       
       division.desc = dictionary[DivisionConstants.RemoteDivision.Description] as? String
       division.name = name
+      
       division.lastSynced = NSDate()
       division.syncInProgress = false
       

@@ -29,6 +29,7 @@ import XCGLogger
 class Event: NSManagedObject {
   
   @NSManaged var id: String
+  @NSManaged var lastSynced: NSDate
   @NSManaged var name: String?
   @NSManaged var endDate: NSDate?
   @NSManaged var startDate: NSDate?

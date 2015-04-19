@@ -118,9 +118,8 @@ extension DivisionChatOverviewViewController {
     // This observer is monitoring all divisions. As soon as the notification without a sender is received the controller is starting to reload its view.
     logger.debug("Division chat overview controller subscribed to notification system")
     notificationObserverToken = MVNotification.subscribeToDivisionSyncCompletedNotificationForDivision(nil) {
-      if $0.object == nil {
-        self.collectionView?.reloadData()
-      }
+      _ in
+      self.collectionView?.reloadData()
     }
   }
   

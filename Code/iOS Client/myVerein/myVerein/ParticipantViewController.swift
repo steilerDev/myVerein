@@ -231,7 +231,8 @@ extension ParticipantViewController {
       if let userAvatar = user.avatar {
         cell.imageView?.image = userAvatar
       } else {
-        //cell.imageView?.setImageWithString(user.displayName, color: UIColor(hex: MVColor.Primary.Normal))
+        // TODO: Not working, issue filed: https://github.com/bachonk/UIImageView-Letters/issues/13
+        cell.imageView?.setImageWithString(user.displayName, color: UIColor(hex: MVColor.Primary.Normal))
       }
     } else {
       logger.warning("Unable to load user for index path \(indexPath)")

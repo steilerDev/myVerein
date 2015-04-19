@@ -100,8 +100,8 @@ class MessageRepository: CoreDataRepository {
       divisionDict = dictionary[MessageConstants.RemoteMessage.Division] as? [String: AnyObject],
       senderDict = dictionary[MessageConstants.RemoteMessage.Sender] as? [String: AnyObject]
     {
-      let divisionRepository = DivisionRepository()
-      let userRepository = UserRepository()
+      let divisionRepository = DivisionRepository(inContext: managedObjectContext)
+      let userRepository = UserRepository(inContext: managedObjectContext)
       let (division: Division?, divisionError) = divisionRepository.getOrCreateUsingDictionary(divisionDict, AndSync: true)
       let (sender: User?, senderError) = userRepository.getOrCreateUsingDictionary(senderDict, AndSync: true)
       
@@ -126,6 +126,7 @@ class MessageRepository: CoreDataRepository {
           division.latestMessage = message
         }
         
+        message.lastSynced = NSDate()
         message.syncInProgress = false
         
         return ((message as! T), nil)

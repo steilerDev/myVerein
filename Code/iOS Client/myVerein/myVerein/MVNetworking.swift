@@ -228,7 +228,7 @@ class MVNetworking {
           // Invaliating the session in case the user changes the domain
           MVNetworkingSessionFactory.invalidateInstance()
           if showLoginScreenOnFailure {
-            (UIApplication.sharedApplication().delegate as! AppDelegate).showLoginView()
+            ~>{ (UIApplication.sharedApplication().delegate as! AppDelegate).showLoginView() }
           }
           failure?(error)
         }

@@ -33,15 +33,11 @@ extension MVNotification {
   /// This function sends out a notification telling all subscriber that the message sync completed and that new messages have been retrieved. A notification for each new message is send out, where the sender is the division of the message. Finally a a notification with an empty sender is posted, to signal that all new messages have been proccessed.
   ///
   /// :param: messages An array of new events that are the reason why this notification is send.
-  class func sendMessageSyncCompletedNotificationForNewMessages(messages: [Message]) {
-    logger.debug("Sending message sync completion notification for \(messages)")
+  class func sendMessageSyncCompletedNotificationForNewMessage(message: Message) {
+    logger.debug("Sending message sync completion notification for \(message)")
     let notificationCenter = NSNotificationCenter.defaultCenter()
-    for message in messages {
-      let notification = NSNotification(name: MVNotificationNames.MVMessageSyncCompleted, object: message.division)
-      notificationCenter.postNotification(notification)
-    }
-    let finalNotification = NSNotification(name: MVNotificationNames.MVMessageSyncCompleted, object: nil)
-    notificationCenter.postNotification(finalNotification)
+    let notification = NSNotification(name: MVNotificationNames.MVMessageSyncCompleted, object: message.division)
+    notificationCenter.postNotification(notification)
   }
   
   /// This function sends out a notification telling all subscriber that the division sync completed and that the subscribed division changed (new divisions and/or less divisions). A notification for each changed division is send out, where the sender is the division itself. After the batch of changed divisions has been processed a notification with an empty sender is posted, to signal that all divisions have been processed.
@@ -61,15 +57,11 @@ extension MVNotification {
   /// This function sends out a notification telling all subscriber that the calendar sync completed and that new events have been retrieved and/or existing events have been altered. A notification for each changed event is send out, where the sender is the event itself. After the batch of changed events has been processed a notification with an empty sender is posted, to singal that the bach of events has been processed.
   ///
   /// :param: events An array of new/changed events that are the reason why this notification is send.
-  class func sendCalendarSyncCompletedNotificationForChangedEvents(events: [Event]) {
-    logger.debug("Sending calendar sync completion notification for \(events)")
+  class func sendCalendarSyncCompletedNotificationForChangedEvent(event: Event) {
+    logger.debug("Sending calendar sync completion notification for \(event)")
     let notificationCenter = NSNotificationCenter.defaultCenter()
-    for event in events {
-      let notification = NSNotification(name: MVNotificationNames.MVCalendarSyncCompleted, object: event)
-      notificationCenter.postNotification(notification)
-    }
-    let finalNotification = NSNotification(name: MVNotificationNames.MVCalendarSyncCompleted, object: nil)
-    notificationCenter.postNotification(finalNotification)
+    let notification = NSNotification(name: MVNotificationNames.MVCalendarSyncCompleted, object: event)
+    notificationCenter.postNotification(notification)
   }
 }
 

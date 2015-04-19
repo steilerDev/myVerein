@@ -235,6 +235,7 @@ extension CoreDataRepository {
     logger.verbose("Creating new \(T.className) with id \(id) (Sync after: \(sync))")
     let newItem = NSEntityDescription.insertNewObjectForEntityForName(T.className, inManagedObjectContext: managedObjectContext) as! T
     newItem.id = id
+    newItem.lastSynced = NSDate()
     
     // Getting rest of the object asynchronously
     if sync {
@@ -272,6 +273,9 @@ protocol CoreDataObject: AnyObject {
   
   /// This variable tells the system if the current object is allready syncing. If this is the case the system should not start another sync action.
   var syncInProgress: Bool { get set }
+  
+  /// This variable tells the system when the last sync of the object took place. This might be used to determine whether or not a re-sync is necessary.
+  var lastSynced: NSDate { get set }
   
   /// This function should execute the syncing of the object.
   func sync() -> ()

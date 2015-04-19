@@ -24,6 +24,7 @@
 import Foundation
 import XCGLogger
 import SwiftyUserDefaults
+import CoreData
 
 /// This class is used to centralized common networking tasks, like loading content and storing it persistent.
 /// The modules for each part is added via an extension.
@@ -40,22 +41,25 @@ extension MVNetworkingHelper {
     MVNetworking.defaultInstance().messageSyncUnreadAction(
       success: {
         response in
-        let logger = XCGLogger.defaultInstance()
-        if let responseArray = response as? [AnyObject] {
-          let messageRepository = MessageRepository()
-          let (messages: [Message]?, error) = messageRepository.getOrCreateUsingArray(responseArray, AndSync: true)
-          if messages == nil || error != nil {
-            logger.error("Unable to sync messages \(error!.extendedDescription)")
-          } else if let messages = messages where !messages.isEmpty {
-            messageRepository.save()
-            logger.info("Successfully synced and saved new messages")
+        {
+          (context: NSManagedObjectContext) in
+          let logger = XCGLogger.defaultInstance()
+          if let responseArray = response as? [AnyObject] {
+            let messageRepository = MessageRepository(inContext: context)
+            let (messages: [Message]?, error) = messageRepository.getOrCreateUsingArray(responseArray, AndSync: true)
+            if messages == nil || error != nil {
+              logger.error("Unable to sync messages \(error!.extendedDescription)")
+            } else if let messages = messages where !messages.isEmpty {
+              messageRepository.save()
+              logger.info("Successfully synced and saved new messages")
+            } else {
+              logger.warning("Successfully synced messages, but there are no new messages available")
+            }
           } else {
-            logger.warning("Successfully synced messages, but there are no new messages available")
+            let error = MVError.createError(.MVMessageCreationError, failureReason: "Unable to parse response array", underlyingError: .MVServerResponseParseError)
+            logger.warning("Unable to sync messages: \(error.extendedDescription)")
           }
-        } else {
-          let error = MVError.createError(.MVMessageCreationError, failureReason: "Unable to parse response array", underlyingError: .MVServerResponseParseError)
-          logger.warning("Unable to sync messages: \(error.extendedDescription)")
-        }
+        }~>
       },
       failure: {
         error in
@@ -70,22 +74,25 @@ extension MVNetworkingHelper {
     MVNetworking.defaultInstance().messageSyncAllAction(
       success: {
         response in
-        let logger = XCGLogger.defaultInstance()
-        if let responseArray = response as? [AnyObject] {
-          let messageRepository = MessageRepository()
-          let (messages: [Message]?, error) = messageRepository.getOrCreateUsingArray(responseArray, AndSync: true)
-          if messages == nil || error != nil {
-            logger.warning("Unable to sync all messages \(error!.extendedDescription)")
-          } else if let messages = messages where !messages.isEmpty {
-            messageRepository.save()
-            logger.info("Successfully synced and saved all messages")
+        {
+          (context: NSManagedObjectContext) in
+          let logger = XCGLogger.defaultInstance()
+          if let responseArray = response as? [AnyObject] {
+            let messageRepository = MessageRepository(inContext: context)
+            let (messages: [Message]?, error) = messageRepository.getOrCreateUsingArray(responseArray, AndSync: true)
+            if messages == nil || error != nil {
+              logger.warning("Unable to sync all messages \(error!.extendedDescription)")
+            } else if let messages = messages where !messages.isEmpty {
+              messageRepository.save()
+              logger.info("Successfully synced and saved all messages")
+            } else {
+              logger.warning("Successfully synced messages, but there are no messages available")
+            }
           } else {
-            logger.warning("Successfully synced messages, but there are no messages available")
+            let error = MVError.createError(.MVMessageCreationError, failureReason: "Unable to parse response array", underlyingError: .MVServerResponseParseError)
+            logger.warning("Unable to sync all messages: \(error.extendedDescription)")
           }
-        } else {
-          let error = MVError.createError(.MVMessageCreationError, failureReason: "Unable to parse response array", underlyingError: .MVServerResponseParseError)
-          logger.warning("Unable to sync all messages: \(error.extendedDescription)")
-        }
+        }~>
       },
       failure: {
         error in
@@ -100,23 +107,26 @@ extension MVNetworkingHelper {
     MVNetworking.defaultInstance().messageSyncOneAction(messageId,
       success: {
         response in
-        let logger = XCGLogger.defaultInstance()
-        if let responseDict = response as? [String: AnyObject] {
-          let messageRepository = MessageRepository()
-          let (message: Message?, error) = messageRepository.syncObjectUsingDictionary(responseDict)
-          if message == nil || error != nil {
-            logger.warning("Unable to sync message \(messageId): \(error!.extendedDescription)")
-          } else if messageRepository.databaseDidChange {
-            messageRepository.save()
-            MVNotification.sendMessageSyncCompletedNotificationForNewMessages([message!])
-            logger.info("Successfully saved message \(messageId)")
+        {
+          (context: NSManagedObjectContext) in
+          let logger = XCGLogger.defaultInstance()
+          if let responseDict = response as? [String: AnyObject] {
+            let messageRepository = MessageRepository(inContext: context)
+            let (message: Message?, error) = messageRepository.syncObjectUsingDictionary(responseDict)
+            if message == nil || error != nil {
+              logger.warning("Unable to sync message \(messageId): \(error!.extendedDescription)")
+            } else if messageRepository.databaseDidChange {
+              messageRepository.save()
+              MVNotification.sendMessageSyncCompletedNotificationForNewMessage(message!)
+              logger.info("Successfully saved message \(messageId)")
+            } else {
+              logger.info("No need to save database or notify subscriber, because data model did not change")
+            }
           } else {
-            logger.info("No need to save database or notify subscriber, because data model did not change")
+            let error = MVError.createError(.MVMessageCreationError, failureReason: "Unable to parse response dictionary", underlyingError: .MVServerResponseParseError)
+            logger.warning("Unable to sync message \(messageId): \(error.extendedDescription)")
           }
-        } else {
-          let error = MVError.createError(.MVMessageCreationError, failureReason: "Unable to parse response dictionary", underlyingError: .MVServerResponseParseError)
-          logger.warning("Unable to sync message \(messageId): \(error.extendedDescription)")
-        }
+        }~>
       },
       failure: {
         error in
@@ -131,18 +141,21 @@ extension MVNetworkingHelper {
     MVNetworking.defaultInstance().sendMessageAction(message,
       success: {
         response in
-        let logger = XCGLogger.defaultInstance()
-        if let responseDict = response as? [String: AnyObject],
-          responseId = responseDict[MessageConstants.RemoteMessage.Id] as? String,
-          responseTimestampDict = responseDict[MessageConstants.RemoteMessage.Timestamp] as? [String: AnyObject],
-          responseTimestamp = MVDateParser.parseDateTime(responseTimestampDict)
         {
-          logger.debug("Updating message id from \(message.id) to \(responseId), and timestamp from \(message.timestamp) to \(responseTimestamp)")
-          let messageRepository = MessageRepository()
-          message.id = responseId
-          message.timestamp = responseTimestamp
-          messageRepository.save()
-        }
+          (context: NSManagedObjectContext) in
+          let logger = XCGLogger.defaultInstance()
+          if let responseDict = response as? [String: AnyObject],
+            responseId = responseDict[MessageConstants.RemoteMessage.Id] as? String,
+            responseTimestampDict = responseDict[MessageConstants.RemoteMessage.Timestamp] as? [String: AnyObject],
+            responseTimestamp = MVDateParser.parseDateTime(responseTimestampDict)
+          {
+            logger.debug("Updating message id from \(message.id) to \(responseId), and timestamp from \(message.timestamp) to \(responseTimestamp)")
+            let messageRepository = MessageRepository(inContext: context)
+            message.id = responseId
+            message.timestamp = responseTimestamp
+            messageRepository.save()
+          }
+        }~>
       },
       failure: {
         error in
@@ -163,20 +176,23 @@ extension MVNetworkingHelper {
       userId: userId,
       success: {
         response in
-        let logger = XCGLogger.defaultInstance()
-        if let responseDict = response as? [String: AnyObject] {
-          let userRepository = UserRepository()
-          let (user: User?, error) = userRepository.syncObjectUsingDictionary(responseDict)
-          if user == nil || error != nil {
-            logger.warning("Unable to sync user \(userId): \(error!.extendedDescription)")
+        {
+          (context: NSManagedObjectContext) in
+          let logger = XCGLogger.defaultInstance()
+          if let responseDict = response as? [String: AnyObject] {
+            let userRepository = UserRepository(inContext: context)
+            let (user: User?, error) = userRepository.syncObjectUsingDictionary(responseDict)
+            if user == nil || error != nil {
+              logger.warning("Unable to sync user \(userId): \(error!.extendedDescription)")
+            } else {
+              userRepository.save()
+              logger.info("Successfully saved user \(userId)")
+            }
           } else {
-            userRepository.save()
-            logger.info("Successfully saved user \(userId)")
+            let error = MVError.createError(.MVUserCreationError, failureReason: "Unable to parse response dictionary", underlyingError: .MVServerResponseParseError)
+            logger.warning("Unable to sync user \(userId): \(error.extendedDescription)")
           }
-        } else {
-          let error = MVError.createError(.MVUserCreationError, failureReason: "Unable to parse response dictionary", underlyingError: .MVServerResponseParseError)
-          logger.warning("Unable to sync user \(userId): \(error.extendedDescription)")
-        }
+        }~>
       },
       failure: {
         error in
@@ -196,20 +212,23 @@ extension MVNetworkingHelper {
       divisionId: divisionId,
       success: {
         response in
-        let logger = XCGLogger.defaultInstance()
-        if let responseDict = response as? [String: AnyObject] {
-          let divisionRepository = DivisionRepository()
-          let (division: Division?, error) = divisionRepository.syncObjectUsingDictionary(responseDict)
-          if division == nil || error != nil {
-            logger.warning("Unable to sync division \(divisionId): \(error!.extendedDescription)")
+        {
+          (context: NSManagedObjectContext) in
+          let logger = XCGLogger.defaultInstance()
+          if let responseDict = response as? [String: AnyObject] {
+            let divisionRepository = DivisionRepository(inContext: context)
+            let (division: Division?, error) = divisionRepository.syncObjectUsingDictionary(responseDict)
+            if division == nil || error != nil {
+              logger.warning("Unable to sync division \(divisionId): \(error!.extendedDescription)")
+            } else {
+              divisionRepository.save()
+              logger.info("Successfully saved division \(divisionId)")
+            }
           } else {
-            divisionRepository.save()
-            logger.info("Successfully saved division \(divisionId)")
+            let error = MVError.createError(.MVDivisionCreationError, failureReason: "Unable to parse response dictionary", underlyingError: .MVServerResponseParseError)
+            logger.warning("Unable to sync division \(divisionId): \(error.extendedDescription)")
           }
-        } else {
-          let error = MVError.createError(.MVDivisionCreationError, failureReason: "Unable to parse response dictionary", underlyingError: .MVServerResponseParseError)
-          logger.warning("Unable to sync division \(divisionId): \(error.extendedDescription)")
-        }
+        }~>
       },
       failure: {
         error in
@@ -224,43 +243,46 @@ extension MVNetworkingHelper {
     MVNetworking.defaultInstance().userDivisionSyncAction(
       success: {
         response in
-        let logger = XCGLogger.defaultInstance()
-        if let responseArray = response as? [AnyObject] {
-          let divisionRepository = DivisionRepository()
-          let (newDivisions: [Division]?, error) = divisionRepository.getOrCreateUsingArray(responseArray, AndSync: true)
-          let oldDivisions = divisionRepository.findDivisionByUserMembershipStatus(.Member) ?? [Division]()
-          
-          if error != nil || newDivisions == nil {
-            logger.warning("Unable to sync user's divisions: \(error!.extendedDescription)")
-          } else if let newDivisions = newDivisions {
-            // If a former subscribed division is no longer part of the list it needs to be removed
-            let formerMembers = oldDivisions.filter {!contains(newDivisions, $0)}
-            // New members were not part of the old divisions
-            let newMembers = newDivisions.filter {!contains(oldDivisions, $0)}
+        {
+          (context: NSManagedObjectContext) in
+          let logger = XCGLogger.defaultInstance()
+          if let responseArray = response as? [AnyObject] {
+            let divisionRepository = DivisionRepository(inContext: context)
+            let (newDivisions: [Division]?, error) = divisionRepository.getOrCreateUsingArray(responseArray, AndSync: true)
+            let oldDivisions = divisionRepository.findDivisionByUserMembershipStatus(.Member) ?? [Division]()
             
-            if !formerMembers.isEmpty || !newMembers.isEmpty {
-              logger.info("Division structure changed, applying changes")
-              for division in formerMembers {
-                division.userMembershipStatus = .FormerMember
-              }
+            if error != nil || newDivisions == nil {
+              logger.warning("Unable to sync user's divisions: \(error!.extendedDescription)")
+            } else if let newDivisions = newDivisions {
+              // If a former subscribed division is no longer part of the list it needs to be removed
+              let formerMembers = oldDivisions.filter {!contains(newDivisions, $0)}
+              // New members were not part of the old divisions
+              let newMembers = newDivisions.filter {!contains(oldDivisions, $0)}
               
-              for division in newMembers {
-                division.userMembershipStatus = .Member
+              if !formerMembers.isEmpty || !newMembers.isEmpty {
+                logger.info("Division structure changed, applying changes")
+                for division in formerMembers {
+                  division.userMembershipStatus = .FormerMember
+                }
+                
+                for division in newMembers {
+                  division.userMembershipStatus = .Member
+                }
+                
+                divisionRepository.save()
+                MVNotification.sendDivisionSyncCompletedNotificationForChangedDivisions(formerMembers + newMembers)
+                logger.info("Successfully synced user's divisions")
+              } else {
+                logger.info("Division structure did not change, nothing to do")
               }
-              
-              divisionRepository.save()
-              MVNotification.sendDivisionSyncCompletedNotificationForChangedDivisions(formerMembers + newMembers)
-              logger.info("Successfully synced user's divisions")
             } else {
-              logger.info("Division structure did not change, nothing to do")
+              logger.severe("Unexpected behaviour while syncing user's divisions")
             }
           } else {
-            logger.severe("Unexpected behaviour while syncing user's divisions")
+            let error = MVError.createError(.MVServerResponseParseError)
+            logger.warning("Unable to sync user's divisions: \(error.extendedDescription)")
           }
-        } else {
-          let error = MVError.createError(.MVServerResponseParseError)
-          logger.warning("Unable to sync user's divisions: \(error.extendedDescription)")
-        }
+        }~>
       },
       failure: {
         error in
@@ -280,33 +302,36 @@ extension MVNetworkingHelper {
     MVNetworking.defaultInstance().eventSyncAction(
       success: {
         response in
-        let logger = XCGLogger.defaultInstance()
-        if let responseArray = response as? [AnyObject] {
-          let eventRepository = EventRepository()
-          let (events: [Event]?, error) = eventRepository.getOrCreateUsingArray(responseArray, AndSync: true)
-          if events == nil || error != nil {
-            logger.warning("Unable to sync events \(error!.extendedDescription)")
-          } else if let events = events where !events.isEmpty {
-            for event in events {
-              // Now we know which events changed, now we need to pull the content
-              MVNetworkingHelper.syncEvent(event.id)
+        {
+          (context: NSManagedObjectContext) in
+          let logger = XCGLogger.defaultInstance()
+          if let responseArray = response as? [AnyObject] {
+            let eventRepository = EventRepository(inContext: context)
+            let (events: [Event]?, error) = eventRepository.getOrCreateUsingArray(responseArray, AndSync: false) //Force sync later anyway
+            if events == nil || error != nil {
+              logger.warning("Unable to sync events \(error!.extendedDescription)")
+            } else if let events = events where !events.isEmpty {
+              for event in events {
+                // Now we know which events changed, now we need to pull the content
+                MVNetworkingHelper.syncEvent(event.id)
+              }
+              eventRepository.save()
+              logger.info("Successfully synced and saved events")
+            }  else {
+              logger.warning("Successfully synced events, but there are no new messages available")
             }
-            eventRepository.save()
-            logger.info("Successfully synced and saved events")
-          }  else {
-            logger.warning("Successfully synced events, but there are no new messages available")
+          } else {
+            let error = MVError.createError(.MVMessageCreationError, failureReason: "Unable to parse response array", underlyingError: .MVServerResponseParseError)
+            logger.warning("Unable to sync events: \(error.extendedDescription)")
           }
-        } else {
-          let error = MVError.createError(.MVMessageCreationError, failureReason: "Unable to parse response array", underlyingError: .MVServerResponseParseError)
-          logger.warning("Unable to sync events: \(error.extendedDescription)")
-        }
-        
-        if let callback = callback {
-          logger.debug("Callback available, executing on main queue")
-          ~>callback
-        } else {
-          logger.info("No callback available")
-        }
+          
+          if let callback = callback {
+            logger.debug("Callback available, executing on main queue")
+            ~>callback
+          } else {
+            logger.info("No callback available")
+          }
+        }~>
       },
       failure: {
         error in
@@ -329,23 +354,26 @@ extension MVNetworkingHelper {
       eventID: eventId,
       success: {
         response in
-        let logger = XCGLogger.defaultInstance()
-        if let responseDict = response as? [String: AnyObject] {
-          let eventRepository = EventRepository()
-          let (event: Event?, error) = eventRepository.syncObjectUsingDictionary(responseDict)
-          if event == nil || error != nil {
-            logger.warning("Unable to sync event \(eventId): \(error!.extendedDescription)")
-          } else if eventRepository.databaseDidChange {
-            eventRepository.save()
-            MVNotification.sendCalendarSyncCompletedNotificationForChangedEvents([event!])
-            logger.info("Successfully saved event \(eventId)")
+        {
+          (context: NSManagedObjectContext) in
+          let logger = XCGLogger.defaultInstance()
+          if let responseDict = response as? [String: AnyObject] {
+            let eventRepository = EventRepository(inContext: context)
+            let (event: Event?, error) = eventRepository.syncObjectUsingDictionary(responseDict)
+            if event == nil || error != nil {
+              logger.warning("Unable to sync event \(eventId): \(error!.extendedDescription)")
+            } else if eventRepository.databaseDidChange {
+              eventRepository.save()
+              MVNotification.sendCalendarSyncCompletedNotificationForChangedEvent(event!)
+              logger.info("Successfully saved event \(eventId)")
+            } else {
+              logger.info("No need to save database or notify subscriber, because data model did not change")
+            }
           } else {
-            logger.info("No need to save database or notify subscriber, because data model did not change")
+            let error = MVError.createError(.MVEventCreationError, failureReason: "Unable to parse response dictionary", underlyingError: .MVServerResponseParseError)
+            logger.warning("Unable to sync event \(eventId): \(error.extendedDescription)")
           }
-        } else {
-          let error = MVError.createError(.MVEventCreationError, failureReason: "Unable to parse response dictionary", underlyingError: .MVServerResponseParseError)
-          logger.warning("Unable to sync event \(eventId): \(error.extendedDescription)")
-        }
+        }~>
       },
       failure: {
         error in

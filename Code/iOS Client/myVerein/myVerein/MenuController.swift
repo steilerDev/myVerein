@@ -37,17 +37,12 @@ class MenuController: UITabBarController {
     
     // Subscribing to notifications, no need to un-subscribe since this view controller is always around
     MVNotification.subscribeToCalendarSyncCompletedNotificationForEvent(nil) {
-      notification in
-      if notification.object == nil {
-        self.calendarViewControllerItem.updateBadgeCount(EventRepository().countPendingEvents())
-      }
+      _ in
+      self.calendarViewControllerItem.updateBadgeCount(EventRepository().countPendingEvents())
     }
     MVNotification.subscribeToMessageSyncCompletedNotificationForDivisionChat(nil){
-      notification in
-      XCGLogger.debug("Sync completed notification received")
-      if notification.object == nil {
-        self.chatViewControllerItem.updateBadgeCount(MessageRepository().countUnreadMessages())
-      }
+      _ in
+      self.chatViewControllerItem.updateBadgeCount(MessageRepository().countUnreadMessages())
     }
   }
   

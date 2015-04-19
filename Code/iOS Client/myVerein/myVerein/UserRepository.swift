@@ -42,10 +42,10 @@ class UserRepository: CoreDataRepository {
       user.email = email
       
       if let divisionArray = dictionary[UserConstants.RemoteUser.Divisions] as? [AnyObject] {
-        let divisionRepository = DivisionRepository()
+        let divisionRepository = DivisionRepository(inContext: managedObjectContext)
         let (divisions: [Division]?, error) = divisionRepository.getOrCreateUsingArray(divisionArray, AndSync: true)
         
-        if error != nil && divisions == nil {
+        if error != nil || divisions == nil {
           logger.warning("Unable to parse divisions for user: \(error!.extendedDescription)")
           return (nil, error)
         } else {
@@ -73,6 +73,7 @@ class UserRepository: CoreDataRepository {
       user.zipCode = dictionary[UserConstants.RemoteUser.ZipCode] as? String
       user.city = dictionary[UserConstants.RemoteUser.City] as? String
       user.country = dictionary[UserConstants.RemoteUser.Country] as? String
+      
       user.lastSynced = NSDate()
       user.syncInProgress = false
       

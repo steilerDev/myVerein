@@ -34,6 +34,7 @@ class Message: NSManagedObject {
   @NSManaged var sender: User!
   @NSManaged var division: Division!
   @NSManaged var content: String!
+  @NSManaged var lastSynced: NSDate
   
   var syncInProgress: Bool = false
 }
