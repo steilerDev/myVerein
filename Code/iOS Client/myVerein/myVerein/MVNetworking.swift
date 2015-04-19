@@ -27,8 +27,6 @@ import AFNetworking
 import XCGLogger
 import SwiftyUserDefaults
 
-
-
 /// This class provides proper network and error handling with the currently stored host.
 class MVNetworking {
   
@@ -85,7 +83,7 @@ class MVNetworking {
           } else {
             let error = MVError.createError(.MVEmptyResponse)
             XCGLogger.warning("The response for \(request) is empty, in general there is nothing to do, executing failure function anyway")
-            request.failure?(error)
+            request.success?(error)
           }
         },
         failure:
