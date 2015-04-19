@@ -30,6 +30,7 @@
 		306FD7341AAB0F4400719B82 /* MVError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 306FD7331AAB0F4400719B82 /* MVError.swift */; };
 		3079B1DA1AAF242600ACD793 /* MVHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3079B1D91AAF242600ACD793 /* MVHelper.swift */; };
 		308270D61ADD81DA00ED5782 /* MVNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 308270D51ADD81DA00ED5782 /* MVNotification.swift */; };
+		3087C3D81AE3CC1800A3F7A8 /* MVDropdownAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3087C3D71AE3CC1800A3F7A8 /* MVDropdownAlert.swift */; };
 		30916FFB1AA8B9D0004D30D1 /* MenuController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30916FFA1AA8B9D0004D30D1 /* MenuController.swift */; };
 		3091702F1AA8C097004D30D1 /* myVereinModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 3091702D1AA8C097004D30D1 /* myVereinModel.xcdatamodeld */; };
 		309170341AA8D2B4004D30D1 /* MessageRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 309170331AA8D2B4004D30D1 /* MessageRepository.swift */; };
@@ -101,6 +102,7 @@
 		306FD7331AAB0F4400719B82 /* MVError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MVError.swift; sourceTree = "<group>"; };
 		3079B1D91AAF242600ACD793 /* MVHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MVHelper.swift; sourceTree = "<group>"; };
 		308270D51ADD81DA00ED5782 /* MVNotification.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MVNotification.swift; sourceTree = "<group>"; };
+		3087C3D71AE3CC1800A3F7A8 /* MVDropdownAlert.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MVDropdownAlert.swift; sourceTree = "<group>"; };
 		30916FFA1AA8B9D0004D30D1 /* MenuController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MenuController.swift; sourceTree = "<group>"; };
 		3091702E1AA8C097004D30D1 /* myVereinModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = myVereinModel.xcdatamodel; sourceTree = "<group>"; };
 		309170331AA8D2B4004D30D1 /* MessageRepository.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MessageRepository.swift; sourceTree = "<group>"; };
@@ -255,6 +257,7 @@
 				3068A4A31ACBEDBA00A3F53D /* MVUserDefaultsConstants.swift */,
 				308270D51ADD81DA00ED5782 /* MVNotification.swift */,
 				30C2DA321ADEB440006A6143 /* MarshalOperator.swift */,
+				3087C3D71AE3CC1800A3F7A8 /* MVDropdownAlert.swift */,
 			);
 			name = "Supporting Classes";
 			sourceTree = "<group>";
@@ -493,6 +496,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3087C3D81AE3CC1800A3F7A8 /* MVDropdownAlert.swift in Sources */,
 				30F254E81AC7271A00E10CB9 /* CalendarViewController.swift in Sources */,
 				3020CBA71A9E1289005AAEEF /* LoginViewController.swift in Sources */,
 				3068A4A41ACBEDBA00A3F53D /* MVUserDefaultsConstants.swift in Sources */,
