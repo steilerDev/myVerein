@@ -74,6 +74,7 @@ class MVDropdownAlert: UIButton {
   
   let topLabel: UILabel
   let bottomLabel: UILabel
+  let originalFrame: CGRect
   
   var delegate: MVDropdownAlertDelegate?
   
@@ -92,10 +93,15 @@ class MVDropdownAlert: UIButton {
     bottomLabel.numberOfLines = DropdownAppearance.NumberOfLinesBottomLabel
     bottomLabel.textAlignment = .Center
     
+    originalFrame = CGRectMake(frame.origin.x, frame.origin.y, frame.width, frame.height)
+    
     super.init(frame: frame)
     
     self.addSubview(topLabel)
     self.addSubview(bottomLabel)
+    
+    let gesture = UIPanGestureRecognizer(target: self, action: "didPanView:")
+    self.addGestureRecognizer(gesture)
     
     self.addTarget(self, action: "didPressDropdown:", forControlEvents: .TouchUpInside)
   }
@@ -103,6 +109,7 @@ class MVDropdownAlert: UIButton {
   required init(coder aDecoder: NSCoder) {
     topLabel = UILabel(coder: aDecoder)
     bottomLabel = UILabel(coder: aDecoder)
+    originalFrame = CGRectMake(0, 0, 0, 0)
     super.init(coder: aDecoder)
   }
   
@@ -216,6 +223,22 @@ class MVDropdownAlert: UIButton {
   func didPressDropdown(sender: UIButton) {
     if delegate?.respondToNotification(self) ?? true {
       self.hide()
+    }
+  }
+  
+  // MARK: Gesture recognizer
+  
+  func didPanView(gestureRecognizer: UIPanGestureRecognizer) {
+    if gestureRecognizer.state == .Ended {
+      if gestureRecognizer.view!.frame.origin.y < 0 {
+        self.hide(animated: true)
+      }
+    } else {
+      let translation = gestureRecognizer.translationInView(self.superview!)
+      if(gestureRecognizer.view!.frame.origin.y + translation.y <= 0) {
+        gestureRecognizer.view!.frame.origin.y += translation.y
+      }
+      gestureRecognizer.setTranslation(CGPointZero, inView: self.superview!)
     }
   }
 }
