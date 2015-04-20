@@ -31,9 +31,7 @@ import SwiftyUserDefaults
 class MVNetworking {
   
   private let logger = XCGLogger.defaultInstance()
-  private var session: AFHTTPSessionManager! {
-    return MVNetworkingSessionFactory.defaultInstance()
-  }
+  private var session: AFHTTPSessionManager! =  MVNetworkingSessionFactory.instance
   
   /// Within this array all requests are stored, that could not be executed because the user was not logged in. After a successfull log in, the requests on this queue are executed. If the queue is nil, the system currently does not try to log in. Since arrays are not thread safe an external lock is used to secure the resource.
   private var logInQueue: [MVRequest]!
@@ -43,16 +41,10 @@ class MVNetworking {
   
   // MARK: Singleton pattern
   
-  private static var instance: MVNetworking?
-  
-  /// This function is returning the default networking instance.
-  class func defaultInstance() -> MVNetworking {
-    if instance == nil {
-      XCGLogger.info("Creating new MVNetworking instance")
-      instance = MVNetworking()
-    }
-    return instance!
-  }
+  static var instance: MVNetworking = {
+    XCGLogger.info("Creating new MVNetworking instance")
+    return MVNetworking()
+  }()
   
   // MARK: Request handling
   
@@ -113,7 +105,8 @@ class MVNetworking {
     } else if localError.code == MVErrorCodes.MVHostNotReachable.rawValue {
       logger.warning("Unable to reach server. No need to retry at the moment: \(localError.extendedDescription)")
       request.failure?(localError)
-      // TODO: Show error that host is not reachable
+      let notification = MVDropdownAlertObject(title: "Host not reachable at the moment", message: "Please check your internet connection and try again", style: .Danger)
+      MVDropdownAlertCenter.instance.showNotification(notification)
     } else {
       logger.warning("Unable to handle error: \(localError.extendedDescription)")
       request.failure?(localError)
@@ -168,7 +161,7 @@ class MVNetworking {
   /// After a successfull log in the function checks if the user is the same as the previously logged in user. If this is not true the function deletes the user's data on the device and starts a re-sync.
   func performLogIn(showLoginScreenOnFailure: Bool = true, success: (() -> ())?, failure: ((NSError) -> ())?) {
     logger.verbose("Logging in using stored credentials")
-    let (username, password, _) = MVSecurity.instance().currentKeychain()
+    let (username, password, _) = MVSecurity.instance.currentKeychain()
     if let username = username, password = password where !password.isEmpty && !username.isEmpty {
       let parameters = [
         NetworkingConstants.Login.Parameter.Username: username,

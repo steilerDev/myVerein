@@ -127,7 +127,7 @@ extension LoginViewController {
         hostname += "/"
       }
       
-      MVSecurity.instance().updateKeychain(username, newPassword: password, newDomain: hostname)
+      MVSecurity.instance.updateKeychain(username, newPassword: password, newDomain: hostname)
       validateCurrentLogin()
     } else {
       logger.warning("Unable to get values from text fields")
@@ -145,7 +145,7 @@ extension LoginViewController {
     hostTextField.enabled = false
     loginButton.enabled = false
     
-    let (currentUsername, currentPassword, currentDomain) = MVSecurity.instance().currentKeychain()
+    let (currentUsername, currentPassword, currentDomain) = MVSecurity.instance.currentKeychain()
     
     if let username = currentUsername,
       password = currentPassword,
@@ -154,7 +154,7 @@ extension LoginViewController {
         passwordTextField.text = password
         hostTextField.text = domain
         
-        MVNetworking.defaultInstance().performLogIn(showLoginScreenOnFailure: false,
+        MVNetworking.instance.performLogIn(showLoginScreenOnFailure: false,
           success: {
             XCGLogger.info("Login successfully, performing segue to main view controller")
             self.dismissViewControllerAnimated(true, completion: {})

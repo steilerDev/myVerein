@@ -31,7 +31,7 @@ class MVNetworkingSessionFactory {
   
   private static let logger = XCGLogger.defaultInstance()
   
-  private static var sharedSessionManager: AFHTTPSessionManager?
+  static var instance: AFHTTPSessionManager? = MVNetworkingSessionFactory.createInstance()
   
   /// Struct containing String constants only used by this class
   private struct NetworkingConstants {
@@ -42,34 +42,35 @@ class MVNetworkingSessionFactory {
   }
   
   /// This function returns the shared session manager used within the whole system. The object is lazily created
-  class func defaultInstance() -> AFHTTPSessionManager? {
-    if sharedSessionManager == nil {
-      logger.debug("Creating new session instance")
-      if let baseUrlString = MVSecurity.instance().currentKeychain().domain,
-        baseUrl = NSURL(string: baseUrlString),
-        certificatePath = NSBundle.mainBundle().pathForResource(NetworkingConstants.Certificate.Name, ofType: NetworkingConstants.Certificate.Type),
-        certificate = NSData(contentsOfFile: certificatePath)
-      {
-        sharedSessionManager = AFHTTPSessionManager(baseURL: baseUrl)
-        sharedSessionManager?.securityPolicy = AFSecurityPolicy(pinningMode: .Certificate)
-        
-        sharedSessionManager?.securityPolicy.allowInvalidCertificates = true
-        sharedSessionManager?.securityPolicy.pinnedCertificates = [certificate]
-        
-        sharedSessionManager?.responseSerializer = AFJSONResponseSerializer()
-        
-        logger.info("Successfully created new session instance")
-      } else {
-        logger.warning("Unable to create new session instance")
-      }
+  class func createInstance() -> AFHTTPSessionManager? {
+    logger.debug("Creating new session instance")
+    if let baseUrlString = MVSecurity.instance.currentKeychain().domain,
+      baseUrl = NSURL(string: baseUrlString),
+      certificatePath = NSBundle.mainBundle().pathForResource(NetworkingConstants.Certificate.Name, ofType: NetworkingConstants.Certificate.Type),
+      certificate = NSData(contentsOfFile: certificatePath)
+    {
+      let sharedSessionManager = AFHTTPSessionManager(baseURL: baseUrl)
+      sharedSessionManager?.securityPolicy = AFSecurityPolicy(pinningMode: .Certificate)
+      
+      sharedSessionManager?.securityPolicy.allowInvalidCertificates = true
+      sharedSessionManager?.securityPolicy.pinnedCertificates = [certificate]
+      
+      sharedSessionManager?.responseSerializer = AFJSONResponseSerializer()
+      
+      logger.info("Successfully created new session instance")
+      return sharedSessionManager
+    } else {
+      logger.warning("Unable to create new session instance")
+      return nil
     }
-    return sharedSessionManager
   }
   
   /// This function invalidates the current instance of the session manager
   class func invalidateInstance() {
     logger.debug("Invalidating session instance")
-    sharedSessionManager?.invalidateSessionCancelingTasks(true)
-    sharedSessionManager = nil
+    if instance != nil {
+      instance!.invalidateSessionCancelingTasks(true)
+      instance = nil
+    }
   }
 }

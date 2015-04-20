@@ -63,8 +63,7 @@ extension AppDelegate: UIApplicationDelegate {
     // Registering notification
     logger.debug("Trying to register for notification/checking if notifications are still available")
     let notificationSettings = UIUserNotificationSettings(forTypes: .Alert | .Sound | .Alert, categories: nil)
-    UIApplication.sharedApplication().registerUserNotificationSettings(notificationSettings)
-    
+    UIApplication.sharedApplication().registerUserNotificationSettings(notificationSettings)    
     return true
   }
   
@@ -204,7 +203,7 @@ extension AppDelegate {
   /// This function is logging out the current user (removing his credentials from the keychain) and presenting the login view.
   func logoutUser() {
     logger.info("Performing logout")
-    MVSecurity.instance().updateKeychain(nil, newPassword: nil, newDomain: nil)
+    MVSecurity.instance.updateKeychain(nil, newPassword: nil, newDomain: nil)
     showLoginView()
   }
 }

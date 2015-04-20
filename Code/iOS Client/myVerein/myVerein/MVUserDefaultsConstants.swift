@@ -29,4 +29,11 @@ struct MVUserDefaultsConstants {
   struct LastSynced {
     static let Event = "eventLastSynced"
   }
+  struct Settings {
+    struct Messages {
+      static let InAppNotificationsEnabled = "messagesInAppNotificationsEnabled"
+      static let InAppNotificationsVibration = "messagesInAppNotificationsVibration"
+      static let InAppNotificationsSound = "messagesInAppNotficationsSound"
+    }
+  }
 }

@@ -50,6 +50,9 @@ extension SettingsViewController {
           logger.info("Selected section 'application settings")
           switch indexPath.indexAtPosition(1) {
             case 0:
+              logger.debug("Selected item 'messages'")
+              performSegueWithIdentifier(SettingsViewControllerConstants.SegueTo.Messages, sender: cell)
+            case 1:
               logger.debug("Selected item 'calendar'")
               performSegueWithIdentifier(SettingsViewControllerConstants.SegueTo.Calendar, sender: cell)
             default:
@@ -73,5 +76,6 @@ struct SettingsViewControllerConstants {
     static let Profile = "showSystemProfileSettings"
     static let Division = "showSystemDivisionSettings"
     static let Calendar = "showApplicationCalendarSettings"
+    static let Messages = "showApplicationMessagesSettings"
   }
 }

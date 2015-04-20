@@ -38,7 +38,7 @@ extension MVNetworkingHelper {
   /// This function is used to gather all new messages for the user and store them persistent. If there are new messages the suitable notifications are send.
   class func syncMessages() {
     logger.verbose("Syncing messages")
-    MVNetworking.defaultInstance().messageSyncUnreadAction(
+    MVNetworking.instance.messageSyncUnreadAction(
       success: {
         response in
         {
@@ -71,7 +71,7 @@ extension MVNetworkingHelper {
   /// This function is used to gather all messages for the user and store them persistent. If there are messages the suitable notifications are send.
   class func syncAllMessages() {
     logger.verbose("Syncing all messages")
-    MVNetworking.defaultInstance().messageSyncAllAction(
+    MVNetworking.instance.messageSyncAllAction(
       success: {
         response in
         {
@@ -104,7 +104,7 @@ extension MVNetworkingHelper {
   /// This function gets all information about the specified message and parses it
   class func syncMessage(messageId: String) {
     logger.verbose("Syncing message with id \(messageId)")
-    MVNetworking.defaultInstance().messageSyncOneAction(messageId,
+    MVNetworking.instance.messageSyncOneAction(messageId,
       success: {
         response in
         {
@@ -118,6 +118,9 @@ extension MVNetworkingHelper {
             } else if messageRepository.databaseDidChange {
               messageRepository.save()
               MVNotification.sendMessageSyncCompletedNotificationForNewMessage(message!)
+              if let alertObject = MVDropdownAlertObject(message: message!) {
+                MVDropdownAlertCenter.instance.showNotification(alertObject)
+              }
               logger.info("Successfully saved message \(messageId)")
             } else {
               logger.info("No need to save database or notify subscriber, because data model did not change")
@@ -138,7 +141,7 @@ extension MVNetworkingHelper {
   /// This function is used to send a specific message. The temporarily created ID is replaced by the system's id, if the request was successful.
   class func sendMessage(message: Message) {
     logger.debug("Sending message \(message)")
-    MVNetworking.defaultInstance().sendMessageAction(message,
+    MVNetworking.instance.sendMessageAction(message,
       success: {
         response in
         {
@@ -172,7 +175,7 @@ extension MVNetworkingHelper {
   /// This function is used to load a user specified by its id and store him persistent
   class func syncUser(userId: String) {
     logger.verbose("Syncing user with ID \(userId)")
-    MVNetworking.defaultInstance().userSyncAction(
+    MVNetworking.instance.userSyncAction(
       userId: userId,
       success: {
         response in
@@ -208,7 +211,7 @@ extension MVNetworkingHelper {
   /// This function is used to load a division specified by its id and store it persistent
   class func syncDivision(divisionId: String) {
     logger.verbose("Syncing division with ID \(divisionId)")
-    MVNetworking.defaultInstance().divisionSyncAction(
+    MVNetworking.instance.divisionSyncAction(
       divisionId: divisionId,
       success: {
         response in
@@ -240,7 +243,7 @@ extension MVNetworkingHelper {
   /// This function is used to update the list of divisions the user is part of. If this list changes the suitable notifications are send.
   class func syncUserDivision() {
     logger.verbose("Syncing list of divisions the user is part of")
-    MVNetworking.defaultInstance().userDivisionSyncAction(
+    MVNetworking.instance.userDivisionSyncAction(
       success: {
         response in
         {
@@ -299,7 +302,7 @@ extension MVNetworkingHelper {
   /// This function is gathering all events that changed since the last time, the user synced his events. If the user never synced his events all events are synced. The callback function is optional and guaranteed to be executed on the main thread. If there any event changed the suitable notifications are send.
   class func syncUserEvent(callback: (() -> ())?) {
     logger.verbose("Syncing events for user")
-    MVNetworking.defaultInstance().eventSyncAction(
+    MVNetworking.instance.eventSyncAction(
       success: {
         response in
         {
@@ -350,7 +353,7 @@ extension MVNetworkingHelper {
   /// This function is syncing an event with the specified id.
   class func syncEvent(eventId: String) {
     logger.verbose("Syncing event with ID \(eventId)")
-    MVNetworking.defaultInstance().eventSyncAction(
+    MVNetworking.instance.eventSyncAction(
       eventID: eventId,
       success: {
         response in
@@ -385,7 +388,7 @@ extension MVNetworkingHelper {
   class func sendEventResponse(event: Event) {
     if let response = event.response {
       logger.verbose("Sending response for event \(event): \(event.response)")
-      MVNetworking.defaultInstance().eventSendResponseAction(
+      MVNetworking.instance.eventSendResponseAction(
         eventID: event.id,
         response: response,
         success: {
@@ -410,7 +413,7 @@ extension MVNetworkingHelper {
   class func updateDeviceToken(deviceToken: NSData) {
     let encodedToken = deviceToken.base64EncodedStringWithOptions(nil)
     Defaults[MVUserDefaultsConstants.DeviceToken] = encodedToken
-    MVNetworking.defaultInstance().updateDeviceTokenAction(
+    MVNetworking.instance.updateDeviceTokenAction(
       encodedToken,
       success: {
         _ in

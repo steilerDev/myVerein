@@ -36,21 +36,14 @@ class MVSecurity {
     static let Domain = "myVereinDomain"
   }
   
-  private static var security: MVSecurity?
+  static var instance: MVSecurity = {
+    XCGLogger.info("Creating new security instance")
+    return MVSecurity()
+  }()
   
   private var currentUsername: String?
   private var currentPassword: String?
   private var currentDomain: String?
-  
-  /// This function either creates a new security instance or returns the shared one.
-  class func instance() -> MVSecurity {
-    if let currentSecurity = security {
-      return currentSecurity
-    } else {
-      security = MVSecurity()
-      return security!
-    }
-  }
   
   /// This initializer gets the current credentials from the keychain. The shared instance is always in sync with the keychain.
   init() {

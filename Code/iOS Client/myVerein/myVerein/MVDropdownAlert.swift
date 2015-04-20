@@ -24,6 +24,8 @@
 import Foundation
 import UIKit
 import XCGLogger
+import SwiftyUserDefaults
+import JSQSystemSoundPlayer
 
 // MARK: - Dropdown alert class
 
@@ -144,10 +146,10 @@ class MVDropdownAlert: UIButton {
         backgroundColor = DropdownAppearance.Color.Danger.Background
     }
     
-    showAlertWithTitle(alertObject.title, message: alertObject.message, backgroundColor: backgroundColor, textColor: textColor, executeCallbackOnHide: callback)
+    showAlertWithTitle(alertObject.title, message: alertObject.message, backgroundColor: backgroundColor, textColor: textColor, vibration: alertObject.vibrate, sound: alertObject.playSound, executeCallbackOnHide: callback)
   }
 
-  func showAlertWithTitle(title: String, message: String? = nil, backgroundColor: UIColor = DropdownAppearance.Color.Default.Background, textColor: UIColor = DropdownAppearance.Color.Default.Text, andDuration duration: Double = DropdownAppearance.Time.Visible, executeCallbackOnHide callback: (()->())? = nil) {
+  func showAlertWithTitle(title: String, message: String? = nil, backgroundColor: UIColor = DropdownAppearance.Color.Default.Background, textColor: UIColor = DropdownAppearance.Color.Default.Text, vibration: Bool = true, sound: Bool = false, andDuration duration: Double = DropdownAppearance.Time.Visible, executeCallbackOnHide callback: (()->())? = nil) {
     self.callbackOnHide = callback
     topLabel.text = title
     
@@ -178,6 +180,14 @@ class MVDropdownAlert: UIButton {
           }
         }
       }
+    }
+    
+    if vibration {
+      JSQSystemSoundPlayer.sharedPlayer().playVibrateSound()
+    }
+    
+    if sound {
+      JSQSystemSoundPlayer.jsq_playMessageReceivedSound()
     }
     
     UIView.animateWithDuration(DropdownAppearance.Time.Animation,
@@ -252,18 +262,13 @@ class MVDropdownAlert: UIButton {
 
 class MVDropdownAlertCenter {
   
-  private static var instance: MVDropdownAlertCenter?
+  static var instance: MVDropdownAlertCenter = {
+    XCGLogger.info("Creating new alert center")
+    return MVDropdownAlertCenter()
+  }()
   
   private let logger = XCGLogger.defaultInstance()
-  
-  class func defaultInstance() -> MVDropdownAlertCenter {
-    if instance == nil {
-      XCGLogger.info("Creating new dropdown alert center")
-      instance = MVDropdownAlertCenter()
-    }
-    return instance!
-  }
-  
+
   /// Within this array all notifications are stored, that could not be shown because the center is currently showing another notification. This queue is only storing notifications that are either 'danger' or 'warning'.
   private var alertQueue: [MVDropdownAlertObject]!
   private var alertQueueLock = NSLock()
@@ -313,6 +318,8 @@ protocol MVDropdownAlertDelegate {
 struct MVDropdownAlertObject {
   let title: String
   let message: String?
+  let vibrate: Bool
+  let playSound: Bool
   let style: MVDropdownAlertStyle
 }
 
@@ -327,7 +334,23 @@ enum MVDropdownAlertStyle {
 
 // MARK: - Convenience initializer for dropdown alert object
 extension MVDropdownAlertObject {
-//  init(message: Message) {
-//    
-//  }
+  init?(message: Message) {
+    if let notificationsEnabled = Defaults[MVUserDefaultsConstants.Settings.Messages.InAppNotificationsEnabled].bool where notificationsEnabled {
+      self.title = message.division.name
+      self.message = "\(message.sender.firstName!): \(message.content)"
+      self.style = .Default
+      self.vibrate = Defaults[MVUserDefaultsConstants.Settings.Messages.InAppNotificationsVibration].bool ?? false
+      self.playSound = Defaults[MVUserDefaultsConstants.Settings.Messages.InAppNotificationsSound].bool ?? false
+    } else {
+      return nil
+    }
+  }
+  
+  init(title: String, message: String? = nil, style: MVDropdownAlertStyle = .Default, vibrate: Bool = true, playSound: Bool = false) {
+    self.title = title
+    self.message = message
+    self.style = style
+    self.vibrate = vibrate
+    self.playSound = playSound
+  }
 }

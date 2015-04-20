@@ -49,7 +49,7 @@ class MenuController: UITabBarController {
   /// After the view appeared perform actions to update UI and check log in status
   override func viewDidAppear(animated: Bool) {
     //Check current credentials
-    let (currentUsername, currentPassword, currentDomain) = MVSecurity.instance().currentKeychain()
+    let (currentUsername, currentPassword, currentDomain) = MVSecurity.instance.currentKeychain()
     
     if !Defaults.hasKey(MVUserDefaultsConstants.UserID) ||
       currentUsername == nil ||
@@ -60,7 +60,7 @@ class MenuController: UITabBarController {
       (UIApplication.sharedApplication().delegate as! AppDelegate).showLoginView()
     } else {
       logger.info("Credentials found, checking if they are valid")
-      MVNetworking.defaultInstance().performLogIn(
+      MVNetworking.instance.performLogIn(
         success: {
           XCGLogger.info("Login successfully, no need to ask for credentials")
         },
