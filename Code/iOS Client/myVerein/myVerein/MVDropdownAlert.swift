@@ -339,8 +339,8 @@ extension MVDropdownAlertObject {
       self.title = message.division.name
       self.message = "\(message.sender.firstName!): \(message.content)"
       self.style = .Default
-      self.vibrate = Defaults[MVUserDefaultsConstants.Settings.Messages.InAppNotificationsVibration].bool ?? false
-      self.playSound = Defaults[MVUserDefaultsConstants.Settings.Messages.InAppNotificationsSound].bool ?? false
+      self.vibrate = Defaults[MVUserDefaultsConstants.Settings.Messages.InAppNotificationsVibration].bool ?? true
+      self.playSound = Defaults[MVUserDefaultsConstants.Settings.Messages.InAppNotificationsSound].bool ?? true
     } else {
       return nil
     }

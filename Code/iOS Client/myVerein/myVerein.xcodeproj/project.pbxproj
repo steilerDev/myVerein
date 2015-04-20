@@ -22,6 +22,8 @@
 		3032A9F51AD70B9100EEEAF4 /* EventViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3032A9F41AD70B9100EEEAF4 /* EventViewController.swift */; };
 		3035D66C1AC086E800C5C0FB /* MVColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3035D66B1AC086E800C5C0FB /* MVColor.swift */; };
 		303EB9551AD03BF500B14B2F /* EventRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 303EB9541AD03BF500B14B2F /* EventRepository.swift */; };
+		30495A101AE58DED006C9381 /* MessagesSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30495A0F1AE58DED006C9381 /* MessagesSettingsViewController.swift */; };
+		30495A131AE59501006C9381 /* CalendarSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30495A121AE59501006C9381 /* CalendarSettingsViewController.swift */; };
 		304C577F1AACA3CC00B221D7 /* MVSecurity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 304C577E1AACA3CC00B221D7 /* MVSecurity.swift */; };
 		3068A4A01ACBDD9F00A3F53D /* MVNetworkingSupportingClasses.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3068A49F1ACBDD9F00A3F53D /* MVNetworkingSupportingClasses.swift */; };
 		3068A4A21ACBE9A900A3F53D /* Event.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3068A4A11ACBE9A900A3F53D /* Event.swift */; };
@@ -36,6 +38,8 @@
 		309170341AA8D2B4004D30D1 /* MessageRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 309170331AA8D2B4004D30D1 /* MessageRepository.swift */; };
 		309256161AB098A400E55691 /* CoreDataRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 309256151AB098A400E55691 /* CoreDataRepository.swift */; };
 		309A8A7C1AB374040087CBC5 /* ChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 309A8A7B1AB374040087CBC5 /* ChatViewController.swift */; };
+		30A25BDB1AE56C5000E10062 /* ToggleCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 30A25BDA1AE56C5000E10062 /* ToggleCell.xib */; };
+		30A25BDD1AE56CE600E10062 /* ToggleCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30A25BDC1AE56CE600E10062 /* ToggleCell.swift */; };
 		30A4F7D91AA97D400064EA2C /* MVNetworking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30A4F7D81AA97D400064EA2C /* MVNetworking.swift */; };
 		30BAFEE51AA52828000D18EF /* ca-cert.cer in Resources */ = {isa = PBXBuildFile; fileRef = 30BAFEE11AA518EA000D18EF /* ca-cert.cer */; };
 		30C1EFDA1AE2E28A00328C79 /* MVRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30C1EFD91AE2E28A00328C79 /* MVRequest.swift */; };
@@ -94,6 +98,8 @@
 		3032A9F41AD70B9100EEEAF4 /* EventViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EventViewController.swift; sourceTree = "<group>"; };
 		3035D66B1AC086E800C5C0FB /* MVColor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MVColor.swift; sourceTree = "<group>"; };
 		303EB9541AD03BF500B14B2F /* EventRepository.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EventRepository.swift; sourceTree = "<group>"; };
+		30495A0F1AE58DED006C9381 /* MessagesSettingsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MessagesSettingsViewController.swift; sourceTree = "<group>"; };
+		30495A121AE59501006C9381 /* CalendarSettingsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CalendarSettingsViewController.swift; sourceTree = "<group>"; };
 		304C577E1AACA3CC00B221D7 /* MVSecurity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MVSecurity.swift; sourceTree = "<group>"; };
 		3068A49F1ACBDD9F00A3F53D /* MVNetworkingSupportingClasses.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MVNetworkingSupportingClasses.swift; sourceTree = "<group>"; };
 		3068A4A11ACBE9A900A3F53D /* Event.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Event.swift; sourceTree = "<group>"; };
@@ -108,6 +114,8 @@
 		309170331AA8D2B4004D30D1 /* MessageRepository.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MessageRepository.swift; sourceTree = "<group>"; };
 		309256151AB098A400E55691 /* CoreDataRepository.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataRepository.swift; sourceTree = "<group>"; };
 		309A8A7B1AB374040087CBC5 /* ChatViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChatViewController.swift; sourceTree = "<group>"; };
+		30A25BDA1AE56C5000E10062 /* ToggleCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ToggleCell.xib; sourceTree = "<group>"; };
+		30A25BDC1AE56CE600E10062 /* ToggleCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ToggleCell.swift; sourceTree = "<group>"; };
 		30A4F7D81AA97D400064EA2C /* MVNetworking.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MVNetworking.swift; sourceTree = "<group>"; };
 		30BAFEE11AA518EA000D18EF /* ca-cert.cer */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ca-cert.cer"; sourceTree = "<group>"; };
 		30C1EFD91AE2E28A00328C79 /* MVRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MVRequest.swift; sourceTree = "<group>"; };
@@ -247,6 +255,15 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
+		30495A111AE58DF9006C9381 /* CustomViewElements */ = {
+			isa = PBXGroup;
+			children = (
+				30A25BDA1AE56C5000E10062 /* ToggleCell.xib */,
+				30A25BDC1AE56CE600E10062 /* ToggleCell.swift */,
+			);
+			name = CustomViewElements;
+			sourceTree = "<group>";
+		};
 		308270D41ADD812900ED5782 /* Supporting Classes */ = {
 			isa = PBXGroup;
 			children = (
@@ -317,6 +334,8 @@
 			isa = PBXGroup;
 			children = (
 				30F254E51AC7224E00E10CB9 /* SettingsViewController.swift */,
+				30495A0F1AE58DED006C9381 /* MessagesSettingsViewController.swift */,
+				30495A121AE59501006C9381 /* CalendarSettingsViewController.swift */,
 			);
 			name = Settings;
 			sourceTree = "<group>";
@@ -336,6 +355,7 @@
 		30FB44BF1AACD212003E4512 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				30495A111AE58DF9006C9381 /* CustomViewElements */,
 				3020CBA81A9E1289005AAEEF /* Main.storyboard */,
 				3020CBAD1A9E1289005AAEEF /* LaunchScreen.xib */,
 			);
@@ -430,6 +450,7 @@
 				30BAFEE51AA52828000D18EF /* ca-cert.cer in Resources */,
 				3020CBAA1A9E1289005AAEEF /* Main.storyboard in Resources */,
 				3020CBAF1A9E1289005AAEEF /* LaunchScreen.xib in Resources */,
+				30A25BDB1AE56C5000E10062 /* ToggleCell.xib in Resources */,
 				3020CBAC1A9E1289005AAEEF /* Images.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -499,6 +520,7 @@
 				3087C3D81AE3CC1800A3F7A8 /* MVDropdownAlert.swift in Sources */,
 				30F254E81AC7271A00E10CB9 /* CalendarViewController.swift in Sources */,
 				3020CBA71A9E1289005AAEEF /* LoginViewController.swift in Sources */,
+				30A25BDD1AE56CE600E10062 /* ToggleCell.swift in Sources */,
 				3068A4A41ACBEDBA00A3F53D /* MVUserDefaultsConstants.swift in Sources */,
 				30A4F7D91AA97D400064EA2C /* MVNetworking.swift in Sources */,
 				30FB44C71AACD898003E4512 /* Division.swift in Sources */,
@@ -517,6 +539,7 @@
 				309A8A7C1AB374040087CBC5 /* ChatViewController.swift in Sources */,
 				309256161AB098A400E55691 /* CoreDataRepository.swift in Sources */,
 				30FB44BB1AACC088003E4512 /* DivisionRepository.swift in Sources */,
+				30495A131AE59501006C9381 /* CalendarSettingsViewController.swift in Sources */,
 				302BE8C21AA642EB001D0FE7 /* DivisionChatCell.swift in Sources */,
 				30F254E61AC7224E00E10CB9 /* SettingsViewController.swift in Sources */,
 				3016A03F1ADACFE800778769 /* InvitationViewController.swift in Sources */,
@@ -530,6 +553,7 @@
 				30FB44C31AACD897003E4512 /* User.swift in Sources */,
 				306FD7341AAB0F4400719B82 /* MVError.swift in Sources */,
 				3068A4A01ACBDD9F00A3F53D /* MVNetworkingSupportingClasses.swift in Sources */,
+				30495A101AE58DED006C9381 /* MessagesSettingsViewController.swift in Sources */,
 				3020CBA51A9E1289005AAEEF /* AppDelegate.swift in Sources */,
 				3016A0411ADAE17000778769 /* InvitationCell.swift in Sources */,
 			);

@@ -832,63 +832,107 @@
                     <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" translucent="NO" prompted="NO"/>
                     <connections>
                         <segue destination="uLA-DS-3Ko" kind="show" identifier="showApplicationMessagesSettings" id="1AO-tD-d7u"/>
+                        <segue destination="WPi-cp-wiM" kind="show" identifier="showApplicationCalendarSettings" id="PIr-0l-vMQ"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="tbO-ie-API" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2032" y="2343"/>
+            <point key="canvasLocation" x="1910" y="2454"/>
+        </scene>
+        <!--Calendar-->
+        <scene sceneID="0eJ-g4-hfZ">
+            <objects>
+                <tableViewController title="Calendar" id="WPi-cp-wiM" customClass="CalendarSettingsViewController" customModule="myVerein" customModuleProvider="target" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="grouped" separatorStyle="default" rowHeight="44" sectionHeaderHeight="10" sectionFooterHeight="10" id="1l1-CH-L3O">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="487"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
+                        <sections>
+                            <tableViewSection headerTitle="Reminder" id="Puu-68-FLW">
+                                <cells>
+                                    <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="XWJ-Vd-C8C" customClass="ToggleCell" customModule="myVerein" customModuleProvider="target">
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="XWJ-Vd-C8C" id="6CF-Cl-GeP">
+                                            <autoresizingMask key="autoresizingMask"/>
+                                        </tableViewCellContentView>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="string" keyPath="title" value="Reminder notification"/>
+                                        </userDefinedRuntimeAttributes>
+                                    </tableViewCell>
+                                    <tableViewCell contentMode="scaleToFill" selectionStyle="default" accessoryType="disclosureIndicator" indentationWidth="10" textLabel="aYd-a8-s3T" detailTextLabel="PRR-Z6-JO3" style="IBUITableViewCellStyleValue1" id="XbQ-no-5Dx">
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="XbQ-no-5Dx" id="qtY-B3-4Pq">
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Reminder" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="aYd-a8-s3T">
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                                                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Detail" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="PRR-Z6-JO3">
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                                                    <color key="textColor" red="0.55686274509803924" green="0.55686274509803924" blue="0.57647058823529407" alpha="1" colorSpace="calibratedRGB"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                </cells>
+                            </tableViewSection>
+                        </sections>
+                        <connections>
+                            <outlet property="dataSource" destination="WPi-cp-wiM" id="9En-he-1ZC"/>
+                            <outlet property="delegate" destination="WPi-cp-wiM" id="OoQ-fo-lhB"/>
+                        </connections>
+                    </tableView>
+                    <connections>
+                        <outlet property="notificationTimeCell" destination="XbQ-no-5Dx" id="apF-eb-Hvq"/>
+                        <outlet property="notificationToggleCell" destination="XWJ-Vd-C8C" id="vlK-Dc-cez"/>
+                    </connections>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="xJY-K1-vag" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2744" y="2317"/>
         </scene>
         <!--Messages-->
         <scene sceneID="RVo-OC-r2H">
             <objects>
-                <tableViewController title="Messages" id="uLA-DS-3Ko" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="Ypm-JW-FKk">
+                <tableViewController title="Messages" id="uLA-DS-3Ko" customClass="MessagesSettingsViewController" customModule="myVerein" customModuleProvider="target" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="grouped" separatorStyle="default" rowHeight="44" sectionHeaderHeight="10" sectionFooterHeight="10" id="Ypm-JW-FKk">
                         <rect key="frame" x="0.0" y="0.0" width="600" height="487"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <color key="backgroundColor" red="0.93725490196078431" green="0.93725490196078431" blue="0.95686274509803926" alpha="1" colorSpace="calibratedRGB"/>
                         <sections>
-                            <tableViewSection headerTitle="In app notifications" id="xea-ok-MXl">
+                            <tableViewSection headerTitle="In-App notifications" id="xea-ok-MXl">
                                 <cells>
-                                    <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="4Ge-ez-mCG">
+                                    <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="TrV-ae-DRh" customClass="ToggleCell" customModule="myVerein" customModuleProvider="target">
                                         <autoresizingMask key="autoresizingMask"/>
-                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="4Ge-ez-mCG" id="Nln-yY-Fxz">
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="TrV-ae-DRh" id="K1V-eY-RsY">
                                             <autoresizingMask key="autoresizingMask"/>
-                                            <subviews>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Enable in app notifications" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ehG-OQ-pd3">
-                                                    <rect key="frame" x="16" y="11" width="203" height="21"/>
-                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                                    <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
-                                                    <nil key="highlightedColor"/>
-                                                </label>
-                                                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1Sd-Ml-Mac">
-                                                    <rect key="frame" x="543" y="6" width="51" height="31"/>
-                                                </switch>
-                                            </subviews>
-                                            <constraints>
-                                                <constraint firstItem="1Sd-Ml-Mac" firstAttribute="trailing" secondItem="Nln-yY-Fxz" secondAttribute="trailingMargin" id="C06-h9-FPo"/>
-                                                <constraint firstItem="ehG-OQ-pd3" firstAttribute="leading" secondItem="Nln-yY-Fxz" secondAttribute="leadingMargin" constant="8" id="caa-fS-QzJ"/>
-                                                <constraint firstAttribute="centerX" secondItem="ehG-OQ-pd3" secondAttribute="centerX" id="kVv-An-R9n"/>
-                                                <constraint firstAttribute="centerY" secondItem="ehG-OQ-pd3" secondAttribute="centerY" id="w8O-41-Kt7"/>
-                                                <constraint firstAttribute="centerY" secondItem="1Sd-Ml-Mac" secondAttribute="centerY" id="zce-Gp-2H7"/>
-                                            </constraints>
-                                            <variation key="default">
-                                                <mask key="constraints">
-                                                    <exclude reference="kVv-An-R9n"/>
-                                                </mask>
-                                            </variation>
                                         </tableViewCellContentView>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="string" keyPath="title" value="In-App Notifications"/>
+                                        </userDefinedRuntimeAttributes>
                                     </tableViewCell>
-                                    <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="L66-GR-F7E">
+                                    <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="L66-GR-F7E" customClass="ToggleCell" customModule="myVerein" customModuleProvider="target">
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="L66-GR-F7E" id="ZLp-PX-2A1">
                                             <autoresizingMask key="autoresizingMask"/>
                                         </tableViewCellContentView>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="string" keyPath="title" value="In-App Vibration"/>
+                                        </userDefinedRuntimeAttributes>
                                     </tableViewCell>
-                                    <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="S1q-FH-uIG">
+                                    <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="S1q-FH-uIG" customClass="ToggleCell" customModule="myVerein" customModuleProvider="target">
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="S1q-FH-uIG" id="g9m-9v-J35">
                                             <autoresizingMask key="autoresizingMask"/>
                                         </tableViewCellContentView>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="string" keyPath="title" value="In-App Sounds"/>
+                                        </userDefinedRuntimeAttributes>
                                     </tableViewCell>
                                 </cells>
                             </tableViewSection>
@@ -898,10 +942,15 @@
                             <outlet property="delegate" destination="uLA-DS-3Ko" id="hSg-Aq-gmw"/>
                         </connections>
                     </tableView>
+                    <connections>
+                        <outlet property="notificationsCell" destination="TrV-ae-DRh" id="555-Xa-4nh"/>
+                        <outlet property="soundCell" destination="S1q-FH-uIG" id="la9-0b-Wss"/>
+                        <outlet property="vibrationCell" destination="L66-GR-F7E" id="1Ol-vq-eLM"/>
+                    </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Une-TP-5PC" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2836" y="2786"/>
+            <point key="canvasLocation" x="2744" y="2982"/>
         </scene>
         <!--Chats-->
         <scene sceneID="Grp-CK-DDK">

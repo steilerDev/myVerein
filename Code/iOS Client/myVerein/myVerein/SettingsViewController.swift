@@ -39,10 +39,12 @@ extension SettingsViewController {
           switch indexPath.indexAtPosition(1) {
             case 0:
               logger.debug("Selected item 'profile")
-              performSegueWithIdentifier(SettingsViewControllerConstants.SegueTo.Profile, sender: cell)
+              UIAlertView(title: "This functionality is not yet implemented", message: "This cell is a placeholder, functionality is going to be added later", delegate: nil, cancelButtonTitle: "Ok").show()
+              //performSegueWithIdentifier(SettingsViewControllerConstants.SegueTo.Profile, sender: cell)
             case 1:
               logger.debug("Selected item 'divisions'")
-              performSegueWithIdentifier(SettingsViewControllerConstants.SegueTo.Division, sender: cell)
+              UIAlertView(title: "This functionality is not yet implemented", message: "This cell is a placeholder, functionality is going to be added later", delegate: nil, cancelButtonTitle: "Ok").show()
+              //performSegueWithIdentifier(SettingsViewControllerConstants.SegueTo.Division, sender: cell)
             default:
               logger.warning("Selected unknown item")
           }

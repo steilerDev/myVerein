@@ -35,5 +35,9 @@ struct MVUserDefaultsConstants {
       static let InAppNotificationsVibration = "messagesInAppNotificationsVibration"
       static let InAppNotificationsSound = "messagesInAppNotficationsSound"
     }
+    struct Calendar {
+      static let LocalNotificationsEnabled = "calendarLocalNotificationsEnabled"
+      static let LocalNotificationsTime = "calendarLocalNotificationsTime"
+    }
   }
 }
