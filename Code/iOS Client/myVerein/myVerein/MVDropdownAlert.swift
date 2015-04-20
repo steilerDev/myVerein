@@ -23,6 +23,7 @@
 
 import Foundation
 import UIKit
+import XCGLogger
 
 // MARK: - Dropdown alert class
 
@@ -76,6 +77,8 @@ class MVDropdownAlert: UIButton {
   let bottomLabel: UILabel
   let originalFrame: CGRect
   
+  var callbackOnHide: (()->())?
+  
   var delegate: MVDropdownAlertDelegate?
   
   // MARK: Initializer
@@ -119,11 +122,11 @@ class MVDropdownAlert: UIButton {
   
   // MARK: Showing the alert
   
-  class func showAlert(alertObject: MVDropdownAlertObject) {
-    MVDropdownAlert().showAlert(alertObject)
+  class func showAlert(alertObject: MVDropdownAlertObject, executeCallbackOnHide callback: (()->())? = nil) {
+    MVDropdownAlert().showAlert(alertObject, executeCallbackOnHide: callback)
   }
   
-  func showAlert(alertObject: MVDropdownAlertObject) {
+  func showAlert(alertObject: MVDropdownAlertObject, executeCallbackOnHide callback: (()->())? = nil) {
     let textColor: UIColor
     let backgroundColor: UIColor
     switch alertObject.style {
@@ -141,10 +144,11 @@ class MVDropdownAlert: UIButton {
         backgroundColor = DropdownAppearance.Color.Danger.Background
     }
     
-    showAlertWithTitle(alertObject.title, message: alertObject.message, backgroundColor: backgroundColor, textColor: textColor)
+    showAlertWithTitle(alertObject.title, message: alertObject.message, backgroundColor: backgroundColor, textColor: textColor, executeCallbackOnHide: callback)
   }
 
-  func showAlertWithTitle(title: String, message: String? = nil, backgroundColor: UIColor = DropdownAppearance.Color.Default.Background, textColor: UIColor = DropdownAppearance.Color.Default.Text, andDuration duration: Double = DropdownAppearance.Time.Visible) {
+  func showAlertWithTitle(title: String, message: String? = nil, backgroundColor: UIColor = DropdownAppearance.Color.Default.Background, textColor: UIColor = DropdownAppearance.Color.Default.Text, andDuration duration: Double = DropdownAppearance.Time.Visible, executeCallbackOnHide callback: (()->())? = nil) {
+    self.callbackOnHide = callback
     topLabel.text = title
     
     if let message = message {
@@ -216,6 +220,7 @@ class MVDropdownAlert: UIButton {
   
   private func removeView() {
     self.removeFromSuperview()
+    callbackOnHide?()
   }
   
   // MARK: Touch up inside selector
@@ -239,6 +244,60 @@ class MVDropdownAlert: UIButton {
         gestureRecognizer.view!.frame.origin.y += translation.y
       }
       gestureRecognizer.setTranslation(CGPointZero, inView: self.superview!)
+    }
+  }
+}
+
+// MARK: - MVDropdownAlertCenter
+
+class MVDropdownAlertCenter {
+  
+  private static var instance: MVDropdownAlertCenter?
+  
+  private let logger = XCGLogger.defaultInstance()
+  
+  class func defaultInstance() -> MVDropdownAlertCenter {
+    if instance == nil {
+      XCGLogger.info("Creating new dropdown alert center")
+      instance = MVDropdownAlertCenter()
+    }
+    return instance!
+  }
+  
+  /// Within this array all notifications are stored, that could not be shown because the center is currently showing another notification. This queue is only storing notifications that are either 'danger' or 'warning'.
+  private var alertQueue: [MVDropdownAlertObject]!
+  private var alertQueueLock = NSLock()
+  
+  /// This function proceses a notification and tries to display it. If a notification is currently shown, the notification gets discarded if it is not of style 'danger' or 'warning'. Since the storing of the object might block execution, the function is dispatching to a background queue.
+  func showNotification(notification: MVDropdownAlertObject) {
+    {
+      self.alertQueueLock.lock()
+      if self.alertQueue != nil {
+        if(notification.style == .Warning || notification.style == .Danger) {
+          self.logger.debug("A notification is currently shown, appending notification \(notification) to the queue")
+          self.alertQueue.append(notification)
+        } else {
+          self.logger.debug("A notification is currently shown but importance of notification is too low: \(notification)")
+        }
+        self.alertQueueLock.unlock()
+      } else {
+        self.alertQueue = [notification]
+        self.alertQueueLock.unlock()
+        self.processQueue()
+      }
+    }~>
+  }
+  
+  /// This function proceses the alert queue. If all items have been processed the queue gets cleared and the process stopped. This function should not be called from the main queue since it might block execution, while trying to acquire the lock for the queue.
+  func processQueue() {
+    alertQueueLock.lock()
+    if alertQueue == nil || alertQueue.isEmpty {
+      alertQueue = nil
+      alertQueueLock.unlock()
+    } else if !alertQueue.isEmpty {
+      let alert = alertQueue.removeAtIndex(0)
+      alertQueueLock.unlock()
+      ~>{ MVDropdownAlert.showAlert(alert, executeCallbackOnHide: { self.processQueue~> }) }
     }
   }
 }
