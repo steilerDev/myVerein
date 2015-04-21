@@ -209,7 +209,7 @@ extension ChatViewController {
     
     logger.debug("Configuring cell at index path \(indexPath) with message \(currentMessage)")
     
-    if userLabelForMessageAtIndexPath(indexPath, inCollectionView: collectionView) != nil {
+    if compareNextCellAndCellAtIndexPath(indexPath, andReturnExpresionResult: { return $0.senderId() != $1.senderId() || $0.timestamp.dateByAddingTimeInterval(ChatViewConstants.TimeBetweenMessagesThresholdForLabel).isBefore($1.timestamp) }) {
       configureCell(currentCell, usingMessage: currentMessage, AndHideTailAndAvatar: false)
     } else {
       configureCell(currentCell, usingMessage: currentMessage, AndHideTailAndAvatar: true)
@@ -523,7 +523,6 @@ extension ChatViewController {
   /// :param: returnValue The return value returned if the expresion holds true or the cell does not have a predecessor. The message of the current cell is available as paramter.
   /// :returns: The result of the return-value-closure if the provided expresion holds true. If the cell does not have a successor the function will always return nil.
   func compareNextCellAndCellAtIndexPath<T>(indexPath: NSIndexPath, andReturnValue returnValue:  (Message) -> T, ifExpresionHoldsTrue closure: (Message, Message) -> Bool) -> T? {
-    
     let prevIndexPath = indexPath.increment()
     if collectionView.collectionView(collectionView, hasItemForIndexPath: prevIndexPath) {
       if let nextMessage = fetchedResultController.objectAtIndexPath(prevIndexPath) as? Message,
@@ -537,11 +536,6 @@ extension ChatViewController {
     return nil
   }
   
-  /// This function compares the current cell identified by the index path with its successor using the provided closure. If the closure returns true the function will return true.
-  ///
-  /// :param: indexPath The index path defining the current cell.
-  /// :param: closure The evaluation of this closure is used to decide wheter or not to return the value. The first argument is the message within the current cell, the second argument is the message within the succeeding cell.
-  /// :returns: True if the provided expresion holds true, false otherwise. If the cell does not have a successor the function will always return false.
   func compareNextCellAndCellAtIndexPath(indexPath: NSIndexPath, andReturnExpresionResult closure: (Message, Message) -> Bool) -> Bool {
     return compareNextCellAndCellAtIndexPath(indexPath,
       andReturnValue: { _ in return true },
