@@ -37,6 +37,8 @@
 		3091702F1AA8C097004D30D1 /* myVereinModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 3091702D1AA8C097004D30D1 /* myVereinModel.xcdatamodeld */; };
 		309170341AA8D2B4004D30D1 /* MessageRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 309170331AA8D2B4004D30D1 /* MessageRepository.swift */; };
 		309256161AB098A400E55691 /* CoreDataRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 309256151AB098A400E55691 /* CoreDataRepository.swift */; };
+		3093DCC41AE700AE00D94EDF /* DivisionChatCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3093DCC31AE700AE00D94EDF /* DivisionChatCell.xib */; };
+		3093DCC61AE7063B00D94EDF /* InvitationCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3093DCC51AE7063B00D94EDF /* InvitationCell.xib */; };
 		309A8A7C1AB374040087CBC5 /* ChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 309A8A7B1AB374040087CBC5 /* ChatViewController.swift */; };
 		30A25BDB1AE56C5000E10062 /* ToggleCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 30A25BDA1AE56C5000E10062 /* ToggleCell.xib */; };
 		30A25BDD1AE56CE600E10062 /* ToggleCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30A25BDC1AE56CE600E10062 /* ToggleCell.swift */; };
@@ -113,6 +115,8 @@
 		3091702E1AA8C097004D30D1 /* myVereinModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = myVereinModel.xcdatamodel; sourceTree = "<group>"; };
 		309170331AA8D2B4004D30D1 /* MessageRepository.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MessageRepository.swift; sourceTree = "<group>"; };
 		309256151AB098A400E55691 /* CoreDataRepository.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataRepository.swift; sourceTree = "<group>"; };
+		3093DCC31AE700AE00D94EDF /* DivisionChatCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DivisionChatCell.xib; sourceTree = "<group>"; };
+		3093DCC51AE7063B00D94EDF /* InvitationCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = InvitationCell.xib; sourceTree = "<group>"; };
 		309A8A7B1AB374040087CBC5 /* ChatViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChatViewController.swift; sourceTree = "<group>"; };
 		30A25BDA1AE56C5000E10062 /* ToggleCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ToggleCell.xib; sourceTree = "<group>"; };
 		30A25BDC1AE56CE600E10062 /* ToggleCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ToggleCell.swift; sourceTree = "<group>"; };
@@ -260,6 +264,10 @@
 			children = (
 				30A25BDA1AE56C5000E10062 /* ToggleCell.xib */,
 				30A25BDC1AE56CE600E10062 /* ToggleCell.swift */,
+				3093DCC31AE700AE00D94EDF /* DivisionChatCell.xib */,
+				302BE8C11AA642EB001D0FE7 /* DivisionChatCell.swift */,
+				3093DCC51AE7063B00D94EDF /* InvitationCell.xib */,
+				3016A0401ADAE17000778769 /* InvitationCell.swift */,
 			);
 			name = CustomViewElements;
 			sourceTree = "<group>";
@@ -279,24 +287,6 @@
 			name = "Supporting Classes";
 			sourceTree = "<group>";
 		};
-		308270D71ADD81F400ED5782 /* DivisionChatOverviewView */ = {
-			isa = PBXGroup;
-			children = (
-				302BE8C31AA64599001D0FE7 /* DivisionChatOverviewViewController.swift */,
-				302BE8C11AA642EB001D0FE7 /* DivisionChatCell.swift */,
-			);
-			name = DivisionChatOverviewView;
-			sourceTree = "<group>";
-		};
-		308270D81ADD821300ED5782 /* InvitationView */ = {
-			isa = PBXGroup;
-			children = (
-				3016A03E1ADACFE800778769 /* InvitationViewController.swift */,
-				3016A0401ADAE17000778769 /* InvitationCell.swift */,
-			);
-			name = InvitationView;
-			sourceTree = "<group>";
-		};
 		30916FF81AA79F0A004D30D1 /* Login */ = {
 			isa = PBXGroup;
 			children = (
@@ -308,7 +298,7 @@
 		30916FF91AA79F1E004D30D1 /* Chat */ = {
 			isa = PBXGroup;
 			children = (
-				308270D71ADD81F400ED5782 /* DivisionChatOverviewView */,
+				302BE8C31AA64599001D0FE7 /* DivisionChatOverviewViewController.swift */,
 				309A8A7B1AB374040087CBC5 /* ChatViewController.swift */,
 			);
 			name = Chat;
@@ -343,7 +333,7 @@
 		30F254E91AC7271F00E10CB9 /* Events */ = {
 			isa = PBXGroup;
 			children = (
-				308270D81ADD821300ED5782 /* InvitationView */,
+				3016A03E1ADACFE800778769 /* InvitationViewController.swift */,
 				30F254E71AC7271A00E10CB9 /* CalendarViewController.swift */,
 				3032A9F41AD70B9100EEEAF4 /* EventViewController.swift */,
 				30159BF81AD980010018419D /* ParticipantViewController.swift */,
@@ -449,9 +439,11 @@
 			files = (
 				30BAFEE51AA52828000D18EF /* ca-cert.cer in Resources */,
 				3020CBAA1A9E1289005AAEEF /* Main.storyboard in Resources */,
+				3093DCC41AE700AE00D94EDF /* DivisionChatCell.xib in Resources */,
 				3020CBAF1A9E1289005AAEEF /* LaunchScreen.xib in Resources */,
 				30A25BDB1AE56C5000E10062 /* ToggleCell.xib in Resources */,
 				3020CBAC1A9E1289005AAEEF /* Images.xcassets in Resources */,
+				3093DCC61AE7063B00D94EDF /* InvitationCell.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -25,7 +25,7 @@ import UIKit
 // TODO: Make it IBDesignable one day with a bigger machine
 class ToggleCell: UITableViewCell {
 
-  var tableViewCell: UITableViewCell!
+  var rootCell: UITableViewCell!
   
   @IBOutlet weak var label: UILabel!
   @IBOutlet weak var toggle: UISwitch!
@@ -73,12 +73,12 @@ class ToggleCell: UITableViewCell {
   }
   
   private func setup() {
-    tableViewCell = NSBundle.mainBundle().loadNibNamed("ToggleCell", owner: self, options: nil).first as! UITableViewCell
+    rootCell = NSBundle.mainBundle().loadNibNamed("ToggleCell", owner: self, options: nil).first as! UITableViewCell
     
-    tableViewCell.frame = self.bounds
-    tableViewCell.autoresizingMask = .FlexibleWidth | .FlexibleHeight
+    rootCell.frame = self.bounds
+    rootCell.autoresizingMask = .FlexibleWidth | .FlexibleHeight
     
-    self.addSubview(tableViewCell)
+    self.addSubview(rootCell)
   }
   
   override func awakeFromNib() {

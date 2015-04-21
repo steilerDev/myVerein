@@ -11,6 +11,8 @@ import XCGLogger
 
 class InvitationCell: UITableViewCell {
 
+  var rootCell: UITableViewCell!
+  
   let logger = XCGLogger.defaultInstance()
   
   @IBOutlet weak var eventTitle: UILabel!
@@ -52,6 +54,29 @@ class InvitationCell: UITableViewCell {
     } else {
       logger.warning("Unable to notify delegate, because delegate could not be unwrapped")
     }
+  }
+  
+  override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
+    super.init(style: style, reuseIdentifier: reuseIdentifier)
+    setup()
+  }
+  
+  required init(coder aDecoder: NSCoder) {
+    super.init(coder: aDecoder)
+    setup()
+  }
+  
+  private func setup() {
+    rootCell = NSBundle.mainBundle().loadNibNamed("InvitationCell", owner: self, options: nil).first as! UITableViewCell
+    
+    rootCell.frame = self.bounds
+    rootCell.autoresizingMask = .FlexibleWidth | .FlexibleHeight
+    
+    self.addSubview(rootCell)
+  }
+  
+  override func awakeFromNib() {
+    super.awakeFromNib()
   }
 
 }

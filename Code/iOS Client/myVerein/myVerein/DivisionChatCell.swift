@@ -29,9 +29,9 @@ class DivisionChatCell: UICollectionViewCell {
   
   let logger = XCGLogger.defaultInstance()
   
-  lazy var notificationBadge: RKNotificationHub = {
-    RKNotificationHub(view: self.divisionImageView.superview)
-  }()
+  var rootCell: UICollectionViewCell!
+  
+  var notificationBadge: RKNotificationHub!
   
   var notificationCount: Int {
     get {
@@ -86,6 +86,31 @@ class DivisionChatCell: UICollectionViewCell {
       divisionLabel.text = "Division"
       divisionImageView.setImageWithDivision(nil)
     }
+  }
+
+  override init(frame: CGRect) {
+    super.init(frame: frame)
+    setup()
+  }
+  
+  required init(coder aDecoder: NSCoder) {
+    super.init(coder: aDecoder)
+    setup()
+  }
+  
+  override func awakeFromNib() {
+    super.awakeFromNib()
+    notificationBadge = RKNotificationHub(view: self.divisionImageView.superview)
+    notificationBadge.moveCircleByX(-5, y: 5)
+  }
+  
+  private func setup() {
+    rootCell = NSBundle.mainBundle().loadNibNamed("DivisionChatCell", owner: self, options: nil).first as! UICollectionViewCell
+    
+    rootCell.frame = self.bounds
+    rootCell.autoresizingMask = .FlexibleWidth | .FlexibleHeight
+    
+    self.addSubview(rootCell)
   }
 }
 

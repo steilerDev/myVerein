@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="7702" systemVersion="14D136" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7701"/>
+        <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="InvitationCell" customModule="myVerein" customModuleProvider="target">
+            <connections>
+                <outlet property="eventLocation" destination="g8m-23-AFW" id="wXQ-A7-Z1S"/>
+                <outlet property="eventTime" destination="Wus-QH-898" id="Vj5-yx-Q8m"/>
+                <outlet property="eventTitle" destination="7H1-tq-xqU" id="Eqy-ea-6m3"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell contentMode="scaleToFill" horizontalCompressionResistancePriority="550" verticalCompressionResistancePriority="550" selectionStyle="none" accessoryType="detailButton" indentationWidth="10" rowHeight="123" id="2dk-K3-mJt">
+            <rect key="frame" x="0.0" y="0.0" width="545" height="123"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" horizontalCompressionResistancePriority="550" verticalCompressionResistancePriority="550" tableViewCell="2dk-K3-mJt" id="DI1-rf-DUC">
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="Event title" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7H1-tq-xqU">
+                        <rect key="frame" x="16" y="8" width="74" height="12"/>
+                        <fontDescription key="fontDescription" style="UICTFontTextStyleHeadline"/>
+                        <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="Event location" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="g8m-23-AFW">
+                        <rect key="frame" x="41" y="28" width="92" height="17"/>
+                        <fontDescription key="fontDescription" style="UICTFontTextStyleSubhead"/>
+                        <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="1" verticalCompressionResistancePriority="1" misplaced="YES" image="Pin" translatesAutoresizingMaskIntoConstraints="NO" id="ufH-zQ-BI3">
+                        <rect key="frame" x="16" y="28" width="17" height="17"/>
+                        <constraints>
+                            <constraint firstAttribute="width" secondItem="ufH-zQ-BI3" secondAttribute="height" multiplier="1:1" id="9OB-rQ-7Cr"/>
+                            <constraint firstAttribute="width" constant="32" id="oOP-H2-EmH"/>
+                        </constraints>
+                        <variation key="default">
+                            <mask key="constraints">
+                                <exclude reference="oOP-H2-EmH"/>
+                            </mask>
+                        </variation>
+                    </imageView>
+                    <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="1" verticalCompressionResistancePriority="1" misplaced="YES" image="Clock" translatesAutoresizingMaskIntoConstraints="NO" id="H0N-6Q-hev">
+                        <rect key="frame" x="16" y="53" width="17" height="17"/>
+                        <constraints>
+                            <constraint firstAttribute="width" secondItem="H0N-6Q-hev" secondAttribute="height" multiplier="1:1" id="Rlm-A6-I9p"/>
+                        </constraints>
+                    </imageView>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="Times" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Wus-QH-898">
+                        <rect key="frame" x="41" y="53" width="39" height="17"/>
+                        <fontDescription key="fontDescription" style="UICTFontTextStyleSubhead"/>
+                        <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" translatesAutoresizingMaskIntoConstraints="NO" id="Whq-dc-WN8">
+                        <rect key="frame" x="16" y="86" width="474" height="29"/>
+                        <segments>
+                            <segment title="Going"/>
+                            <segment title="Maybe"/>
+                            <segment title="Decline"/>
+                        </segments>
+                        <connections>
+                            <action selector="responseChanged:" destination="-1" eventType="valueChanged" id="Lr3-Sw-0vk"/>
+                        </connections>
+                    </segmentedControl>
+                </subviews>
+                <constraints>
+                    <constraint firstItem="H0N-6Q-hev" firstAttribute="leading" secondItem="7H1-tq-xqU" secondAttribute="leading" id="0NE-ZG-RnE"/>
+                    <constraint firstItem="H0N-6Q-hev" firstAttribute="height" secondItem="Wus-QH-898" secondAttribute="height" id="0ea-Id-6SZ"/>
+                    <constraint firstItem="H0N-6Q-hev" firstAttribute="centerY" secondItem="Wus-QH-898" secondAttribute="centerY" id="2wS-a0-iAf"/>
+                    <constraint firstAttribute="bottomMargin" secondItem="Whq-dc-WN8" secondAttribute="bottom" id="9mD-UM-jUC"/>
+                    <constraint firstItem="ufH-zQ-BI3" firstAttribute="leading" secondItem="7H1-tq-xqU" secondAttribute="leading" id="FsX-cB-XLe"/>
+                    <constraint firstItem="Wus-QH-898" firstAttribute="leading" secondItem="H0N-6Q-hev" secondAttribute="trailing" constant="8" symbolic="YES" id="HHT-r9-Udm"/>
+                    <constraint firstItem="7H1-tq-xqU" firstAttribute="top" secondItem="DI1-rf-DUC" secondAttribute="topMargin" id="KdD-Dn-iMN"/>
+                    <constraint firstItem="Whq-dc-WN8" firstAttribute="top" secondItem="H0N-6Q-hev" secondAttribute="bottom" constant="8" symbolic="YES" id="KsK-3G-7mg"/>
+                    <constraint firstItem="g8m-23-AFW" firstAttribute="leading" secondItem="ufH-zQ-BI3" secondAttribute="trailing" constant="8" symbolic="YES" id="X8e-ze-dbc"/>
+                    <constraint firstItem="H0N-6Q-hev" firstAttribute="width" secondItem="H0N-6Q-hev" secondAttribute="height" multiplier="1:1" id="Xec-ez-Q5d"/>
+                    <constraint firstItem="7H1-tq-xqU" firstAttribute="leading" secondItem="DI1-rf-DUC" secondAttribute="leadingMargin" constant="8" id="YtV-Ew-bOu"/>
+                    <constraint firstItem="g8m-23-AFW" firstAttribute="centerY" secondItem="ufH-zQ-BI3" secondAttribute="centerY" id="bEQ-DS-slV"/>
+                    <constraint firstAttribute="bottomMargin" secondItem="Wus-QH-898" secondAttribute="bottom" constant="33" id="bau-zc-5LQ"/>
+                    <constraint firstItem="g8m-23-AFW" firstAttribute="top" secondItem="7H1-tq-xqU" secondAttribute="bottom" constant="8" symbolic="YES" id="fpz-9i-jYU"/>
+                    <constraint firstItem="ufH-zQ-BI3" firstAttribute="top" secondItem="7H1-tq-xqU" secondAttribute="bottom" constant="8" symbolic="YES" id="nlC-G7-qTB"/>
+                    <constraint firstItem="Wus-QH-898" firstAttribute="top" secondItem="g8m-23-AFW" secondAttribute="bottom" constant="8" symbolic="YES" id="pfv-kP-vuv"/>
+                    <constraint firstItem="ufH-zQ-BI3" firstAttribute="width" secondItem="ufH-zQ-BI3" secondAttribute="height" multiplier="1:1" id="s04-gh-TLe"/>
+                    <constraint firstItem="H0N-6Q-hev" firstAttribute="top" secondItem="ufH-zQ-BI3" secondAttribute="bottom" constant="8" symbolic="YES" id="vPd-ov-hCd"/>
+                    <constraint firstAttribute="trailingMargin" secondItem="Whq-dc-WN8" secondAttribute="trailing" id="vhJ-bK-MVQ"/>
+                    <constraint firstItem="H0N-6Q-hev" firstAttribute="leading" secondItem="Whq-dc-WN8" secondAttribute="leading" id="xmu-6f-rfz"/>
+                    <constraint firstItem="ufH-zQ-BI3" firstAttribute="height" secondItem="g8m-23-AFW" secondAttribute="height" id="yoi-lP-W0w"/>
+                </constraints>
+                <variation key="default">
+                    <mask key="constraints">
+                        <exclude reference="nlC-G7-qTB"/>
+                        <exclude reference="vPd-ov-hCd"/>
+                        <exclude reference="bau-zc-5LQ"/>
+                    </mask>
+                </variation>
+            </tableViewCellContentView>
+            <point key="canvasLocation" x="298.5" y="430.5"/>
+        </tableViewCell>
+    </objects>
+    <resources>
+        <image name="Clock" width="33" height="32"/>
+        <image name="Pin" width="32" height="32"/>
+    </resources>
+</document>
