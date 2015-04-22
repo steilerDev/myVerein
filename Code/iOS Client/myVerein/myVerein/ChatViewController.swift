@@ -289,7 +289,7 @@ extension ChatViewController {
   /// :param: collectionView The collection view the cell is in.
   /// :returns: The user that should be shown in the label, or nil if nothing should be shown.
   func userLabelForMessageAtIndexPath(indexPath: NSIndexPath, inCollectionView collectionView: JSQMessagesCollectionView) -> User? {
-    return comparePreviousCellAndCellAtIndexPath(indexPath,
+    let sender = comparePreviousCellAndCellAtIndexPath(indexPath,
       andReturnValue: { $0.sender },
       ifExpresionHoldsTrue: {
         $1.senderId() != self.senderId && (
@@ -298,6 +298,12 @@ extension ChatViewController {
         )
       }
     )
+    
+    if sender != nil && sender!.id != senderId {
+      return sender
+    } else {
+      return nil
+    }
   }
   
   override func collectionView(collectionView: JSQMessagesCollectionView!, attributedTextForMessageBubbleTopLabelAtIndexPath indexPath: NSIndexPath!) -> NSAttributedString! {
@@ -523,14 +529,16 @@ extension ChatViewController {
   /// :param: returnValue The return value returned if the expresion holds true or the cell does not have a predecessor. The message of the current cell is available as paramter.
   /// :returns: The result of the return-value-closure if the provided expresion holds true. If the cell does not have a successor the function will always return nil.
   func compareNextCellAndCellAtIndexPath<T>(indexPath: NSIndexPath, andReturnValue returnValue:  (Message) -> T, ifExpresionHoldsTrue closure: (Message, Message) -> Bool) -> T? {
-    let prevIndexPath = indexPath.increment()
-    if collectionView.collectionView(collectionView, hasItemForIndexPath: prevIndexPath) {
-      if let nextMessage = fetchedResultController.objectAtIndexPath(prevIndexPath) as? Message,
-        let currentMessage = fetchedResultController.objectAtIndexPath(indexPath) as? Message
-      {
-        if closure(currentMessage, nextMessage) {
-          return returnValue(currentMessage)
+    if let let currentMessage = fetchedResultController.objectAtIndexPath(indexPath) as? Message {
+      let prevIndexPath = indexPath.increment()
+      if collectionView.collectionView(collectionView, hasItemForIndexPath: prevIndexPath) {
+        if let nextMessage = fetchedResultController.objectAtIndexPath(prevIndexPath) as? Message {
+          if closure(currentMessage, nextMessage) {
+            return returnValue(currentMessage)
+          }
         }
+      } else {
+        return returnValue(currentMessage)
       }
     }
     return nil

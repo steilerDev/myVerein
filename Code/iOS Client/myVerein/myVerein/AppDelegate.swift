@@ -210,6 +210,8 @@ extension AppDelegate {
   func logoutUser() {
     logger.info("Performing logout")
     MVSecurity.instance.updateKeychain(nil, newPassword: nil, newDomain: nil)
+    logger.debug("Resetting user defaults storing last sync timestamps")
+    Defaults[MVUserDefaultsConstants.LastSynced.Event] = nil
     showLoginView()
   }
 }

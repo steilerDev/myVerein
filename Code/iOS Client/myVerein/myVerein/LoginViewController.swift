@@ -78,18 +78,28 @@ extension LoginViewController {
       } else {
         urlString = "myVerein.app"
       }
-      OnePasswordExtension.sharedExtension().findLoginForURLString(urlString, forViewController: self, sender: sender)
-        {
+      OnePasswordExtension.sharedExtension().findLoginForURLString(urlString, forViewController: self, sender: sender) {
           loginDict, error in
           let logger = XCGLogger.defaultInstance()
-          if let login = loginDict as? [String: String] {
-            if let username = login[AppExtensionUsernameKey], password = login[AppExtensionPasswordKey], domain = login[AppExtensionURLStringKey] {
-              logger.debug("Filling fields with stored information")
+          if let loginDict = loginDict as? [String: String] {
+            logger.debug("Filling fields with stored information")
+            logger.debug("\(loginDict)")
+            if let username = loginDict[AppExtensionUsernameKey] {
               self.usernameTextField.text = username
+            } else {
+              logger.warning("No username available")
+            }
+            
+            if let password = loginDict[AppExtensionPasswordKey] {
               self.passwordTextField.text = password
+            } else {
+              logger.warning("No password available")
+            }
+            
+            if let domain = loginDict[AppExtensionURLStringKey] {
               self.hostTextField.text = domain
             } else {
-              logger.warning("Unable to get required fields from password manager")
+              logger.warning("No domain available")
             }
           } else {
             if (error.code != Int(AppExtensionErrorCodeCancelledByUser)) {
@@ -101,7 +111,7 @@ extension LoginViewController {
       }
     } else {
       var alert = UIAlertController(title: "No password manager found", message: "To use this extension you need to install a password manager, supporting iOS 8 extensions, like 1Password", preferredStyle: .Alert)
-      alert.addAction(UIAlertAction(title: "Okay", style: .Cancel, handler: { (action) -> Void in }))
+      alert.addAction(UIAlertAction(title: "Okay", style: .Cancel, handler: nil))
       alert.addAction(UIAlertAction(title: "Learn more", style: .Default, handler: { (action) -> Void in
         UIApplication.sharedApplication().openURL(NSURL(string: LoginViewControllerConstants.PasswordManagerURL)!)
       }))
@@ -153,6 +163,8 @@ extension LoginViewController {
         usernameTextField.text = username
         passwordTextField.text = password
         hostTextField.text = domain
+        
+        MVNetworkingSessionFactory.invalidateInstance()
         
         MVNetworking.instance.performLogIn(showLoginScreenOnFailure: false,
           success: {

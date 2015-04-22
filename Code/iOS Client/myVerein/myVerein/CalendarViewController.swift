@@ -94,13 +94,13 @@ extension CalendarViewController {
   /// Moving loading of calendar data to view will appear, in hope to be more responsive
   override func viewWillAppear(animated: Bool) {
     super.viewWillAppear(animated)
-    logger.debug("CalendarView did appear, loading calendar data and syncing events")
-    startRefresh()
   }
   
   /// Within this function the notification observer subscribes to the notification system.
   override func viewDidAppear(animated: Bool) {
     super.viewDidAppear(animated)
+    logger.debug("CalendarView did appear, loading calendar data and syncing events")
+    startRefresh()
     // This observer is monitoring all events. As soon as the notification without a sender is received the controller is starting to reload its view.
     logger.debug("Calendar view controller subscribed to notification system")
     notificationObserverToken = MVNotification.subscribeToCalendarSyncCompletedNotificationForEvent(nil) {

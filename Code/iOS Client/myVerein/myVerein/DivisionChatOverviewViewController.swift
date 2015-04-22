@@ -207,6 +207,7 @@ extension DivisionChatOverviewViewController: UICollectionViewDataSource {
 // MARK: - UICollectionViewDelegate
 extension DivisionChatOverviewViewController: UICollectionViewDelegate {
   override func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
+    logger.debug("User selected item at index path \(indexPath)")
     if let selectedCell = collectionView.cellForItemAtIndexPath(indexPath) as? DivisionChatCell {
       performSegueWithIdentifier(DivisionChatOverviewConstants.SegueToChat, sender: selectedCell)
     } else {

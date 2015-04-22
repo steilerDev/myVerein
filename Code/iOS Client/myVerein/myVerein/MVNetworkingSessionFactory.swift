@@ -40,7 +40,7 @@ class MVNetworkingSessionFactory {
     }
   }
   
-  private static var _instance: AFHTTPSessionManager? = MVNetworkingSessionFactory.createInstance()
+  private static var _instance: AFHTTPSessionManager?
   
   /// Struct containing String constants only used by this class
   private struct NetworkingConstants {

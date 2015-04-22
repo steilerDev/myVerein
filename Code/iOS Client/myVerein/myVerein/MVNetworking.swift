@@ -31,7 +31,11 @@ import SwiftyUserDefaults
 class MVNetworking {
   
   private let logger = XCGLogger.defaultInstance()
-  private var session: AFHTTPSessionManager! =  MVNetworkingSessionFactory.instance
+  private var session: AFHTTPSessionManager! {
+    get {
+      return MVNetworkingSessionFactory.instance
+    }
+  }
   
   /// Within this array all requests are stored, that could not be executed because the user was not logged in. After a successfull log in, the requests on this queue are executed. If the queue is nil, the system currently does not try to log in. Since arrays are not thread safe an external lock is used to secure the resource.
   private var logInQueue: [MVRequest]!
