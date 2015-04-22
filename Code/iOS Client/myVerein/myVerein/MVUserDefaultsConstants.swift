@@ -29,15 +29,43 @@ struct MVUserDefaultsConstants {
   struct LastSynced {
     static let Event = "eventLastSynced"
   }
+  
   struct Settings {
     struct Messages {
-      static let InAppNotificationsEnabled = "messagesInAppNotificationsEnabled"
-      static let InAppNotificationsVibration = "messagesInAppNotificationsVibration"
-      static let InAppNotificationsSound = "messagesInAppNotficationsSound"
+      struct InAppNotificationsEnabled {
+        static let Key = "messagesInAppNotificationsEnabled"
+        static let DefaultValue = true
+      }
+      struct InAppNotificationsVibration {
+        static let Key = "messagesInAppNotificationsVibration"
+        static let DefaultValue = true
+      }
+      struct InAppNotificationsSound {
+        static let Key = "messagesInAppNotficationsSound"
+        static let DefaultValue = true
+      }
     }
     struct Calendar {
-      static let LocalNotificationsEnabled = "calendarLocalNotificationsEnabled"
-      static let LocalNotificationsTime = "calendarLocalNotificationsTime"
+      struct LocalNotificationsEnabled {
+        static let Key = "calendarLocalNotificationsEnabled"
+        static let DefaultValue = true
+      }
+      struct LocalNotificationsTime {
+        static let Key = "calendarLocalNotificationsTime"
+        static let DefaultValue = 1800.0
+      }
+      struct InAppNotificationsEnabled {
+        static let Key = "calendarInAppNotificationsEnabled"
+        static let DefaultValue = true
+      }
+      struct InAppNotificationsVibration {
+        static let Key = "calendarInAppNotificaionsVibration"
+        static let DefaultValue = true
+      }
+      struct InAppNotificationsSound {
+        static let Key = "calendarInAppNotficationsSound"
+        static let DefaultValue = true
+      }
     }
   }
 }

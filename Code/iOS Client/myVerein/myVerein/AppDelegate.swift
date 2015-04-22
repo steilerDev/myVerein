@@ -86,7 +86,13 @@ extension AppDelegate: UIApplicationDelegate {
     logger.error("Application failed to register for remote notification: \(error.extendedDescription)")
   }
   
+  func application(application: UIApplication, didReceiveLocalNotification notification: UILocalNotification) {
+    logger.info("Received local notification, showing as in app notification")
+    MVDropdownAlertCenter.instance.showNotification(MVDropdownAlertObject(localNotification: notification))
+  }
+  
   func applicationDidBecomeActive(application: UIApplication) {
+    UIApplication.sharedApplication().applicationIconBadgeNumber = 0
     logger.info("Starting background thread, which is syncing the application with the server")
     timerObject = {
       self.logger.debug("Syncing system")

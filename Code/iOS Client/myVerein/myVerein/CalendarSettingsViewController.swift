@@ -15,6 +15,9 @@ class CalendarSettingsViewController: UITableViewController {
   let logger = XCGLogger.defaultInstance()
   
   @IBOutlet weak var notificationToggleCell: ToggleCell!
+  @IBOutlet weak var inAppNotificationToggleCell: ToggleCell!
+  @IBOutlet weak var inAppNotificationVibrationToggleCell: ToggleCell!
+  @IBOutlet weak var inAppNotificationSoundToggleCell: ToggleCell!
   
   @IBOutlet weak var notificationTimeCell: UITableViewCell!
   
@@ -22,17 +25,45 @@ class CalendarSettingsViewController: UITableViewController {
     super.viewDidLoad()
     logger.debug("Calendar settings view loaded, populating now")
     notificationToggleCell.delegate = self
+    inAppNotificationToggleCell.delegate = self
+    inAppNotificationVibrationToggleCell.delegate = self
+    inAppNotificationSoundToggleCell.delegate = self
     notificationsSettingsCellChanged()
-    setDetailText()
+    inAppNotificationsSettingsChanged()
+    updateDetailText()
   }
   
+  /// If the main notification toggle changed, the other cells need to be updated as well
   func notificationsSettingsCellChanged() {
-    let notification = Defaults[MVUserDefaultsConstants.Settings.Calendar.LocalNotificationsEnabled].bool ?? true
+    let notification = Defaults[MVUserDefaultsConstants.Settings.Calendar.LocalNotificationsEnabled.Key].bool ?? MVUserDefaultsConstants.Settings.Calendar.LocalNotificationsEnabled.DefaultValue
     
     notificationToggleCell.toggleState = notification
     notificationTimeCell.userInteractionEnabled = notification
     notificationTimeCell.textLabel?.enabled = notification
     notificationTimeCell.detailTextLabel?.enabled = notification
+    
+    inAppNotificationToggleCell.enabled = notification
+    
+    if !notification {
+      inAppNotificationToggleCell.toggleState = false
+      Defaults[MVUserDefaultsConstants.Settings.Calendar.InAppNotificationsEnabled.Key] = false
+      inAppNotificationsSettingsChanged()
+    }
+  }
+  
+  /// If the main in app notification toggle cahnged, the other cells might need to be updated as well
+  func inAppNotificationsSettingsChanged() {
+    let notification = Defaults[MVUserDefaultsConstants.Settings.Calendar.InAppNotificationsEnabled.Key].bool ?? MVUserDefaultsConstants.Settings.Calendar.InAppNotificationsEnabled.DefaultValue
+    
+    inAppNotificationSoundToggleCell.enabled = notification
+    inAppNotificationVibrationToggleCell.enabled = notification
+    
+    if !notification {
+      inAppNotificationSoundToggleCell.toggleState = false
+      Defaults[MVUserDefaultsConstants.Settings.Calendar.InAppNotificationsSound.Key] = false
+      inAppNotificationVibrationToggleCell.toggleState = false
+      Defaults[MVUserDefaultsConstants.Settings.Calendar.InAppNotificationsVibration.Key] = false
+    }
   }
   
   override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
@@ -54,84 +85,20 @@ class CalendarSettingsViewController: UITableViewController {
   }
   
   func selectTime() {
-    let alert = UIAlertController(title: nil, message: nil, preferredStyle: .ActionSheet)
-    let cancelAction = UIAlertAction(title: "Cancel", style: .Cancel, handler: nil)
-    let atTimeOfEvent = UIAlertAction(title: "At time of event", style: .Default) {
-      _ in
-      Defaults[MVUserDefaultsConstants.Settings.Calendar.LocalNotificationsTime] = 0.0
-      self.setDetailText()
-    }
-    let fiveMinutesBefore = UIAlertAction(title: "5 minutes before", style: .Default) {
-      _ in
-      Defaults[MVUserDefaultsConstants.Settings.Calendar.LocalNotificationsTime] = 300.0
-      self.setDetailText()
-    }
-    let fifteenMinutesBefore = UIAlertAction(title: "15 minutes before", style: .Default) {
-      _ in
-      Defaults[MVUserDefaultsConstants.Settings.Calendar.LocalNotificationsTime] = 900.0
-      self.setDetailText()
-    }
-    let thirtyMinutesBefore = UIAlertAction(title: "30 minutes before", style: .Default) {
-      _ in
-      Defaults[MVUserDefaultsConstants.Settings.Calendar.LocalNotificationsTime] = 1800.0
-      self.setDetailText()
-    }
-    let oneHourBefore = UIAlertAction(title: "1 hour before", style: .Default) {
-      _ in
-      Defaults[MVUserDefaultsConstants.Settings.Calendar.LocalNotificationsTime] = 3600.0
-      self.setDetailText()
-    }
-    let twoHoursBefore = UIAlertAction(title: "2 hours before", style: .Default) {
-      _ in
-      Defaults[MVUserDefaultsConstants.Settings.Calendar.LocalNotificationsTime] = 7200.0
-      self.setDetailText()
-    }
-    let oneDayBefore = UIAlertAction(title: "1 day before", style: .Default) {
-      _ in
-      Defaults[MVUserDefaultsConstants.Settings.Calendar.LocalNotificationsTime] = 86400.0
-      self.setDetailText()
-    }
-    let twoDaysBefore = UIAlertAction(title: "2 days before", style: .Default) {
-      _ in
-      Defaults[MVUserDefaultsConstants.Settings.Calendar.LocalNotificationsTime] = 172800.0
-      self.setDetailText()
-    }
-    alert.addAction(fiveMinutesBefore)
-    alert.addAction(fifteenMinutesBefore)
-    alert.addAction(thirtyMinutesBefore)
-    alert.addAction(oneHourBefore)
-    alert.addAction(twoHoursBefore)
-    alert.addAction(oneDayBefore)
-    alert.addAction(cancelAction)
-    self.presentViewController(alert, animated: true, completion: nil)
+    let alert = TimeIntervalPickerAlertView(inViewController: self)
+    alert.presentView()
   }
 
-  func setDetailText() {
-    let timeInterval = Defaults[MVUserDefaultsConstants.Settings.Calendar.LocalNotificationsTime].double ?? 1800.0
-    switch timeInterval {
-      case 0.0:
-        notificationTimeCell.detailTextLabel?.text = "At time of event"
-      case 300.0:
-        notificationTimeCell.detailTextLabel?.text = "5 minutes before"
-      case 900.0:
-        notificationTimeCell.detailTextLabel?.text = "15 minutes before"
-      case 1800.0:
-        notificationTimeCell.detailTextLabel?.text = "30 minutes before"
-      case 3600.0:
-        notificationTimeCell.detailTextLabel?.text = "1 hour before"
-      case 7200.0:
-        notificationTimeCell.detailTextLabel?.text = "2 hour before"
-      case 86400.0:
-        notificationTimeCell.detailTextLabel?.text = "1 day before"
-      case 172800.0:
-        notificationTimeCell.detailTextLabel?.text = "2 days before"
-      default:
-        logger.warning("Unrecognized value stored in user defaults, using default one")
-        Defaults[MVUserDefaultsConstants.Settings.Calendar.LocalNotificationsTime] = 1800.0
-        notificationTimeCell.detailTextLabel?.text = "30 minutes before"
+  func updateDetailText() {
+    let timeInterval = Defaults[MVUserDefaultsConstants.Settings.Calendar.LocalNotificationsTime.Key].double ?? MVUserDefaultsConstants.Settings.Calendar.LocalNotificationsTime.DefaultValue
+    if let timeIntervalString = TimeIntervalPickerAlertView.intervalStringBefore(timeInterval) {
+      notificationTimeCell.detailTextLabel?.text = timeIntervalString
+    } else {
+      logger.warning("Unrecognized value stored for notificaiton time interval in user defaults, using default one")
+      Defaults[MVUserDefaultsConstants.Settings.Calendar.LocalNotificationsTime.Key] = MVUserDefaultsConstants.Settings.Calendar.LocalNotificationsTime.DefaultValue
+      notificationTimeCell.detailTextLabel?.text = TimeIntervalPickerAlertView.intervalStringBefore(MVUserDefaultsConstants.Settings.Calendar.LocalNotificationsTime.DefaultValue)
     }
   }
-  
 }
 
 // MARK: - ToggleCell delegate
@@ -141,10 +108,30 @@ extension CalendarSettingsViewController: ToggleCellDelegate {
     switch sender {
     case notificationToggleCell:
       logger.info("Notification settings changed to \(sender.toggleState)")
-      Defaults[MVUserDefaultsConstants.Settings.Calendar.LocalNotificationsEnabled] = sender.toggleState
+      Defaults[MVUserDefaultsConstants.Settings.Calendar.LocalNotificationsEnabled.Key] = sender.toggleState
       notificationsSettingsCellChanged()
+    case inAppNotificationToggleCell:
+      logger.info("In app notification settings changed to \(sender.toggleState)")
+      Defaults[MVUserDefaultsConstants.Settings.Calendar.InAppNotificationsEnabled.Key] = sender.toggleState
+      inAppNotificationsSettingsChanged()
+    case inAppNotificationSoundToggleCell:
+      logger.info("In app notification sound settings changed to \(sender.toggleState)")
+      Defaults[MVUserDefaultsConstants.Settings.Calendar.InAppNotificationsSound.Key] = sender.toggleState
+    case inAppNotificationVibrationToggleCell:
+      logger.info("In app notification vibration settings changed to \(sender.toggleState)")
+      Defaults[MVUserDefaultsConstants.Settings.Calendar.InAppNotificationsVibration.Key] = sender.toggleState
     default:
       logger.error("A unknown cell changed it's state")
+    }
+  }
+}
+
+// MARK: - TimeIntervalPickerAlertView delegate
+extension CalendarSettingsViewController: TimeIntervalPickerAlertViewDelegate {
+  func userDidSelectAction(action: Double?) {
+    if let action = action {
+      Defaults[MVUserDefaultsConstants.Settings.Calendar.LocalNotificationsTime.Key] = action
+      updateDetailText()
     }
   }
 }

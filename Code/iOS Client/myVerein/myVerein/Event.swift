@@ -24,6 +24,7 @@ import Foundation
 import MapKit
 import CoreData
 import XCGLogger
+import SwiftyUserDefaults
 
 // MARK: - Pure database object, holding only information stored in database
 class Event: NSManagedObject {
@@ -37,6 +38,8 @@ class Event: NSManagedObject {
   @NSManaged var locationName: String?
   @NSManaged var locationLat: NSNumber?
   @NSManaged var locationLng: NSNumber?
+
+  @NSManaged var customReminderTimerInterval: NSNumber?
   
   // Raw values stored in database, convenience getter and setter are provided in an extension. This values should -in general- not be accessed directly.
   @NSManaged var rawResponse: String?
@@ -207,6 +210,49 @@ extension Event: MKAnnotation {
   }
 }
 
+
+// MARK: - Local Notification functions
+extension Event {
+  /// This function returns the scheduled notification of this event
+  func scheduledNotification() -> UILocalNotification? {
+    let scheduledNotifications = UIApplication.sharedApplication().scheduledLocalNotifications as! [UILocalNotification]
+    for notification in scheduledNotifications {
+      if let notificationId = notification.userInfo?[EventConstants.NotificationId] as? String where notificationId == self.id {
+        return notification
+      }
+    }
+    return nil
+  }
+  
+  /// This function will schedule a local notification associated with this event. All previously scheduled notification are going to be cancelled.
+  ///
+  /// :param: secondsBeforeEvent Specifies the amount of time the notification is fired before the beginning of the event. If the argument is not specified, the default value from UserDefaults is used. If a value is specified, the system concludes a custom notification.
+  func scheduleNotification(secondsBeforeEvent: Double = (Defaults[MVUserDefaultsConstants.Settings.Calendar.LocalNotificationsTime.Key].double ?? MVUserDefaultsConstants.Settings.Calendar.LocalNotificationsTime.DefaultValue)) {
+    
+    cancleScheduledNotification()
+    
+    let notification = UILocalNotification()
+    notification.fireDate = startDate!.dateByAddingTimeInterval(-secondsBeforeEvent)
+    notification.alertTitle = self.title
+    
+    if let bodyString = TimeIntervalPickerAlertView.intervalStringIn(secondsBeforeEvent) {
+      notification.alertBody = "Starts \(bodyString)"
+    } else {
+      notification.alertBody = "Starts soon"
+    }
+    
+    notification.applicationIconBadgeNumber = 1
+    
+  }
+  
+  func cancleScheduledNotification() {
+    if let notification = scheduledNotification() {
+      UIApplication.sharedApplication().cancelLocalNotification(notification)
+    }
+  }
+}
+
+
 // MARK: - Event object related enumeration
 enum EventResponse: String {
   case Going = "GOING"
@@ -223,6 +269,8 @@ struct EventConstants {
   static let MinimalSecondsBetweenEventSync = 0.0 // TODO: Change
   // This variable is defining the offset, substracted from the last sync time, to compensate time differences between client and server
   static let SyncOffsetInSeconds = -900.0
+  
+  static let NotificationId = "relatedEventId"
   
   // This struct defines placeholder if specific variables are not available
   struct Placeholder {

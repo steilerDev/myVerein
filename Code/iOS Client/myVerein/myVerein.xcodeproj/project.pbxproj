@@ -39,6 +39,7 @@
 		309256161AB098A400E55691 /* CoreDataRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 309256151AB098A400E55691 /* CoreDataRepository.swift */; };
 		3093DCC41AE700AE00D94EDF /* DivisionChatCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3093DCC31AE700AE00D94EDF /* DivisionChatCell.xib */; };
 		3093DCC61AE7063B00D94EDF /* InvitationCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3093DCC51AE7063B00D94EDF /* InvitationCell.xib */; };
+		3093DCCE1AE7D2E700D94EDF /* TimeIntervalPickerAlertView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3093DCCD1AE7D2E700D94EDF /* TimeIntervalPickerAlertView.swift */; };
 		309A8A7C1AB374040087CBC5 /* ChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 309A8A7B1AB374040087CBC5 /* ChatViewController.swift */; };
 		30A25BDB1AE56C5000E10062 /* ToggleCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 30A25BDA1AE56C5000E10062 /* ToggleCell.xib */; };
 		30A25BDD1AE56CE600E10062 /* ToggleCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30A25BDC1AE56CE600E10062 /* ToggleCell.swift */; };
@@ -117,6 +118,7 @@
 		309256151AB098A400E55691 /* CoreDataRepository.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataRepository.swift; sourceTree = "<group>"; };
 		3093DCC31AE700AE00D94EDF /* DivisionChatCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DivisionChatCell.xib; sourceTree = "<group>"; };
 		3093DCC51AE7063B00D94EDF /* InvitationCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = InvitationCell.xib; sourceTree = "<group>"; };
+		3093DCCD1AE7D2E700D94EDF /* TimeIntervalPickerAlertView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TimeIntervalPickerAlertView.swift; sourceTree = "<group>"; };
 		309A8A7B1AB374040087CBC5 /* ChatViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChatViewController.swift; sourceTree = "<group>"; };
 		30A25BDA1AE56C5000E10062 /* ToggleCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ToggleCell.xib; sourceTree = "<group>"; };
 		30A25BDC1AE56CE600E10062 /* ToggleCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ToggleCell.swift; sourceTree = "<group>"; };
@@ -268,6 +270,7 @@
 				302BE8C11AA642EB001D0FE7 /* DivisionChatCell.swift */,
 				3093DCC51AE7063B00D94EDF /* InvitationCell.xib */,
 				3016A0401ADAE17000778769 /* InvitationCell.swift */,
+				3093DCCD1AE7D2E700D94EDF /* TimeIntervalPickerAlertView.swift */,
 			);
 			name = CustomViewElements;
 			sourceTree = "<group>";
@@ -520,6 +523,7 @@
 				3035D66C1AC086E800C5C0FB /* MVColor.swift in Sources */,
 				30916FFB1AA8B9D0004D30D1 /* MenuController.swift in Sources */,
 				30C1EFDE1AE2FDC600328C79 /* DescriptionViewController.swift in Sources */,
+				3093DCCE1AE7D2E700D94EDF /* TimeIntervalPickerAlertView.swift in Sources */,
 				3091702F1AA8C097004D30D1 /* myVereinModel.xcdatamodeld in Sources */,
 				3032A9F51AD70B9100EEEAF4 /* EventViewController.swift in Sources */,
 				302BE8C41AA64599001D0FE7 /* DivisionChatOverviewViewController.swift in Sources */,

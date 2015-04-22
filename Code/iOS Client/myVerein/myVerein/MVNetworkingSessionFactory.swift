@@ -31,7 +31,16 @@ class MVNetworkingSessionFactory {
   
   private static let logger = XCGLogger.defaultInstance()
   
-  static var instance: AFHTTPSessionManager? = MVNetworkingSessionFactory.createInstance()
+  static var instance: AFHTTPSessionManager {
+    get {
+      if _instance == nil {
+        _instance = MVNetworkingSessionFactory.createInstance()
+      }
+      return _instance!
+    }
+  }
+  
+  private static var _instance: AFHTTPSessionManager? = MVNetworkingSessionFactory.createInstance()
   
   /// Struct containing String constants only used by this class
   private struct NetworkingConstants {
@@ -68,9 +77,9 @@ class MVNetworkingSessionFactory {
   /// This function invalidates the current instance of the session manager
   class func invalidateInstance() {
     logger.debug("Invalidating session instance")
-    if instance != nil {
-      instance!.invalidateSessionCancelingTasks(true)
-      instance = nil
+    if _instance != nil {
+      _instance!.invalidateSessionCancelingTasks(true)
+      _instance = nil
     }
   }
 }

@@ -274,23 +274,25 @@ class MVDropdownAlertCenter {
   private var alertQueueLock = NSLock()
   
   /// This function proceses a notification and tries to display it. If a notification is currently shown, the notification gets discarded if it is not of style 'danger' or 'warning'. Since the storing of the object might block execution, the function is dispatching to a background queue.
-  func showNotification(notification: MVDropdownAlertObject) {
-    {
-      self.alertQueueLock.lock()
-      if self.alertQueue != nil {
-        if(notification.style == .Warning || notification.style == .Danger) {
-          self.logger.debug("A notification is currently shown, appending notification \(notification) to the queue")
-          self.alertQueue.append(notification)
+  func showNotification(notification: MVDropdownAlertObject?) {
+    if let notification = notification {
+      {
+        self.alertQueueLock.lock()
+        if self.alertQueue != nil {
+          if(notification.style == .Warning || notification.style == .Danger) {
+            self.logger.debug("A notification is currently shown, appending notification \(notification) to the queue")
+            self.alertQueue.append(notification)
+          } else {
+            self.logger.debug("A notification is currently shown and importance of new notification is too low: \(notification)")
+          }
+          self.alertQueueLock.unlock()
         } else {
-          self.logger.debug("A notification is currently shown but importance of notification is too low: \(notification)")
+          self.alertQueue = [notification]
+          self.alertQueueLock.unlock()
+          self.processQueue()
         }
-        self.alertQueueLock.unlock()
-      } else {
-        self.alertQueue = [notification]
-        self.alertQueueLock.unlock()
-        self.processQueue()
-      }
-    }~>
+      }~>
+    }
   }
   
   /// This function proceses the alert queue. If all items have been processed the queue gets cleared and the process stopped. This function should not be called from the main queue since it might block execution, while trying to acquire the lock for the queue.
@@ -335,12 +337,24 @@ enum MVDropdownAlertStyle {
 // MARK: - Convenience initializer for dropdown alert object
 extension MVDropdownAlertObject {
   init?(message: Message) {
-    if let notificationsEnabled = Defaults[MVUserDefaultsConstants.Settings.Messages.InAppNotificationsEnabled].bool where notificationsEnabled {
+    if let notificationsEnabled = Defaults[MVUserDefaultsConstants.Settings.Messages.InAppNotificationsEnabled.Key].bool where notificationsEnabled {
       self.title = message.division.name
       self.message = "\(message.sender.firstName!): \(message.content)"
       self.style = .Default
-      self.vibrate = Defaults[MVUserDefaultsConstants.Settings.Messages.InAppNotificationsVibration].bool ?? true
-      self.playSound = Defaults[MVUserDefaultsConstants.Settings.Messages.InAppNotificationsSound].bool ?? true
+      self.vibrate = Defaults[MVUserDefaultsConstants.Settings.Messages.InAppNotificationsVibration.Key].bool ?? MVUserDefaultsConstants.Settings.Messages.InAppNotificationsVibration.DefaultValue
+      self.playSound = Defaults[MVUserDefaultsConstants.Settings.Messages.InAppNotificationsSound.Key].bool ?? MVUserDefaultsConstants.Settings.Messages.InAppNotificationsSound.DefaultValue
+    } else {
+      return nil
+    }
+  }
+  
+  init?(localNotification: UILocalNotification) {
+    if let notificationsEnabled = Defaults[MVUserDefaultsConstants.Settings.Calendar.InAppNotificationsEnabled.Key].bool where notificationsEnabled {
+      self.title = localNotification.alertTitle
+      self.message = localNotification.alertBody
+      self.style = .Default
+      self.vibrate = Defaults[MVUserDefaultsConstants.Settings.Calendar.InAppNotificationsVibration.Key].bool ?? MVUserDefaultsConstants.Settings.Calendar.InAppNotificationsVibration.DefaultValue
+      self.playSound = Defaults[MVUserDefaultsConstants.Settings.Calendar.InAppNotificationsSound.Key].bool ?? MVUserDefaultsConstants.Settings.Calendar.InAppNotificationsSound.DefaultValue
     } else {
       return nil
     }

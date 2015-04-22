@@ -61,6 +61,9 @@ extension SettingsViewController {
               logger.warning("Selected unknown item")
           }
         case 2:
+          logger.debug("Selected section 'about'")
+          performSegueWithIdentifier(SettingsViewControllerConstants.SegueTo.About, sender: cell)
+        case 3:
           logger.debug("Selecte section 'log-out'")
           (UIApplication.sharedApplication().delegate as! AppDelegate).logoutUser()
         default:
@@ -79,5 +82,6 @@ struct SettingsViewControllerConstants {
     static let Division = "showSystemDivisionSettings"
     static let Calendar = "showApplicationCalendarSettings"
     static let Messages = "showApplicationMessagesSettings"
+    static let About = "showAboutView"
   }
 }
