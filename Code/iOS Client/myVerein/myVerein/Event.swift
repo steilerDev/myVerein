@@ -50,6 +50,8 @@ class Event: NSManagedObject {
   @NSManaged var rawDeclinedUser: NSSet?
  
   var syncInProgress: Bool = false
+  
+  let logger = XCGLogger.defaultInstance()
 }
 
 // MARK: - Convenience getter and setter for complex values/relations stored in database
@@ -228,7 +230,7 @@ extension Event {
   ///
   /// :param: secondsBeforeEvent Specifies the amount of time the notification is fired before the beginning of the event. If the argument is not specified, the default value from UserDefaults is used. If a value is specified, the system concludes a custom notification.
   func scheduleNotification(secondsBeforeEvent: Double = (Defaults[MVUserDefaultsConstants.Settings.Calendar.LocalNotificationsTime.Key].double ?? MVUserDefaultsConstants.Settings.Calendar.LocalNotificationsTime.DefaultValue)) {
-    
+    logger.debug("Scheduling a notification for event \(self) \(secondsBeforeEvent) seconds before start time")
     cancleScheduledNotification()
     
     let notification = UILocalNotification()
@@ -242,6 +244,11 @@ extension Event {
     }
     
     notification.applicationIconBadgeNumber = 1
+    
+    if secondsBeforeEvent != (Defaults[MVUserDefaultsConstants.Settings.Calendar.LocalNotificationsTime.Key].double ?? MVUserDefaultsConstants.Settings.Calendar.LocalNotificationsTime.DefaultValue) {
+      logger.debug("Notification is scheduled as a non default notification time")
+      customReminderTimerInterval = secondsBeforeEvent
+    }
     
   }
   

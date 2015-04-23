@@ -60,7 +60,7 @@ class MenuController: UITabBarController {
       (UIApplication.sharedApplication().delegate as! AppDelegate).showLoginView()
     } else {
       logger.info("Credentials found, checking if they are valid")
-      MVNetworking.instance.performLogIn(
+      MVNetworking.instance.performLogIn(showLoginScreenOnFailure: false,
         success: {
           XCGLogger.info("Login successfully, no need to ask for credentials")
         },

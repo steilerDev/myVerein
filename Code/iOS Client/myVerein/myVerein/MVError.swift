@@ -39,7 +39,10 @@ enum MVErrorCodes: Int {
   case MVLastSyncTooCloseError = 25
   case MVEmptyResponse = 26
   case MVNotLoggedInError = 27
-  case MVHostNotReachable = 28
+  case MVHTTPClientError = 28
+  case MVHostNotReachable = 29
+  case MVHostError = 30
+  case MVRequestCancelled = 31
   
   // CoreData related errors
   case MVLocalDatabaseError = 50
@@ -216,6 +219,24 @@ class MVError {
           NSLocalizedFailureReasonErrorKey: "The system is not aware of this error",
           NSLocalizedRecoverySuggestionErrorKey: "Contact the developer"
         ]
+      case .MVHTTPClientError:
+        return [
+          NSLocalizedDescriptionKey: "The server response contained a 4xx error code",
+          NSLocalizedFailureReasonErrorKey: "The clients request was faulty",
+          NSLocalizedRecoverySuggestionErrorKey: "Check the request and try again"
+        ]
+      case .MVHostError:
+        return [
+          NSLocalizedDescriptionKey: "The server reported a problem",
+          NSLocalizedFailureReasonErrorKey: "The request could not be handled by the server at the moment",
+          NSLocalizedRecoverySuggestionErrorKey: "Check the request and try again"
+        ]
+      case .MVRequestCancelled:
+        return [
+          NSLocalizedDescriptionKey: "The request was cancelled while waiting for the response",
+          NSLocalizedFailureReasonErrorKey: "The request was cancelled during execution",
+          NSLocalizedRecoverySuggestionErrorKey: "Try again"
+        ]
     default: return nil
     }
   }
@@ -228,12 +249,28 @@ class MVError {
     XCGLogger.debug("Trying to convert \(error.extendedDescription)")
     if error.domain == errorDomain {
       return error
-    } else if error.code == -1011 && error.domain == AFURLResponseSerializationErrorDomain && ((error.userInfo?[AFNetworkingOperationFailingURLResponseErrorKey] as? NSHTTPURLResponse)?.statusCode ?? -1) == 401 {
-      return MVError.createError(.MVNotLoggedInError, underlyingError: error)
-    } else if error.code == -1004 && error.domain == "NSURLErrorDomain" {
+    } else if error.code == -1011 && error.domain == AFURLResponseSerializationErrorDomain {
+      if let httpErrorCode = (error.userInfo?[AFNetworkingOperationFailingURLResponseErrorKey] as? NSHTTPURLResponse)?.statusCode {
+        XCGLogger.debug("The HTTP error code is \(httpErrorCode)")
+        switch httpErrorCode {
+          case 401, 403:
+           return MVError.createError(.MVNotLoggedInError, underlyingError: error)
+          case 400..<500:
+            return MVError.createError(.MVHTTPClientError, underlyingError: error)
+          case 502, 503:
+            return MVError.createError(.MVHostNotReachable, underlyingError: error)
+          case 500..<600:
+            return MVError.createError(.MVHostError, underlyingError: error)
+          default: break
+        }
+      }
+    } else if error.domain == "NSURLErrorDomain" {
+      if error.code = -1004 {
       return MVError.createError(.MVHostNotReachable, underlyingError: error)
-    } else {
-      return MVError.createError(.MVErrorNotRecognized, underlyingError: error)
+      } else if error.code = -999 {
+        return MVError.createError(.MVRequestCancelled, underlyingError: error)
+      }
     }
+    return MVError.createError(.MVErrorNotRecognized, underlyingError: error)
   }
 }

@@ -279,11 +279,12 @@ class MVDropdownAlertCenter {
       {
         self.alertQueueLock.lock()
         if self.alertQueue != nil {
-          if(notification.style == .Warning || notification.style == .Danger) {
+          // Only appending an alert to the queue if the last notification is not equal to the new one and it's style is either warning or danger.
+          if ((self.alertQueue.last != notification) ?? true) && (notification.style == .Warning || notification.style == .Danger) {
             self.logger.debug("A notification is currently shown, appending notification \(notification) to the queue")
             self.alertQueue.append(notification)
           } else {
-            self.logger.debug("A notification is currently shown and importance of new notification is too low: \(notification)")
+            self.logger.debug("A notification is currently shown and importance of new notification is too low, or notification is a duplicate: \(notification)")
           }
           self.alertQueueLock.unlock()
         } else {
@@ -302,9 +303,18 @@ class MVDropdownAlertCenter {
       alertQueue = nil
       alertQueueLock.unlock()
     } else if !alertQueue.isEmpty {
-      let alert = alertQueue.removeAtIndex(0)
       alertQueueLock.unlock()
-      ~>{ MVDropdownAlert.showAlert(alert, executeCallbackOnHide: { self.processQueue~> }) }
+      // Showing alert on main queue, but removing notification from queue after notification was shown. The callback is dispatched to the background queue
+      ~>{
+          MVDropdownAlert.showAlert(self.alertQueue.first!) {
+            {
+              self.alertQueueLock.lock()
+              self.alertQueue.removeAtIndex(0)
+              self.alertQueueLock.unlock()
+              self.processQueue()
+            }~>
+          }
+      }
     }
   }
 }
@@ -335,7 +345,7 @@ enum MVDropdownAlertStyle {
 }
 
 // MARK: - Convenience initializer for dropdown alert object
-extension MVDropdownAlertObject {
+extension MVDropdownAlertObject: Equatable {
   init?(message: Message) {
     if let notificationsEnabled = Defaults[MVUserDefaultsConstants.Settings.Messages.InAppNotificationsEnabled.Key].bool where notificationsEnabled {
       self.title = message.division.name
@@ -367,4 +377,13 @@ extension MVDropdownAlertObject {
     self.vibrate = vibrate
     self.playSound = playSound
   }
+}
+
+// MARK: - Equatable function protocol functions
+func ==(lhs: MVDropdownAlertObject, rhs: MVDropdownAlertObject) -> Bool {
+  return lhs.title == rhs.title &&
+    lhs.message == rhs.message &&
+    lhs.vibrate == rhs.vibrate &&
+    lhs.playSound == rhs.playSound &&
+    lhs.style == rhs.style
 }
