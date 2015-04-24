@@ -245,6 +245,8 @@ extension Event {
     
     notification.applicationIconBadgeNumber = 1
     
+    UIApplication.sharedApplication().scheduleLocalNotification(notification)
+    
     if secondsBeforeEvent != (Defaults[MVUserDefaultsConstants.Settings.Calendar.LocalNotificationsTime.Key].double ?? MVUserDefaultsConstants.Settings.Calendar.LocalNotificationsTime.DefaultValue) {
       logger.debug("Notification is scheduled as a non default notification time")
       customReminderTimerInterval = secondsBeforeEvent
@@ -290,6 +292,7 @@ struct EventConstants {
     static let Id = "id"
     static let EndDate = "endDate"
     static let StartDate = "startDate"
+    static let CustomReminderTimerInterval = "customReminderTimerInterval"
   }
   
   // This struct defines the names of all database columns/relations that should not be accessed directly

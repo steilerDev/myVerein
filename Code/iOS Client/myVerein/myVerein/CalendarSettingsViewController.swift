@@ -9,6 +9,7 @@
 import UIKit
 import XCGLogger
 import SwiftyUserDefaults
+import CoreData
 
 class CalendarSettingsViewController: UITableViewController {
 
@@ -21,6 +22,8 @@ class CalendarSettingsViewController: UITableViewController {
   
   @IBOutlet weak var notificationTimeCell: UITableViewCell!
   
+  let initialDefaultNotificationTime = Defaults[MVUserDefaultsConstants.Settings.Calendar.LocalNotificationsTime.Key].double ?? MVUserDefaultsConstants.Settings.Calendar.LocalNotificationsTime.DefaultValue
+  
   override func viewDidLoad() {
     super.viewDidLoad()
     logger.debug("Calendar settings view loaded, populating now")
@@ -31,6 +34,34 @@ class CalendarSettingsViewController: UITableViewController {
     notificationsSettingsCellChanged()
     inAppNotificationsSettingsChanged()
     updateDetailText()
+  }
+  
+  override func viewDidDisappear(animated: Bool) {
+    super.viewDidDisappear(animated)
+    // Checking if notifications settings have changed and applying them
+    if Defaults[MVUserDefaultsConstants.Settings.Calendar.LocalNotificationsEnabled.Key].bool ?? MVUserDefaultsConstants.Settings.Calendar.LocalNotificationsEnabled.DefaultValue {
+      if let newDefaultNotificationTime = Defaults[MVUserDefaultsConstants.Settings.Calendar.LocalNotificationsTime.Key].double where initialDefaultNotificationTime != newDefaultNotificationTime {
+        logger.info("The default notification time changed, rescheduling notifications");
+        
+        
+        {
+          (context: NSManagedObjectContext) in
+          let eventRepository = EventRepository(inContext: context)
+          let eventsWithoutCustomReminder = eventRepository.findEventsWithoutCustomReminder()
+          if let eventsWithoutCustomReminder = eventsWithoutCustomReminder {
+            XCGLogger.debug("Found \(eventsWithoutCustomReminder.count) events without custom reminder")
+            for event in eventsWithoutCustomReminder {
+              event.scheduleNotification()
+            }
+          } else {
+            XCGLogger.warning("Unable to find any events without custom reminder")
+          }
+        }~>
+      }
+    } else {
+      logger.info("Notifications got disabled, cancelling scheduled notification")
+      UIApplication.sharedApplication().cancelAllLocalNotifications()
+    }
   }
   
   /// If the main notification toggle changed, the other cells need to be updated as well

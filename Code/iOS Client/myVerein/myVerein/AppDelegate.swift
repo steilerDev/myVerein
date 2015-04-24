@@ -63,7 +63,12 @@ extension AppDelegate: UIApplicationDelegate {
     // Registering notification
     logger.debug("Trying to register for notification/checking if notifications are still available")
     let notificationSettings = UIUserNotificationSettings(forTypes: .Alert | .Sound | .Alert, categories: nil)
-    UIApplication.sharedApplication().registerUserNotificationSettings(notificationSettings)    
+    UIApplication.sharedApplication().registerUserNotificationSettings(notificationSettings)
+    
+    if let localNotification = launchOptions?[UIApplicationLaunchOptionsLocalNotificationKey] as? UILocalNotification {
+      logger.info("The application was launched through a notification: \(localNotification)")
+    }
+    
     return true
   }
   

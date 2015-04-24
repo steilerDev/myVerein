@@ -27,6 +27,20 @@ import XCGLogger
 // MARK: - Functions used to query the database
 class EventRepository: CoreDataRepository {
   
+  /// This function retrieves all events, that do not have a custom reminder set
+  func findEventsWithoutCustomReminder() -> [Event]? {
+    logger.verbose("Retrieving events without custom reminder")
+    
+    // Create a new fetch request using the event entity
+    let fetchRequest = NSFetchRequest(entityName: EventConstants.ClassName)
+    
+    let predicate = NSPredicate(format: "\(EventConstants.Fields.CustomReminderTimerInterval) == nil")
+    fetchRequest.predicate = predicate
+    
+    // Execute the fetch request, and cast the results to an array of LogItem objects
+    return executeListRequest(fetchRequest)
+  }
+  
   /// This function gathers all events, where the user responded with the provided event response
   func findEventsByUserResponse(userResponse: EventResponse) -> [Event]? {
     logger.verbose("Retrieving event with user response \(userResponse)")
@@ -153,6 +167,13 @@ class EventRepository: CoreDataRepository {
       event.name = name
       event.startDate = startDateTime
       event.endDate = endDateTime
+ 
+      // Scheduling local notification
+      if event.customReminderTimerInterval == nil {
+        event.scheduleNotification()
+      } else {
+        event.scheduleNotification(secondsBeforeEvent: event.customReminderTimerInterval!.doubleValue)
+      }
       
       event.lastSynced = NSDate()
       event.syncInProgress = false

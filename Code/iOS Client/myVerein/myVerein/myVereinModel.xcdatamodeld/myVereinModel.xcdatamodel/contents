@@ -13,7 +13,7 @@
         <relationship name="rawEnrolledUser" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="User" inverseName="rawDivisions" inverseEntity="User" syncable="YES"/>
     </entity>
     <entity name="Event" representedClassName="myVerein.Event" syncable="YES">
-        <attribute name="customReminderTimerInterval" optional="YES" attributeType="Double" defaultValueString="-1" syncable="YES"/>
+        <attribute name="customReminderTimerInterval" optional="YES" attributeType="Double" syncable="YES"/>
         <attribute name="endDate" optional="YES" attributeType="Date" syncable="YES"/>
         <attribute name="eventDescription" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="id" attributeType="String" indexed="YES" syncable="YES"/>

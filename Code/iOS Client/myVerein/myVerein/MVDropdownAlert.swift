@@ -270,7 +270,7 @@ class MVDropdownAlertCenter {
   private let logger = XCGLogger.defaultInstance()
 
   /// Within this array all notifications are stored, that could not be shown because the center is currently showing another notification. This queue is only storing notifications that are either 'danger' or 'warning'.
-  private var alertQueue: [MVDropdownAlertObject]!
+  private var alertQueue: [MVDropdownAlertObject]?
   private var alertQueueLock = NSLock()
   
   /// This function proceses a notification and tries to display it. If a notification is currently shown, the notification gets discarded if it is not of style 'danger' or 'warning'. Since the storing of the object might block execution, the function is dispatching to a background queue.
@@ -280,9 +280,9 @@ class MVDropdownAlertCenter {
         self.alertQueueLock.lock()
         if self.alertQueue != nil {
           // Only appending an alert to the queue if the last notification is not equal to the new one and it's style is either warning or danger.
-          if ((self.alertQueue.last != notification) ?? true) && (notification.style == .Warning || notification.style == .Danger) {
+          if ((self.alertQueue?.last != notification) ?? true) && (notification.style == .Warning || notification.style == .Danger) {
             self.logger.debug("A notification is currently shown, appending notification \(notification) to the queue")
-            self.alertQueue.append(notification)
+            self.alertQueue!.append(notification)
           } else {
             self.logger.debug("A notification is currently shown and importance of new notification is too low, or notification is a duplicate: \(notification)")
           }
@@ -299,17 +299,17 @@ class MVDropdownAlertCenter {
   /// This function proceses the alert queue. If all items have been processed the queue gets cleared and the process stopped. This function should not be called from the main queue since it might block execution, while trying to acquire the lock for the queue.
   func processQueue() {
     alertQueueLock.lock()
-    if alertQueue == nil || alertQueue.isEmpty {
+    if alertQueue == nil || alertQueue!.isEmpty {
       alertQueue = nil
       alertQueueLock.unlock()
-    } else if !alertQueue.isEmpty {
+    } else {
       alertQueueLock.unlock()
       // Showing alert on main queue, but removing notification from queue after notification was shown. The callback is dispatched to the background queue
       ~>{
-          MVDropdownAlert.showAlert(self.alertQueue.first!) {
+          MVDropdownAlert.showAlert(self.alertQueue!.first!) {
             {
               self.alertQueueLock.lock()
-              self.alertQueue.removeAtIndex(0)
+              self.alertQueue?.removeAtIndex(0)
               self.alertQueueLock.unlock()
               self.processQueue()
             }~>

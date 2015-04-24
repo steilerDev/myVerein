@@ -265,9 +265,9 @@ class MVError {
         }
       }
     } else if error.domain == "NSURLErrorDomain" {
-      if error.code = -1004 {
-      return MVError.createError(.MVHostNotReachable, underlyingError: error)
-      } else if error.code = -999 {
+      if error.code == -1004 {
+        return MVError.createError(.MVHostNotReachable, underlyingError: error)
+      } else if error.code == -999 {
         return MVError.createError(.MVRequestCancelled, underlyingError: error)
       }
     }
