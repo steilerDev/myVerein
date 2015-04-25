@@ -134,22 +134,22 @@ public class InitController
                 return new ResponseEntity<>(messageSource.getMessage("init.message.settings.mongoNotAvailable", null, "The stated MongoDB is not available", locale), HttpStatus.BAD_REQUEST);
             }
 
-            try
-            {
+//            try
+//            {
                 logger.debug("Temporarily storing settings information");
                 settings.setClubName(clubName);
-                settings.setDatabaseHost(databaseHost);
-                settings.setDatabasePort(databasePort);
-                settings.setDatabaseUser(databaseUser);
-                settings.setDatabasePassword(databasePassword);
-                settings.setDatabaseName(databaseCollection);
+//                settings.setDatabaseHost(databaseHost);
+//                settings.setDatabasePort(databasePort);
+//                settings.setDatabaseUser(databaseUser);
+//                settings.setDatabasePassword(databasePassword);
+//                settings.setDatabaseName(databaseCollection);
                 databaseName = databaseCollection;
                 savingInitialSetup(null, null, settings);
-            } catch (IOException e)
-            {
-                logger.warn("Unable to save settings.");
-                return new ResponseEntity<>(messageSource.getMessage("init.message.settings.savingSettingsError", null, "Unable to save settings, please try again", locale), HttpStatus.INTERNAL_SERVER_ERROR);
-            }
+//            } catch (IOException e)
+//            {
+//                logger.warn("Unable to save settings.");
+//                return new ResponseEntity<>(messageSource.getMessage("init.message.settings.savingSettingsError", null, "Unable to save settings, please try again", locale), HttpStatus.INTERNAL_SERVER_ERROR);
+//            }
             logger.info("Successfully stored and validated settings information");
             return new ResponseEntity<>(messageSource.getMessage("init.message.settings.savingSettingsSuccess", null, "Successfully saved settings", locale), HttpStatus.OK);
         }
@@ -208,10 +208,6 @@ public class InitController
             {
                 logger.warn("Storing data into database was not successfully.");
                 return new ResponseEntity<>(messageSource.getMessage("init.message.admin.savingAdminError", null, "Unable to save new super admin, please try again", locale), HttpStatus.INTERNAL_SERVER_ERROR);
-            } else if(!settings.saveSettings(superAdmin, null))
-            {
-                logger.warn("Unable to save settings or refresh application context");
-                return new ResponseEntity<>(messageSource.getMessage("init.message.admin.savingSettingsError", null, "Unable to save settings, please try again", locale), HttpStatus.INTERNAL_SERVER_ERROR);
             } else
             {
                 logger.info("Successfully saved new admin, settings and restarted application context.");
@@ -322,7 +318,7 @@ public class InitController
                 if(settings != null)
                 {
                     logger.debug("Storing settings");
-                    settings.saveSettings(user, null);
+                    settingsRepository.save(settings);
                     DBObject settingsObject = (DBObject) mappingMongoConverter.convertToMongoType(settings);
                     settingsObject.put("_class", settings.getClass().getCanonicalName());
                     mongoDB.getCollection(settings.getClass().getSimpleName().toLowerCase()).insert(settingsObject);
@@ -464,6 +460,7 @@ public class InitController
         List<String> customUserFields = new ArrayList<>();
         customUserFields.add("Membership number");
         systemSettings.setCustomUserFields(customUserFields);
+        systemSettings.setRootDivision(div1);
         settingsRepository.save(systemSettings);
 
         return new ResponseEntity<>("Successfully reset database to example", HttpStatus.OK);

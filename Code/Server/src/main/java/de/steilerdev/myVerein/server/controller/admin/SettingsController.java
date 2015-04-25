@@ -32,11 +32,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.ConstraintViolationException;
+import javax.xml.ws.Response;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -74,49 +72,42 @@ public class SettingsController
     @RequestMapping(method = RequestMethod.GET, produces = "application/json")
     public ResponseEntity<Map<String, Object>> loadSettings(@CurrentUser User currentUser)
     {
-        logger.trace("[" + currentUser + "] Starting to load settings");
+        logger.trace("[{}] Starting to load settings", currentUser);
         Map<String, Object> settings;
         if(!currentUser.isAdmin())
         {
-            logger.warn("[" + currentUser + "] The user is a non-admin and tries to access the settings");
+            logger.warn("[{}] The user is a non-admin and tries to access the settings", currentUser);
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         } else if(!currentUser.isSuperAdmin())
         {
-            logger.info("[" + currentUser + "] The user is a non-superadmin and is accessing the settings");
+            logger.info("[{}] The user is a non-superadmin and is accessing the settings", currentUser);
             settings = new HashMap<>();
             settings.put("administrationNotAllowedMessage", "You are not the super admin, and therefore you cannot adjust system settings.");
         } else
         {
-            logger.debug("[" + currentUser + "] Loading settings for super admin");
+            logger.debug("[{}] Loading settings for super admin", currentUser);
 
             settings = Settings.loadSettings(settingsRepository).getSettingsMap();
 
             if(gridFSRepository.findClubLogo() != null)
             {
-                logger.debug("[" + currentUser + "] The club logo is available");
+                logger.debug("[{}] The club logo is available", currentUser);
                 settings.put("clubLogoAvailable", true);
             }
         }
 
         settings.put("currentAdmin", currentUser.getSendingObjectOnlyEmailNameId());
-        logger.info("[" + currentUser + "] Finished loading settings");
+        logger.info("[{}] Finished loading settings", currentUser);
         return new ResponseEntity<>(settings, HttpStatus.OK);
     }
 
     /**
-     * This function is saving the settings for the system durable. In case the database connection changed, the system is restarted. The function is invoked by POSTing the parameters to the URI /api/admin/settings.
-     * NOTE: At the moment the restarting of the application is not working correctly. To apply changed database settings the application needs to be redeployed manually from the management interface.
+     * This function is saving the settings for the system durable. The function is invoked by POSTing the parameters to the URI /api/admin/settings.
      * @param currentAdmin If the logged in user is a super admin, this field specifies the new super admin. If the logged in user is a normal admin, this field needs to contain his email.
      * @param adminPasswordNew The new password for the currently logged in admin.
      * @param adminPasswordNewRe The retyped new password for the currently logged in admin.
      * @param clubName The club name.
      * @param clubLogo The club logo. If this parameter is present the former club logo is going to be replaced.
-     * @param databaseHost The hostname of the used MongoDB server.
-     * @param databasePort The port of the used MongoDB server.
-     * @param databaseUser The username, used to authenticate against the MongoDB server.
-     * @param databasePassword The password, used to authenticate against the MongoDB server.
-     * @param databaseCollection The name of the database collection, where the data of this system is stored in.
-     * @param rememberMeTokenKey The phrase used to secure the remember me cookies.
      * @param parameters The complete map of all parameters, containing the custom user fields.
      * @param currentAdminPassword The password of the currently logged in user, used to authenticate the changes.
      * @param currentUser The currently logged in user.
@@ -128,238 +119,232 @@ public class SettingsController
                                                @RequestParam(required = false) String adminPasswordNewRe,
                                                @RequestParam(required = false) String clubName,
                                                @RequestParam(required = false) MultipartFile clubLogo,
-                                               @RequestParam(required = false) String databaseHost,
-                                               @RequestParam(required = false) String databasePort,
-                                               @RequestParam(required = false) String databaseUser,
-                                               @RequestParam(required = false) String databasePassword,
-                                               @RequestParam(required = false) String databaseCollection,
                                                @RequestParam Map<String, String> parameters,
                                                @RequestParam String currentAdminPassword,
                                                @CurrentUser User currentUser)
     {
-        logger.trace("[" + currentUser + "] Starting to save settings");
+        logger.trace("[{}] Starting to save settings", currentUser);
         Settings settings = Settings.loadSettings(settingsRepository);
-        if(!passwordEncoder.isPasswordValid(currentUser.getPassword(), currentAdminPassword, currentUser.getSalt()))
+        if (!passwordEncoder.isPasswordValid(currentUser.getPassword(), currentAdminPassword, currentUser.getSalt()))
         {
-            logger.warn("[" + currentUser + "] The stated password is invalid");
+            logger.warn("[{}] The stated password is invalid", currentUser);
             return new ResponseEntity<>("The stated password is incorrect, please try again", HttpStatus.FORBIDDEN);
-        } else if(currentUser.isAdmin())
+        } else if (!currentUser.isAdmin())
         {
-            if(currentUser.isSuperAdmin())
+            logger.warn("[{}] A user who is not an admin tries to change the settings", currentUser);
+            return new ResponseEntity<>("You are not allowed to change these settings", HttpStatus.FORBIDDEN);
+        } else
+        {
+            if (currentUser.isSuperAdmin())
             {
-                logger.debug("[" + currentUser + "] The user is a super admin");
-                if(currentAdmin != null && !currentAdmin.equals(currentUser.getEmail()))
+                ResponseEntity<String> systemSettingsChangeResponseEntity = changeSystemSettings(currentAdmin, clubName, clubLogo, parameters, settings, currentUser);
+                if (systemSettingsChangeResponseEntity != null)
                 {
-                    logger.warn("[" + currentUser + "] The super admin user is changing to " + currentAdmin);
-                    Division rootDivision = divisionRepository.findByName(settings.getClubName());
-                    if(rootDivision == null)
-                    {
-                        logger.warn("[" + currentUser + "] Unable to find root division " + settings.getClubName());
-                        return new ResponseEntity<>("Unable to find root division", HttpStatus.INTERNAL_SERVER_ERROR);
-                    }
-
-                    User newSuperAdmin = userRepository.findByEmail(currentAdmin);
-                    if(newSuperAdmin == null)
-                    {
-                        logger.warn("[" + currentUser + "] Unable to find new super admin " + currentAdmin);
-                        return new ResponseEntity<>("Unable to find new super admin", HttpStatus.INTERNAL_SERVER_ERROR);
-                    }
-
-                    logger.debug("[" + currentUser + "] Saving new super admin");
-                    rootDivision.setAdminUser(newSuperAdmin);
-                    divisionRepository.save(rootDivision);
-                    logger.info("[" + currentUser + "] Successfully saved " + currentAdmin + " as new super admin");
-                }
-                try
-                {
-                    if (clubName != null && !clubName.isEmpty())
-                    {
-                        logger.debug("[" + currentUser + "] Setting club name to " + clubName);
-                        Division rootDivision = divisionRepository.findByName(settings.getClubName());
-                        if(rootDivision == null)
-                        {
-                            logger.warn("[" + currentUser + "] Unable to find former root division.");
-                            return new ResponseEntity<>("Unable to find former root division", HttpStatus.INTERNAL_SERVER_ERROR);
-                        }
-                        //Changing and saving the root division
-                        rootDivision.setName(clubName);
-                        divisionRepository.save(rootDivision);
-                        settings.setClubName(clubName);
-                    }
-
-                    if (clubLogo != null && !clubLogo.isEmpty())
-                    {
-                        logger.debug("[" + currentUser + "] Saving club logo");
-                        try
-                        {
-                            gridFSRepository.storeClubLogo(clubLogo);
-                        } catch (MongoException e)
-                        {
-                            logger.warn("[" + currentUser + "] Problem while saving club logo: " + e.getMessage());
-                            return new ResponseEntity<>("Problem while saving club logo: " + e.getMessage(), HttpStatus.BAD_REQUEST);
-                        }
-                    }
-
-                    if (databaseHost != null && !databaseHost.isEmpty())
-                    {
-                        logger.debug("[" + currentUser + "] Setting database host to " + databaseHost);
-                        settings.setDatabaseHost(databaseHost);
-                    }
-
-                    if (databasePort != null && !databasePort.isEmpty())
-                    {
-                        logger.debug("[" + currentUser + "] Setting database port to " + databasePort);
-                        settings.setDatabasePort(databasePort);
-                    }
-
-                    if (databaseUser != null)
-                    {
-                        logger.debug("[" + currentUser + "] Setting database user to " + databaseUser);
-                        settings.setDatabaseUser(databaseUser);
-                    }
-
-                    if (databasePassword != null)
-                    {
-                        logger.debug("[" + currentUser + "] Setting database password");
-                        settings.setDatabasePassword(databasePassword);
-                    }
-
-                    if (databaseCollection != null && !databaseCollection.isEmpty())
-                    {
-                        logger.debug("[" + currentUser + "] Setting database collection name " + databaseCollection);
-                        settings.setDatabaseName(databaseCollection);
-                    }
-
-                    logger.debug("[" + currentUser + "] Gathering all custom user fields");
-                    //Reducing parameters to custom user field parameters only and the value of the input
-                    List<String> reducedValues = parameters.keySet().parallelStream()
-                            .filter(key -> key.startsWith("cuf_") && !parameters.get(key).trim().isEmpty())
-                            .distinct() //Only allowing distinct keys
-                            .map(key -> key.substring(4)) //Reducing the key to the initial 'name' value, used to create the fields by jQuery
-                            .collect(Collectors.toList());
-
-                    //Analysing the values and checking, if
-                    if(!reducedValues.isEmpty())
-                    {
-                        logger.debug("[" + currentUser + "] There are custom user fields available");
-                        ArrayList<String> customUserFieldValues = new ArrayList<>();
-                        reducedValues.parallelStream().forEach(key -> {
-                            if(parameters.get("delete" + key) != null)
-                            {
-                                logger.warn("[" + currentUser + "] Deleting custom user field " + key);
-                                if(parameters.get("deleteContent" + key) != null)
-                                {
-                                    logger.warn("[" + currentUser + "] Deleting content of custom user field " + key + " on every user object");
-                                    List<User> user = mongoTemplate.find(new Query(Criteria.where("customUserField." + key).exists(true)), User.class);
-                                    if(user != null && !user.isEmpty())
-                                    {
-                                        user.parallelStream().forEach(thisUser -> {
-                                            thisUser.removeCustomUserField(key);
-                                            try
-                                            {
-                                                logger.trace("[" + currentUser + "] Deleting custom user field content " + key + " for user " + thisUser.getEmail());
-                                                userRepository.save(thisUser);
-                                            } catch (ConstraintViolationException e)
-                                            {
-                                                logger.warn("[" + currentUser + "] A database constraint was violated while trying to delete the custom user field " + key + " for user " + thisUser.getEmail() + ": " + e.getMessage());
-                                            }
-                                        });
-                                    }
-                                }
-                            } else
-                            {
-                                String value = parameters.get("cuf_" + key).trim();
-                                if(!key.equals(value) && settings.getCustomUserFields().contains(key)) //The key was renamed
-                                {
-                                    logger.debug("[" + currentUser + "] The custom user field " + key + " changed to " + value);
-                                    List<User> user = mongoTemplate.find(new Query(Criteria.where("customUserField." + key).exists(true)), User.class);
-                                    if(user != null && !user.isEmpty())
-                                    {
-                                        user.parallelStream().forEach(thisUser -> {
-                                            thisUser.renameCustomUserField(key, value);
-                                            try
-                                            {
-                                                logger.trace("[" + currentUser + "] Renaming custom user field " + key + " to " + value + " for user " + thisUser.getEmail());
-                                                userRepository.save(thisUser);
-                                            } catch (ConstraintViolationException e)
-                                            {
-                                                logger.warn("[" + currentUser + "] A database constraint was violated while trying to rename the custom user field " + key + " for user " + thisUser.getEmail() + ": " + e.getMessage());
-                                            }
-                                        });
-                                    }
-                                }
-                                logger.debug("[" + currentUser + "] Adding " + value + " as custom user field");
-                                customUserFieldValues.add(value);
-                            }
-                        });
-                        settings.setCustomUserFields(customUserFieldValues);
-                    }
-
-                    logger.debug("[" + currentUser + "] Saving updated settings file");
-                    settings.saveSettings(currentUser, settingsRepository);
-                    logger.info("[" + currentUser + "] Successfully saved updated settings file");
-                } catch (IOException e)
-                {
-                    logger.warn("[" + currentUser + "] Unable to update settings file: " + e.getMessage());
-                    return new ResponseEntity<>("Unable to update settings file", HttpStatus.INTERNAL_SERVER_ERROR);
+                    return systemSettingsChangeResponseEntity;
                 }
             } else
             {
-                logger.debug("[" + currentUser + "] The user is an admin");
-                if(currentAdmin != null && !currentAdmin.equals(currentUser.getEmail()))
+                logger.debug("[{}] The user is only an admin", currentUser);
+                if (currentAdmin != null && !currentAdmin.equals(currentUser.getEmail()))
                 {
-                    logger.warn("[" + currentUser + "] The current user differs from the stated user");
+                    logger.warn("[{}] The current user differs from the stated user", currentUser);
                     return new ResponseEntity<>("The current user differs from the stated user", HttpStatus.BAD_REQUEST);
                 }
             }
 
-            if(adminPasswordNew != null && adminPasswordNewRe != null && !adminPasswordNew.isEmpty() && !adminPasswordNewRe.isEmpty())
+            if (adminPasswordNew != null && adminPasswordNewRe != null && !adminPasswordNew.isEmpty() && !adminPasswordNewRe.isEmpty())
             {
-                logger.info("[" + currentUser + "] The user wants to change his password.");
-                if(!adminPasswordNew.equals(adminPasswordNewRe))
+                logger.debug("[{}] Trying to change password", currentUser);
+                ResponseEntity<String> passwordChangeResponseEntity = changePassword(adminPasswordNew, adminPasswordNewRe, currentUser);
+                if (passwordChangeResponseEntity != null)
                 {
-                    logger.warn("[" + currentUser + "] The stated passwords did not match");
-                    return new ResponseEntity<>("The stated passwords did not match", HttpStatus.BAD_REQUEST);
-                } else
-                {
-                    currentUser.setPassword(adminPasswordNew);
-                    try
-                    {
-                        logger.debug("[" + currentUser + "] Saving new user password.");
-                        userRepository.save(currentUser);
-                        logger.info("[" + currentUser + "] Successfully saved new user password");
-                    } catch (ConstraintViolationException e)
-                    {
-                        logger.warn("[" + currentUser + "] A database constraint was violated while saving the user: " + e.getMessage());
-                        return new ResponseEntity<>("A database constraint was violated while saving the user.", HttpStatus.BAD_REQUEST);
-                    }
+                    return passwordChangeResponseEntity;
                 }
             }
+            logger.info("[{}] Successfully updated all settings", currentAdmin);
+            return new ResponseEntity<>("Successfully updated settings", HttpStatus.OK);
+        }
+    }
+
+    /**
+     * This function changes the system settings according to the parameter. This function is only called if the user is a super admin.
+     * @param currentAdmin If the logged in user is a super admin, this field specifies the new super admin. If the logged in user is a normal admin, this field needs to contain his email.
+     * @param clubName The club name.
+     * @param clubLogo The club logo. If this parameter is present the former club logo is going to be replaced.
+     * @param parameters The complete map of all parameters, containing the custom user fields.
+     * @param currentUser The currently logged in user.
+     * @param settings The currently loaded settings object.
+     * @return An HTTP response with a status code, if an error occurred an error message is bundled into the response, otherwise null.
+     */
+    private ResponseEntity<String> changeSystemSettings(String currentAdmin, String clubName, MultipartFile clubLogo, Map<String, String> parameters, Settings settings, User currentUser)
+    {
+        logger.debug("[{}] The user is a super admin", currentUser);
+        // Changing super admin
+        if(currentAdmin != null && !currentAdmin.equals(currentUser.getEmail()))
+        {
+            logger.warn("[{}] The super admin user is changing to {}", currentUser, currentAdmin);
+            Division rootDivision = settings.getRootDivision();
+            if(rootDivision == null)
+            {
+                logger.warn("[{}] Unable to find root division", currentUser);
+                return new ResponseEntity<>("Unable to find root division", HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+
+            User newSuperAdmin = userRepository.findByEmail(currentAdmin);
+            if(newSuperAdmin == null)
+            {
+                logger.warn("[{}] Unable to find new super admin {}", currentUser, currentAdmin);
+                return new ResponseEntity<>("Unable to find new super admin", HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+
+            logger.debug("[{}] Saving new super admin {}", currentUser, newSuperAdmin);
+            settings.getRootDivision().setAdminUser(newSuperAdmin);
+            divisionRepository.save(rootDivision);
+            logger.info("[{}] Successfully saved {} as new super admin", currentUser, currentAdmin);
+        }
+        // Change other settings
+        if (clubName != null && !clubName.isEmpty())
+        {
+            logger.debug("[{}] Setting club name to {}", currentUser, clubName);
+            Division rootDivision = settings.getRootDivision();
+            if(rootDivision == null)
+            {
+                logger.warn("[{}] Unable to find root division", currentUser);
+                return new ResponseEntity<>("Unable to find root division", HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+            //Changing and saving the root division
+            rootDivision.setName(clubName);
+            divisionRepository.save(rootDivision);
+            settings.setClubName(clubName);
+        }
+
+        if (clubLogo != null && !clubLogo.isEmpty())
+        {
+            logger.debug("[{}] Saving club logo", currentUser);
+            try
+            {
+                gridFSRepository.storeClubLogo(clubLogo);
+            } catch (MongoException e)
+            {
+                logger.warn("[{}] Problem while saving club logo: {}", currentUser, e.getMessage());
+                return new ResponseEntity<>("Problem while saving club logo: " + e.getMessage(), HttpStatus.BAD_REQUEST);
+            }
+        }
+
+        settings.setCustomUserFields(updateCustomUserFields(parameters, currentUser, settings));
+
+        logger.debug("[{}] Saving updated settings file", currentUser);
+        settingsRepository.save(settings);
+        logger.info("[{}] Successfully saved updated settings file", currentUser);
+        return null;
+    }
+
+    /**
+     * This function updates the defined custom user fields.
+     * @param parameters A map containing the custom user fields (prefixed with 'cuf_'). If additionally a key-value pair starting with 'delete' or 'deleteContent is present, the field is going to be removed.
+     * @param currentUser The currently logged in user.
+     * @param settings The currently used settings object.
+     * @return The new list of custom user fields.
+     */
+    private List<String> updateCustomUserFields(Map<String, String> parameters, User currentUser, Settings settings)
+    {
+        logger.debug("[{}] Gathering all custom user fields", currentUser);
+        //Reducing parameters to custom user field parameters only and the value of the input
+        List<String> reducedValues = parameters.keySet().parallelStream().filter(key -> key.startsWith("cuf_") && !parameters.get(key).trim().isEmpty()).distinct() //Only allowing distinct keys
+                .map(key -> key.substring(4)) //Reducing the key to the initial 'name' value, used to create the fields by jQuery
+                .collect(Collectors.toList());
+
+        //Analysing the values: Checking if the value is deleted, renamed or created
+        if (!reducedValues.isEmpty())
+        {
+            logger.info("[{}] No custom user fields specified, clearing fields");
+            return null;
         } else
         {
-            logger.warn("[" + currentUser + "] A user who is not an admin tries to change the settings ");
-            return new ResponseEntity<>("You are not allowed to change these settings", HttpStatus.FORBIDDEN);
+            logger.debug("[{}] There are custom user fields available", currentUser);
+            ArrayList<String> customUserFieldValues = new ArrayList<>();
+            reducedValues.parallelStream().forEach(key -> {
+                if (parameters.get("delete" + key) != null)
+                {
+                    logger.warn("[{}] Deleting custom user field {}", currentUser, key);
+                    if (parameters.get("deleteContent" + key) != null)
+                    {
+                        logger.warn("[{}] Deleting content of custom user field {} on every user object", currentUser, key);
+                        List<User> user = mongoTemplate.find(new Query(Criteria.where("customUserField." + key).exists(true)), User.class);
+                        if (user != null && !user.isEmpty())
+                        {
+                            user.parallelStream().forEach(thisUser -> {
+                                thisUser.removeCustomUserField(key);
+                                logger.trace("[{}] Deleting custom user field content {} for user {}", currentUser, key, thisUser);
+                                userRepository.save(thisUser);
+                            });
+                        }
+                    }
+                } else
+                {
+                    String value = parameters.get("cuf_" + key).trim();
+                    if (!key.equals(value) && settings.getCustomUserFields().contains(key)) //The key was renamed
+                    {
+                        logger.debug("[{}] The custom user field {} changed to {}", currentUser, key, value);
+                        List<User> user = mongoTemplate.find(new Query(Criteria.where("customUserField." + key).exists(true)), User.class);
+                        if (user != null && !user.isEmpty())
+                        {
+                            user.parallelStream().forEach(thisUser -> {
+                                thisUser.renameCustomUserField(key, value);
+                                logger.trace("[{}] Renaming custom user field {} to {} for user {}", currentUser, key, value, thisUser);
+                                userRepository.save(thisUser);
+                            });
+                        }
+                    }
+                    logger.debug("[{}] Adding {} as custom user field", currentUser, value);
+                    customUserFieldValues.add(value);
+                }
+            });
+            return customUserFieldValues;
         }
-        logger.info("[" + currentUser + "] Successfully updated all settings");
-        return new ResponseEntity<>("Successfully updated settings", HttpStatus.OK);
+    }
+
+    /**
+     * This function changes the password of the currently logged in user.
+     * @param newPassword The new password of the user.
+     * @param newPasswordRe The retyped new password of the user.
+     * @param currentUser The currently logged in user.
+     * @return An HTTP response with a status code, if an error occurred an error message is bundled into the response, otherwise null.
+     */
+    private ResponseEntity<String> changePassword(String newPassword, String newPasswordRe, User currentUser)
+    {
+        logger.info("[{}] The user wants to change his password", currentUser);
+        if (!newPassword.equals(newPasswordRe))
+        {
+            logger.warn("[{}] The stated passwords did not match", currentUser);
+            return new ResponseEntity<>("The stated passwords did not match", HttpStatus.BAD_REQUEST);
+        } else
+        {
+            currentUser.setPassword(newPassword);
+            logger.debug("[{}] Saving new user password", currentUser);
+            userRepository.save(currentUser);
+            logger.info("[{}] Successfully saved new user password", currentUser);
+            return null;
+        }
     }
 
     /**
      * This function gathers all defined custom user fields. The function is invoked by GETting the URI /apic/admin/settings/customUserFields.
+     * @param currentUser The currently logged in user.
      * @return An HTTP response with a status code. If an error occurred an error error code is returned, otherwise a success code together with the list of all custom user fields is returned.
      */
     @RequestMapping(value = "customUserFields", produces = "application/json", method = RequestMethod.GET)
     public ResponseEntity<List<String>> getCustomUserFields(@CurrentUser User currentUser)
     {
-        logger.trace("[" + currentUser + "] Gathering custom user fields");
+        logger.trace("[{}] Gathering custom user fields", currentUser);
         List<String> customUserFields = Settings.loadSettings(settingsRepository).getCustomUserFields();
         if(customUserFields != null)
         {
-            logger.debug("[" + currentUser + "] Returning custom user fields");
+            logger.debug("[{}] Returning custom user fields", currentUser);
             return new ResponseEntity<>(customUserFields, HttpStatus.OK);
         } else
         {
-            logger.warn("[" + currentUser + "] Unable to gather custom user fields");
+            logger.warn("[{}] Unable to gather custom user fields", currentUser);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

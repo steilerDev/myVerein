@@ -46,6 +46,12 @@ public class MessageController
     @Autowired
     private DivisionRepository divisionRepository;
 
+    /**
+     * This function retrieves the function identified by its message id. The function is invoked by GETting the URI /api/user/message using the parameter id.
+     * @param messageId The message id of the searched message.
+     * @param currentUser The currently logged in user.
+     * @return A response entity containing either the message and a success code or a failure code if the request failed.
+     */
     @RequestMapping(produces = "application/json", method = RequestMethod.GET, params = "id")
     public ResponseEntity<Message> getMessage(@RequestParam(value = "id") String messageId, @CurrentUser User currentUser)
     {
@@ -86,6 +92,7 @@ public class MessageController
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         } else
         {
+            // Setting the messages as delivered
             messages.parallelStream().forEach(message -> message.setDelivered(currentUser));
 
             if(all != null && !all.isEmpty())
@@ -103,7 +110,7 @@ public class MessageController
                 return new ResponseEntity<>(messages, HttpStatus.OK);
             } catch (IllegalArgumentException e)
             {
-                logger.warn("[" + currentUser + "] Unable to save messages for " + currentUser.getEmail() + ": " + e.getMessage());
+                logger.warn("[{}] Unable to save messages: {}", currentUser, e.getMessage());
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
@@ -112,9 +119,9 @@ public class MessageController
     /**
      * This function sends a message to a specific group chat. The function is invoked by POSTing to the URI /api/user/message.
      * @param currentUser The currently logged in user.
-     * @param division The name of the division where the message is send to.
+     * @param division The id of the division where the message is send to.
      * @param content The content of the message.
-     * @return An HTTP response with a status code. If no error occurred the system wide used id and timestamp are returned. The timestamp is set to the time or receiving on the server, to ensure the same view on the total order of messages for everyone.
+     * @return An HTTP response with a status code. If no error occurred the system wide used id and timestamp are returned. The timestamp is set to the time of receiving on the server, to ensure the same view on the total order of messages for everyone.
      */
     @RequestMapping(produces = "application/json", method = RequestMethod.POST)
     public ResponseEntity<Message> sendMessage(@CurrentUser User currentUser, @RequestParam String division, @RequestParam String content, @RequestParam(required = false) String timestamp)
@@ -128,24 +135,17 @@ public class MessageController
         } else if ((receivingDivision = divisionRepository.findById(division)) == null)
         {
             logger.warn("[{}] Unable to find receiving division {}", currentUser, division);
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        } else if (!currentUser.getDivisions().contains(receivingDivision))
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        } else if (!receivingDivision.getMemberList().contains(currentUser.getId()))
         {
             logger.warn("[{}] Trying to send a message to a division the user is not part of: {}", currentUser, division);
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } else
         {
-            if (receivingDivision.getMemberList().isEmpty())
-            {
-                logger.warn("[{}] Empty receiver list", currentUser);
-                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-            } else
-            {
-                Message message = new Message(content, currentUser, receivingDivision);
-                messageRepository.save(message);
-                logger.info("[{}] Successfully saved and send message", currentUser);
-                return new ResponseEntity<>(message.getSendingObjectOnlyIdAndTimestamp(), HttpStatus.OK);
-            }
+            Message message = new Message(content, currentUser, receivingDivision);
+            messageRepository.save(message);
+            logger.info("[{}] Successfully saved and send message", currentUser);
+            return new ResponseEntity<>(message.getSendingObjectOnlyIdAndTimestamp(), HttpStatus.OK);
         }
     }
 }

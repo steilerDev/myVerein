@@ -16,12 +16,6 @@
  */
 package de.steilerdev.myVerein.server.controller.user;
 
-
-import com.relayrides.pushy.apns.PushManager;
-import com.relayrides.pushy.apns.util.ApnsPayloadBuilder;
-import com.relayrides.pushy.apns.util.SimpleApnsPushNotification;
-import com.relayrides.pushy.apns.util.TokenUtil;
-import de.steilerdev.myVerein.server.apns.PushService;
 import de.steilerdev.myVerein.server.model.User;
 import de.steilerdev.myVerein.server.model.UserRepository;
 import de.steilerdev.myVerein.server.security.CurrentUser;
@@ -34,6 +28,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+/**
+ * This class handles gathering and updating information about a user by another/the same user.
+ */
 @RestController
 @RequestMapping("/api/user/user")
 public class UserController
@@ -43,6 +41,12 @@ public class UserController
     @Autowired
     private UserRepository userRepository;
 
+    /**
+     * This function gathers and returns the user identified by its id, containing all information the requesting user is allowed to see. The function is invoked by GETting the URI /api/user/user with the parameter id.
+     * @param userID The user id of the requested user.
+     * @param currentUser The currently logged in user.
+     * @return A response entity either containing the user and a success code, or a failure code.
+     */
     @RequestMapping(method = RequestMethod.GET, produces = "application/json")
     public ResponseEntity<User> getUser(@RequestParam(value = "id") String userID, @CurrentUser User currentUser)
     {
@@ -50,19 +54,25 @@ public class UserController
         User searchedUser;
         if(userID.isEmpty())
         {
-            logger.warn("[" + currentUser + "] The user ID is empty");
+            logger.warn("[{}] The user ID is empty", currentUser);
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } else if ((searchedUser = userRepository.findById(userID)) == null)
         {
-            logger.warn("[" + currentUser + "] Unable to find user with the stated ID " + userID);
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            logger.warn("[{}] Unable to find user with the stated ID {}", currentUser, userID);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } else
         {
-            logger.info("[" + currentUser + "] Returning user with ID " + userID);
+            logger.info("[{}] Returning user {}", currentUser, searchedUser);
             return new ResponseEntity<>(searchedUser.getSendingObjectInternalSync(), HttpStatus.OK);
         }
     }
 
+    /**
+     * This function is used to update the device token of a user, who has opted-in to receive push notifications. The function is invoked by POSTing the deviceToken parameter to the URI /api/user/user.
+     * @param deviceToken The Base64 encoded device token string.
+     * @param currentUser The currently logged in user.
+     * @return A response entity containing a response code, reflecting the result of the operation.
+     */
     @RequestMapping(method = RequestMethod.POST, params = "deviceToken")
     public ResponseEntity updateDeviceToken(@RequestParam String deviceToken, @CurrentUser User currentUser)
     {
@@ -85,46 +95,4 @@ public class UserController
             }
         }
     }
-
-    @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity sendNotification(@CurrentUser User currentUser)
-    {
-//        logger.info("Sending push to {}", currentUser);
-//
-//
-//        final byte[] token = currentUser.getDeviceToken();
-//
-//        final ApnsPayloadBuilder payloadBuilder = new ApnsPayloadBuilder();
-//
-//        payloadBuilder.setAlertBody("Ring ring, Neo.");
-//
-//        final String payload = payloadBuilder.buildWithDefaultMaximumLength();
-//
-//        final PushManager<SimpleApnsPushNotification> pushManager = PushService.getInstance();
-//
-//        try
-//        {
-//            if(pushManager != null)
-//            {
-//                pushManager.getQueue().put(new SimpleApnsPushNotification(token, payload));
-//            }
-//        } catch (Exception e)
-//        {
-//            logger.error("Exception while sending: {}", e.getMessage());
-//        }
-//        logger.debug("Successfully send notification");
-//
-////        byte[] payload = APNS.newPayload().alertBody("Hello world").buildBytes();
-////        if(currentUser.getDeviceToken() != null && payload != null)
-////        {
-////            logger.debug("Sending notification");
-////            PushService.getInstance().push(currentUser.getDeviceToken(), payload);
-//            return new ResponseEntity(HttpStatus.OK);
-////        } else {
-////            logger.debug("Unable to send notification");
-////            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
-//        }
-        return null;
-    }
-
 }

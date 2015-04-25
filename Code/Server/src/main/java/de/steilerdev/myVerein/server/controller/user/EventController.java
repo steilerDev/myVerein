@@ -36,6 +36,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * This class handles gathering information about events by a user.
+ */
 @RestController
 @RequestMapping("/api/user/event")
 public class EventController
@@ -46,18 +49,16 @@ public class EventController
     private EventRepository eventRepository;
 
     /**
-     * This function gathers all events for the currently logged in user. If lastChanged is stated only events that
-     * changed after that moment are returned.
-     *
+     * This function gathers all events for the currently logged in user. If lastChanged is stated only events that changed after that moment are returned. The function is invoked by GETting the URI /api/user/event.
      * @param lastChanged The date of the last changed action, correctly formatted (YYYY-MM-DDTHH:mm:ss)
      * @param currentUser The currently logged in user
-     * @return A list of all events for the user that changed since the last changed moment in time (only containing
-     * id's)
+     * @return A response entity containing a list of all events for the user that changed since the last changed moment in time (only containing their ids), or all events if the parameter was not specified. In case of an error, the response entity only contains the error code.
      */
     @RequestMapping(produces = "application/json", method = RequestMethod.GET)
     public ResponseEntity<List<Event>> getAllEventsForUser(@RequestParam(required = false) String lastChanged, @CurrentUser User currentUser)
     {
         List<Event> events;
+        // Gathering events
         if (lastChanged != null && !lastChanged.isEmpty())
         {
             logger.debug("[{}] Gathering all user events changed after {}", currentUser, lastChanged);
@@ -77,6 +78,7 @@ public class EventController
             events = eventRepository.findAllByPrefixedInvitedUser(Event.prefixedUserIDForUser(currentUser));
         }
 
+        // Checking and returning events
         if (events == null || events.isEmpty())
         {
             logger.warn("[{}] No events to return", currentUser);
@@ -89,42 +91,56 @@ public class EventController
         }
     }
 
+    /**
+     * This function retrieves the event specified by it's id and returns all appropriate information about the event. The function is invoked by GETting the URI /api/user/event using the parameter id.
+     * @param eventID The id of the searched event.
+     * @param currentUser The currently logged in user.
+     * @return A response entity containing the specified event, reduced to it's appropriate information. In case of an error, the response entity only contains an error code.
+     */
     @RequestMapping(produces = "application/json", params = "id", method = RequestMethod.GET)
     public ResponseEntity<Event> getEvent(@RequestParam(value = "id") String eventID, @CurrentUser User currentUser)
     {
-        logger.debug("[{}] Gathering event with id {}", currentUser, eventID);
+        Event event;
+        logger.trace("[{}] Gathering event with id {}", currentUser, eventID);
         if (eventID.isEmpty())
         {
             logger.warn("[{}] The id is not allowed to be empty", currentUser);
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        } else if ((event = eventRepository.findEventById(eventID)) == null)
+        {
+            logger.warn("[{}] Unable to find event with id {}", currentUser, eventID);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } else
         {
-            Event event = eventRepository.findEventById(eventID);
-            if (event == null)
-            {
-                logger.warn("[{}] Unable to find event with id {}", currentUser, eventID);
-                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-            } else
-            {
-                logger.info("[{}] Returning event {}", currentUser, event);
-                return new ResponseEntity<>(event.getSendingObjectInternalSync(currentUser), HttpStatus.OK);
-            }
+            logger.info("[{}] Returning event {}", currentUser, event);
+            return new ResponseEntity<>(event.getSendingObjectInternalSync(currentUser), HttpStatus.OK);
         }
     }
 
+    /**
+     * This function accepts a user response to a specific event and stores this response. The function is invoked by POSTing the parameter id to the URI /api/user/event.
+     * @param responseString The string representation of the enumeration {@link de.steilerdev.myVerein.server.model.Event.EventStatus EventStatus}.
+     * @param eventID The event id of the event the user is responding to.
+     * @param currentUser The currently logged in user.
+     * @return A response entity containing a success code, in case of a successful execution or an error code in case of a failure.
+     */
     @RequestMapping(produces = "application/json", method = RequestMethod.POST)
     public ResponseEntity respondToEvent(@RequestParam(value = "response") String responseString, @RequestParam(value = "id") String eventID, @CurrentUser User currentUser)
     {
-        logger.debug("[{}] Responding to event {} with {}", currentUser, eventID, responseString);
+        logger.trace("[{}] Responding to event {} with {}", currentUser, eventID, responseString);
         Event event;
-        if(eventID.isEmpty())
+        if(eventID.isEmpty() || responseString.isEmpty())
         {
-            logger.warn("[{}] The event id is not allowed to be empty", currentUser);
+            logger.warn("[{}] The event or response is not allowed to be empty", currentUser);
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
         } else if((event = eventRepository.findEventById(eventID)) == null)
         {
             logger.warn("[{}] Unable to gather the specified event with id {}", currentUser, eventID);
-            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        } else if(!event.getInvitedUser().containsKey(currentUser.getId()))
+        {
+            logger.warn("[{}] User is not invited to the event", currentUser);
+            return new ResponseEntity(HttpStatus.FORBIDDEN);
         } else
         {
             EventStatus response;
@@ -138,28 +154,28 @@ public class EventController
                 }
             } catch (IllegalArgumentException e)
             {
-                logger.warn("[{}] Unable to parse response: {}", currentUser, e.getLocalizedMessage());
+                logger.warn("[{}] Unable to parse response: {}", currentUser, e.getMessage());
                 return new ResponseEntity(HttpStatus.BAD_REQUEST);
             }
 
-            if(!event.getInvitedUser().containsKey(currentUser.getId()))
-            {
-                logger.warn("[{}] User is not invited to the event");
-                return new ResponseEntity(HttpStatus.BAD_REQUEST);
-            } else
-            {
-                event.getInvitedUser().put(currentUser.getId(), response);
-                eventRepository.save(event);
-                logger.info("[{}] Successfully responded to event {} with response {}", currentUser, event, response);
-                return new ResponseEntity(HttpStatus.OK);
-            }
+            event.getInvitedUser().put(currentUser.getId(), response);
+            eventRepository.save(event);
+            logger.info("[{}] Successfully responded to event {} with response {}", currentUser, event, response);
+            return new ResponseEntity(HttpStatus.OK);
         }
     }
 
+    /**
+     * This function gathers and returns the user, that chose the specified response for the specified event. The function is invoked by GETting the URI /api/user/event with the response and event id.
+     * @param responseString The string representation of the enumeration {@link de.steilerdev.myVerein.server.model.Event.EventStatus EventStatus}, used to specify the searched group of user.
+     * @param eventID The event id of the searched event.
+     * @param currentUser The currently logged in user.
+     * @return A response entity containing a list of user ids and a success code, in case of a successful execution, or an error code in case of a failure.
+     */
     @RequestMapping(produces = "application/json", params = {"id", "response"}, method = RequestMethod.GET)
     public ResponseEntity<List<String>> getResponsesOfEvent(@RequestParam(value = "response") String responseString, @RequestParam(value = "id") String eventID, @CurrentUser User currentUser)
     {
-        logger.debug("[{}] Finding all responses of type {} to event {}", currentUser, responseString, eventID);
+        logger.trace("[{}] Finding all responses of type {} to event {}", currentUser, responseString, eventID);
         Event event;
         if(eventID.isEmpty())
         {
@@ -169,6 +185,10 @@ public class EventController
         {
             logger.warn("[{}] Unable to gather the specified event with id {}", currentUser, eventID);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        } else if(!event.getInvitedUser().containsKey(currentUser.getId()))
+        {
+            logger.warn("[{}] User is not invited to the event and therefore not allowed to view this list", currentUser);
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         } else
         {
             EventStatus response;
@@ -177,23 +197,16 @@ public class EventController
                 response = EventStatus.valueOf(responseString.toUpperCase());
             } catch (IllegalArgumentException e)
             {
-                logger.warn("[{}] Unable to parse response: {}", currentUser, e.getLocalizedMessage());
+                logger.warn("[{}] Unable to parse response: {}", currentUser, e.getMessage());
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
 
-            if(!event.getInvitedUser().containsKey(currentUser.getId()))
-            {
-                logger.warn("[{}] User is not invited to the event");
-                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-            } else
-            {
-                // Filtering invited user matching the response
-                HashMap<String, EventStatus> invitedUser = new HashMap<>(event.getInvitedUser());
-                List<String> matchingUser = invitedUser.keySet().stream().filter(userID -> invitedUser.get(userID) == response).collect(Collectors.toList());
+            // Filtering invited user matching the response
+            HashMap<String, EventStatus> invitedUser = new HashMap<>();
+            List<String> matchingUser = invitedUser.keySet().stream().filter(userID -> invitedUser.get(userID) == response).collect(Collectors.toList());
 
-                logger.info("[{}] Successfully gathered all user matching the response {} for event {}", currentUser, response, event);
-                return new ResponseEntity<>(matchingUser, HttpStatus.OK);
-            }
+            logger.info("[{}] Successfully gathered all user matching the response {} for event {}", currentUser, response, event);
+            return new ResponseEntity<>(matchingUser, HttpStatus.OK);
         }
     }
 }

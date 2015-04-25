@@ -13,7 +13,7 @@ var settingsSubmitButton,
     previousCreatedCustomUserFields;
 
 function disableSettings() {
-    //Disable the complete formllll
+    //Disable the complete form
     settingsFormBootstrapValidator.find('input').prop("disabled", true);
     $('#clubLogoButton').addClass('btn-disabled');
     currentAdminSelectize[0].selectize.disable();
@@ -123,11 +123,6 @@ function loadSettings() {
                 showMessage(response.administrationNotAllowedMessage, 'warning', 'icon_error-triangle_alt');
             } else {
                 $('#superAdminLabel').removeClass("hidden");
-                $('#databaseHost').val(response.dbHost);
-                $('#databasePort').val(response.dbPort);
-                $('#databaseUser').val(response.dbUser);
-                $('#databasePassword').val(response.dbPassword);
-                $('#databaseCollection').val(response.dbName);
                 $('#clubName').val(response.clubName);
                 if(response.clubLogoAvailable) {
                     $('#clubLogoDelete').removeClass("hidden");

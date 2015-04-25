@@ -20,7 +20,7 @@ function addCustomUserFieldUser(key, value){
     $(newCustomUserField).insertAfter($('#customUserFieldsSeparator'));
 }
 
-//Reset the user form
+//Reset the user form, clearing all values
 function resetUserForm(doNotHideDeleteButton) {
     $('#firstName').val('');
     $('#lastName').val('');
@@ -90,14 +90,14 @@ function disableUserForm(){
 }
 
 //Loading a user's information into the form
-function loadUser(email) {
+function loadUser(id) {
     userSubmitButton.startAnimation();
     //Sending JSON request with the email as parameter to get the user details
     $.ajax({
         url: '/api/admin/user',
         type: 'GET',
         data: {
-            email: email
+            id: id
         },
         error: function (response) {
             userSubmitButton.stopAnimation(-1, function(button){
@@ -158,7 +158,7 @@ function loadUser(email) {
             $('#oldUserHeading').removeClass("hidden");
             $('#oldUserHeadingName').text('<' + user.email + '>');
             $('#oldUserButton').removeClass('hidden');
-            $('#userFlag').val(user.email);
+            $('#userFlag').val(user.id);
 
             if(!user.administrationNotAllowedMessage) //No message means he is allowed to administrate, everything happening in this block shouldn't be part of the response anyway
             {
@@ -181,10 +181,8 @@ function loadUser(email) {
                     $('#birthday').datepicker('setUTCDate', date);
                 }
 
-                //Inserting private information if there are any
+                //Inserting custom user information if there are any
                 if (user.customUserField && Object.keys(user.customUserField).length > 0) {
-                    console.log(user.customUserField);
-                    console.log(Object.keys(user.customUserField).length);
                     $('#customUserFieldsEmpty').addClass('hidden');
                     $.each(user.customUserField, function (key, value) {
                         addCustomUserFieldUser(key, value);
@@ -258,6 +256,7 @@ function loadUserList() {
 
 //This function is called as soon as the tab is shown. If necessary it is loading all required resources.
 function loadUserPage() {
+    // The selectize field of the user is initialized
     if(!(userDivisionsSelectize = $('#divisions'))[0].selectize) {
         //Configuring division input field
         userDivisionsSelectize.selectize({
@@ -303,11 +302,12 @@ function loadUserPage() {
         });
     }
 
+    // The user list is initialized
     if(!userList) {
         //Configuring fuzzy-search on user list.
         var listOptions = {
-            valueNames: ['firstName', 'lastName', 'email'],
-            item: '<li class="list-item"><h3><span class="firstName"></span> <span class="lastName"></span></h3><p class="email"></p></li>',
+            valueNames: ['firstName', 'lastName', 'email','id'],
+            item: '<li class="list-item"><h3><span class="firstName"></span> <span class="lastName"></span></h3><p class="email"></p><span class="id" hidden="hidden"></span></li>',
             plugins: [ListFuzzySearch()]
         };
 
@@ -318,11 +318,12 @@ function loadUserPage() {
         userList.on("updated", function () {
             $("li.list-item").click(function (e) {
                 //Get the email as identification of the selected user and loading the user into the form
-                loadUser($(this).children(".email").text());
+                loadUser($(this).children(".id").text());
             });
         });
     }
 
+    // The user form validator is initialized
     if(!(userFormBootstrapValidator = $('#userForm')).data('bootstrapValidator')) {
         //Enable bootstrap validator
         userFormBootstrapValidator.bootstrapValidator({
@@ -340,23 +341,25 @@ function loadUserPage() {
                     data: $(e.target).serialize(),
                     error: function (response) {
                         userSubmitButton.stopAnimation(-1);
-                        showMessage(response.responseText, 'error', 'icon_error-triangle_alt');
+                        showMessage(response.responseText.errorMessage, 'error', 'icon_error-triangle_alt');
                     },
                     success: function (response) {
                         userSubmitButton.stopAnimation(0);
-                        $('#userFlag').val($('#email').val());
-                        showMessage(response, 'success', 'icon_check');
+                        $('#userFlag').val(response.userId);
+                        showMessage(response.successMessage, 'success', 'icon_check');
                         loadUserList();
                     }
                 });
             });
     }
 
+    // The user submit button is initialized
     if(!userSubmitButton) {
         //Enabling progress button
         userSubmitButton = new UIProgressButton(document.getElementById('userSubmitButton'));
     }
 
+    // The user delete button is initialized
     if(!userDeleteButton) {
         //Enabling progress button
         userDeleteButton = new UIProgressButton(document.getElementById('userDelete'));
@@ -364,7 +367,7 @@ function loadUserPage() {
             e.preventDefault();
             userDeleteButton.startAnimation();
             $.ajax({
-                url: '/api/admin/user?email=' + $('#userFlag').val(), //Workaround since DELETE request needs to be identified by the URI only and jQuery is not attaching the data to the URI, which leads to a Spring error.
+                url: '/api/admin/user?id=' + $('#userFlag').val(), //Workaround since DELETE request needs to be identified by the URI only and jQuery is not attaching the data to the URI, which leads to a Spring error.
                 type: 'DELETE',
                 //data: {
                 //    email: $('#userFlag').val()
@@ -383,6 +386,7 @@ function loadUserPage() {
         })
     }
 
+    // The datepicker instances are initialized
     if(!($('#activeMemberSince').data().datepicker && $('#birthday').data().datepicker && $('#passiveMemberSince').data().datepicker && $('#resignationDate').data().datepicker)) {
         //Global variables
         var datepickerOptions = {
@@ -397,11 +401,12 @@ function loadUserPage() {
         $('#resignationDate').datepicker(datepickerOptions);
     }
 
-
+    // The click events get bound to the functions
     $('#addUser').click(function (e) {
         loadNewUser();
     });
 
+    // The user list is loaded and the form is presented to create a new user
     loadUserList();
     loadNewUser();
 }

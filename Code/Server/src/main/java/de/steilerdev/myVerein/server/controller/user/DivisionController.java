@@ -35,6 +35,9 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This class handles gathering information about divisions by a user.
+ */
 @RestController
 @RequestMapping("/api/user/division")
 public class DivisionController
@@ -44,39 +47,50 @@ public class DivisionController
     @Autowired
     private DivisionRepository divisionRepository;
 
-    @RequestMapping(method = RequestMethod.GET, produces = "application/json")
+    /**
+     * This function retrieves and returns the division identified by its id. The function is invoked by GETting the URI /api/user/division with the id parameter.
+     * @param divisionID The division id of the searched division.
+     * @param currentUser The currently logged in user.
+     * @return A response entity containing a division with all appropriate information together with a success code. If an error occurred an empty response entity with a failure code is returned.
+     */
+    @RequestMapping(method = RequestMethod.GET, params = "id",produces = "application/json")
     public ResponseEntity<Division> getDivision(@RequestParam(value = "id") String divisionID, @CurrentUser User currentUser)
     {
-        logger.trace("[" + currentUser + "] Loading division with ID " + divisionID);
+        logger.trace("[{}] Loading division with ID {}", currentUser, divisionID);
         Division searchedDivision;
         if(divisionID.isEmpty())
         {
-            logger.warn("[" + currentUser + "] The division ID is empty");
+            logger.warn("[{}] The division ID is empty", currentUser);
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } else if ((searchedDivision = divisionRepository.findById(divisionID)) == null)
         {
-            logger.warn("[" + currentUser + "] Unable to find division with the stated ID " + divisionID);
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            logger.warn("[{}] Unable to find division with the stated ID {}", currentUser, divisionID);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } else
         {
-            logger.info("[" + currentUser + "] Returning division with ID " + divisionID);
+            logger.info("{}] Returning division {}", currentUser, searchedDivision);
             return new ResponseEntity<>(searchedDivision.getSendingObjectInternalSync(), HttpStatus.OK);
         }
     }
 
-    @RequestMapping(value = "sync", method = RequestMethod.GET, produces = "application/json")
-    public ResponseEntity<List<Division>> syncUserDivision(@CurrentUser User currentUser)
+    /**
+     * This function gathers and returns all division, the user is part of. The function is invoked by GETting the URI /api/user/division.
+     * @param currentUser The currently logged in user.
+     * @return A response entity with a list of divisions, reduced to their ids together with a success code, if the execution was successful, otherwise an empty response entity with an error code is returned.
+     */
+    @RequestMapping(method = RequestMethod.GET, produces = "application/json")
+    public ResponseEntity<List<Division>> getUserDivision(@CurrentUser User currentUser)
     {
-        logger.trace("[" + currentUser + "] Syncing division");
+        logger.trace("[{}] Syncing division", currentUser);
         List<Division> divisions = currentUser.getDivisions();
-        if (divisions == null )
+        if (divisions == null)
         {
-            logger.warn("[" + currentUser + "] No divisions found");
+            logger.warn("[{}] No divisions found", currentUser);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         } else
         {
             divisions.replaceAll(Division::getSendingObjectOnlyId);
-            logger.info("[" + currentUser + "] Returning user divisions");
+            logger.info("[{}] Returning user divisions", currentUser);
             return new ResponseEntity<>(divisions, HttpStatus.OK);
         }
     }

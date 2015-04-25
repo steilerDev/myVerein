@@ -172,7 +172,7 @@ public struct NetworkingConstants {
       }
     }
     struct Sync {
-      static let URI = Division.BaseURI + "/sync"
+      static let URI = Division.BaseURI
       static let Method = HTTPMethods.GET
     }
   }
