@@ -62,13 +62,7 @@ extension Division: CoreDataObject {
   }
   
   func sync() {
-    if !syncInProgress {
-      XCGLogger.debug("Sync not in progress, syncing division \(self.id)")
-      syncInProgress = true
-      MVNetworkingHelper.syncDivision(id)
-    } else {
-      XCGLogger.debug("Sync in progress, not syncing division \(self.id)")
-    }
+    MVNetworkingHelper.syncDivision(self)
   }
 }
 

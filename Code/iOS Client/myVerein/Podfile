@@ -12,4 +12,5 @@ pod "UIImageView-Letters"
 pod 'RKNotificationHub'
 pod 'JTCalendar'
 pod 'XCGLogger'
+pod 'SVProgressHUD'
 #pod 'Alamofire', '~> 1.1'

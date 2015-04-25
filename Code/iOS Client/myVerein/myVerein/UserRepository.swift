@@ -75,7 +75,6 @@ class UserRepository: CoreDataRepository {
       user.country = dictionary[UserConstants.RemoteUser.Country] as? String
       
       user.lastSynced = NSDate()
-      user.syncInProgress = false
       
       logger.info("Successfully parsed and populated user \(user)")
       return ((user as! T), nil)

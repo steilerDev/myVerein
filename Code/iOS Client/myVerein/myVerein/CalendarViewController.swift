@@ -217,7 +217,7 @@ extension CalendarViewController {
     logger.info("Calendar refresh started")
     startAnimatingRefreshButton()
     // In general the networking task of syncing the user's events takes longer than the calendar's reloading of data, so the refresh button's animation will stop after the networking task finished
-    MVNetworkingHelper.syncUserEvent({
+    MVNetworkingHelper.syncUserEvent(callback: {
       self.updateUI()
       self.stopAnimatingRefreshButton()
     })

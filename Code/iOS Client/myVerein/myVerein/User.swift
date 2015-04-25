@@ -137,13 +137,7 @@ extension User: CoreDataObject {
   }
   
   func sync() {
-    if !syncInProgress {
-      XCGLogger.debug("Sync not in progress, syncing user \(self.id)")
-      syncInProgress = true
-      MVNetworkingHelper.syncUser(id)
-    } else {
-      XCGLogger.debug("Sync in progress, not syncing user \(self.id)")
-    }
+    MVNetworkingHelper.syncUser(self)
   }
 }
 

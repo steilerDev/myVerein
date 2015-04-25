@@ -111,13 +111,7 @@ extension Event: CoreDataObject {
   }
   
   func sync() {
-    if !syncInProgress {
-      XCGLogger.debug("Sync not in progress, syncing event \(self.id)")
-      syncInProgress = true
-      MVNetworkingHelper.syncEvent(id)
-    } else {
-      XCGLogger.debug("Sync in progress, not syncing event \(self.id)")
-    }
+    MVNetworkingHelper.syncEvent(self)
   }
 }
 
@@ -234,24 +228,28 @@ extension Event {
     cancleScheduledNotification()
     
     let notification = UILocalNotification()
-    notification.fireDate = startDate!.dateByAddingTimeInterval(-secondsBeforeEvent)
-    notification.alertTitle = self.title
-    
-    if let bodyString = TimeIntervalPickerAlertView.intervalStringIn(secondsBeforeEvent) {
-      notification.alertBody = "Starts \(bodyString)"
+    let fireDate = startDate!.dateByAddingTimeInterval(-secondsBeforeEvent)
+    if !fireDate.isBefore(NSDate()) {
+      notification.fireDate = startDate!.dateByAddingTimeInterval(-secondsBeforeEvent)
+      notification.alertTitle = self.title
+      
+      if let bodyString = TimeIntervalPickerAlertView.intervalStringIn(secondsBeforeEvent) {
+        notification.alertBody = "Starts \(bodyString)"
+      } else {
+        notification.alertBody = "Starts soon"
+      }
+      
+      notification.applicationIconBadgeNumber = 1
+      
+      UIApplication.sharedApplication().scheduleLocalNotification(notification)
+      
+      if secondsBeforeEvent != (Defaults[MVUserDefaultsConstants.Settings.Calendar.LocalNotificationsTime.Key].double ?? MVUserDefaultsConstants.Settings.Calendar.LocalNotificationsTime.DefaultValue) {
+        logger.debug("Notification is scheduled as a non default notification time")
+        customReminderTimerInterval = secondsBeforeEvent
+      }
     } else {
-      notification.alertBody = "Starts soon"
+      logger.warning("Not scheduling notification for event \(self) because the fire date would be in the past")
     }
-    
-    notification.applicationIconBadgeNumber = 1
-    
-    UIApplication.sharedApplication().scheduleLocalNotification(notification)
-    
-    if secondsBeforeEvent != (Defaults[MVUserDefaultsConstants.Settings.Calendar.LocalNotificationsTime.Key].double ?? MVUserDefaultsConstants.Settings.Calendar.LocalNotificationsTime.DefaultValue) {
-      logger.debug("Notification is scheduled as a non default notification time")
-      customReminderTimerInterval = secondsBeforeEvent
-    }
-    
   }
   
   func cancleScheduledNotification() {

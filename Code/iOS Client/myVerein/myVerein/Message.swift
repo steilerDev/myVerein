@@ -62,13 +62,7 @@ extension Message: CoreDataObject {
   }
   
   func sync() {
-    if !syncInProgress {
-      XCGLogger.debug("Sync not in progress, syncing message \(self.id)")
-      syncInProgress = true
-      MVNetworkingHelper.syncMessage(id)
-    } else {
-      XCGLogger.debug("Sync in progress, not syncing message \(self.id)")
-    }
+    MVNetworkingHelper.syncMessage(self)
   }
 }
 

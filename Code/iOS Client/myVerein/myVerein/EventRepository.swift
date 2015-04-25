@@ -176,7 +176,6 @@ class EventRepository: CoreDataRepository {
       }
       
       event.lastSynced = NSDate()
-      event.syncInProgress = false
       
       logger.info("Succesfully parsed and populaterd event")
       return ((event as! T), nil)

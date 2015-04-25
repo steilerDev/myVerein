@@ -28,6 +28,7 @@ PODS:
   - Locksmith (1.2.1)
   - pop (1.0.7)
   - RKNotificationHub (1.0.5)
+  - SVProgressHUD (1.1.3)
   - SwiftyUserDefaults (1.1.0)
   - UIImageView-Letters (1.1.1)
   - XCGLogger (2.0)
@@ -40,6 +41,7 @@ DEPENDENCIES:
   - Locksmith
   - pop (~> 1.0)
   - RKNotificationHub
+  - SVProgressHUD
   - SwiftyUserDefaults
   - UIImageView-Letters
   - XCGLogger
@@ -53,6 +55,7 @@ SPEC CHECKSUMS:
   Locksmith: 770f6c5c6e5c5c712d1f00e709c62b8a7240c716
   pop: 628ffc631644601567ee8bfaaaea493ebd7d0923
   RKNotificationHub: 529ee3c92564738d3e489057968bfbc4ffd3e942
+  SVProgressHUD: 748080e4f36e603f6c02aec292664239df5279c1
   SwiftyUserDefaults: ae600cd466daa1420a058d09aefbf45ccb6caf1e
   UIImageView-Letters: ea2b315919f0c50bb98999c3a3d7208db0c7064b
   XCGLogger: 90570901ddf86d5479672d61a1b0a639235b851a

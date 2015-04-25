@@ -285,6 +285,7 @@ extension LoginViewController {
   
   override func viewDidAppear(animated: Bool) {
     super.viewDidAppear(animated)
+    (UIApplication.sharedApplication().delegate as! AppDelegate).stopBackgroundSync()
     logger.debug("Registering observer for keyboard notification")
     let notificationCenter = NSNotificationCenter.defaultCenter()
     let mainQueue = NSOperationQueue.mainQueue()
@@ -296,6 +297,7 @@ extension LoginViewController {
   
   override func viewWillDisappear(animated: Bool) {
     super.viewWillDisappear(animated)
+    (UIApplication.sharedApplication().delegate as! AppDelegate).startBackgroundSync()
     logger.debug("Un-registering observer for keyboard notification to free up resources and prevent memory leaks")
     let notificationCenter = NSNotificationCenter.defaultCenter()
     if let keyboardWillShowObserver = keyboardWillShowObserver {
@@ -325,7 +327,6 @@ extension LoginViewController: POPAnimationDelegate {
 
 // MARK: - UITextFieldDelegate
 extension LoginViewController: UITextFieldDelegate {
-  
   func textFieldShouldReturn(textField: UITextField) -> Bool {
     logger.verbose("Detected enter press on UITextField")
     switch textField {

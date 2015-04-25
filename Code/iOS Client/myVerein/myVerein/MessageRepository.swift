@@ -127,7 +127,6 @@ class MessageRepository: CoreDataRepository {
         }
         
         message.lastSynced = NSDate()
-        message.syncInProgress = false
         
         return ((message as! T), nil)
       } else {

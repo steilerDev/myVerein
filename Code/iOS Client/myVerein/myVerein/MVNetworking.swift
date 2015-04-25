@@ -26,6 +26,7 @@ import Locksmith
 import AFNetworking
 import XCGLogger
 import SwiftyUserDefaults
+import SVProgressHUD
 
 /// This class provides proper network and error handling with the currently stored host.
 class MVNetworking {
@@ -40,6 +41,47 @@ class MVNetworking {
   /// Within this array all requests are stored, that could not be executed because the user was not logged in. After a successfull log in, the requests on this queue are executed. If the queue is nil, the system currently does not try to log in. Since arrays are not thread safe an external lock is used to secure the resource.
   private var logInQueue: [MVRequest]!
   private var logInQueueLock = NSLock()
+  
+  /// This counter is used to monitor the amount of currently executed requests. If the last request is executed, the application is going to try to execute the callback. The callback is guaranteed to be executed only once, because the reference is cleared after the execution.
+  private var requestCounter = 0 {
+    didSet {
+      logger.debug("Request counter now at \(self.requestCounter)")
+    }
+  }
+  private var requestCounterLock = NSLock()
+  private var _requestCounterCallback: (()->())?
+  /// This function handles the getting and setting of the request counter callback. Setting the callback may block the execution queue, because a lock needs to be acquired before assigning the value. This callback is guaranteed to be executed on the main queue
+  var requestCounterCallback: (()->())? {
+    get {
+      return _requestCounterCallback
+    }
+    set {
+      requestCounterLock.lock()
+      _requestCounterCallback = newValue
+      requestCounterLock.unlock()
+    }
+  }
+  
+  /// This function should be executed before any request started, it is increasing the request counter and handling the lock on the object.
+  private func requestStarted() {
+    requestCounterLock.lock()
+    requestCounter++
+    requestCounterLock.unlock()
+  }
+  
+  /// This function should be executed after any request finished. Finished means that the request was removed from any queue and either his success or failure callback was executed. The funciton is decreasing the request counter. If the counter is zero, it is trying to execute the specified callback function after clearing the variable.
+  private func requestFinished() {
+    // Reducing counter and trying to execute callback
+    self.requestCounterLock.lock()
+    self.requestCounter--
+    if let callback = self._requestCounterCallback where self.requestCounter == 0 {
+      self._requestCounterCallback = nil
+      self.requestCounterLock.unlock()
+      ~>callback
+    } else {
+      self.requestCounterLock.unlock()
+    }
+  }
   
   // MARK: - Internal functions
   
@@ -57,44 +99,53 @@ class MVNetworking {
     handleRequest(MVRequest(URI: URI, parameters: parameters, requestMethod: requestMethod, success: success, failure: failure))
   }
   
-  /// This function performs a network action specified by the request struct. If the request fails because of an unauthenticated user, the function tries to log the user in and then retries the initial action.
-  private func handleRequest(request: MVRequest) {
-    
-    logger.debug("About to handle \(request)")
-    
-    if let session = session {
+  /// This function performs a network action specified by the request struct. If the request fails because of an unauthenticated user, the function tries to log the user in and then retries the initial action. The function is executed asynchronously
+  ///
+  /// :param: request The request that should be executed by the function
+  /// :param: ignoringRequestCountIncrease This flag indicates if the request count should be increased (false, default) or not. This flag should only be set if the request that is executed was allready counted (e.g. initial request failed and request was stored on login queue)
+  private func handleRequest(request: MVRequest, ignoringRequestCountIncrease: Bool = false) {
+    {
+      if !ignoringRequestCountIncrease {
+        self.requestStarted()
+      }
       
-      let requestFunction = request.requestFunctionInSession(session)
+      self.logger.debug("About to handle \(request)")
       
-      logger.debug("Executing \(request)")
-      requestFunction(URLFromURI(request.URI),
-        parameters: request.parameters,
-        success:
-        {
-          _, response in
-          XCGLogger.info("Successfully executed \(request)")
-          // Executing success callback
-          if response != nil {
-            request.success?(response)
-          } else {
-            let error = MVError.createError(.MVEmptyResponse)
-            XCGLogger.warning("The response for \(request) is empty, in general there is nothing to do, executing failure function anyway")
-            request.success?(error)
+      if let session = self.session {
+        
+        let requestFunction = request.requestFunctionInSession(session)
+        
+        self.logger.debug("Executing \(request)")
+        requestFunction(self.URLFromURI(request.URI),
+          parameters: request.parameters,
+          success:
+          {
+            _, response in
+            XCGLogger.info("Successfully executed \(request)")
+            // Executing success callback
+            if response != nil {
+              request.success?(response)
+            } else {
+              let error = MVError.createError(.MVEmptyResponse)
+              XCGLogger.warning("The response for \(request) is empty, in general there is nothing to do, executing failure function anyway")
+              request.success?(error)
+            }
+            self.requestFinished()
+          },
+          failure:
+          {
+            _, error in
+            XCGLogger.warning("Failed executing \(request): \(error.extendedDescription)")
+            // Handling a request error using the request failure handler. If the error was because of a 401 error, the handler is trying to log the user in before retrying
+            self.handleRequest(request, withError: error)
           }
-        },
-        failure:
-        {
-          _, error in
-          XCGLogger.warning("Failed executing \(request): \(error.extendedDescription)")
-          // Handling a request error using the request failure handler. If the error was because of a 401 error, the handler is trying to log the user in before retrying
-          self.handleRequest(request, withError: error)
-        }
-      )
-    } else {
-      let error = MVError.createError(.MVSessionLoadingError)
-      logger.warning("Unable to execute \(request): \(error.extendedDescription)")
-      request.failure?(error)
-    }
+        )
+      } else {
+        let error = MVError.createError(.MVSessionLoadingError)
+        self.logger.warning("Unable to execute \(request): \(error.extendedDescription)")
+        request.failure?(error)
+      }
+    }~>
   }
   
   /// This function is used to handle a failure during a request. If the failure is due to the fact that the user was not logged in the function is going to try to log the user in. In case of a successfully log in, the initial function is executed again. The retry count is tracking how often the request tried again, to prevent an infinite loop, in case of a forbidden resource.
@@ -111,9 +162,11 @@ class MVNetworking {
       request.failure?(localError)
       let notification = MVDropdownAlertObject(title: "Host not reachable at the moment", message: "Please check your internet connection and try again", style: .Danger)
       MVDropdownAlertCenter.instance.showNotification(notification)
+      requestFinished()
     } else {
       logger.warning("Unable to handle error: \(localError.extendedDescription)")
       request.failure?(localError)
+      requestFinished()
     }
   }
 
@@ -131,11 +184,11 @@ class MVNetworking {
         self.performLogIn(
           success: {
             {
-              self.logInQueueLock.lock()
               let logger = XCGLogger.defaultInstance()
               logger.debug("Successfully logged in, processing queued requests")
+              self.logInQueueLock.lock()
               for request in self.logInQueue {
-                self.handleRequest(request)
+                self.handleRequest(request, ignoringRequestCountIncrease: true)
               }
               self.logInQueue = nil
               self.logInQueueLock.unlock()
@@ -149,6 +202,7 @@ class MVNetworking {
               logger.debug("Unable to log in, processing queued requests")
               for request in self.logInQueue {
                 request.failure?(error)
+                self.requestFinished()
               }
               self.logInQueue = nil
               self.logInQueueLock.unlock()
@@ -172,7 +226,7 @@ class MVNetworking {
         NetworkingConstants.Login.Parameter.Password: password,
         NetworkingConstants.Login.Parameter.RememberMe: "on"
       ]
-    
+      requestStarted()
       session.POST(URLFromURI(NetworkingConstants.Login.URI),
         parameters: parameters,
         success:
@@ -198,6 +252,10 @@ class MVNetworking {
               logger.info("System ID or User ID did change or this is the first log in. Storing and resetting database")
               logger.debug("SystemID Old: \(Defaults[MVUserDefaultsConstants.UserID].string), new: \(newUserID)")
               logger.debug("UserID Old: \(Defaults[MVUserDefaultsConstants.SystemID].string), new: \(newSystemID)")
+              // Showing progress bar
+              ~>(UIApplication.sharedApplication().delegate as! AppDelegate).showInitialSyncProgress
+              // Assigning end of showing progress bar as callback as soon as all network functions have been executed
+              self.requestCounterCallback = (UIApplication.sharedApplication().delegate as! AppDelegate).hideInitialSyncProgress
               Defaults[MVUserDefaultsConstants.UserID] = newUserID
               Defaults[MVUserDefaultsConstants.SystemID] = newSystemID
               (UIApplication.sharedApplication().delegate as! AppDelegate).flushDatabase()
@@ -214,6 +272,7 @@ class MVNetworking {
             logger.error("Unable to log in because reading header fields failed: \(error.extendedDescription)")
             failure?(error)
           }
+          self.requestFinished()
         },
         failure:
         {
@@ -226,6 +285,7 @@ class MVNetworking {
             ~>{ (UIApplication.sharedApplication().delegate as! AppDelegate).showLoginView() }
           }
           failure?(error)
+          self.requestFinished()
         }
       )
     } else {

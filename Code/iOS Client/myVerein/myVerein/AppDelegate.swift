@@ -24,6 +24,7 @@ import UIKit
 import CoreData
 import XCGLogger
 import SwiftyUserDefaults
+import SVProgressHUD
 
 @UIApplicationMain
 class AppDelegate: UIResponder {
@@ -98,19 +99,11 @@ extension AppDelegate: UIApplicationDelegate {
   
   func applicationDidBecomeActive(application: UIApplication) {
     UIApplication.sharedApplication().applicationIconBadgeNumber = 0
-    logger.info("Starting background thread, which is syncing the application with the server")
-    timerObject = {
-      self.logger.debug("Syncing system")
-      MVNetworkingHelper.syncMessages()
-      MVNetworkingHelper.syncUserDivision()
-      MVNetworkingHelper.syncUserEvent(nil)
-      self.logger.debug("Finished sync")
-    }<~
+    startBackgroundSync()
   }
   
   func applicationWillResignActive(application: UIApplication) {
-    logger.info("Stopping background thread, which is syncing the application with the server")
-    timerObject = nil
+    stopBackgroundSync()
   }
   
   func applicationWillTerminate(application: UIApplication) {
@@ -150,6 +143,24 @@ extension AppDelegate {
     }
   }
   
+  /// This function starts the background task of synchronizing the app with the server every x minutes. By default this function is executed when the application became active or the LoginView disappeared.
+  func startBackgroundSync() {
+    logger.info("Starting background thread, which is syncing the application with the server")
+    timerObject = {
+      self.logger.debug("Syncing system")
+      MVNetworkingHelper.syncMessages()
+      MVNetworkingHelper.syncUserDivision()
+      MVNetworkingHelper.syncUserEvent()
+      self.logger.debug("Finished sync")
+    }<~
+  }
+  
+  /// This function stops the background task of synchronizing the app with the server every x minutes. By default this function is executed when the application became inactive or the LoginView appeared.
+  func stopBackgroundSync() {
+    logger.info("Stopping background thread, which is syncing the application with the server")
+    timerObject = nil
+  }
+  
   func flushDatabase() {
     logger.debug("Flushing database")
     if let managedObjectContext = managedObjectContext {
@@ -185,6 +196,16 @@ extension AppDelegate {
     Defaults[MVUserDefaultsConstants.LastSynced.Event] = nil
   }
   
+  func showInitialSyncProgress() {
+    logger.info("Showing initial sync")
+    SVProgressHUD.showWithStatus("Initial sync in progress, please wait")
+  }
+  
+  func hideInitialSyncProgress() {
+    logger.info("Hiding initial sync")
+    SVProgressHUD.dismiss()
+  }
+  
   func saveContext () {
     if let moc = self.managedObjectContext {
       var error: NSError?
@@ -204,8 +225,8 @@ extension AppDelegate {
     if let currentViewController = window?.rootViewController as? UITabBarController,
       loginViewController = currentViewController.storyboard?.instantiateViewControllerWithIdentifier(LoginViewController.StoryBoardID) as? LoginViewController
     {
-        logger.info("Showing log in screen")
-        currentViewController.presentViewController(loginViewController, animated: true, completion: nil)
+      logger.info("Showing log in screen")
+      currentViewController.presentViewController(loginViewController, animated: true, completion: nil)
     } else {
       logger.severe("Unable to show log in screen")
     }

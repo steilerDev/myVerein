@@ -185,6 +185,7 @@ extension ParticipantViewController {
         } else {
           logger.error("Unable to get participants with \(response) response for \(self.event), because response object could not be read")
         }
+        self.tableView.reloadData()
         self.refreshControlElement.endRefreshing()
       },
       failure: {
@@ -226,12 +227,13 @@ extension ParticipantViewController {
   
   /// This function configures the cell at the provided index path
   func configureCell(cell: UITableViewCell, atIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+    logger.debug("Configuring cell at index path \(indexPath)")
     if let user = fetchedResultController.objectAtIndexPath(indexPath) as? User {
       cell.textLabel?.text = user.displayName
       if let userAvatar = user.avatar {
         cell.imageView?.image = userAvatar
       } else {
-        // TODO: Not working, issue filed: https://github.com/bachonk/UIImageView-Letters/issues/13
+        // TODO: Not working, issue filed: https://github.com/bachonk/UIImageView-Letters/issues/13 An error message is appearing in log: "<Error>: CGContextSetFillColorWithColor: invalid context 0x0. This is a serious error. This application, or a library it uses, is using an invalid context  and is thereby contributing to an overall degradation of system stability and reliability. This notice is a courtesy: please fix this problem. It will become a fatal error in an upcoming update."
         cell.imageView?.setImageWithString(user.displayName, color: UIColor(hex: MVColor.Primary.Normal))
       }
     } else {
@@ -258,6 +260,7 @@ extension ParticipantViewController: NSFetchedResultsControllerDelegate {
   }
   
   func controller(controller: NSFetchedResultsController, didChangeObject anObject: AnyObject, atIndexPath indexPath: NSIndexPath?, forChangeType type: NSFetchedResultsChangeType, newIndexPath: NSIndexPath?) {
+    logger.debug("Fetch controller recognize change on object \(anObject)")
     switch type {
       case .Insert:
         tableView.insertRowsAtIndexPaths([newIndexPath!], withRowAnimation: .Fade)
