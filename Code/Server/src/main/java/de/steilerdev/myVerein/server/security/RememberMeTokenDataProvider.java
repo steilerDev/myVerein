@@ -16,8 +16,8 @@
  */
 package de.steilerdev.myVerein.server.security;
 
-import de.steilerdev.myVerein.server.model.RememberMeToken;
-import de.steilerdev.myVerein.server.model.RememberMeTokenRepository;
+import de.steilerdev.myVerein.server.model.rememberMeToken.RememberMeToken;
+import de.steilerdev.myVerein.server.model.rememberMeToken.RememberMeTokenRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,19 +1,17 @@
 package de.steilerdev.myVerein.server.controller;
 
-import com.mongodb.MongoTimeoutException;
-import de.steilerdev.myVerein.server.model.*;
+import de.steilerdev.myVerein.server.model.settings.Settings;
+import de.steilerdev.myVerein.server.model.settings.SettingsHelper;
+import de.steilerdev.myVerein.server.model.settings.SettingsRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.*;
 
 /**
@@ -37,7 +35,7 @@ public class IndexController {
     public String startApplication(Model model)
     {
         logger.trace("Gathering club name for index page.");
-        String clubName = Settings.loadSettings(settingsRepository).getClubName();
+        String clubName = SettingsHelper.loadSettings(settingsRepository).getClubName();
         if(clubName == null || clubName.isEmpty())
         {
             logger.warn("Unable to retrieve club name, or club name is empty. Using default name.");
@@ -60,13 +58,13 @@ public class IndexController {
     public String login(@RequestParam(required = false) String error, @RequestParam(required = false) String logout, @RequestParam(required = false) String cookieTheft, Model model)
     {
         logger.trace("Getting login page.");
-        if (Settings.loadSettings(settingsRepository).isInitialSetup())
+        if (SettingsHelper.loadSettings(settingsRepository).isInitialSetup())
         {
             logger.warn("Starting initial setup.");
             return "init";
         } else
         {
-            String clubName = Settings.loadSettings(settingsRepository).getClubName();
+            String clubName = SettingsHelper.loadSettings(settingsRepository).getClubName();
             if(clubName == null || clubName.isEmpty())
             {
                 logger.warn("Unable to retrieve club name, or club name is empty. Using default name.");

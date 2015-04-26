@@ -14,14 +14,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.steilerdev.myVerein.server.model;
+package de.steilerdev.myVerein.server.model.message;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import de.steilerdev.myVerein.server.model.BaseEntity;
+import de.steilerdev.myVerein.server.model.user.User;
 import de.steilerdev.myVerein.server.model.division.Division;
 import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.beans.BeanUtils;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 
@@ -32,44 +33,8 @@ import java.util.*;
 /**
  * This object is representing an entity within the messages' collection of the MongoDB.
  */
-public class Message
+public class Message extends BaseEntity
 {
-    /**
-     * This enum is representing the status of a message sent to a specific receiver.
-     */
-    public enum MessageStatus {
-        /**
-         * This status is assigned to a message which is stored on the server but not delivered to the client yet
-         */
-        PENDING {
-            @Override
-            public String toString() {
-                return "PENDING";
-            }
-        },
-        /**
-         * This status is assigned to a message which is delivered to the client
-         */
-        DELIVERED {
-            @Override
-            public String toString() {
-                return "DELIVERED";
-            }
-        },
-        /**
-         * This status is assigned to a message which is read by the client
-         */
-        READ {
-            @Override
-            public String toString() {
-                return "READ";
-            }
-        }
-    }
-
-    @Id
-    private String id;
-
     @NotBlank
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String content;
@@ -92,13 +57,16 @@ public class Message
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Division group;
 
+    /*
+        Constructors (Empty one to meet bean definition and convenience ones)
+     */
+
     public Message() {}
 
     public Message(String content, User sender, Division group)
     {
         this(content, LocalDateTime.now(), sender, group);
     }
-
 
     public Message(String content, LocalDateTime timestamp, User sender, Division group)
     {
@@ -115,15 +83,9 @@ public class Message
         setDelivered(sender);
     }
 
-    public String getId()
-    {
-        return id;
-    }
-
-    public void setId(String id)
-    {
-        this.id = id;
-    }
+    /*
+        Mandatory basic getter and setter
+     */
 
     public String getContent()
     {
@@ -175,16 +137,32 @@ public class Message
         this.group = group;
     }
 
+    /*
+        Convenience getter and setter
+     */
+
+    /**
+     * This function sets the status of the message for the specified user to delivered. This function does not check if the user is part of the receiver list.
+     * @param user The user that received the message.
+     */
     public void setDelivered(User user)
     {
         receiver.put(user.getId(), MessageStatus.DELIVERED);
     }
 
+    /**
+     * This function sets the status of the message for the specified user to read. This function does not check if the user is part of the receiver list.
+     * @param user The user that read the message.
+     */
     public void setRead(User user)
     {
         receiver.put(user.getId(), MessageStatus.READ);
     }
 
+    /**
+     * This function replaces the list of receiving user by the specified user. The status is set to 'pending' by default.
+     * @param users
+     */
     public void setReceivingUser(User... users)
     {
         receiver = new HashMap<>();
@@ -193,6 +171,10 @@ public class Message
             receiver.put(user.getId(), MessageStatus.PENDING);
         }
     }
+
+    /*
+        Sending object functions
+     */
 
     /**
      * This function creates a new message object and copies only the id and timestamp of the current message. This is used as a response to a succesfully send message.
@@ -267,12 +249,34 @@ public class Message
         return sendingObject;
     }
 
-    /**
-     * {@link de.steilerdev.myVerein.server.model.MessageRepository#findAllByPrefixedReceiverIDAndMessageStatus} needs a receiver id, prefixed with "receiver.", because a custom query with a fixed prefix is not working. This function creates this prefixed receiver id.
-     * @param user The user, which needs to be prefixed.
-     * @return The prefixed user ID.
+    /*
+        Required java object functions
      */
-    public static String receiverIDForUser(User user) {
-        return user == null? null: "receiver." + user.getId();
+
+    @Override
+    public int hashCode()
+    {
+        return id == null? 0: id.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        return obj != null && obj instanceof Message && this.id != null && this.id.equals(((Message) obj).getId());
+    }
+
+    @Override
+    public String toString()
+    {
+        if (content != null && !content.isEmpty() && group != null)
+        {
+            return content + " send to " + group;
+        } else if(content != null && !content.isEmpty())
+        {
+            return content;
+        } else
+        {
+            return id;
+        }
     }
 }

@@ -22,18 +22,13 @@ import org.springframework.data.annotation.Id;
  */
 public abstract class BaseEntity
 {
+    /*
+        Default unique identifier for all entities together with getter/setter
+     */
+
     @Id
     @JsonInclude(JsonInclude.Include.NON_NULL)
     protected String id;
-
-    @Override
-    public abstract String toString();
-
-    @Override
-    public abstract boolean equals(Object obj);
-
-    @Override
-    public abstract int hashCode();
 
     public String getId()
     {
@@ -44,4 +39,17 @@ public abstract class BaseEntity
     {
         this.id = id;
     }
+
+    /*
+        Required java object functions
+     */
+
+    @Override
+    public abstract String toString();
+
+    @Override
+    public abstract boolean equals(Object obj);
+
+    @Override
+    public abstract int hashCode();
 }

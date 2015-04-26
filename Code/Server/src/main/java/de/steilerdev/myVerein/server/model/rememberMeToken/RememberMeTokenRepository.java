@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.steilerdev.myVerein.server.model;
+package de.steilerdev.myVerein.server.model.rememberMeToken;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
@@ -22,11 +22,10 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 /**
- * This repository is used to store and retrieve tokens for the remember me functionality. The repository is implemented during runtime by SpringData through the @Repository annotation.
+ * This repository is used to store and retrieve tokens for the remember me functionality. The repository is implemented during runtime by SpringData.
  */
-@Repository
 public interface RememberMeTokenRepository extends MongoRepository<RememberMeToken, String>
 {
-    public abstract RememberMeToken findRememberMeTokenBySeries(String series);
-    public abstract List<RememberMeToken> findRememberMeTokenByUsername(String username);
+    RememberMeToken findRememberMeTokenBySeries(String series);
+    List<RememberMeToken> findRememberMeTokenByUsername(String username);
 }

@@ -20,6 +20,11 @@ import com.mongodb.MongoException;
 import de.steilerdev.myVerein.server.model.*;
 import de.steilerdev.myVerein.server.model.division.Division;
 import de.steilerdev.myVerein.server.model.division.DivisionRepository;
+import de.steilerdev.myVerein.server.model.settings.Settings;
+import de.steilerdev.myVerein.server.model.settings.SettingsHelper;
+import de.steilerdev.myVerein.server.model.settings.SettingsRepository;
+import de.steilerdev.myVerein.server.model.user.User;
+import de.steilerdev.myVerein.server.model.user.UserRepository;
 import de.steilerdev.myVerein.server.security.CurrentUser;
 import de.steilerdev.myVerein.server.security.PasswordEncoder;
 import org.slf4j.Logger;
@@ -86,7 +91,7 @@ public class SettingsController
         {
             logger.debug("[{}] Loading settings for super admin", currentUser);
 
-            settings = Settings.loadSettings(settingsRepository).getSettingsMap();
+            settings = SettingsHelper.loadSettings(settingsRepository).getSettingsMap();
 
             if(gridFSRepository.findClubLogo() != null)
             {
@@ -123,7 +128,7 @@ public class SettingsController
                                                @CurrentUser User currentUser)
     {
         logger.trace("[{}] Starting to save settings", currentUser);
-        Settings settings = Settings.loadSettings(settingsRepository);
+        Settings settings = SettingsHelper.loadSettings(settingsRepository);
         if (!passwordEncoder.isPasswordValid(currentUser.getPassword(), currentAdminPassword, currentUser.getSalt()))
         {
             logger.warn("[{}] The stated password is invalid", currentUser);
@@ -319,7 +324,7 @@ public class SettingsController
             return new ResponseEntity<>("The stated passwords did not match", HttpStatus.BAD_REQUEST);
         } else
         {
-            currentUser.setPassword(newPassword);
+            currentUser.replacePassword(newPassword);
             logger.debug("[{}] Saving new user password", currentUser);
             userRepository.save(currentUser);
             logger.info("[{}] Successfully saved new user password", currentUser);
@@ -336,7 +341,7 @@ public class SettingsController
     public ResponseEntity<List<String>> getCustomUserFields(@CurrentUser User currentUser)
     {
         logger.trace("[{}] Gathering custom user fields", currentUser);
-        List<String> customUserFields = Settings.loadSettings(settingsRepository).getCustomUserFields();
+        List<String> customUserFields = SettingsHelper.loadSettings(settingsRepository).getCustomUserFields();
         if(customUserFields != null)
         {
             logger.debug("[{}] Returning custom user fields", currentUser);

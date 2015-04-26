@@ -17,18 +17,16 @@
 package de.steilerdev.myVerein.server.model.event;
 
 import de.steilerdev.myVerein.server.model.division.Division;
-import de.steilerdev.myVerein.server.model.User;
+import de.steilerdev.myVerein.server.model.user.User;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
-import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * This interface is used to query the database for specific event object. The repository is implemented during runtime by SpringData through the @Repository annotation.
+ * This interface is used to query the database for specific event object. The repository is implemented during runtime by SpringData.
  */
-@Repository
 public interface EventRepository extends MongoRepository<Event, String> {
 
     List<Event> findByInvitedDivision(Division invitedDivision);
@@ -57,7 +55,7 @@ public interface EventRepository extends MongoRepository<Event, String> {
                         "]}" +
                     "]}"
     )
-    List<Event> findAllSpanningOverPeriod(LocalDateTime periodStart, LocalDateTime periodEnd);
+    List<Event> findBySpanningOverPeriod(LocalDateTime periodStart, LocalDateTime periodEnd);
 
     /**
      * This function gathers all events, where the user is in the list of invited user.

@@ -16,7 +16,7 @@ function resetDivisionForm(doNotHideDeleteButton) {
     $('#name').val('');
     $('#description').val('');
     adminSelectize[0].selectize.clear();
-    $('#oldName').val('');
+    $('#divisionId').val('');
 
     //Reset heading
     $('#initDivisionHeading').removeClass('hidden');
@@ -47,15 +47,15 @@ function disableDivisionForm() {
 }
 
 //Loading division information into the form
-function loadDivision(name, newDivision) {
+function loadDivision(id, newDivision) {
     resetDivisionForm();
     divisionSubmitButton.startAnimation();
-    //Sending JSON request with the division name as parameter to get the division details
+    //Sending JSON request with the division id as parameter to get the division details
     $.ajax({
         url: '/api/admin/division',
         type: 'GET',
         data: {
-            name: name
+            id: id
         },
         error: function () {
             divisionSubmitButton.stopAnimation(-1, function(button){
@@ -66,7 +66,7 @@ function loadDivision(name, newDivision) {
         success: function (response) {
             resetDivisionForm();
 
-            $('#oldName').val(response.name);
+            $('#divisionId').val(response.id);
 
             var name = $('#name');
             name.focus();
@@ -153,7 +153,7 @@ function loadDivisionPage() {
             'tree.click',
             function (event) {
                 if(event.node.name != clubName) {
-                    loadDivision(event.node.name);
+                    loadDivision(event.node.id);
                 }
             }
         );
@@ -165,10 +165,10 @@ function loadDivisionPage() {
                     url: '/api/admin/division/divisionTree',
                     type: 'POST',
                     data: {
-                        moved_node: event.move_info.moved_node.name,
-                        target_node: event.move_info.target_node.name,
+                        moved_node: event.move_info.moved_node.id,
+                        target_node: event.move_info.target_node.id,
                         position: event.move_info.position,
-                        previous_parent: event.move_info.previous_parent.name
+                        previous_parent: event.move_info.previous_parent.id
                     },
                     error: function (response) {
                         showMessage(response.responseText, 'error', 'icon_error-triangle_alt');
@@ -257,7 +257,6 @@ function loadDivisionPage() {
                     success: function (response) {
                         divisionSubmitButton.stopAnimation(1);
                         showMessage(response, 'success', 'icon_check');
-                        $('#oldName').val($('#name').val()); //If the name changed and the division is not reloaded the oldName needs to be resetted
                         loadTree();
                     }
                 });
@@ -276,10 +275,10 @@ function loadDivisionPage() {
             e.preventDefault();
             divisionDeleteButton.startAnimation();
             $.ajax({
-                url: '/api/admin/division?divisionName=' + $('#oldName').val(), //Workaround since DELETE request needs to be identified by the URI only and jQuery is not attaching the data to the URI, which leads to a Spring error.
+                url: '/api/admin/division?id=' + $('#divisionId').val(), //Workaround since DELETE request needs to be identified by the URI only and jQuery is not attaching the data to the URI, which leads to a Spring error.
                 type: 'DELETE',
                 //data: {
-                //    divisionName: $('#oldName').val()
+                //    id: $('#divisionId').val()
                 //},
                 error: function (response) {
                     divisionDeleteButton.stopAnimation(-1);
@@ -315,9 +314,9 @@ function loadDivisionPage() {
             success: function(response) {
                 divisionSubmitButton.stopAnimation(1);
                 //Separating response message and name of the new division
-                loadDivision(response.newDivisionName, true);
+                loadDivision(response.divisionId, true);
                 loadTree(function(){
-                    divisionTree.tree('selectNode', divisionTree.tree('getNodeByName', response.newDivisionName));
+                    divisionTree.tree('selectNode', divisionTree.tree('getNodeByName', response.divisionName));
                 });
                 showMessage(response.successMessage, 'success', 'icon_check');
             }

@@ -16,10 +16,15 @@
  */
 package de.steilerdev.myVerein.server.controller.admin;
 
-import de.steilerdev.myVerein.server.model.*;
 import de.steilerdev.myVerein.server.model.division.Division;
 import de.steilerdev.myVerein.server.model.division.DivisionRepository;
 import de.steilerdev.myVerein.server.model.event.EventRepository;
+import de.steilerdev.myVerein.server.model.settings.Settings;
+import de.steilerdev.myVerein.server.model.settings.SettingsHelper;
+import de.steilerdev.myVerein.server.model.settings.SettingsRepository;
+import de.steilerdev.myVerein.server.model.user.Gender;
+import de.steilerdev.myVerein.server.model.user.User;
+import de.steilerdev.myVerein.server.model.user.UserRepository;
 import de.steilerdev.myVerein.server.security.CurrentUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,8 +46,6 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/admin/user")
 public class UserManagementController
 {
-    private final Logger logger = LoggerFactory.getLogger(UserManagementController.class);
-
     @Autowired
     private DivisionRepository divisionRepository;
 
@@ -54,6 +57,8 @@ public class UserManagementController
 
     @Autowired
     private EventRepository eventRepository;
+
+    private final Logger logger = LoggerFactory.getLogger(UserManagementController.class);
 
     /**
      * These final strings are used to bundle information within a response entity.
@@ -183,7 +188,7 @@ public class UserManagementController
         } else
         {
             modifyingUser = new User();
-            modifyingUser.setPassword(password);
+            modifyingUser.replacePassword(password);
             return populateUser(firstName, lastName, email, birthday, gender, street, streetNumber, zip, city, country, activeMemberSince, passiveMemberSince, resignationDate, iban, bic, divisions, parameters, modifyingUser, currentUser);
         }
     }
@@ -348,7 +353,7 @@ public class UserManagementController
             logger.debug("[{}] Parsing gender for {}", currentUser, modifyingUser);
             try
             {
-                modifyingUser.setGender(User.Gender.valueOf(gender));
+                modifyingUser.setGender(Gender.valueOf(gender));
             } catch (IllegalArgumentException e)
             {
                 logger.warn("[{}] Unable to parse gender: {}", currentUser, e.getMessage());
@@ -465,11 +470,11 @@ public class UserManagementController
         if(term == null || term.isEmpty())
         {
             logger.trace("[{}] Retrieving all users", currentUser);
-            userList = userRepository.findAllEmailAndName();
+            userList = userRepository.findOnlyEmailAndName();
         } else
         {
             logger.trace("[{}] Retrieving all users using the search term {}", currentUser, term);
-            userList = userRepository.findAllEmailAndNameContainingString(term);
+            userList = userRepository.findOnlyEmailAndNameContainingString(term);
         }
 
         if(userList == null)
@@ -517,7 +522,7 @@ public class UserManagementController
             searchedUser.setAdministrationNotAllowedMessage(null);
 
             //Adding all custom user fields defined within the settings file to the object
-            Settings settings = Settings.loadSettings(settingsRepository);
+            Settings settings = SettingsHelper.loadSettings(settingsRepository);
             if(settings.getCustomUserFields() != null && !settings.getCustomUserFields().isEmpty())
             {
                 for(String customField: settings.getCustomUserFields())

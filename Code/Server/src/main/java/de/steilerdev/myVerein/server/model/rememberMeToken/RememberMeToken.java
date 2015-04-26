@@ -14,8 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.steilerdev.myVerein.server.model;
+package de.steilerdev.myVerein.server.model.rememberMeToken;
 
+import de.steilerdev.myVerein.server.model.BaseEntity;
 import org.springframework.data.annotation.Id;
 import org.springframework.security.web.authentication.rememberme.PersistentRememberMeToken;
 
@@ -25,15 +26,16 @@ import java.util.Date;
  * A re-implementation of the PersistentRememberMeToken. Original object is not usable with SpringData MongoDB, because it got no default constructor and fitting setter.
  * This class actually overrides everything and tries to find workarounds for equals and get hash code, to replicate the original implementation as good as possible.
  */
-public class RememberMeToken
+public class RememberMeToken extends BaseEntity
 {
-    @Id
-    private String id;
-
     private String username;
     private String series;
     private String tokenValue;
     private Date date;
+
+    /*
+        Constructors (Empty one to meet bean definition and convenience ones)
+     */
 
     public RememberMeToken() {}
 
@@ -52,6 +54,10 @@ public class RememberMeToken
         this.tokenValue = token.getTokenValue();
         this.date = token.getDate();
     }
+
+    /*
+        Mandatory basic getter and setter
+     */
 
     public String getUsername()
     {
@@ -103,8 +109,47 @@ public class RememberMeToken
         this.id = id;
     }
 
+    /*
+        Convenience getter and setter
+     */
+
+    /**
+     * This function converts this object to a persistent remember me token, that is usable in the context of Spring's remember me service.
+     * @return A persistent remember me token, similar to this object.
+     */
     public PersistentRememberMeToken toPersistentRememberMeToken()
     {
         return new PersistentRememberMeToken(username, series, tokenValue, date);
+    }
+
+    /*
+        Required java object functions
+     */
+
+    @Override
+    public int hashCode()
+    {
+        return id == null? 0: id.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        return obj != null && obj instanceof RememberMeToken && this.id != null && this.id.equals(((RememberMeToken) obj).getId());
+    }
+
+    @Override
+    public String toString()
+    {
+        if(username != null && !username.isEmpty() && tokenValue != null && !tokenValue.isEmpty() && series != null && !series.isEmpty())
+        {
+            return "Remember-me token for " + username + " with value " + tokenValue + " from series " + series;
+        } else if (username != null && !username.isEmpty())
+        {
+            return "Remember-me token for " + username;
+        } else
+        {
+            return id;
+        }
     }
 }

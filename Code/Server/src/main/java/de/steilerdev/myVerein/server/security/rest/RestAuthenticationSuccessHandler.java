@@ -16,9 +16,10 @@
  */
 package de.steilerdev.myVerein.server.security.rest;
 
-import de.steilerdev.myVerein.server.model.Settings;
-import de.steilerdev.myVerein.server.model.SettingsRepository;
-import de.steilerdev.myVerein.server.model.User;
+import de.steilerdev.myVerein.server.model.settings.Settings;
+import de.steilerdev.myVerein.server.model.settings.SettingsHelper;
+import de.steilerdev.myVerein.server.model.settings.SettingsRepository;
+import de.steilerdev.myVerein.server.model.user.User;
 import de.steilerdev.myVerein.server.security.SecurityHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,7 +48,7 @@ public class RestAuthenticationSuccessHandler extends SimpleUrlAuthenticationSuc
         clearAuthenticationAttributes(request);
         if(!response.isCommitted())
         {
-            Settings settings =  Settings.loadSettings(settingsRepository);
+            Settings settings =  SettingsHelper.loadSettings(settingsRepository);
             response.setHeader("System-ID", settings.getId());
             response.setHeader("System-Version", settings.getSystemVersion());
             response.setHeader("User-ID", currentUser.getId());

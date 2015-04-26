@@ -16,9 +16,13 @@
  */
 package de.steilerdev.myVerein.server.controller.user;
 
-import de.steilerdev.myVerein.server.model.*;
 import de.steilerdev.myVerein.server.model.division.Division;
 import de.steilerdev.myVerein.server.model.division.DivisionRepository;
+import de.steilerdev.myVerein.server.model.message.Message;
+import de.steilerdev.myVerein.server.model.message.MessageHelper;
+import de.steilerdev.myVerein.server.model.message.MessageRepository;
+import de.steilerdev.myVerein.server.model.message.MessageStatus;
+import de.steilerdev.myVerein.server.model.user.User;
 import de.steilerdev.myVerein.server.security.CurrentUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,7 +90,7 @@ public class MessageController
     public ResponseEntity<List<Message>> getMessages(@CurrentUser User currentUser, @RequestParam(required = false) String all)
     {
         logger.trace("[{}] Getting unread messages", currentUser);
-        List<Message> messages = messageRepository.findAllByPrefixedReceiverIDAndMessageStatus(Message.receiverIDForUser(currentUser), Message.MessageStatus.PENDING);
+        List<Message> messages = messageRepository.findByPrefixedReceiverIDAndMessageStatus(MessageHelper.receiverIDForUser(currentUser), MessageStatus.PENDING);
         if (messages == null)
         {
             logger.debug("[{}] Unable to find any undelivered messages", currentUser);
@@ -99,8 +103,8 @@ public class MessageController
             if(all != null && !all.isEmpty())
             {
                 logger.debug("[{}] Retrieving all messages", currentUser);
-                messages.addAll(messageRepository.findAllByPrefixedReceiverIDAndMessageStatus(Message.receiverIDForUser(currentUser), Message.MessageStatus.DELIVERED));
-                messages.addAll(messageRepository.findAllByPrefixedReceiverIDAndMessageStatus(Message.receiverIDForUser(currentUser), Message.MessageStatus.READ));
+                messages.addAll(messageRepository.findByPrefixedReceiverIDAndMessageStatus(MessageHelper.receiverIDForUser(currentUser), MessageStatus.DELIVERED));
+                messages.addAll(messageRepository.findByPrefixedReceiverIDAndMessageStatus(MessageHelper.receiverIDForUser(currentUser), MessageStatus.READ));
             }
 
             try

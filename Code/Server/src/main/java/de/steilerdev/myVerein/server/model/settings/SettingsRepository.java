@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2014 Frank Steiler <frank@steilerdev.de>
+ * Copyright (C) 2015 Frank Steiler <frank@steilerdev.de>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,19 +14,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.steilerdev.myVerein.server.model;
+package de.steilerdev.myVerein.server.model.settings;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 /**
- * This interface is used to query the database for specific picture object. The repository is implemented during runtime by SpringData through the @Repository annotation.
+ * This interface is used to query the database for the system settings. The repository is implemented during runtime by SpringData.
  */
-@Repository
-public interface PictureRepository extends MongoRepository<Picture, String> {
-
-    public List<Picture> findByUploader(User uploader);
-
+public interface SettingsRepository extends MongoRepository<Settings, String>
+{
+    List<Settings> findAll();
 }

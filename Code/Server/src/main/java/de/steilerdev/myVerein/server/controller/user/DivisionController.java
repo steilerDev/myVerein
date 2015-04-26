@@ -19,7 +19,7 @@ package de.steilerdev.myVerein.server.controller.user;
 
 import de.steilerdev.myVerein.server.model.division.Division;
 import de.steilerdev.myVerein.server.model.division.DivisionRepository;
-import de.steilerdev.myVerein.server.model.User;
+import de.steilerdev.myVerein.server.model.user.User;
 import de.steilerdev.myVerein.server.security.CurrentUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

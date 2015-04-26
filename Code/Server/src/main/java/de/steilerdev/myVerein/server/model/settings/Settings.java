@@ -14,8 +14,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.steilerdev.myVerein.server.model;
+package de.steilerdev.myVerein.server.model.settings;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import de.steilerdev.myVerein.server.model.BaseEntity;
 import de.steilerdev.myVerein.server.model.division.Division;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,67 +29,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Settings
+public class Settings extends BaseEntity
 {
-    @Id
-    private String id;
 
     @Transient
     private final String systemVersion = "0.1-BETA1";
 
-    private String clubName;
-
     @DBRef
     private Division rootDivision;
-
+    private String clubName;
     private List<String> customUserFields;
-
     private boolean initialSetup;
 
-    @Transient
-    private static Logger logger = LoggerFactory.getLogger(Settings.class);
-
-
-    static public Settings loadSettings(SettingsRepository settingsRepository)
-    {
-        logger.debug("Getting current settings");
-        List<Settings> currentSettings = settingsRepository.findAll();
-        Settings currentSetting;
-
-        if(currentSettings == null || currentSettings.isEmpty())
-        {
-            logger.info("Unable to find settings in database, creating new object");
-            currentSetting = new Settings();
-            settingsRepository.save(currentSetting);
-        } else
-        {
-            currentSetting = currentSettings.remove(0);
-            if(!currentSettings.isEmpty())
-            {
-                logger.info("There are more settings objects present in database, deleting unnecessary ones");
-                settingsRepository.delete(currentSettings);
-            }
-        }
-        return currentSetting;
-    }
-
-    public Map<String, Object> getSettingsMap()
-    {
-        Map<String, Object> settingsMap = new HashMap<>();
-        settingsMap.put("clubName", clubName);
-        settingsMap.put("customUserFields", customUserFields);
-        return settingsMap;
-    }
-
-    public String getId()
-    {
-        return id;
-    }
-
-    public void setId(String id)
-    {
-        this.id = id;
-    }
+    /*
+        Mandatory basic getter and setter
+     */
 
     public String getClubName()
     {
@@ -132,5 +88,41 @@ public class Settings
     public void setInitialSetup(boolean initialSetup)
     {
         this.initialSetup = initialSetup;
+    }
+
+    /*
+        Convenience getter and setter
+     */
+
+    @Transient
+    @JsonIgnore
+    public Map<String, Object> getSettingsMap()
+    {
+        Map<String, Object> settingsMap = new HashMap<>();
+        settingsMap.put("clubName", clubName);
+        settingsMap.put("customUserFields", customUserFields);
+        return settingsMap;
+    }
+
+    /*
+        Required java object functions
+     */
+
+    @Override
+    public int hashCode()
+    {
+        return id == null? 0: id.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        return obj != null && obj instanceof Settings && this.id != null && this.id.equals(((Settings) obj).getId());
+    }
+
+    @Override
+    public String toString()
+    {
+        return clubName != null && !clubName.isEmpty()? "Settings for " + clubName + " system version " + systemVersion: id;
     }
 }

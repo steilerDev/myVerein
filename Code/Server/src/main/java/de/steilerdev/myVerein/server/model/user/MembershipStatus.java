@@ -12,21 +12,37 @@
  * You should have received a copy of the GNU General Public License along with this program.  If not, see
  * <http://www.gnu.org/licenses/>.
  */
-package de.steilerdev.myVerein.server.model.event;
-
-import de.steilerdev.myVerein.server.model.user.User;
+package de.steilerdev.myVerein.server.model.user;
 
 /**
- * This class contains static helper functions needed while handling events.
+ * This enum is representing the current membership status of a user.
  */
-public class EventHelper
-{
+public enum MembershipStatus {
     /**
-     * {@link EventRepository#findByPrefixedInvitedUser(String)} needs a user id, prefixed with "invitedUser.", because a custom query with a fixed prefix is not working. This function creates this prefixed user id.
-     * @param user The user, which needs to be prefixed.
-     * @return The prefixed user ID.
+     * This value is assigned to all active members.
      */
-    public static String prefixedUserIDForUser(User user) {
-        return user == null? null: "invitedUser." + user.getId();
+    ACTIVE {
+        @Override
+        public String toString() {
+            return "ACTIVE";
+        }
+    },
+    /**
+     * This value is assigned to all passive members.
+     */
+    PASSIVE {
+        @Override
+        public String toString() {
+            return "PASSIVE";
+        }
+    },
+    /**
+     * This value is assigned to all resigned members.
+     */
+    RESIGNED {
+        @Override
+        public String toString() {
+            return "RESIGNED";
+        }
     }
 }

@@ -16,17 +16,15 @@
  */
 package de.steilerdev.myVerein.server.model.division;
 
-import de.steilerdev.myVerein.server.model.User;
+import de.steilerdev.myVerein.server.model.user.User;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 /**
- * This interface is used to query the database for specific division object. The repository is implemented during runtime by SpringData through the @Repository annotation.
+ * This interface is used to query the database for specific division object. The repository is implemented during runtime by SpringData.
  */
-@Repository
 public interface DivisionRepository extends MongoRepository<Division, String> {
 
     Division findByName(String name);

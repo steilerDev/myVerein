@@ -22,7 +22,7 @@ import de.steilerdev.myVerein.server.model.BaseEntity;
 import de.steilerdev.myVerein.server.model.division.Division;
 import de.steilerdev.myVerein.server.model.division.DivisionHelper;
 import de.steilerdev.myVerein.server.model.division.DivisionRepository;
-import de.steilerdev.myVerein.server.model.User;
+import de.steilerdev.myVerein.server.model.user.User;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.slf4j.Logger;
@@ -100,18 +100,8 @@ public class Event extends BaseEntity
     public Event() {}
 
     /*
-        Mandatory getter and setter
+        Mandatory basic getter and setter
      */
-
-    public String getId()
-    {
-        return id;
-    }
-
-    public void setId(String id)
-    {
-        this.id = id;
-    }
 
     public String getName()
     {

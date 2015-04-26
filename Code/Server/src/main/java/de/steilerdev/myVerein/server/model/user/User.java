@@ -15,10 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.steilerdev.myVerein.server.model;
+package de.steilerdev.myVerein.server.model.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import de.steilerdev.myVerein.server.model.BaseEntity;
 import de.steilerdev.myVerein.server.model.division.Division;
 import de.steilerdev.myVerein.server.model.division.DivisionHelper;
 import de.steilerdev.myVerein.server.model.division.DivisionRepository;
@@ -46,32 +47,19 @@ import java.util.stream.Collectors;
 /**
  * This object is representing an entity within the user's collection of the MongoDB and is used by Spring Security as UserDetails implementation. On top of that the class is providing several useful helper methods.
  */
-public class User implements UserDetails
+public class User extends BaseEntity implements UserDetails
 {
     @Transient
     @JsonIgnore
     private static Logger logger = LoggerFactory.getLogger(User.class);
 
-    public enum Gender {
-        MALE,
-        FEMALE
-    }
-
-    public enum MembershipStatus {
-        ACTIVE,
-        PASSIVE,
-        RESIGNED
-    }
-
     @NotBlank
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String firstName;
+
     @NotBlank
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String lastName;
-
-    @Id
-    private String id;
 
     @Indexed
     @NotBlank
@@ -81,11 +69,11 @@ public class User implements UserDetails
 
     @JsonIgnore
     @NotBlank
-    private String password;
+    private String password; // The hashed password
 
     @JsonIgnore
     @NotBlank
-    private String salt;
+    private String salt; // The salt is used to increase the security of the password hash
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Map<String,String> customUserField;
@@ -134,20 +122,18 @@ public class User implements UserDetails
     private MembershipStatus membershipStatus;
 
     @JsonIgnore
-    private byte[] deviceToken;
+    private byte[] deviceToken; // The device token for the APNS service
 
     @Transient
     @JsonIgnore
-    Collection<? extends GrantedAuthority> authorities;
+    Collection<? extends GrantedAuthority> authorities; // Needed by UserDetails interface
 
     @Transient
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String administrationNotAllowedMessage;
 
     /*
-
-    Standard function (Constructor and getter/setter)
-
+        Constructors (Empty one to meet bean definition and convenience ones)
      */
 
     public User() {}
@@ -164,19 +150,13 @@ public class User implements UserDetails
         this.firstName = firstName;
         this.lastName = lastName;
         this.customUserField = customUserField;
-        setPassword(password);
+        replacePassword(password);
         updateMembershipStatus();
     }
 
-    public String getId()
-    {
-        return id;
-    }
-
-    public void setId(String id)
-    {
-        this.id = id;
-    }
+    /*
+        Mandatory basic getter and setter
+     */
 
     public String getFirstName()
     {
@@ -213,15 +193,9 @@ public class User implements UserDetails
         return password;
     }
 
-    /**
-     * Setting the password. The password is automatically hashed and the salt is randomly re-generated.
-     * @param password The new plain text password.
-     */
     public void setPassword(String password)
     {
-        salt = KeyGenerators.string().generateKey();
-        PasswordEncoder passwordEncoder = new PasswordEncoder();
-        this.password = passwordEncoder.encodePassword(password, salt);
+        this.password = password;
     }
 
     public Map<String, String> getCustomUserField()
@@ -412,6 +386,15 @@ public class User implements UserDetails
         this.deviceToken = deviceToken;
     }
 
+    /*
+        Convenience getter and setter
+     */
+
+    /**
+     * This function accepts a base 64 encoded string, decodes the string and sets the plain byte array of the device token of the user.
+     * @param deviceToken The base 64 encoded device token.
+     * @return True if the device token was successfully set, false otherwise. In general this execution only fails if the token is not 32 bytes long.
+     */
     @Transient
     @JsonIgnore
     public boolean setDeviceTokenBase64Encoded(String deviceToken)
@@ -433,6 +416,10 @@ public class User implements UserDetails
         }
     }
 
+    /**
+     * This function encodes the device token to base 64.
+     * @return The base 64 encoded string representation of the device token.
+     */
     @Transient
     @JsonIgnore
     public String getDeviceTokenBase64Encoded()
@@ -446,11 +433,16 @@ public class User implements UserDetails
         }
     }
 
-    /*
-
-        Other getter/setter functions
-
+    /**
+     * This function replaces the current password and salt using the provided plain-text password. The function hashes the password using the default system-wide password encoder.
+     * @param newPassword The new plain-text password.
      */
+    public void replacePassword(String newPassword)
+    {
+        salt = KeyGenerators.string().generateKey();
+        PasswordEncoder passwordEncoder = new PasswordEncoder();
+        this.password = passwordEncoder.encodePassword(newPassword, salt);
+    }
 
     /**
      * This function adds a custom user field and overwrites the existing value.
@@ -476,14 +468,13 @@ public class User implements UserDetails
             customUserField.put(key, value);
         } else if(overwrite || !customUserField.keySet().contains(key))
         {
-            //Escaping a dot for the key is needed
             customUserField.put(key, value);
         }
     }
 
     /**
      * This function removes a custom user field specified by the key.
-     * @param key The unescaped key of the custom user field.
+     * @param key The key of the custom user field.
      */
     public void removeCustomUserField(String key)
     {
@@ -495,8 +486,8 @@ public class User implements UserDetails
 
     /**
      * This function renames a custom user field.
-     * @param oldKey The unescaped old key.
-     * @param newKey The unescaped new key.
+     * @param oldKey The old key of the custom user field.
+     * @param newKey The new key of the custom user field.
      */
     public void renameCustomUserField(String oldKey, String newKey)
     {
@@ -599,9 +590,7 @@ public class User implements UserDetails
     }
 
     /*
-
-        Spring security functions
-
+        Spring security functions (Implementation of the UserDetails interface)
      */
 
     /**
@@ -675,9 +664,7 @@ public class User implements UserDetails
     }
 
     /*
-
         Helper functions needed by the application
-
      */
 
     /**
@@ -726,6 +713,102 @@ public class User implements UserDetails
             }
         }
     }
+
+    /**
+     * This function checks if the current user is allowed to modify a specified event. The user is allowed to modify the event, if he is either the creator of the event or the superadmin.
+     * @param event The selected event.
+     * @return True if the user is allowed, false otherwise.
+     */
+    @JsonIgnore
+    @Transient
+    public boolean isAllowedToAdministrate(Event event)
+    {
+        return this.isAdmin() &&
+                (
+                    this.equals(event.getEventAdmin()) ||
+                    this.isSuperAdmin() ||
+                    event.getEventAdmin() == null //If there is no admin for the event it is okay to manipulate the event (Although this should not happen)
+                );
+    }
+
+    /**
+     * This function checks if the user is allowed to administrate (view private information and change user details) the selected user. The user is allowed to administrate the user, if he is the super admin, or if he is administrating a division, the user is part of.
+     * @param selectedUser The selected user.
+     * @param divisionRepository The division repository used to retrieve all divisions information, due to a problem of injecting the resource within the user object.
+     * @return True if the user is allowed, false otherwise.
+     */
+    @JsonIgnore
+    @Transient
+    public boolean isAllowedToAdministrate(User selectedUser, DivisionRepository divisionRepository)
+    {
+        //Getting the list of administrated divisions
+        List<Division> administratedDivisions = divisionRepository.findByAdminUser(this);
+
+        return this.isAdmin() && //First of all the user needs to be an administrator
+                selectedUser != null && //The user needs to be present
+                (
+                    this.isSuperAdmin() || //If the user is the super admin he can do whatever he wants
+                    selectedUser.getDivisions() == null ||  //If there is no divisions or
+                    selectedUser.getDivisions().isEmpty() ||  //the list of divisions is empty, the user is allowed to administrate the user
+                    selectedUser.equals(this) || //If the user is the same he is allowed
+                    selectedUser.getDivisions().parallelStream() //Streaming all divisions the user is part of
+                            .anyMatch(div -> //If there is any match the admin is allowed to view the user
+                                    div.getAncestors().parallelStream() //Streaming all ancestors of the user's divisions
+                                            .anyMatch(administratedDivisions::contains)) //If there is any match between administrated divisions and ancestors of one of the users divisions
+                );
+    }
+
+    /**
+     * This function checks if the user is allowed to administrate a selected division. The user is allowed to administrate the division, if he is the super admin, or administrating the division or a parent division.
+     * @param division The selected division.
+     * @param divisionRepository The division repository used to retrieve all divisions information, due to a problem of injecting the resource within the user object.
+     * @return True if the user is allowed, false otherwise.
+     */
+    @JsonIgnore
+    @Transient
+    public boolean isAllowedToAdministrate(Division division, DivisionRepository divisionRepository)
+    {
+        List<Division> optimizedSetOfDivisions;
+        return this.isAdmin() && //The user needs to be an administrator
+                division != null && //The division needs to be present
+                (
+                    this.isSuperAdmin() || //If the user is a super admin he can do whatever he wants
+                    (optimizedSetOfDivisions = DivisionHelper.getOptimizedSetOfDivisions(divisionRepository.findByAdminUser(this))) != null &&  //Getting all divisions administrated by the user, should not be empty, since the user is an admin, but checking for error anyway.
+                    optimizedSetOfDivisions.parallelStream().anyMatch(div -> div.equals(division) ||  //If the selected division is one of the administrated ones or
+                                                          division.getAncestors().contains(div)) //If the selected division is an ancestor of the administrated ones
+                );
+    }
+
+    /**
+     * This function checks if the current user has the role superadmin.
+     * @return True if the user is the super admin, false otherwise.
+     */
+    @JsonIgnore
+    @Transient
+    public boolean isSuperAdmin()
+    {
+        return authorities != null &&
+               authorities.parallelStream()
+                    .anyMatch(authority -> authority.getAuthority().equals(UserAuthenticationService.AuthorityRoles.SUPERADMIN.toString()));
+    }
+
+    /**
+     * This function checks if the user is an administrator. The user is an administrator, if he is administrating at least one division.
+     * @return Tue if the user is an administrator, false otherwise.
+     */
+    @JsonIgnore
+    @Transient
+    public boolean isAdmin()
+    {
+        return authorities != null &&
+               authorities.parallelStream()
+                    .anyMatch(authority -> authority.getAuthority().equals(UserAuthenticationService.AuthorityRoles.ADMIN.toString()) ||
+                                        authority.getAuthority().equals(UserAuthenticationService.AuthorityRoles.SUPERADMIN.toString()));
+    }
+
+    /*
+        Sending object functions
+     */
 
     /**
      * This function creates a new user object and copies only the id of the current user.
@@ -840,101 +923,8 @@ public class User implements UserDetails
         return sendingObject;
     }
 
-    /**
-     * This function checks if the current user is allowed to modify a specified event. The user is allowed to modify the event, if he is either the creator of the event or the superadmin.
-     * @param event The selected event.
-     * @return True if the user is allowed, false otherwise.
-     */
-    @JsonIgnore
-    @Transient
-    public boolean isAllowedToAdministrate(Event event)
-    {
-        return this.isAdmin() &&
-                (
-                        this.equals(event.getEventAdmin()) ||
-                        this.isSuperAdmin() ||
-                        event.getEventAdmin() == null //If there is no admin for the event it is okay to manipulate the event (Although this should not happen)
-                );
-    }
-
-    /**
-     * This function checks if the user is allowed to administrate (view private information and change user details) the selected user. The user is allowed to administrate the user, if he is the super admin, or if he is administrating a division, the user is part of.
-     * @param selectedUser The selected user.
-     * @param divisionRepository The division repository used to retrieve all divisions information, due to a problem of injecting the resource within the user object.
-     * @return True if the user is allowed, false otherwise.
-     */
-    @JsonIgnore
-    @Transient
-    public boolean isAllowedToAdministrate(User selectedUser, DivisionRepository divisionRepository)
-    {
-        //Getting the list of administrated divisions
-        List<Division> administratedDivisions = divisionRepository.findByAdminUser(this);
-
-        return this.isAdmin() && //First of all the user needs to be an administrator
-                selectedUser != null && //The user needs to be present
-                (
-                    this.isSuperAdmin() || //If the user is the super admin he can do whatever he wants
-                    selectedUser.getDivisions() == null ||  //If there is no divisions or
-                    selectedUser.getDivisions().isEmpty() ||  //the list of divisions is empty, the user is allowed to administrate the user
-                    selectedUser.equals(this) || //If the user is the same he is allowed
-                    selectedUser.getDivisions().parallelStream() //Streaming all divisions the user is part of
-                            .anyMatch(div -> //If there is any match the admin is allowed to view the user
-                                    div.getAncestors().parallelStream() //Streaming all ancestors of the user's divisions
-                                            .anyMatch(anc -> administratedDivisions.contains(anc))) //If there is any match between administrated divisions and ancestors of one of the users divisions
-                );
-    }
-
-    /**
-     * This function checks if the user is allowed to administrate a selected division. The user is allowed to administrate the division, if he is the super admin, or administrating the division or a parent division.
-     * @param division The selected division.
-     * @param divisionRepository The division repository used to retrieve all divisions information, due to a problem of injecting the resource within the user object.
-     * @return True if the user is allowed, false otherwise.
-     */
-    @JsonIgnore
-    @Transient
-    public boolean isAllowedToAdministrate(Division division, DivisionRepository divisionRepository)
-    {
-        return this.isAdmin() && //The user needs to be an administrator
-                division != null && //The division needs to be present
-                (
-                    this.isSuperAdmin() || //If the user is a super admin he can do whatever he wants
-                    DivisionHelper.getOptimizedSetOfDivisions(divisionRepository.findByAdminUser(this)) //Getting all divisions administrated by the user, should not be empty, since the user is an admin
-                        .parallelStream().anyMatch(div -> div.equals(division) ||  //If the selected division is one of the administrated ones
-                                                          division.getAncestors().contains(div)) //If the selected division is an ancestor of the administrated ones
-                );
-    }
-
-    /**
-     * This function checks if the current user has the role superadmin.
-     * @return True if the user is the super admin, false otherwise.
-     */
-    @JsonIgnore
-    @Transient
-    public boolean isSuperAdmin()
-    {
-        return authorities != null &&
-               authorities.parallelStream()
-                    .anyMatch(authority -> authority.getAuthority().equals(UserAuthenticationService.AuthorityRoles.SUPERADMIN.toString()));
-    }
-
-    /**
-     * This function checks if the user is an administrator. The user is an administrator, if he is administrating at least one division.
-     * @return Tue if the user is an administrator, false otherwise.
-     */
-    @JsonIgnore
-    @Transient
-    public boolean isAdmin()
-    {
-        return authorities != null &&
-               authorities.parallelStream()
-                    .anyMatch(authority -> authority.getAuthority().equals(UserAuthenticationService.AuthorityRoles.ADMIN.toString()) ||
-                                        authority.getAuthority().equals(UserAuthenticationService.AuthorityRoles.SUPERADMIN.toString()));
-    }
-
     /*
-
-        Overwritten Java Object functions
-
+        Required java object functions
      */
 
     @Override

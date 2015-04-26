@@ -16,11 +16,11 @@
  */
 package de.steilerdev.myVerein.server.controller.admin;
 
-import de.steilerdev.myVerein.server.model.*;
 import de.steilerdev.myVerein.server.model.division.Division;
 import de.steilerdev.myVerein.server.model.division.DivisionRepository;
 import de.steilerdev.myVerein.server.model.event.Event;
 import de.steilerdev.myVerein.server.model.event.EventRepository;
+import de.steilerdev.myVerein.server.model.user.User;
 import de.steilerdev.myVerein.server.security.CurrentUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +29,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.ConstraintViolationException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -39,7 +38,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * This controller is processing all requests associated with the event management.
@@ -59,7 +57,7 @@ public class EventManagementController
     /**
      * These final strings are used to bundle information within a response entity.
      */
-    final String successMessage = "successMessage", errorMessage = "errorMessage", eventId = "eventId";
+    private final String successMessage = "successMessage", errorMessage = "errorMessage", eventId = "eventId";
 
     /**
      * This function gathers all dates where an event takes place within a specific month and year. The function is invoked by GETting the URI /api/admin/event and specifying the month and year via the request parameters.
@@ -89,7 +87,7 @@ public class EventManagementController
         LocalDateTime start = LocalDate.of(yearInt, monthInt, 1).atStartOfDay();
         LocalDateTime end = start.plusMonths(1);
 
-        List<Event> eventsOfMonth = eventRepository.findAllSpanningOverPeriod(start, end);
+        List<Event> eventsOfMonth = eventRepository.findBySpanningOverPeriod(start, end);
 
         if(eventsOfMonth == null)
         {
@@ -140,7 +138,7 @@ public class EventManagementController
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-        if((eventsOfDay = eventRepository.findAllSpanningOverPeriod(startOfDay, endOfDay)) == null)
+        if((eventsOfDay = eventRepository.findBySpanningOverPeriod(startOfDay, endOfDay)) == null)
         {
             logger.warn("[{}] Unable to get events spanning from {} to {}", currentUser, startOfDay, endOfDay);
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

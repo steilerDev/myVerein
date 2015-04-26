@@ -18,7 +18,7 @@ import de.steilerdev.myVerein.server.model.event.Event;
 import de.steilerdev.myVerein.server.model.event.EventHelper;
 import de.steilerdev.myVerein.server.model.event.EventStatus;
 import de.steilerdev.myVerein.server.model.event.EventRepository;
-import de.steilerdev.myVerein.server.model.User;
+import de.steilerdev.myVerein.server.model.user.User;
 import de.steilerdev.myVerein.server.security.CurrentUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -15,7 +15,7 @@
 package de.steilerdev.myVerein.server.model.division;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import de.steilerdev.myVerein.server.model.User;
+import de.steilerdev.myVerein.server.model.user.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.annotation.Transient;

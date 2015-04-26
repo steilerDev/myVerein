@@ -12,21 +12,21 @@
  * You should have received a copy of the GNU General Public License along with this program.  If not, see
  * <http://www.gnu.org/licenses/>.
  */
-package de.steilerdev.myVerein.server.model.event;
+package de.steilerdev.myVerein.server.model.message;
 
 import de.steilerdev.myVerein.server.model.user.User;
 
 /**
- * This class contains static helper functions needed while handling events.
+ * This class contains static helper functions needed while handling messages.
  */
-public class EventHelper
+public class MessageHelper
 {
     /**
-     * {@link EventRepository#findByPrefixedInvitedUser(String)} needs a user id, prefixed with "invitedUser.", because a custom query with a fixed prefix is not working. This function creates this prefixed user id.
+     * {@link MessageRepository#findByPrefixedReceiverIDAndMessageStatus} needs a receiver id, prefixed with "receiver.", because a custom query with a fixed prefix is not working. This function creates this prefixed receiver id.
      * @param user The user, which needs to be prefixed.
      * @return The prefixed user ID.
      */
-    public static String prefixedUserIDForUser(User user) {
-        return user == null? null: "invitedUser." + user.getId();
+    public static String receiverIDForUser(User user) {
+        return user == null? null: "receiver." + user.getId();
     }
 }

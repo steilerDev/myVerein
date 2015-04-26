@@ -19,7 +19,7 @@ package de.steilerdev.myVerein.server.model.division;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import de.steilerdev.myVerein.server.model.BaseEntity;
-import de.steilerdev.myVerein.server.model.User;
+import de.steilerdev.myVerein.server.model.user.User;
 import org.hibernate.validator.constraints.NotBlank;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -87,7 +87,7 @@ public class Division extends BaseEntity implements Comparable<Division>
     }
 
     /*
-        Mandatory getter and setter
+        Mandatory basic getter and setter
      */
 
     public String getName()

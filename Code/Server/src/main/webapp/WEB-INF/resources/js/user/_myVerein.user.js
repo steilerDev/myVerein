@@ -341,7 +341,7 @@ function loadUserPage() {
                     data: $(e.target).serialize(),
                     error: function (response) {
                         userSubmitButton.stopAnimation(-1);
-                        showMessage(response.responseText.errorMessage, 'error', 'icon_error-triangle_alt');
+                        showMessage(response.responseJSON.errorMessage, 'error', 'icon_error-triangle_alt');
                     },
                     success: function (response) {
                         userSubmitButton.stopAnimation(0);

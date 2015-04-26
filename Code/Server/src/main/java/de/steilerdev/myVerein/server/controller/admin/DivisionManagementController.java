@@ -17,10 +17,11 @@
 package de.steilerdev.myVerein.server.controller.admin;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import de.steilerdev.myVerein.server.model.*;
 import de.steilerdev.myVerein.server.model.division.Division;
 import de.steilerdev.myVerein.server.model.division.DivisionHelper;
 import de.steilerdev.myVerein.server.model.division.DivisionRepository;
+import de.steilerdev.myVerein.server.model.user.User;
+import de.steilerdev.myVerein.server.model.user.UserRepository;
 import de.steilerdev.myVerein.server.security.CurrentUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +30,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.ConstraintViolationException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -53,12 +53,17 @@ public class DivisionManagementController
     /**
      * The name given to new divisions
      */
-    private static final String newDivisionName = "New division";
+    private final String newDivisionName = "New division";
+
+    /**
+     * These final strings are used to bundle information within a response entity.
+     */
+    private final String successMessage = "successMessage", errorMessage = "errorMessage", divisionId = "divisionId", divisionName = "divisionName";
 
     /**
      * This function is saving changes on an exisiting division. If the division needs to be created see {@link DivisionManagementController#createDivision}. This function is invoked by POSTing the parameters to the URI /api/admin/division.
      * @param name The new name of the division.
-     * @param oldName The old name of the division (might be equal to new name)
+     * @param divisionId The id of the division
      * @param description The description of the division (may be empty)
      * @param admin The name of the administrating user (may be empty)
      * @param currentUser The currently logged in user.
@@ -66,22 +71,22 @@ public class DivisionManagementController
      */
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<String> saveDivision(  @RequestParam String name,
-                                                 @RequestParam String oldName,
+                                                 @RequestParam(value = "id") String divisionId,
                                                  @RequestParam String description,
                                                  @RequestParam String admin,
                                                  @CurrentUser User currentUser)
     {
-        logger.trace("[{}] Saving division {}", currentUser, oldName);
+        logger.trace("[{}] Saving division {}", currentUser, divisionId);
         Division division;
-        if(oldName.isEmpty())
+        if(divisionId.isEmpty())
         {
-            logger.warn("[{}] The original name of the division is missing", currentUser);
-            return new ResponseEntity<>("The original name of the division is missing", HttpStatus.BAD_REQUEST);
-        } else if((division = divisionRepository.findByName(oldName)) == null)
+            logger.warn("[{}] The id of the division is missing", currentUser);
+            return new ResponseEntity<>("The id of the division is missing", HttpStatus.BAD_REQUEST);
+        } else if((division = divisionRepository.findById(divisionId)) == null)
         {
-            logger.warn("[{}] Unable to find specified division {}", currentUser, oldName);
+            logger.warn("[{}] Unable to find specified division {}", currentUser, divisionId);
             return new ResponseEntity<>("Unable to find the specified division", HttpStatus.BAD_REQUEST);
-        } else if(!oldName.equals(name) && divisionRepository.findByName(name) != null)
+        } else if(!division.getName().equals(name) && divisionRepository.findByName(name) != null)
         {
             logger.debug("[{}] A division with the provided name {} already exists", currentUser, name);
             return new ResponseEntity<>("A division with the provided new name already exists", HttpStatus.BAD_REQUEST);
@@ -129,81 +134,73 @@ public class DivisionManagementController
     @RequestMapping(method = RequestMethod.POST, params = "new", produces = "application/json")
     public ResponseEntity<Map<String, String>> createDivision(@RequestParam("new") String newFlag, @CurrentUser User currentUser)
     {
-        logger.trace("[" + currentUser + "]  Creating a new empty division");
+        logger.trace("[{}] Creating a new empty division", currentUser);
         Map<String, String> responseMap = new HashMap<>();
         List<Division> administratedDivisions = DivisionHelper.getOptimizedSetOfAdministratedDivisions(currentUser, divisionRepository);
         Division newDivision;
         if(newFlag.isEmpty())
         {
-            logger.warn("[" + currentUser + "]  The new flag is not allowed to be empty");
-            responseMap.put("errorMessage", "The new flag parameter is not allowed to be empty");
+            logger.warn("[{}] The new flag is not allowed to be empty", currentUser);
+            responseMap.put(errorMessage, "The new flag parameter is not allowed to be empty");
             return new ResponseEntity<>(responseMap, HttpStatus.BAD_REQUEST);
-        } else if(administratedDivisions != null && administratedDivisions.size() > 0)
+        } else if(administratedDivisions == null || administratedDivisions.isEmpty())
         {
+            logger.warn("[{}] The user is not allowed to create a new division", currentUser);
+            responseMap.put(errorMessage, "You are not allowed to create a new division");
+            return new ResponseEntity<>(responseMap, HttpStatus.FORBIDDEN);
+        } else
+        {
+            // Trying to find a unique name for the new division
             String newName = newDivisionName;
             for(int i = 1; divisionRepository.findByName(newName) != null; i++)
             {
                 newName = newDivisionName.concat(" " + i);
             }
 
-            logger.debug("[" + currentUser + "]  The temporary name of the new division is " + newName);
+            logger.debug("[{}] The temporary name of the new division is {}", currentUser, newName);
 
             newDivision = new Division();
             //If there is a new division the parent is one of the administrated divisions. The correct layout is updated through a different request.
             newDivision.replaceParent(administratedDivisions.get(0));
             newDivision.setName(newName);
-            try
-            {
-                divisionRepository.save(newDivision);
-                logger.info("[" + currentUser + "]  The new division was successfully created with name " + newName);
-                responseMap.put("successMessage", "The new division was successfully created");
-                responseMap.put("newDivisionName", newName);
-                return new ResponseEntity<>(responseMap, HttpStatus.OK);
-            } catch (ConstraintViolationException e)
-            {
-                logger.warn("[" + currentUser + "]  A database constraint was violated while saving the division: " + e.getMessage());
-                responseMap.put("errorMessage", "A database constraint was violated while saving the division.");
-                return new ResponseEntity<>(responseMap, HttpStatus.BAD_REQUEST);
-            }
-        } else
-        {
-            logger.warn("[" + currentUser + "]  The user is not allowed to create a new division");
-            responseMap.put("errorMessage", "You are not allowed to create a new division");
-            return new ResponseEntity<>(responseMap, HttpStatus.FORBIDDEN);
+
+            divisionRepository.save(newDivision);
+            logger.info("[{}] The new division {} was successfully created", currentUser, newDivision);
+            responseMap.put(successMessage, "The new division was successfully created");
+            responseMap.put(divisionName, newName);
+            responseMap.put(divisionId, newDivision.getId());
+            return new ResponseEntity<>(responseMap, HttpStatus.OK);
         }
     }
 
     /**
      * This function is deleting the stated division. The function is invoked, by DELETEing the parameter to the URI /api/admin/division
-     * @param divisionName The name of the division that needs to be deleted.
+     * @param divisionId The id of the division that needs to be deleted.
      * @param currentUser The currently logged in user.
      * @return An HTTP response with a status code. If an error occurred an error message is bundled into the response, otherwise a success message is available.
      */
     @RequestMapping(method = RequestMethod.DELETE)
-    public ResponseEntity<String> deleteDivision(@RequestParam String divisionName, @CurrentUser User currentUser)
+    public ResponseEntity<String> deleteDivision(@RequestParam(value = "id") String divisionId, @CurrentUser User currentUser)
     {
-        logger.trace("[" + currentUser + "]  Deleting an existing division");
-        Division deletedDivision = divisionRepository.findByName(divisionName);
-        if(deletedDivision == null)
+        logger.trace("[{}] Deleting an existing division", currentUser);
+        Division deletedDivision;
+        if(divisionId.isEmpty())
         {
-            logger.warn("[" + currentUser + "]  Unable to find stated division " + divisionName);
+            logger.warn("[{}] The division id is not allowed to be empty", currentUser);
+            return new ResponseEntity<>("The division id is not allowed to be empty", HttpStatus.BAD_REQUEST);
+        } else if((deletedDivision = divisionRepository.findById(divisionId)) == null)
+        {
+            logger.warn("[{}] Unable to find stated division {}", currentUser, divisionId);
             return new ResponseEntity<>("Unable to find the stated division", HttpStatus.BAD_REQUEST);
         } else if (!currentUser.isAllowedToAdministrate(deletedDivision, divisionRepository))
         {
-            logger.warn("[" + currentUser + "]  The user is not allowed to delete the division " + deletedDivision.getName());
-            return new ResponseEntity<>("You are not allowed to delete the selected division", HttpStatus.BAD_REQUEST);
+            logger.warn("[{}] The user is not allowed to delete the division {}", currentUser, deletedDivision);
+            return new ResponseEntity<>("You are not allowed to delete the selected division", HttpStatus.FORBIDDEN);
         } else
         {
-            try
-            {
-                divisionRepository.delete(deletedDivision);
-                logger.info("[" + currentUser + "]  Successfully deleted division " + divisionName);
-                return new ResponseEntity<>("Successfully deleted selected division", HttpStatus.OK);
-            } catch (IllegalArgumentException e)
-            {
-                logger.warn("[" + currentUser + "]  Unable to delete division " + divisionName + ": " + e.getMessage());
-                return new ResponseEntity<>("Unable to delete the selected division", HttpStatus.INTERNAL_SERVER_ERROR);
-            }
+            divisionRepository.delete(deletedDivision);
+            logger.info("[{}] Successfully deleted division {}", currentUser, deletedDivision);
+            return new ResponseEntity<>("Successfully deleted selected division", HttpStatus.OK);
         }
     }
 
@@ -218,43 +215,43 @@ public class DivisionManagementController
         List<Division> divisions;
         if(term == null || term.isEmpty())
         {
-            logger.trace("[" + currentUser + "]  Retrieving all divisions");
+            logger.trace("[{}] Retrieving all divisions", currentUser);
             divisions = divisionRepository.findAllNames();
         } else
         {
-            logger.trace("[" + currentUser + "]  Retrieving all divisions using the search term " + term);
+            logger.trace("[{}] Retrieving all divisions using the search term {}", currentUser, term);
             divisions = divisionRepository.findAllNamesContainingString(term);
         }
 
         if(divisions == null)
         {
-            logger.warn("[" + currentUser + "]  Unable to get divisions" + (term != null? " matching term " + term: ""));
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            logger.warn("[{}] Unable to get divisions for term {}", currentUser, term);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } else
         {
             divisions.replaceAll(Division::getSendingObjectInternalSync);
-            logger.info("[" + currentUser + "]  Returning all divisions" + (term != null? " matching term " + term: ""));
+            logger.info("[{}] Returning all division matching term {}", currentUser, term);
             return new ResponseEntity<>(divisions, HttpStatus.OK);
         }
     }
 
     /**
      * This function returns a single division as JSON object, where the administrator's fields are reduced to his name and email. The function is invoked by GETting the URI /api/admin/division using the parameter name.
-     * @param name The name of the division.
+     * @param divisionId The id of the division.
      * @return An HTTP response with a status code, together with the JSON object of the divisions, or only an error code if an error occurred.
      */
-    @RequestMapping(produces = "application/json", params = "name", method = RequestMethod.GET)
-    public ResponseEntity<Division> getSingleDivision (@RequestParam String name, @CurrentUser User currentUser)
+    @RequestMapping(produces = "application/json", params = "id", method = RequestMethod.GET)
+    public ResponseEntity<Division> getSingleDivision (@RequestParam(value = "id") String divisionId, @CurrentUser User currentUser)
     {
-        logger.trace("[{}] Getting division {}", currentUser, name);
+        logger.trace("[{}] Getting division {}", currentUser, divisionId);
         Division searchedDivision;
-        if(name.isEmpty())
+        if(divisionId.isEmpty())
         {
-            logger.warn("[{}] The name is not allowed to be empty");
+            logger.warn("[{}] The division id is not allowed to be empty", currentUser);
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        } else if((searchedDivision = divisionRepository.findByName(name)) == null)
+        } else if((searchedDivision = divisionRepository.findById(divisionId)) == null)
         {
-            logger.warn("[{}] Unable to find division {}", currentUser, name);
+            logger.warn("[{}] Unable to find division {}", currentUser, divisionId);
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } else
         {
@@ -265,10 +262,10 @@ public class DivisionManagementController
 
     /**
      * This controller is invoked as soon as an administrator is changing the layout of the division tree on the web interface. The function is invoked, by POSTing the parameters to the URI /api/admin/division/divisionTree
-     * @param moved_node The name of the node that has been moved.
-     * @param target_node The name of the node, where the moved_node got moved to.
+     * @param moved_node The id of the node that has been moved.
+     * @param target_node The id of the node, where the moved_node got moved to.
      * @param position The relation the moved_node is positioned to the target_node.
-     * @param previous_parent The previous parent of the node.
+     * @param previous_parent The id of the previous parent of the node.
      * @param currentUser The currently logged in user.
      * @return An HTTP response with a status code. If an error occurred an error message is bundled into the response, otherwise a success message is available.
      */
@@ -284,7 +281,7 @@ public class DivisionManagementController
         {
             logger.warn("[{}] Required parameter missing", currentUser);
             return new ResponseEntity<>("Required parameter missing", HttpStatus.BAD_REQUEST);
-        } else if((movedDivision = divisionRepository.findByName(moved_node)) == null || (targetDivision = divisionRepository.findByName(target_node)) == null || (previousParentDivision = divisionRepository.findByName(previous_parent)) == null)
+        } else if((movedDivision = divisionRepository.findById(moved_node)) == null || (targetDivision = divisionRepository.findById(target_node)) == null || (previousParentDivision = divisionRepository.findById(previous_parent)) == null)
         {
             logger.warn("[{}] Unable to find old parent ({}), new parent ({}) or moved division ({})", currentUser, previous_parent, target_node, moved_node);
             return new ResponseEntity<>("Unable to find new parent or moved division", HttpStatus.BAD_REQUEST);
@@ -316,37 +313,6 @@ public class DivisionManagementController
         {
             logger.warn("[{}] Unrecognized position of the node ({})", currentUser, position);
             return new ResponseEntity<>("Unrecognized position of the node", HttpStatus.BAD_REQUEST);
-        }
-    }
-
-    /**
-     * This function gathers the complete division tree that the user is administrating. The function is invoked by GETting the URI /api/admin/division/divisionTree.
-     * @param currentUser The currently logged in user.
-     * @return An HTTP response with a status code. In case of success a list of tree nodes (which contain their child nodes), that represent the division tree, are bundled with the status code, otherwise just the error code is returned.
-     */
-    @RequestMapping(value = "divisionTree", produces = "application/json", method = RequestMethod.GET)
-    public ResponseEntity<List<TreeNode>> getDivisionTree(@CurrentUser User currentUser)
-    {
-        logger.trace("[{}] Gathering the division tree", currentUser);
-        List<Division> divisions = DivisionHelper.getOptimizedSetOfAdministratedDivisions(currentUser, divisionRepository);
-        if(divisions == null || divisions.isEmpty())
-        {
-            logger.warn("[{}] Unable to find divisions for the user", currentUser);
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        } else
-        {
-            // Creating division tree
-            List<TreeNode> divisionTree = new ArrayList<>();
-            divisions.parallelStream().forEach(div -> divisionTree.add(getSubTree(div)));
-            if(divisionTree.isEmpty())
-            {
-                logger.warn("[{}] The division tree is empty", currentUser);
-                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-            } else
-            {
-                logger.debug("[{}] Returning the division tree", currentUser);
-                return new ResponseEntity<>(divisionTree, HttpStatus.OK);
-            }
         }
     }
 
@@ -386,6 +352,38 @@ public class DivisionManagementController
         divisionRepository.findByParent(newNode).parallelStream().forEach(div -> updateSubtree(div, newNode));
     }
 
+
+    /**
+     * This function gathers the complete division tree that the user is administrating. The function is invoked by GETting the URI /api/admin/division/divisionTree.
+     * @param currentUser The currently logged in user.
+     * @return An HTTP response with a status code. In case of success a list of tree nodes (which contain their child nodes), that represent the division tree, are bundled with the status code, otherwise just the error code is returned.
+     */
+    @RequestMapping(value = "divisionTree", produces = "application/json", method = RequestMethod.GET)
+    public ResponseEntity<List<TreeNode>> getDivisionTree(@CurrentUser User currentUser)
+    {
+        logger.trace("[{}] Gathering the division tree", currentUser);
+        List<Division> divisions = DivisionHelper.getOptimizedSetOfAdministratedDivisions(currentUser, divisionRepository);
+        if(divisions == null || divisions.isEmpty())
+        {
+            logger.warn("[{}] Unable to find divisions for the user", currentUser);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        } else
+        {
+            // Creating division tree
+            List<TreeNode> divisionTree = new ArrayList<>();
+            divisions.stream().forEach(div -> divisionTree.add(getSubTree(div)));
+            if(divisionTree.isEmpty())
+            {
+                logger.warn("[{}] The division tree is empty", currentUser);
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            } else
+            {
+                logger.debug("[{}] Returning the division tree", currentUser);
+                return new ResponseEntity<>(divisionTree, HttpStatus.OK);
+            }
+        }
+    }
+
     /**
      * This recursive function gathers the subtree starting at the selected node.
      * @param divisionRoot The root node of the searched sub tree.
@@ -401,28 +399,30 @@ public class DivisionManagementController
         {
             logger.trace("Gathering subtree for division {}", divisionRoot);
             List<Division> children = divisionRepository.findByParent(divisionRoot);
-            TreeNode rootNode = new TreeNode(divisionRoot.getName());
+            TreeNode rootNode = new TreeNode(divisionRoot);
             if (children != null && !children.isEmpty())
             {
-                children.parallelStream().forEach(division -> rootNode.addChildren(getSubTree(division)));
+                children.stream().forEach(division -> rootNode.addChildren(getSubTree(division)));
             }
             return rootNode;
         }
     }
 
     /**
-     * This subclass is representing the data structure needed by the jqTree framework
+     * This subclass is representing the data structure needed by the jqTree framework.
      */
     public class TreeNode
     {
         private String label;
+        private String id;
 
         @JsonInclude(JsonInclude.Include.NON_NULL)
         private List<TreeNode> children;
 
-        public TreeNode(String label)
+        public TreeNode(Division nodeDivision)
         {
-            this.label = label;
+            this.label = nodeDivision.getName();
+            this.id = nodeDivision.getId();
         }
 
         public void addChildren(TreeNode children)
@@ -444,6 +444,15 @@ public class DivisionManagementController
             this.label = label;
         }
 
+        public String getId()
+        {
+            return id;
+        }
+
+        public void setId(String id)
+        {
+            this.id = id;
+        }
 
         public List<TreeNode> getChildren()
         {

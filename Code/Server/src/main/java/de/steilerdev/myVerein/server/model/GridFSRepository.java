@@ -48,17 +48,17 @@ public class GridFSRepository
     /**
      * The name of the club logo file stored within GridFS
      */
-    private static final String clubLogoFileName = "clubLogo";
+    private final String clubLogoFileName = "clubLogo";
     /**
      * A String containing the informal name of the format.
      */
-    private static final String clubLogoFileFormat = "png";
-    private static final String clubLogoFileFormatMIME = "image/png";
+    private final String clubLogoFileFormat = "png";
+    private final String clubLogoFileFormatMIME = "image/png";
 
     /**
      * The name of the filename column within the database
      */
-    private static final String filenameColumn = "filename";
+    private final String filenameColumn = "filename";
 
     public void deleteCurrentClubLogo()
     {

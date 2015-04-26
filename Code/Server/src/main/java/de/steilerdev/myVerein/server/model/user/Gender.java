@@ -12,21 +12,28 @@
  * You should have received a copy of the GNU General Public License along with this program.  If not, see
  * <http://www.gnu.org/licenses/>.
  */
-package de.steilerdev.myVerein.server.model.event;
-
-import de.steilerdev.myVerein.server.model.user.User;
+package de.steilerdev.myVerein.server.model.user;
 
 /**
- * This class contains static helper functions needed while handling events.
+ * This enum is representing the gender of a user.
  */
-public class EventHelper
-{
+public enum Gender {
     /**
-     * {@link EventRepository#findByPrefixedInvitedUser(String)} needs a user id, prefixed with "invitedUser.", because a custom query with a fixed prefix is not working. This function creates this prefixed user id.
-     * @param user The user, which needs to be prefixed.
-     * @return The prefixed user ID.
+     * This gender is assigned to all male member.
      */
-    public static String prefixedUserIDForUser(User user) {
-        return user == null? null: "invitedUser." + user.getId();
+    MALE {
+        @Override
+        public String toString() {
+            return "MALE";
+        }
+    },
+    /**
+     * This gender is assigned to all female member.
+     */
+    FEMALE {
+        @Override
+        public String toString() {
+            return "FEMALE";
+        }
     }
 }

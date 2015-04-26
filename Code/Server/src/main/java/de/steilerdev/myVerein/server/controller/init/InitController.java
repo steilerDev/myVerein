@@ -17,11 +17,17 @@
 package de.steilerdev.myVerein.server.controller.init;
 
 import com.mongodb.*;
-import de.steilerdev.myVerein.server.model.*;
 import de.steilerdev.myVerein.server.model.division.Division;
 import de.steilerdev.myVerein.server.model.division.DivisionRepository;
 import de.steilerdev.myVerein.server.model.event.Event;
 import de.steilerdev.myVerein.server.model.event.EventRepository;
+import de.steilerdev.myVerein.server.model.message.Message;
+import de.steilerdev.myVerein.server.model.message.MessageRepository;
+import de.steilerdev.myVerein.server.model.settings.Settings;
+import de.steilerdev.myVerein.server.model.settings.SettingsRepository;
+import de.steilerdev.myVerein.server.model.user.Gender;
+import de.steilerdev.myVerein.server.model.user.User;
+import de.steilerdev.myVerein.server.model.user.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -197,7 +203,7 @@ public class InitController
             superAdmin.setFirstName(firstName);
             superAdmin.setLastName(lastName);
             superAdmin.setEmail(email);
-            superAdmin.setPassword(password);
+            superAdmin.replacePassword(password);
 
             logger.debug("Creating a new initial root division.");
             Division rootDivision = new Division(settings.getClubName(), null, superAdmin, null);
@@ -363,13 +369,13 @@ public class InitController
         user1.setStreetNumber("27");
         user1.setStreet("Metzstraße");
         user1.setCountry("Germany");
-        user1.setGender(User.Gender.MALE);
+        user1.setGender(Gender.MALE);
         User user2 = new User("John", "Doe", "john@doe.com", "asdf");
         user2.setActiveSince(LocalDate.of(1999, 1, 1));
         user2.setPassiveSince(LocalDate.of(2000, 6, 1));
         User user3 = new User("Peter", "Enis", "peter@enis.com", "asdf");
         User user4 = new User("Luke", "Skywalker", "luke@skywalker.com", "asdf");
-        user4.setGender(User.Gender.MALE);
+        user4.setGender(Gender.MALE);
         User user5 = new User("Marty", "McFly", "marty@mcfly.com", "asdf");
         User user6 = new User("Tammo", "Schwindt", "tammo@tammon.de", "asdf");
 

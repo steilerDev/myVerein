@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.steilerdev.myVerein.server.model;
+package de.steilerdev.myVerein.server.model.message;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
@@ -24,14 +24,13 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * This interface is used to query the database for specific message object. The repository is implemented during runtime by SpringData through the @Repository annotation.
+ * This interface is used to query the database for specific message object. The repository is implemented during runtime by SpringData.
  */
-@Repository
 public interface MessageRepository extends MongoRepository<Message, String> {
 
     @Query(value = "{?0 : ?1 }")
-    List<Message> findAllByPrefixedReceiverIDAndMessageStatus(String receiverID, Message.MessageStatus messageStatus);
+    List<Message> findByPrefixedReceiverIDAndMessageStatus(String receiverID, MessageStatus messageStatus);
 
     @Query(value = "{$and: [{?0 : { $exists: true }}, {'timestamp': {$gt: ?1}}] }")
-    List<Message> findAllByPrefixedReceiverIDAndTimestampAfter(String receiverID, LocalDateTime timestamp); //Maybe someday... (Using this method you could enable multi device)
+    List<Message> findByPrefixedReceiverIDAndTimestampAfter(String receiverID, LocalDateTime timestamp); //Maybe someday... (Using this method you could enable multi device)
 }

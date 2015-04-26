@@ -18,9 +18,10 @@ package de.steilerdev.myVerein.server.controller;
 
 import com.mongodb.gridfs.GridFSDBFile;
 import de.steilerdev.myVerein.server.model.GridFSRepository;
-import de.steilerdev.myVerein.server.model.Settings;
-import de.steilerdev.myVerein.server.model.SettingsRepository;
-import de.steilerdev.myVerein.server.model.User;
+import de.steilerdev.myVerein.server.model.settings.Settings;
+import de.steilerdev.myVerein.server.model.settings.SettingsHelper;
+import de.steilerdev.myVerein.server.model.settings.SettingsRepository;
+import de.steilerdev.myVerein.server.model.user.User;
 import de.steilerdev.myVerein.server.security.CurrentUser;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -29,7 +30,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -133,7 +133,7 @@ public class ContentController
     public ResponseEntity<String> getClubName()
     {
         logger.trace("Gathering club name");
-        String clubName = Settings.loadSettings(settingsRepository).getClubName();
+        String clubName = SettingsHelper.loadSettings(settingsRepository).getClubName();
         if(clubName == null || clubName.isEmpty())
         {
             logger.warn("Unable to get club name");
