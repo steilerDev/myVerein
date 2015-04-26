@@ -14,9 +14,10 @@
  */
 package de.steilerdev.myVerein.server.controller.user;
 
-import de.steilerdev.myVerein.server.model.Event;
-import de.steilerdev.myVerein.server.model.Event.EventStatus;
-import de.steilerdev.myVerein.server.model.EventRepository;
+import de.steilerdev.myVerein.server.model.event.Event;
+import de.steilerdev.myVerein.server.model.event.EventHelper;
+import de.steilerdev.myVerein.server.model.event.EventStatus;
+import de.steilerdev.myVerein.server.model.event.EventRepository;
 import de.steilerdev.myVerein.server.model.User;
 import de.steilerdev.myVerein.server.security.CurrentUser;
 import org.slf4j.Logger;
@@ -43,7 +44,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/user/event")
 public class EventController
 {
-    private static Logger logger = LoggerFactory.getLogger(EventController.class);
+    private final Logger logger = LoggerFactory.getLogger(EventController.class);
 
     @Autowired
     private EventRepository eventRepository;
@@ -71,11 +72,11 @@ public class EventController
                 logger.warn("[{}] Unable to get all events for user, because the last changed format is wrong: {}", currentUser, e.getLocalizedMessage());
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
-            events = eventRepository.findAllByPrefixedInvitedUserAndLastChangedAfter(Event.prefixedUserIDForUser(currentUser), lastChangedTime);
+            events = eventRepository.findByPrefixedInvitedUserAndLastChangedAfter(EventHelper.prefixedUserIDForUser(currentUser), lastChangedTime);
         } else
         {
             logger.debug("[{}] Gathering all user events", currentUser);
-            events = eventRepository.findAllByPrefixedInvitedUser(Event.prefixedUserIDForUser(currentUser));
+            events = eventRepository.findByPrefixedInvitedUser(EventHelper.prefixedUserIDForUser(currentUser));
         }
 
         // Checking and returning events
@@ -106,7 +107,7 @@ public class EventController
         {
             logger.warn("[{}] The id is not allowed to be empty", currentUser);
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        } else if ((event = eventRepository.findEventById(eventID)) == null)
+        } else if ((event = eventRepository.findById(eventID)) == null)
         {
             logger.warn("[{}] Unable to find event with id {}", currentUser, eventID);
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -119,7 +120,7 @@ public class EventController
 
     /**
      * This function accepts a user response to a specific event and stores this response. The function is invoked by POSTing the parameter id to the URI /api/user/event.
-     * @param responseString The string representation of the enumeration {@link de.steilerdev.myVerein.server.model.Event.EventStatus EventStatus}.
+     * @param responseString The string representation of the enumeration {@link de.steilerdev.myVerein.server.model.event.EventStatus}.
      * @param eventID The event id of the event the user is responding to.
      * @param currentUser The currently logged in user.
      * @return A response entity containing a success code, in case of a successful execution or an error code in case of a failure.
@@ -133,7 +134,7 @@ public class EventController
         {
             logger.warn("[{}] The event or response is not allowed to be empty", currentUser);
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
-        } else if((event = eventRepository.findEventById(eventID)) == null)
+        } else if((event = eventRepository.findById(eventID)) == null)
         {
             logger.warn("[{}] Unable to gather the specified event with id {}", currentUser, eventID);
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
@@ -167,7 +168,7 @@ public class EventController
 
     /**
      * This function gathers and returns the user, that chose the specified response for the specified event. The function is invoked by GETting the URI /api/user/event with the response and event id.
-     * @param responseString The string representation of the enumeration {@link de.steilerdev.myVerein.server.model.Event.EventStatus EventStatus}, used to specify the searched group of user.
+     * @param responseString The string representation of the enumeration {@link de.steilerdev.myVerein.server.model.event.EventStatus}, used to specify the searched group of user.
      * @param eventID The event id of the searched event.
      * @param currentUser The currently logged in user.
      * @return A response entity containing a list of user ids and a success code, in case of a successful execution, or an error code in case of a failure.
@@ -181,7 +182,7 @@ public class EventController
         {
             logger.warn("[{}] The event id is not allowed to be empty", currentUser);
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        } else if((event = eventRepository.findEventById(eventID)) == null)
+        } else if((event = eventRepository.findById(eventID)) == null)
         {
             logger.warn("[{}] Unable to gather the specified event with id {}", currentUser, eventID);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -202,7 +203,7 @@ public class EventController
             }
 
             // Filtering invited user matching the response
-            HashMap<String, EventStatus> invitedUser = new HashMap<>();
+            HashMap<String, EventStatus> invitedUser = new HashMap<>(event.getInvitedUser());
             List<String> matchingUser = invitedUser.keySet().stream().filter(userID -> invitedUser.get(userID) == response).collect(Collectors.toList());
 
             logger.info("[{}] Successfully gathered all user matching the response {} for event {}", currentUser, response, event);

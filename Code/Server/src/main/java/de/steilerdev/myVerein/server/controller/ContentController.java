@@ -30,27 +30,24 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 
 /**
  * This controller is used to server files or information stored within the database or settings file.
  */
-@Controller
+@RestController
 @RequestMapping("/content")
 public class ContentController
 {
-    private static Logger logger = LoggerFactory.getLogger(ContentController.class);
+    private final Logger logger = LoggerFactory.getLogger(ContentController.class);
 
     @Autowired
-    GridFSRepository gridFSRepository;
+    private GridFSRepository gridFSRepository;
 
     @Autowired
-    SettingsRepository settingsRepository;
+    private SettingsRepository settingsRepository;
 
     /**
      * This function gathers the club logo either from the database or the classpath, depending if the user uploaded a custom logo. The function is invoked by GETting the URI /content/clubLogo.
@@ -58,7 +55,7 @@ public class ContentController
      * @return The current club logo as byte array.
      */
     @RequestMapping(value = "clubLogo", produces = "image/png", method = RequestMethod.GET)
-    @ResponseBody ResponseEntity<byte[]> getClubLogo(@RequestParam (required = false) String defaultLogo)
+    public ResponseEntity<byte[]> getClubLogo(@RequestParam (required = false) String defaultLogo)
     {
         logger.trace("Loading club logo");
         GridFSDBFile clubLogo = null;
@@ -106,7 +103,7 @@ public class ContentController
      * @return An HTTP response with a status code. If an error occurred an error message is bundled into the response, otherwise a success message is available.
      */
     @RequestMapping(value = "clubLogo", method = RequestMethod.DELETE)
-    public @ResponseBody ResponseEntity<String> deleteClubLogo(@CurrentUser User currentUser)
+    public ResponseEntity<String> deleteClubLogo(@CurrentUser User currentUser)
     {
         if(currentUser == null)
         {
@@ -133,7 +130,7 @@ public class ContentController
      * @return An HTTP response with a status code. If an error occurred an error message is bundled into the response, otherwise the name of the club.
      */
     @RequestMapping(value = "clubName", method = RequestMethod.GET)
-    @ResponseBody ResponseEntity<String> getClubName()
+    public ResponseEntity<String> getClubName()
     {
         logger.trace("Gathering club name");
         String clubName = Settings.loadSettings(settingsRepository).getClubName();

@@ -14,30 +14,31 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.steilerdev.myVerein.server.model;
+package de.steilerdev.myVerein.server.model.division;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import de.steilerdev.myVerein.server.model.BaseEntity;
+import de.steilerdev.myVerein.server.model.User;
 import org.hibernate.validator.constraints.NotBlank;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.LazyLoadingException;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * This object is representing an entity within the division's collection of the MongoDB. On top of that the class is providing several useful helper methods.
  */
-public class Division implements Comparable<Division>
+public class Division extends BaseEntity implements Comparable<Division>
 {
-    @Id
-    private String id;
+    @JsonIgnore
+    @Transient
+    private final Logger logger = LoggerFactory.getLogger(Division.class);
 
     @Indexed
     @NotBlank
@@ -56,15 +57,15 @@ public class Division implements Comparable<Division>
     private Division parent;
 
     @JsonIgnore
-    @DBRef //(lazy = true)
+    @DBRef
     private List<Division> ancestors;
 
     @JsonIgnore
     private List<String> memberList;
 
-    @JsonIgnore
-    @Transient
-    private static Logger logger = LoggerFactory.getLogger(Division.class);
+    /*
+        Constructors (Empty one to meet bean definition and convenience ones)
+     */
 
     public Division(){}
 
@@ -82,18 +83,12 @@ public class Division implements Comparable<Division>
         this.name = name;
         this.desc = desc;
         this.adminUser = adminUser;
-        this.setParent(parent);
+        this.replaceParent(parent);
     }
 
-    public String getId()
-    {
-        return id;
-    }
-
-    public void setId(String id)
-    {
-        this.id = id;
-    }
+    /*
+        Mandatory getter and setter
+     */
 
     public String getName()
     {
@@ -130,6 +125,11 @@ public class Division implements Comparable<Division>
         return parent;
     }
 
+    public void setParent(Division parent)
+    {
+        this.parent = parent;
+    }
+
     public List<String> getMemberList()
     {
         return memberList;
@@ -140,6 +140,28 @@ public class Division implements Comparable<Division>
         this.memberList = memberList;
     }
 
+    public List<Division> getAncestors()
+    {
+        if(ancestors == null)
+        {
+            return new ArrayList<>();
+        }
+        return ancestors;
+    }
+
+    public void setAncestors(List<Division> ancestors)
+    {
+        this.ancestors = ancestors;
+    }
+
+    /*
+        Convenience getter and setter
+     */
+
+    /**
+     * This function adds a member to the member list, if he is not already in the list.
+     * @param user The new user.
+     */
     public void addMember(User user)
     {
         if(memberList == null)
@@ -152,6 +174,10 @@ public class Division implements Comparable<Division>
         }
     }
 
+    /**
+     * This function removes a member from the member list, if he is in the list.
+     * @param user The user that should be deleted.
+     */
     public void removeMember(User user)
     {
         if(memberList != null && !memberList.isEmpty())
@@ -161,15 +187,16 @@ public class Division implements Comparable<Division>
     }
 
     /**
-     * This function updates the parent and the ancestors.
+     * This function updates the parent and the ancestors of this division.
      * @param parent The new parent.
      */
-    public void setParent(Division parent)
+    public void replaceParent(Division parent)
     {
-        logger.trace("Changing parent for " + this.name);
+        logger.trace("Changing parent for {}", this);
+        this.parent = parent;
         if(parent != null)
         {
-            logger.debug("Updating ancestors for " + this.name);
+            logger.debug("Updating ancestors for {}", this);
             List<Division> ancestor;
             if (parent.getAncestors() == null)
             {
@@ -180,35 +207,18 @@ public class Division implements Comparable<Division>
                 ancestor = new ArrayList<>(parent.getAncestors());
             }
             ancestor.add(parent);
-            logger.debug("Ancestors " + ancestor.stream().map(Division::getName).collect(Collectors.joining(", ")) + " for division " + this.name);
+            logger.debug("Ancestors {} for division {}", ancestors, this);
             this.ancestors = ancestor;
+        } else
+        {
+            this.ancestors = null;
         }
-        this.parent = parent;
         logger.info("Successfully updated parent and ancestors of " + this.name);
     }
 
-    /**
-     * @return The ancestor of this object. The function never returns null, but an empty list, if there are no ancestors defined.
+    /*
+        Sending object functions
      */
-    public List<Division> getAncestors()
-    {
-        if(ancestors == null)
-        {
-            return new ArrayList<>();
-        }
-        return ancestors;
-    }
-
-    public void addAncestor(Division ancestor)
-    {
-        logger.debug("Adding ancestor " + ancestor.getName() + " to " + this.name);
-        this.getAncestors().add(ancestor);
-    }
-
-    public void setAncestors(List<Division> ancestors)
-    {
-        this.ancestors = ancestors;
-    }
 
     /**
      * This function creates a new division object and copies only the id of the current division.
@@ -220,6 +230,20 @@ public class Division implements Comparable<Division>
     {
         Division sendingObject = new Division();
         sendingObject.setId(id);
+        return sendingObject;
+    }
+
+    /**
+     * This function creates a new division object and copies only the id and name of the current division.
+     * @return A new division object only containing the id and name.
+     */
+    @JsonIgnore
+    @Transient
+    public Division getSendingObjectOnlyIdAndName()
+    {
+        Division sendingObject = new Division();
+        sendingObject.setId(id);
+        sendingObject.setName(name);
         return sendingObject;
     }
 
@@ -264,62 +288,9 @@ public class Division implements Comparable<Division>
         return sendingObject;
     }
 
-    //Todo: These two are expensive!! Especially expanded set, which is called fairly often.
-
-    /**
-     * This function is using a set of divisions, and reduces it to the divisions closest to the root
-     * @param unoptimizedSetOfDivisions A set of divisions.
-     * @return The list of optimized divisions.
+    /*
+        Required java object functions
      */
-    @JsonIgnore
-    @Transient
-    public static List<Division> getOptimizedSetOfDivisions(List<Division> unoptimizedSetOfDivisions)
-    {
-        if(unoptimizedSetOfDivisions == null || unoptimizedSetOfDivisions.isEmpty())
-        {
-            logger.warn("Trying to optimize set of divisions, but unoptimized set is either null or empty");
-            return null;
-        } else if (unoptimizedSetOfDivisions.size() == 1)
-        {
-            return unoptimizedSetOfDivisions;
-        } else
-        {
-            logger.debug("Optimizing division set");
-            //Reducing the list to the divisions that are on the top of the tree, removing all unnecessary divisions.
-            return unoptimizedSetOfDivisions.parallelStream() //Creating a stream of all divisions
-                    .filter(division -> unoptimizedSetOfDivisions.parallelStream().sorted() //filtering all divisions that are already defined in a divisions that is closer to the root of the tree. Using a parallel and sorted stream, because therefore the likeliness of an early match increases
-                            .noneMatch(allDivisions -> division.getAncestors().contains(allDivisions))) //Checking, if there is any division in the list, that is an ancestor of the current division. If there is a match there exists a closer division.
-                    .collect(Collectors.toList()); // Converting the stream to a list
-        }
-    }
-
-    /**
-     * This function expands the set of divisions. This means that every division, the user is part of (all child divisions of every division) are going to be returned.
-     * @param initialSetOfDivisions The set of divisions that needs to be expanded.
-     * @param divisionRepository The division repository, needed to get queried.
-     * @return The expanded list of divisions.
-     */
-    @JsonIgnore
-    @Transient
-    public static List<Division> getExpandedSetOfDivisions(List<Division> initialSetOfDivisions, DivisionRepository divisionRepository)
-    {
-        if( (initialSetOfDivisions = getOptimizedSetOfDivisions(initialSetOfDivisions)) == null)
-        {
-            logger.warn("Trying to expand a set of divisions, but initial set is either null or empty");
-            return null;
-        } else
-        {
-            logger.debug("Expanding division set");
-            HashSet<Division>  expandedSetOfDivisions = new HashSet<>();
-
-            for (Division division: initialSetOfDivisions)
-            {
-                expandedSetOfDivisions.addAll(divisionRepository.findByAncestors(division));
-                expandedSetOfDivisions.add(divisionRepository.findById(division.getId()));
-            }
-            return new ArrayList<>(expandedSetOfDivisions);
-        }
-    }
 
     /**
      * Comparing two objects of the division class according to their name. Overwritten to be able to use the contains() method of java.util.List.
@@ -371,7 +342,7 @@ public class Division implements Comparable<Division>
                 }
             } catch (LazyLoadingException e)
             {
-                logger.error("Unable to compare divisions {} {}: {}", o, this, e.getLocalizedMessage());
+                logger.error("Unable to compare divisions {} {}: {}", o, this, e.getMessage());
                 return 0;
             }
         } else

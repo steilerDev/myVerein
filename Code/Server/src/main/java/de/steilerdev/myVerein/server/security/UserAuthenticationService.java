@@ -16,8 +16,8 @@
  */
 package de.steilerdev.myVerein.server.security;
 
-import de.steilerdev.myVerein.server.model.Division;
-import de.steilerdev.myVerein.server.model.DivisionRepository;
+import de.steilerdev.myVerein.server.model.division.Division;
+import de.steilerdev.myVerein.server.model.division.DivisionRepository;
 import de.steilerdev.myVerein.server.model.User;
 import de.steilerdev.myVerein.server.model.UserRepository;
 import org.slf4j.Logger;

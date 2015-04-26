@@ -18,9 +18,12 @@ package de.steilerdev.myVerein.server.controller.init;
 
 import com.mongodb.*;
 import de.steilerdev.myVerein.server.model.*;
+import de.steilerdev.myVerein.server.model.division.Division;
+import de.steilerdev.myVerein.server.model.division.DivisionRepository;
+import de.steilerdev.myVerein.server.model.event.Event;
+import de.steilerdev.myVerein.server.model.event.EventRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -29,7 +32,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.net.UnknownHostException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -403,7 +405,6 @@ public class InitController
         event1.setDescription("Super event at awesome location with great people");
         event1.addDivision(div2);
         event1.setEventAdmin(user1);
-        event1.updateMultiDate();
         event1.setLastChanged(LocalDateTime.now());
 
         Event event2 = new Event();
@@ -412,7 +413,6 @@ public class InitController
         event2.setName("Super Event 2");
         event2.addDivision(div3);
         event2.setEventAdmin(user4);
-        event2.updateMultiDate();
         event2.setLastChanged(LocalDateTime.now());
 
         Event event3 = new Event();
@@ -421,7 +421,6 @@ public class InitController
         event3.setName("Super Event 3");
         event3.addDivision(div1);
         event3.setEventAdmin(user1);
-        event3.updateMultiDate();
         event3.setLastChanged(LocalDateTime.now());
 
         Event event4 = new Event();
@@ -430,7 +429,6 @@ public class InitController
         event4.setName("Super Event 4");
         event4.addDivision(div1);
         event4.setEventAdmin(user2);
-        event4.updateMultiDate();
         event4.setLastChanged(LocalDateTime.now());
 
         eventRepository.save(event1);

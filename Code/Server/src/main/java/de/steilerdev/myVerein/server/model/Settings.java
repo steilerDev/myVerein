@@ -16,6 +16,7 @@
  */
 package de.steilerdev.myVerein.server.model;
 
+import de.steilerdev.myVerein.server.model.division.Division;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.annotation.Id;

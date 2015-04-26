@@ -153,7 +153,7 @@ function loadOccupiedDates(date)
     }
     $("#event-calendar-loading").addClass('heartbeat');
     $.ajax({
-        url: '/api/admin/event/month',
+        url: '/api/admin/event',
         type: 'GET',
         data: {
             'month': date._d.getMonth() + 1, //Month is starting at 0
@@ -188,7 +188,7 @@ function loadDate(dateString)
     });
 
     $.ajax({
-        url: '/api/admin/event/date',
+        url: '/api/admin/event',
         type: 'GET',
         data: {
             date: dateString
@@ -508,7 +508,7 @@ function loadEventPage() {
                             },
                             success: function (response) {
                                 eventSubmitButton.stopAnimation(1);
-                                loadEvent(response.eventID);
+                                loadEvent(response.eventId);
                                 loadOccupiedDates(calendar.month);
                                 showMessage(response.successMessage, 'success', 'icon_check');
                             }

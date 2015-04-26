@@ -17,6 +17,8 @@
 package de.steilerdev.myVerein.server.controller.user;
 
 import de.steilerdev.myVerein.server.model.*;
+import de.steilerdev.myVerein.server.model.division.Division;
+import de.steilerdev.myVerein.server.model.division.DivisionRepository;
 import de.steilerdev.myVerein.server.security.CurrentUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +30,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -38,7 +39,7 @@ import java.util.List;
 @RequestMapping("/api/user/message")
 public class MessageController
 {
-    private static Logger logger = LoggerFactory.getLogger(MessageController.class);
+    private final Logger logger = LoggerFactory.getLogger(MessageController.class);
 
     @Autowired
     private MessageRepository messageRepository;

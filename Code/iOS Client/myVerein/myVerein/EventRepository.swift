@@ -78,19 +78,24 @@ class EventRepository: CoreDataRepository {
     
     // There are three cases how an event could span over the date, either it is completly during the day (end and start between day boundaries), or starts before the start of the day and ends after the start of the day, or starts before the end of the day and ends after the end of the day.
     
+    // This predicate matches event that occur on the specified date
     let startAndEndBetweenBoundariesPredicate = NSCompoundPredicate.andPredicateWithSubpredicates([
-      NSPredicate(format: "\(EventConstants.Fields.StartDate) >= %@ && \(EventConstants.Fields.StartDate) <= %@", startDate, endDate),
-      NSPredicate(format: "\(EventConstants.Fields.EndDate) >= %@ && \(EventConstants.Fields.EndDate) <= %@", startDate, endDate),
+      NSPredicate(format: "\(EventConstants.Fields.StartDate) >= %@", startDate), // The start date of the event is after the start of the date
+      NSPredicate(format: "\(EventConstants.Fields.StartDate) <= %@", endDate), // The start date of the event is before the end of the date
+      NSPredicate(format: "\(EventConstants.Fields.EndDate) >= %@", startDate), // The end date of the event is after the start of the date
+      NSPredicate(format: "\(EventConstants.Fields.EndDate) <= %@", endDate) // The end date of the event is before the end of the date
     ])
     
+    // This predicate matches events that span over the start of the date
     let startBeforeAndEndAfterStartOfDatePredicate = NSCompoundPredicate.andPredicateWithSubpredicates([
-      NSPredicate(format: "\(EventConstants.Fields.StartDate) < %@", startDate),
-      NSPredicate(format: "\(EventConstants.Fields.EndDate) > %@", startDate)
+      NSPredicate(format: "\(EventConstants.Fields.StartDate) < %@", startDate), // The start date of the event is before the start of the date
+      NSPredicate(format: "\(EventConstants.Fields.EndDate) > %@", startDate) // The end date of the event is after the start of the date
     ])
     
+    // This predicate matches events that span over the end of the date
     let startBeforeAndEndAfterEndOfDatePredicate = NSCompoundPredicate.andPredicateWithSubpredicates([
-      NSPredicate(format: "\(EventConstants.Fields.StartDate) < %@", endDate),
-      NSPredicate(format: "\(EventConstants.Fields.EndDate) > %@", endDate)
+      NSPredicate(format: "\(EventConstants.Fields.StartDate) < %@", endDate), // The start date of the event is before the end of the date
+      NSPredicate(format: "\(EventConstants.Fields.EndDate) > %@", endDate) // The end date of the event is after the end of the date
     ])
     
     let datePredicate = NSCompoundPredicate.orPredicateWithSubpredicates([startAndEndBetweenBoundariesPredicate, startBeforeAndEndAfterStartOfDatePredicate, startBeforeAndEndAfterEndOfDatePredicate])

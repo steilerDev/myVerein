@@ -16,6 +16,7 @@
  */
 package de.steilerdev.myVerein.server.model;
 
+import de.steilerdev.myVerein.server.model.division.Division;
 import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;

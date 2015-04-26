@@ -26,7 +26,7 @@ public class IndexController {
     @Autowired
     private SettingsRepository settingsRepository;
 
-    private static Logger logger = LoggerFactory.getLogger(IndexController.class);
+    private final Logger logger = LoggerFactory.getLogger(IndexController.class);
 
     /**
      * This request mapping is processing the request to view the application page and retrieves the club name.

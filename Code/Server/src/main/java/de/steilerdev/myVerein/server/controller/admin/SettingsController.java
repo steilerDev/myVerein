@@ -18,6 +18,8 @@ package de.steilerdev.myVerein.server.controller.admin;
 
 import com.mongodb.MongoException;
 import de.steilerdev.myVerein.server.model.*;
+import de.steilerdev.myVerein.server.model.division.Division;
+import de.steilerdev.myVerein.server.model.division.DivisionRepository;
 import de.steilerdev.myVerein.server.security.CurrentUser;
 import de.steilerdev.myVerein.server.security.PasswordEncoder;
 import org.slf4j.Logger;
@@ -31,9 +33,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.validation.ConstraintViolationException;
-import javax.xml.ws.Response;
-import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -62,7 +61,7 @@ public class SettingsController
     @Autowired
     private DivisionRepository divisionRepository;
 
-    private static Logger logger = LoggerFactory.getLogger(SettingsController.class);
+    private final Logger logger = LoggerFactory.getLogger(SettingsController.class);
 
     /**
      * This function is gathering the current settings of the application. The function is invoked by GETting the URI /api/admin/settings.

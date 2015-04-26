@@ -14,8 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.steilerdev.myVerein.server.model;
+package de.steilerdev.myVerein.server.model.division;
 
+import de.steilerdev.myVerein.server.model.User;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -28,26 +29,24 @@ import java.util.List;
 @Repository
 public interface DivisionRepository extends MongoRepository<Division, String> {
 
-    public Division findByName(String name);
-    public List<Division> findByAdminUser(User adminUser);
-    public Division findById(String id);
+    Division findByName(String name);
+    Division findById(String id);
+    List<Division> findByAdminUser(User adminUser);
+    List<Division> findByParent(Division parent);
+    List<Division> findByAncestors(Division ancestors);
 
     /**
      * Gathers all division names available.
      * @return All divisions, but only their name field is populated.
      */
     @Query(value="{}", fields="{ 'name' : 1}")
-    public List<Division> findAllNames();
+    List<Division> findAllNames();
 
     /**
-     * Gathers all division names available, that contain the String.
+     * Gathers all divisions, where the name contains the specified string.
      * @param contains The returned division needs to contain the specified String.
      * @return All divisions, containing the specified String, but only their name field is populated.
      */
     @Query(value="{'_id': { $regex: '.*?0.*', $options: 'i' }}", fields="{ 'name' : 1}")
-    public List<Division> findAllNamesContainingString(String contains);
-
-    public List<Division> findByParent(Division parent);
-
-    public List<Division> findByAncestors(Division ancestors);
+    List<Division> findAllNamesContainingString(String contains);
 }

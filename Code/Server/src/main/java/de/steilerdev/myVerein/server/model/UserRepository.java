@@ -16,6 +16,7 @@
  */
 package de.steilerdev.myVerein.server.model;
 
+import de.steilerdev.myVerein.server.model.division.Division;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;

@@ -19,8 +19,11 @@ package de.steilerdev.myVerein.server.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.util.ArrayIterator;
-import de.steilerdev.myVerein.server.controller.admin.DivisionManagementController;
+import de.steilerdev.myVerein.server.model.division.Division;
+import de.steilerdev.myVerein.server.model.division.DivisionHelper;
+import de.steilerdev.myVerein.server.model.division.DivisionRepository;
+import de.steilerdev.myVerein.server.model.event.Event;
+import de.steilerdev.myVerein.server.model.event.EventRepository;
 import de.steilerdev.myVerein.server.security.PasswordEncoder;
 import de.steilerdev.myVerein.server.security.UserAuthenticationService;
 import org.hibernate.validator.constraints.Email;
@@ -38,9 +41,7 @@ import org.springframework.security.crypto.keygen.KeyGenerators;
 
 import java.time.LocalDate;
 import java.util.*;
-import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * This object is representing an entity within the user's collection of the MongoDB and is used by Spring Security as UserDetails implementation. On top of that the class is providing several useful helper methods.
@@ -528,7 +529,7 @@ public class User implements UserDetails
     {
         logger.debug("[{}] Replacing division set", this);
 
-        List<Division> finalDivisions = Division.getExpandedSetOfDivisions(divs, divisionRepository);
+        List<Division> finalDivisions = DivisionHelper.getExpandedSetOfDivisions(divs, divisionRepository);
         List<Division> oldDivisions = divisions;
 
         if((finalDivisions == null || finalDivisions.isEmpty()) && (oldDivisions == null || oldDivisions.isEmpty()))
@@ -543,7 +544,7 @@ public class User implements UserDetails
 
             //Updating events, affected by division change
             oldDivisions.parallelStream().forEach(div -> {
-                List<Event> changedEvents = eventRepository.findAllByInvitedDivision(div);
+                List<Event> changedEvents = eventRepository.findByInvitedDivision(div);
                 changedEvents.parallelStream().forEach(event -> event.updateInvitedUser(divisionRepository));
                 eventRepository.save(changedEvents);
             });
@@ -556,7 +557,7 @@ public class User implements UserDetails
 
             //Updating events, affected by division change
             finalDivisions.stream().forEach(div -> {
-                List<Event> changedEvents = eventRepository.findAllByInvitedDivision(div);
+                List<Event> changedEvents = eventRepository.findByInvitedDivision(div);
                 changedEvents.stream().forEach(event -> event.updateInvitedUser(divisionRepository));
                 eventRepository.save(changedEvents);
             });
@@ -589,7 +590,7 @@ public class User implements UserDetails
 
             //Updating events, affected by division change
             changedDivisions.parallelStream().forEach(div -> {
-                List<Event> changedEvents = eventRepository.findAllByInvitedDivision(div);
+                List<Event> changedEvents = eventRepository.findByInvitedDivision(div);
                 changedEvents.parallelStream().forEach(event -> event.updateInvitedUser(divisionRepository));
                 eventRepository.save(changedEvents);
             });
@@ -897,7 +898,7 @@ public class User implements UserDetails
                 division != null && //The division needs to be present
                 (
                     this.isSuperAdmin() || //If the user is a super admin he can do whatever he wants
-                    Division.getOptimizedSetOfDivisions(divisionRepository.findByAdminUser(this)) //Getting all divisions administrated by the user, should not be empty, since the user is an admin
+                    DivisionHelper.getOptimizedSetOfDivisions(divisionRepository.findByAdminUser(this)) //Getting all divisions administrated by the user, should not be empty, since the user is an admin
                         .parallelStream().anyMatch(div -> div.equals(division) ||  //If the selected division is one of the administrated ones
                                                           division.getAncestors().contains(div)) //If the selected division is an ancestor of the administrated ones
                 );

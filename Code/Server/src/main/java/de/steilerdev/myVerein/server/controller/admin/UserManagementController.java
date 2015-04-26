@@ -17,6 +17,9 @@
 package de.steilerdev.myVerein.server.controller.admin;
 
 import de.steilerdev.myVerein.server.model.*;
+import de.steilerdev.myVerein.server.model.division.Division;
+import de.steilerdev.myVerein.server.model.division.DivisionRepository;
+import de.steilerdev.myVerein.server.model.event.EventRepository;
 import de.steilerdev.myVerein.server.security.CurrentUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +28,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.ConstraintViolationException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -39,19 +41,19 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/admin/user")
 public class UserManagementController
 {
-    private static Logger logger = LoggerFactory.getLogger(UserManagementController.class);
+    private final Logger logger = LoggerFactory.getLogger(UserManagementController.class);
 
     @Autowired
-    DivisionRepository divisionRepository;
+    private DivisionRepository divisionRepository;
 
     @Autowired
-    UserRepository userRepository;
+    private UserRepository userRepository;
 
     @Autowired
-    SettingsRepository settingsRepository;
+    private SettingsRepository settingsRepository;
 
     @Autowired
-    EventRepository eventRepository;
+    private EventRepository eventRepository;
 
     /**
      * These final strings are used to bundle information within a response entity.
@@ -114,10 +116,10 @@ public class UserManagementController
             return new ResponseEntity<>(responseMap, HttpStatus.BAD_REQUEST);
         } else if (userFlag.equals("true"))
         {
-            return createNewUser(firstName, lastName, email, birthday, password, gender, street, streetNumber, zip, city, country, activeMemberSince, passiveMemberSince, resignationDate, iban, bic, divisions, parameters, currentUser);
+            return createUser(firstName, lastName, email, birthday, password, gender, street, streetNumber, zip, city, country, activeMemberSince, passiveMemberSince, resignationDate, iban, bic, divisions, parameters, currentUser);
         } else
         {
-            return modifyExistingUser(firstName, lastName, email, birthday, gender, street, streetNumber, zip, city, country, activeMemberSince, passiveMemberSince, resignationDate, iban, bic, divisions, userFlag, parameters, currentUser);
+            return modifyUser(firstName, lastName, email, birthday, gender, street, streetNumber, zip, city, country, activeMemberSince, passiveMemberSince, resignationDate, iban, bic, divisions, userFlag, parameters, currentUser);
         }
     }
 
@@ -144,25 +146,25 @@ public class UserManagementController
      * @param currentUser The currently logged in user.
      * @return A response entity containing a map with either a success message (key: 'successMessage') and the user id of the user (key: 'userId') or an error message (key 'errorMessage'). The appropriate http code is used.
      */
-    private ResponseEntity<Map<String, String>> createNewUser( String firstName,
-                                                               String lastName,
-                                                               String email,
-                                                               String birthday,
-                                                               String password,
-                                                               String gender,
-                                                               String street,
-                                                               String streetNumber,
-                                                               String zip,
-                                                               String city,
-                                                               String country,
-                                                               String activeMemberSince,
-                                                               String passiveMemberSince,
-                                                               String resignationDate,
-                                                               String iban,
-                                                               String bic,
-                                                               String divisions,
-                                                               Map<String, String> parameters,
-                                                               User currentUser)
+    private ResponseEntity<Map<String, String>> createUser(String firstName,
+                                                           String lastName,
+                                                           String email,
+                                                           String birthday,
+                                                           String password,
+                                                           String gender,
+                                                           String street,
+                                                           String streetNumber,
+                                                           String zip,
+                                                           String city,
+                                                           String country,
+                                                           String activeMemberSince,
+                                                           String passiveMemberSince,
+                                                           String resignationDate,
+                                                           String iban,
+                                                           String bic,
+                                                           String divisions,
+                                                           Map<String, String> parameters,
+                                                           User currentUser)
     {
         User modifyingUser;
         Map<String, String> responseMap = new HashMap<>();
@@ -209,25 +211,25 @@ public class UserManagementController
      * @param currentUser The currently logged in user.
      * @return A response entity containing a map with either a success message (key: 'successMessage') and the user id of the user (key: 'userId') or an error message (key 'errorMessage'). The appropriate http code is used.
      */
-    private ResponseEntity<Map<String, String>> modifyExistingUser(String firstName,
-                                                                   String lastName,
-                                                                   String email,
-                                                                   String birthday,
-                                                                   String gender,
-                                                                   String street,
-                                                                   String streetNumber,
-                                                                   String zip,
-                                                                   String city,
-                                                                   String country,
-                                                                   String activeMemberSince,
-                                                                   String passiveMemberSince,
-                                                                   String resignationDate,
-                                                                   String iban,
-                                                                   String bic,
-                                                                   String divisions,
-                                                                   String userId,
-                                                                   Map<String, String> parameters,
-                                                                   User currentUser)
+    private ResponseEntity<Map<String, String>> modifyUser(String firstName,
+                                                           String lastName,
+                                                           String email,
+                                                           String birthday,
+                                                           String gender,
+                                                           String street,
+                                                           String streetNumber,
+                                                           String zip,
+                                                           String city,
+                                                           String country,
+                                                           String activeMemberSince,
+                                                           String passiveMemberSince,
+                                                           String resignationDate,
+                                                           String iban,
+                                                           String bic,
+                                                           String divisions,
+                                                           String userId,
+                                                           Map<String, String> parameters,
+                                                           User currentUser)
     {
         User modifyingUser;
         Map<String, String> responseMap = new HashMap<>();
