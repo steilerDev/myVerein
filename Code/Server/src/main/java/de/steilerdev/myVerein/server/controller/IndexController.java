@@ -27,6 +27,11 @@ public class IndexController {
     private final Logger logger = LoggerFactory.getLogger(IndexController.class);
 
     /**
+     * The default club name shown, if none is defined
+     */
+    private final String defaultClubName = "myVerein";
+
+    /**
      * This request mapping is processing the request to view the application page and retrieves the club name.
      * @param model The model, handed over to the template engine rendering the view.
      * @return The path to the view for the index page, together with the club name as parameter.
@@ -34,20 +39,13 @@ public class IndexController {
     @RequestMapping(method = RequestMethod.GET)
     public String startApplication(Model model)
     {
-        logger.trace("Gathering club name for index page.");
-        String clubName = SettingsHelper.loadSettings(settingsRepository).getClubName();
-        if(clubName == null || clubName.isEmpty())
-        {
-            logger.warn("Unable to retrieve club name, or club name is empty. Using default name.");
-            clubName = "myVerein";
-        }
-        model.addAttribute("clubName", clubName);
-        logger.info("Returning index view.");
+        model.addAttribute("clubName", getClubName());
+        logger.debug("Returning index view");
         return "index";
     }
 
     /**
-     * This request mapping is processing the request to view the login page. If the initial flag is set within the settings file, the initial configuration page is returned.
+     * This request mapping is processing the request to view the login page. If the initial flag is set within the settings file or there is no settings document available in the database, the initial configuration page is returned.
      * @param error This parameter is present if a login error occurred.
      * @param logout This parameter is present if a user logged out of the application and got redirected to this page.
      * @param cookieTheft This parameter is present if a cookieTheft exception was thrown, which means that the rememberMeCookie of the user might have been compromised.
@@ -57,20 +55,14 @@ public class IndexController {
     @RequestMapping(value = "login", method = RequestMethod.GET)
     public String login(@RequestParam(required = false) String error, @RequestParam(required = false) String logout, @RequestParam(required = false) String cookieTheft, Model model)
     {
-        logger.trace("Getting login page.");
-        if (SettingsHelper.loadSettings(settingsRepository).isInitialSetup())
+        logger.trace("Getting login page");
+        if (SettingsHelper.initialSetupNeeded(settingsRepository))
         {
-            logger.warn("Starting initial setup.");
+            logger.warn("Starting initial setup");
             return "init";
         } else
         {
-            String clubName = SettingsHelper.loadSettings(settingsRepository).getClubName();
-            if(clubName == null || clubName.isEmpty())
-            {
-                logger.warn("Unable to retrieve club name, or club name is empty. Using default name.");
-                clubName = "myVerein";
-            }
-            model.addAttribute("clubName", clubName);
+            model.addAttribute("clubName", getClubName());
             if (error != null)
             {
                 logger.warn("An error occurred during log in");
@@ -116,7 +108,7 @@ public class IndexController {
      * @return OK
      */
     @RequestMapping(method = RequestMethod.HEAD, value = "*")
-    public ResponseEntity<String> fuck(@RequestHeader Map<String, String> headers)
+    public ResponseEntity<String> workAround(@RequestHeader Map<String, String> headers)
     {
         for (String headerKey : headers.keySet())
         {
@@ -124,5 +116,22 @@ public class IndexController {
         }
         System.err.print("\n");
         return new ResponseEntity<>("No", HttpStatus.OK);
+    }
+
+    /**
+     * This function tries to retrieve the defined club name from the database. If the club name is not available a default one is used.
+     * @return The club name.
+     */
+    private String getClubName()
+    {
+        logger.trace("Gathering club name");
+        Settings currentSettings = SettingsHelper.loadSettings(settingsRepository);
+        String clubName;
+        if(currentSettings == null || (clubName = currentSettings.getClubName()) == null || clubName.isEmpty())
+        {
+            logger.warn("Unable to retrieve club name, using default name");
+            clubName = defaultClubName;
+        }
+        return clubName;
     }
 }

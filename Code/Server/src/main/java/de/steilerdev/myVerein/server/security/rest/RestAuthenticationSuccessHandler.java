@@ -32,6 +32,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+/**
+ * This class is used to modify the default behaviour in case of a successful authentication within the context of the system's REST API.
+ * The default behaviour would redirect the user to the index page, but within the context of the REST API this handler only sends a success code. The header files are modified, to reflect the system's version, identifier as well as the users identifier.
+ */
 public class RestAuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler
 {
     private static Logger logger = LoggerFactory.getLogger(RestAuthenticationSuccessHandler.class);
@@ -39,6 +43,14 @@ public class RestAuthenticationSuccessHandler extends SimpleUrlAuthenticationSuc
     @Autowired
     SettingsRepository settingsRepository;
 
+    /**
+     * This function is invoked, when the user successfully authenticates himself against the system.
+     * @param request The user's request.
+     * @param response The server's response, containing header fields holding information about the system's version, identification and the user's identification.
+     * @param authentication The authentication object, holding the authentication principal.
+     * @throws ServletException Used to meet signature, this implementation should not throw any ServletExceptions.
+     * @throws IOException Used to meet signature, this implementation should not throw any IOExceptions.
+     */
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
                                         Authentication authentication) throws ServletException, IOException

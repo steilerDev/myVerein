@@ -27,10 +27,21 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+/**
+ * This class is used to modify the default behaviour in case of a authentication failure within the context of the system's REST API.
+ */
 public class RestAuthenticationFailureHandler extends SimpleUrlAuthenticationFailureHandler
 {
-    private static Logger logger = LoggerFactory.getLogger(RestAuthenticationFailureHandler.class);
+    private final Logger logger = LoggerFactory.getLogger(RestAuthenticationFailureHandler.class);
 
+    /**
+     * This function is invoked if a user's authentication went wrong. In that case a simple 401 is send.
+     * @param request The user's request.
+     * @param response The server's response.
+     * @param exception The authentication exception.
+     * @throws IOException Used to meet signature, this implementation should not throw any IOExceptions.
+     * @throws ServletException Used to meet signature, this implementation should not throw any ServletExceptions.
+     */
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException
     {

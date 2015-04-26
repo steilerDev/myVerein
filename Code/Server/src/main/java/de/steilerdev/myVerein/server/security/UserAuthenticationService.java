@@ -76,12 +76,18 @@ public class UserAuthenticationService implements UserDetailsService
     @Autowired
     DivisionRepository divisionRepository;
 
-    private static Logger logger = LoggerFactory.getLogger(UserAuthenticationService.class);
+    private final Logger logger = LoggerFactory.getLogger(UserAuthenticationService.class);
 
+    /**
+     * This function loads a user identified by his username (email address).
+     * @param username The username of the user.
+     * @return The specified user.
+     * @throws UsernameNotFoundException If a user with the specified username could not be retrieved.
+     */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException
     {
-        logger.debug("Loading user " + username);
+        logger.debug("[{}] Loading user", username);
         User user = userRepository.findByEmail(username);
         if(user == null)
         {
@@ -101,7 +107,7 @@ public class UserAuthenticationService implements UserDetailsService
      */
     private ArrayList<GrantedAuthority> getUserAuthorities(User user)
     {
-        logger.trace("Checking user' granted authorities");
+        logger.trace("[{}] Checking user's granted authorities", user);
         ArrayList<GrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority(AuthorityRoles.USER.toString()));
         List<Division> administratedDiv = divisionRepository.findByAdminUser(user);
@@ -113,7 +119,7 @@ public class UserAuthenticationService implements UserDetailsService
                 authorities.add(new SimpleGrantedAuthority(AuthorityRoles.SUPERADMIN.toString()));
             }
         }
-        logger.info("User " + user.getEmail() + " is " + authorities);
+        logger.info("[{}] Retrieved user authorities: {}", user, authorities);
         return authorities;
     }
 }

@@ -28,60 +28,79 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * This data provider is implementing the necessary functions to enable a persistent token repository. This provider is needed to user the remember me functionality.
+ * This data provider is implementing the necessary functions to enable a persistent token repository. This provider is needed to user the remember me functionality. This class stores all remember me tokens in the database.
  */
 public class RememberMeTokenDataProvider implements PersistentTokenRepository
 {
     @Autowired
     RememberMeTokenRepository rememberMeTokenRepository;
 
-    private static Logger logger = LoggerFactory.getLogger(RememberMeTokenRepository.class);
-    
+    private final Logger logger = LoggerFactory.getLogger(RememberMeTokenRepository.class);
+
+    /**
+     * This function stores a new remember me token in the database.
+     * @param persistentRememberMeToken The new token, that needs to be stored presistent.
+     */
     @Override
     public void createNewToken(PersistentRememberMeToken persistentRememberMeToken)
     {
-        logger.debug("Creating new remember me token for user " + persistentRememberMeToken.getUsername());
+        logger.debug("[{}] Creating new remember me token", persistentRememberMeToken.getUsername());
         rememberMeTokenRepository.save(new RememberMeToken(persistentRememberMeToken));
     }
 
+    /**
+     * This function updates an existing remember me token.
+     * @param series The series of the remember me token.
+     * @param tokenValue The new token value.
+     * @param lastUsed The last used date of the token.
+     */
     @Override
     public void updateToken(String series, String tokenValue, Date lastUsed)
     {
         RememberMeToken token = rememberMeTokenRepository.findRememberMeTokenBySeries(series);
         if(token != null)
         {
-            logger.debug("Updating remember me token of series " + series);
+            logger.debug("[{}] Updating remember me token of series {}", token.getUsername(),series);
             token = new RememberMeToken(token.getUsername(), series, tokenValue, lastUsed);
             rememberMeTokenRepository.save(token);
         } else
         {
-            logger.warn("Unable to update remember me token of series " + series);
+            logger.warn("Unable to update remember me token of series {}", series);
         }
     }
 
+    /**
+     * Retrieves a token defined by it's series.
+     * @param series The series of the token.
+     * @return The token retrieved from the series.
+     */
     @Override
     public PersistentRememberMeToken getTokenForSeries(String series)
     {
-        logger.debug("Getting token for series " + series);
+        logger.debug("Getting token for series {}", series);
         return rememberMeTokenRepository.findRememberMeTokenBySeries(series).toPersistentRememberMeToken();
     }
 
+    /**
+     * Removes the token for a specified user.
+     * @param username The username of the user.
+     */
     @Override
     public void removeUserTokens(String username)
     {
         List<RememberMeToken> tokens = rememberMeTokenRepository.findRememberMeTokenByUsername(username);
         if(tokens != null)
         {
-            logger.debug("Deleting remember me token for user " + username);
+            logger.debug("[{}] Deleting remember me token", username);
             try {
                 rememberMeTokenRepository.delete(tokens);
             } catch(IllegalArgumentException e)
             {
-                logger.error("Unable to delete remember me token for user " + username + ": " + e.getMessage());
+                logger.error("[{}] Unable to delete remember me token: {}", username, e.getMessage());
             }
         } else
         {
-            logger.warn("Unable to delete remember me token for user " + username);
+            logger.warn("[{}] Unable to retrieve remember me", username);
         }
     }
 }

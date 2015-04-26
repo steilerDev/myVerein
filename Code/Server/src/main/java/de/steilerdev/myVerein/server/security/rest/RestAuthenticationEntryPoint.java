@@ -26,10 +26,21 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+/**
+ * This class is used to modify the default behaviour in case of an unauthorized access to a secured resource by Spring Security within the context of the system's REST API.
+ * By default a 302 would be send and redirect the user to the log in page. In the context of a REST API this behaviour is not optimal. Therefore this class is not sending a 302 but a 401 status code.
+ */
 public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint
 {
-    private static Logger logger = LoggerFactory.getLogger(RestAuthenticationEntryPoint.class);
+    private final Logger logger = LoggerFactory.getLogger(RestAuthenticationEntryPoint.class);
 
+    /**
+     * This function is invoked, when the user accesses a secured resource, while not being authorized.
+     * @param request The user's request.
+     * @param response The response send from the server.
+     * @param authException The thrown authentication exception.
+     * @throws IOException Used to meet signature, this implementation should not throw any IOExceptions.
+     */
     @Override
     public void commence( HttpServletRequest request, HttpServletResponse response,
                           AuthenticationException authException ) throws IOException

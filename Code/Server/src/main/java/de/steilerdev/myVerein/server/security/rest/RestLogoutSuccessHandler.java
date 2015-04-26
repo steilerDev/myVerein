@@ -28,10 +28,21 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+/**
+ * This class is used to modify the default behaviour in case of a successful logout within the context of the system's REST API.
+ */
 public class RestLogoutSuccessHandler extends SimpleUrlLogoutSuccessHandler
 {
-    private static Logger logger = LoggerFactory.getLogger(RestLogoutSuccessHandler.class);
+    private final Logger logger = LoggerFactory.getLogger(RestLogoutSuccessHandler.class);
 
+    /**
+     * This function is invoked when the logout of a user was successful.
+     * @param request The user's request.
+     * @param response The server's response.
+     * @param authentication The authentication object, holding the authentication principal.
+     * @throws IOException Used to meet signature, this implementation should not throw any IOExceptions.
+     * @throws ServletException Used to meet signature, this implementation should not throw any ServletExceptions.
+     */
     @Override
     public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException
     {

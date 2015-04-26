@@ -19,7 +19,7 @@ package de.steilerdev.myVerein.server.security;
 import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
 
 /**
- * Creates a SHA-512 Password encoder with 1000 iterations. This encoder in the context of this application when handling passwords to secure them.
+ * Creates a SHA-512 Password encoder with 1000 iterations. This encoder is used in the context of this application when handling passwords to secure them.
  */
 public class PasswordEncoder extends ShaPasswordEncoder
 {

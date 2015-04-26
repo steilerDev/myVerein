@@ -36,13 +36,30 @@ public class SettingsHelper
         logger.debug("Getting current settings");
         List<Settings> currentSettings = settingsRepository.findAll();
 
-        Settings currentSetting = currentSettings.remove(0);
-
-        if(!currentSettings.isEmpty())
+        if(currentSettings == null || currentSettings.isEmpty())
         {
-            logger.info("There are more settings objects present in database, deleting unnecessary ones");
-            settingsRepository.delete(currentSettings);
+            logger.warn("No settings document available");
+            return null;
+        } else
+        {
+            Settings currentSetting = currentSettings.remove(0);
+            if (!currentSettings.isEmpty())
+            {
+                logger.info("There are more settings objects present in database, deleting unnecessary ones");
+                settingsRepository.delete(currentSettings);
+            }
+            return currentSetting;
         }
-        return currentSetting;
+    }
+
+    /**
+     * This function checks if an initial setup for the system is needed. This is the case if either the {@link de.steilerdev.myVerein.server.model.settings.Settings#initialSetup initialSetup} flag is set or there is no settings document available.
+     * @param settingsRepository The settings repository needed to query the database.
+     * @return True is an initial setup is needed, false otherwise.
+     */
+    static public boolean initialSetupNeeded(SettingsRepository settingsRepository)
+    {
+        Settings currentSettings;
+        return (currentSettings = SettingsHelper.loadSettings(settingsRepository)) == null || currentSettings.isInitialSetup();
     }
 }
