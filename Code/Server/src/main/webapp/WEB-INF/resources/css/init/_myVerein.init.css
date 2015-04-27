@@ -3,3 +3,12 @@
     background: url("/content/clubLogo?defaultLogo") no-repeat center top; /*Getting default logo, independent from database stored logo*/
     background-size: 230px auto;
 }
+
+.loginCheckbox {
+    line-height: 1.7;
+}
+
+.checkbox {
+    margin-bottom: 10px;
+    font-weight: normal;
+}

@@ -38,7 +38,7 @@ $(document).ready(function() {
                     success: function (response) {
                         showMessage(response, 'success', 'icon_check');
                         initSettingsButton.stopAnimation(1, function(){
-                            // Todo: Redirect
+                            window.setTimeout('window.location.href = "/"', 2000);
                         });
                     },
                     error: function (response) {

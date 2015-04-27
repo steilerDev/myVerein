@@ -24,10 +24,12 @@ import de.steilerdev.myVerein.server.model.event.EventRepository;
 import de.steilerdev.myVerein.server.model.message.Message;
 import de.steilerdev.myVerein.server.model.message.MessageRepository;
 import de.steilerdev.myVerein.server.model.settings.Settings;
+import de.steilerdev.myVerein.server.model.settings.SettingsHelper;
 import de.steilerdev.myVerein.server.model.settings.SettingsRepository;
 import de.steilerdev.myVerein.server.model.user.Gender;
 import de.steilerdev.myVerein.server.model.user.User;
 import de.steilerdev.myVerein.server.model.user.UserRepository;
+import de.steilerdev.myVerein.server.security.SecurityHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,11 +40,18 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import java.lang.reflect.Array;
 import java.net.UnknownHostException;
+import java.security.Security;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
+/**
+ * This class is managing the initial setup of the system
+ */
 @RestController
 @RequestMapping("/api/init")
 public class InitController
@@ -68,422 +77,359 @@ public class InitController
     @Autowired
     private ReloadableResourceBundleMessageSource messageSource;
 
-    @Autowired
-    private MappingMongoConverter mappingMongoConverter;
-
-    private ServerAddress mongoAddress = null;
-    private List<MongoCredential> mongoCredential = null;
-    private String databaseName = null;
-
-    private static Logger logger = LoggerFactory.getLogger(InitController.class);
+    private final Logger logger = LoggerFactory.getLogger(InitController.class);
 
     /**
-     * This function is temporarily saving the general settings during the initial setup. The values are stored permanently after calling the initSuperAdmin function. This function is invoked by POSTing the parameters to the URI /api/init/settings.
-     * @param clubName The name of the club.
-     * @param databaseHost The hostname of the MongoDB server (Default localhost).
-     * @param databasePort The port of the MongoDB server (Default 27017).
-     * @param databaseUser The user used to authenticate against the MongoDB server (may be empty if not needed).
-     * @param databasePassword The password used to authenticate against the MongoDB server (may be empty if not needed).
-     * @param databaseCollection The name of the database collection (Default myVerein).
-     * @param locale The current locale of the user.
-     * @return An HTTP response with a status code. If an error occurred an error message is bundled into the response, otherwise a success message is available.
+     * This function is creating the initial settings for this system. It is creating an initial administrating user, as well as an initial division root.
+     * This function can only be executed if either the initial setup up flag is set in the database or if there is no settings document available. The function is resetting the specified collection.
+     * To change the database settings, the 'myVerein.properties' file has to be adjusted and the server needs to be restarted.
+     * @param clubName The new name of the club.
+     * @param firstName The first name of the administrating user.
+     * @param lastName The last name of the administrating user.
+     * @param email The email of the administrating user.
+     * @param password The new password of the administrating user.
+     * @param passwordRe The retyped password of the administrating user.
+     * @param createExample If this parameter is set to 'on' the function is going to populate the system with example data.
+     * @param request The user's request.
+     * @param locale The currently set locale of the user.
+     * @return A response enitity containing either a success or a failure code, together with a message.
      */
-    @RequestMapping(value = "settings", method = RequestMethod.POST)
+    @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<String> initSettings(@RequestParam String clubName,
-                                               @RequestParam String databaseHost,
-                                               @RequestParam String databasePort,
-                                               @RequestParam String databaseUser,
-                                               @RequestParam String databasePassword,
-                                               @RequestParam String databaseCollection,
+                                               @RequestParam String firstName,
+                                               @RequestParam String lastName,
+                                               @RequestParam String email,
+                                               @RequestParam String password,
+                                               @RequestParam String passwordRe,
+                                               @RequestParam(required = false) String createExample,
+                                               HttpServletRequest request,
                                                Locale locale)
     {
-        logger.trace("Starting initial settings configuration");
-        Settings settings = new Settings();
-        if(!settings.isInitialSetup())
+        final String clientIpAddr = SecurityHelper.getClientIpAddr(request);
+        logger.trace("[{}] Starting initial configuration", clientIpAddr);
+        if(!SettingsHelper.initialSetupNeeded(settingsRepository))
         {
-            logger.warn("An initial setup API was used, even though the system is already configured.");
-            return new ResponseEntity<>(messageSource.getMessage("init.message.settings.notAllowed", null, "You are not allowed to perform this action at the moment", locale), HttpStatus.BAD_REQUEST);
-        } else if(clubName.isEmpty())
+            logger.warn("[{}] An initial setup API was used, even though the system is already configured", clientIpAddr);
+            return new ResponseEntity<>("An initial setup API was used, even though the system is already configured", HttpStatus.FORBIDDEN);
+        } else if(clubName.isEmpty() || firstName.isEmpty() || lastName.isEmpty() || email.isEmpty() || password.isEmpty() || passwordRe.isEmpty())
         {
-            logger.warn("The club name is not present");
-            return new ResponseEntity<>(messageSource.getMessage("init.message.settings.noName", null, "The club name is required", locale), HttpStatus.BAD_REQUEST);
-        } else
-        {
-            int databasePortInt = 27017;
-            if(databaseHost.isEmpty())
-            {
-                logger.warn("The database host is empty, using default value.");
-                databaseHost = "localhost";
-            }
-            if(databasePort.isEmpty())
-            {
-                logger.warn("The database port is empty, using default value.");
-                databasePort = "27017";
-            } else
-            {
-                try
-                {
-                    databasePortInt = Integer.parseInt(databasePort);
-                } catch (NumberFormatException e)
-                {
-                    logger.warn("The database port does not seem to be a number " + databasePort + ", " + e.getMessage());
-                    return new ResponseEntity<>(messageSource.getMessage("init.message.settings.dbPortNoNumber", null, "The database port needs to be a number", locale), HttpStatus.BAD_REQUEST);
-                }
-            }
-            if(databaseCollection.isEmpty())
-            {
-                logger.warn("The database collection name is empty, using default value");
-                databaseCollection = "myVerein";
-            }
-
-            if(!mongoIsAvailable(databaseHost, databasePortInt, databaseUser, databasePassword, databaseCollection))
-            {
-                logger.warn("The stated MongoDB is not available");
-                return new ResponseEntity<>(messageSource.getMessage("init.message.settings.mongoNotAvailable", null, "The stated MongoDB is not available", locale), HttpStatus.BAD_REQUEST);
-            }
-
-//            try
-//            {
-                logger.debug("Temporarily storing settings information");
-                settings.setClubName(clubName);
-//                settings.setDatabaseHost(databaseHost);
-//                settings.setDatabasePort(databasePort);
-//                settings.setDatabaseUser(databaseUser);
-//                settings.setDatabasePassword(databasePassword);
-//                settings.setDatabaseName(databaseCollection);
-                databaseName = databaseCollection;
-                savingInitialSetup(null, null, settings);
-//            } catch (IOException e)
-//            {
-//                logger.warn("Unable to save settings.");
-//                return new ResponseEntity<>(messageSource.getMessage("init.message.settings.savingSettingsError", null, "Unable to save settings, please try again", locale), HttpStatus.INTERNAL_SERVER_ERROR);
-//            }
-            logger.info("Successfully stored and validated settings information");
-            return new ResponseEntity<>(messageSource.getMessage("init.message.settings.savingSettingsSuccess", null, "Successfully saved settings", locale), HttpStatus.OK);
-        }
-    }
-
-    /**
-     * This function is creating the initial super admin, as well as the root division. On top of that it stores all information durable, as well as restarts the application. The function is invoked by POSTing the parameters to the URI /api/init/superAdmin.
-     * NOTE: At the moment the restarting of the application is not working correctly. To apply changed database settings the application needs to be redeployed manually from the management interface.
-     * @param firstName The first name of the new super admin.
-     * @param lastName The last name of the new super admin.
-     * @param email The email of the new super admin.
-     * @param password The password of the new super admin.
-     * @param passwordRe The retyped password of the new super admin.
-     * @param locale The current locale of the user.
-     * @return An HTTP response with a status code. If an error occurred an error message is bundled into the response, otherwise a success message is available.
-     */
-    @RequestMapping(value = "superAdmin", method = RequestMethod.POST)
-    public ResponseEntity<String> initSuperAdmin(@RequestParam String firstName,
-                                                 @RequestParam String lastName,
-                                                 @RequestParam String email,
-                                                 @RequestParam String password,
-                                                 @RequestParam String passwordRe,
-                                                 Locale locale)
-    {
-        Settings settings = new Settings();
-        logger.trace("Starting initial admin configuration");
-        if(!settings.isInitialSetup())
-        {
-            logger.warn("An initial setup API was used, even though the system is already configured.");
-            return new ResponseEntity<>(messageSource.getMessage("init.message.admin.notAllowed", null, "You are not allowed to perform this action at the moment", locale), HttpStatus.BAD_REQUEST);
-        } else if(firstName.isEmpty() || lastName.isEmpty() || email.isEmpty() || password.isEmpty() || passwordRe.isEmpty())
-        {
-            logger.warn("A required parameter of the super admin is empty or missing during initial configuration");
-            return new ResponseEntity<>(messageSource.getMessage("init.message.admin.missingParameter", null, "A required parameter is empty or missing", locale), HttpStatus.BAD_REQUEST);
+            logger.warn("[{}] A required parameter is missing during the initial setup", clientIpAddr);
+            return new ResponseEntity<>("A required parameter is missing", HttpStatus.BAD_REQUEST);
         } else if(!password.equals(passwordRe))
         {
-            logger.warn("The password and the re-typed password do not match!");
-            return new ResponseEntity<>(messageSource.getMessage("init.message.admin.passwordMatchError", null, "The password and the re-typed password do not match", locale), HttpStatus.BAD_REQUEST);
+            logger.warn("[{}] The provided administrator passwords do not match", clientIpAddr);
+            return new ResponseEntity<>("The provided administrator passwords do not match", HttpStatus.BAD_REQUEST);
         } else
         {
-            logger.debug("Creating a new initial user.");
-            User superAdmin = new User();
-            superAdmin.setFirstName(firstName);
-            superAdmin.setLastName(lastName);
-            superAdmin.setEmail(email);
-            superAdmin.replacePassword(password);
 
-            logger.debug("Creating a new initial root division.");
-            Division rootDivision = new Division(settings.getClubName(), null, superAdmin, null);
+            logger.debug("[{}] Resetting the database", clientIpAddr);
+            resetDatabase();
+
+            User admin = new User(firstName, lastName, email, password);
+            Division rootDivision = new Division(clubName, null, admin, null);
+            Settings settings = new Settings();
 
             settings.setInitialSetup(false);
+            settings.setClubName(clubName);
+            settings.setRootDivision(rootDivision);
 
-            logger.info("Everything in place, now the settings are stored durable.");
+            userRepository.save(admin);
+            divisionRepository.save(rootDivision);
+            settingsRepository.save(settings);
 
-            if(!savingInitialSetup(superAdmin, rootDivision, null))
+            if(createExample != null && !createExample.isEmpty() && createExample.equals("on"))
             {
-                logger.warn("Storing data into database was not successfully.");
-                return new ResponseEntity<>(messageSource.getMessage("init.message.admin.savingAdminError", null, "Unable to save new super admin, please try again", locale), HttpStatus.INTERNAL_SERVER_ERROR);
-            } else
-            {
-                logger.info("Successfully saved new admin, settings and restarted application context.");
-                return new ResponseEntity<>(messageSource.getMessage("init.message.admin.success", null, "Successfully saved the new super admin, updated all settings and restarted the application. Refresh this page and start using myVerein.", locale) , HttpStatus.OK);
+                logger.info("[{}] Creating example data", clientIpAddr);
+                createExampleData(rootDivision, admin);
             }
+
+            logger.info("[{}] Successfully stored and validated settings", clientIpAddr);
+            return new ResponseEntity<>("Successfully saved settings", HttpStatus.OK);
         }
     }
 
-    /**
-     * This function is validating the provided information of the MongoDB server, by establishing a test connection.
-     * @param databaseHost The hostname of the MongoDB server.
-     * @param databasePort The port of the MongoDB server.
-     * @param databaseUser The user used to authenticate against the MongoDB server (may be empty if not needed).
-     * @param databasePassword The password used to authenticate against the MongoDB server (may be empty if not needed).
-     * @param databaseCollection The name of the database collection.
-     * @return True if the connection was successfully established, false otherwise.
+    /*
+
+        WARNING: The following function are lazily hacked together!
+
      */
-    private boolean mongoIsAvailable(String databaseHost, int databasePort, String databaseUser, String databasePassword, String databaseCollection)
-    {
-        logger.trace("Testing MongoDB connection");
 
-        if(!databaseUser.isEmpty() && !databasePassword.isEmpty())
-        {
-            logger.debug("Credentials have been provided");
-            mongoCredential = Arrays.asList(MongoCredential.createMongoCRCredential(databaseUser, databaseCollection, databasePassword.toCharArray()));
-        }
-
-        try
-        {
-            logger.debug("Creating server address");
-            mongoAddress = new ServerAddress(databaseHost, databasePort);
-        } catch (UnknownHostException e)
-        {
-            logger.warn("Unable to resolve server host: " + e.getMessage());
-            return false;
-        }
-
-        logger.debug("Creating mongo client");
-        MongoClient mongoClient = new MongoClient(mongoAddress, mongoCredential);
-        try
-        {
-            //Checking if connection REALLY works
-            logger.debug("Establishing connection now.");
-            List<String> databases = mongoClient.getDatabaseNames();
-            if(databases == null)
-            {
-                logger.warn("The returned list of databases is null");
-                return false;
-            } else if(databases.isEmpty())
-            {
-                logger.info("The databases are empty");
-                return true;
-            } else
-            {
-                logger.debug("The database connection seems okay");
-                return true;
-            }
-        } catch (MongoException e)
-        {
-            logger.warn("Unable to receive list of present databases: " + e.getMessage());
-            return false;
-        } finally
-        {
-            logger.debug("Closing mongo client");
-            mongoClient.close();
-        }
-    }
 
     /**
-     * This function is establishing a connection to the new database and storing the new super user as well as the new root division. To correctly execute this function the {@link #mongoIsAvailable} function should be called first.
-     * @param user The new super admin.
-     * @param division The new root division.
-     * @return True if the operation was successfully, false otherwise.
-     */
-    private boolean savingInitialSetup(User user, Division division, Settings settings)
-    {
-        if(mongoAddress != null && databaseName != null && !databaseName.isEmpty())
-        {
-            logger.trace("Saving user and division using new MongoDB connection");
-
-            MongoClient mongoClient = new MongoClient(mongoAddress, mongoCredential);
-
-            DB mongoDB = mongoClient.getDB(databaseName);
-            if (mongoClient.getDatabaseNames().contains(databaseName))
-            {
-                logger.warn("The database already contains the defined collection, dropping content.");
-                mongoDB.dropDatabase();
-            }
-
-            try
-            {
-                if(user != null)
-                {
-                    logger.debug("Storing user");
-                    DBObject userObject = (DBObject) mappingMongoConverter.convertToMongoType(user);
-                    userObject.put("_class", user.getClass().getCanonicalName());
-                    mongoDB.getCollection(user.getClass().getSimpleName().toLowerCase()).insert(userObject);
-                }
-
-                if(division != null)
-                {
-                    logger.debug("Storing division");
-                    DBObject divisionObject = (DBObject) mappingMongoConverter.convertToMongoType(division);
-                    divisionObject.put("_class", division.getClass().getCanonicalName());
-                    mongoDB.getCollection(division.getClass().getSimpleName().toLowerCase()).insert(divisionObject);
-                }
-
-                if(settings != null)
-                {
-                    logger.debug("Storing settings");
-                    settingsRepository.save(settings);
-                    DBObject settingsObject = (DBObject) mappingMongoConverter.convertToMongoType(settings);
-                    settingsObject.put("_class", settings.getClass().getCanonicalName());
-                    mongoDB.getCollection(settings.getClass().getSimpleName().toLowerCase()).insert(settingsObject);
-                }
-
-                logger.info("Successfully saved root division and super admin");
-                return true;
-            } catch (MongoException e)
-            {
-                logger.warn("Unable to store root division and super admin in database");
-                return false;
-            } finally
-            {
-                mongoClient.close();
-            }
-        } else
-        {
-            logger.warn("Unable to save super admin and new root division, because the new MongoDB connection is not available");
-            return false;
-        }
-    }
-
-    /**
-     * This function is clearing the current database and creates a new set of test data. This function is called by POSTing the URI '/'
+     * This function is clearing the current database and creates a new set of test data. This function is called by POSTing the URI '/api/init'. This function should be removed in a production environment.
      * @return In general it should just return okay. No error checking is done!
      */
     @RequestMapping(value = "database", method = RequestMethod.POST)
-    public ResponseEntity<String> createDatabaseExample()
+    public ResponseEntity<String> createSystemExample()
     {
         logger.debug("Deleting old database and reloading database example.");
         resetDatabase();
 
-        User user1 = new User("Frank", "Steiler", "frank@steiler.eu", "asdf");
-        user1.setBirthday(LocalDate.of(1994, 6, 28));
-        user1.setActiveSince(LocalDate.of(2000, 1, 1));
-        user1.setIban("DE46500700100927353010");
-        user1.setBic("BYLADEM1001");
-        user1.setCity("Stuttgart");
-        user1.setZipCode("70190");
-        user1.setStreetNumber("27");
-        user1.setStreet("Metzstraße");
-        user1.setCountry("Germany");
-        user1.setGender(Gender.MALE);
-        User user2 = new User("John", "Doe", "john@doe.com", "asdf");
-        user2.setActiveSince(LocalDate.of(1999, 1, 1));
-        user2.setPassiveSince(LocalDate.of(2000, 6, 1));
-        User user3 = new User("Peter", "Enis", "peter@enis.com", "asdf");
-        User user4 = new User("Luke", "Skywalker", "luke@skywalker.com", "asdf");
-        user4.setGender(Gender.MALE);
-        User user5 = new User("Marty", "McFly", "marty@mcfly.com", "asdf");
-        User user6 = new User("Tammo", "Schwindt", "tammo@tammon.de", "asdf");
+        User admin = new User("Frank", "Steiler", "frank@steiler.eu", "asdf");
+        admin.setBirthday(LocalDate.of(1994, 6, 28));
+        admin.setActiveSince(LocalDate.of(2000, 1, 1));
+        admin.setIban("DE46500700100927353010");
+        admin.setBic("BYLADEM1001");
+        admin.setCity("Stuttgart");
+        admin.setZipCode("70190");
+        admin.setStreetNumber("27");
+        admin.setStreet("Metzstraße");
+        admin.setCountry("Germany");
+        admin.setGender(Gender.MALE);
 
-        userRepository.save(user1);
-        userRepository.save(user2);
-        userRepository.save(user3);
-        userRepository.save(user4);
-        userRepository.save(user5);
-        userRepository.save(user6);
+        userRepository.save(admin);
 
-        Division div1 = new Division("myVerein", null, user1, null);
-        Division div2 = new Division("Rugby", null, user2, div1);
-        Division div3 = new Division("Soccer", null, null, div1);
-        Division div4 = new Division("Rugby - 1st team", null, user2, div2);
-        Division div5 = new Division("Rugby - 2nd team", null, user3, div2);
-
-        divisionRepository.save(div1);
-        divisionRepository.save(div2);
-        divisionRepository.save(div3);
-        divisionRepository.save(div4);
-        divisionRepository.save(div5);
-
-        int thisMonth = LocalDateTime.now().getMonthValue();
-        int thisYear = LocalDateTime.now().getYear();
-
-        Event event1 = new Event();
-        event1.setStartDateTime(LocalDateTime.of(thisYear, thisMonth, 20, 13, 0));
-        event1.setEndDateTime(LocalDateTime.of(thisYear, thisMonth, 20, 14, 0));
-        event1.setName("Super Event 1");
-        event1.setLocation("DHBW Stuttgart");
-        event1.setLocationLat(48.7735272);
-        event1.setLocationLng(9.171102399999995);
-        event1.setDescription("Super event at awesome location with great people");
-        event1.addDivision(div2);
-        event1.setEventAdmin(user1);
-        event1.setLastChanged(LocalDateTime.now());
-
-        Event event2 = new Event();
-        event2.setStartDateTime(LocalDateTime.of(thisYear, thisMonth, 20, 13, 0));
-        event2.setEndDateTime(LocalDateTime.of(thisYear, thisMonth, 21, 13, 0));
-        event2.setName("Super Event 2");
-        event2.addDivision(div3);
-        event2.setEventAdmin(user4);
-        event2.setLastChanged(LocalDateTime.now());
-
-        Event event3 = new Event();
-        event3.setStartDateTime(LocalDateTime.of(thisYear, thisMonth, 21, 13, 0));
-        event3.setEndDateTime(LocalDateTime.of(thisYear, thisMonth, 21, 13, 5));
-        event3.setName("Super Event 3");
-        event3.addDivision(div1);
-        event3.setEventAdmin(user1);
-        event3.setLastChanged(LocalDateTime.now());
-
-        Event event4 = new Event();
-        event4.setStartDateTime(LocalDateTime.of(thisYear, thisMonth, 11, 13, 0));
-        event4.setEndDateTime(LocalDateTime.of(thisYear, thisMonth, 15, 13, 5));
-        event4.setName("Super Event 4");
-        event4.addDivision(div1);
-        event4.setEventAdmin(user2);
-        event4.setLastChanged(LocalDateTime.now());
-
-        eventRepository.save(event1);
-        eventRepository.save(event2);
-        eventRepository.save(event3);
-        eventRepository.save(event4);
-
-        user1.replaceDivisions(divisionRepository, eventRepository, div1);
-        user2.replaceDivisions(divisionRepository, eventRepository, div2, div4);
-        user3.replaceDivisions(divisionRepository, eventRepository, div2);
-        user4.replaceDivisions(divisionRepository, eventRepository, div3);
-        user5.replaceDivisions(divisionRepository, eventRepository, div2, div4);
-
-        userRepository.save(user1);
-        userRepository.save(user2);
-        userRepository.save(user3);
-        userRepository.save(user4);
-        userRepository.save(user5);
-
-        Message message1 = new Message("Hello world", user1, divisionRepository.findById(div1.getId()));
-        Message message2 = new Message("Hello world, too", user2, divisionRepository.findById(div1.getId()));
-        messageRepository.save(message1);
-        messageRepository.save(message2);
+        Division rootDivision = new Division("myVerein", null, admin, null);
+        divisionRepository.save(rootDivision);
 
         Settings systemSettings = new Settings();
         systemSettings.setClubName("myVerein");
         List<String> customUserFields = new ArrayList<>();
         customUserFields.add("Membership number");
         systemSettings.setCustomUserFields(customUserFields);
-        systemSettings.setRootDivision(div1);
+        systemSettings.setRootDivision(rootDivision);
         settingsRepository.save(systemSettings);
+
+        createExampleData(rootDivision, admin);
 
         return new ResponseEntity<>("Successfully reset database to example", HttpStatus.OK);
     }
 
     /**
-     * This function is resetting the complete database.
+     * This function creates a set of example data, including example user {@link #createExampleUser(User)}, example division {@link #createExampleDivision(List, Division)}, example events {@link #createExampleEvents(List, List)} and example messages
+     * @param rootDivision The current root division of the system (This division is not altered).
+     * @param adminUser The current admin user of the system (This user is not altered).
      */
-    private void resetDatabase()
+    private void createExampleData(Division rootDivision, User adminUser)
     {
-        new Thread(() -> {
-            try
+        List<User> user = createExampleUser(adminUser);
+        List<Division> divisions = createExampleDivision(user, rootDivision);
+
+        createExampleEvents(user, divisions);
+        subscribeUserToDivision(user, divisions);
+        createExampleMessages(divisions);
+    }
+
+    /**
+     * This function creates a set of user and stores them permanently.
+     * @param adminUser The admin user. Every user is checked to not match the email from the allready created admin user.
+     * @return The list of created user.
+     */
+    private List<User> createExampleUser(User adminUser)
+    {
+        ArrayList<User> users = new ArrayList<>();
+
+        User testUser = new User("John", "Doe", "john@doe.com", "asdf");
+        testUser.setActiveSince(LocalDate.of(1999, 1, 1));
+        testUser.setPassiveSince(LocalDate.of(2000, 6, 1));
+
+        if(!testUser.getEmail().equals(adminUser.getEmail()))
+        {
+            users.add(testUser);
+        }
+
+        testUser = new User("Peter", "Enis", "peter@enis.com", "asdf");
+        if(!testUser.getEmail().equals(adminUser.getEmail()))
+        {
+            users.add(testUser);
+        }
+
+        testUser = new User("Luke", "Skywalker", "luke@skywalker.com", "asdf");
+        testUser.setGender(Gender.MALE);
+        if(!testUser.getEmail().equals(adminUser.getEmail()))
+        {
+            users.add(testUser);
+        }
+
+        testUser = new User("Marty", "McFly", "marty@mcfly.com", "asdf");
+        if(!testUser.getEmail().equals(adminUser.getEmail()))
+        {
+            users.add(testUser);
+        }
+
+        testUser = new User("Tammo", "Schwindt", "tammo@tammon.de", "asdf");
+        if(!testUser.getEmail().equals(adminUser.getEmail()))
+        {
+            users.add(testUser);
+        }
+
+        userRepository.save(users);
+        return users;
+    }
+
+    /**
+     * This function creates a set of example divisions.
+     * @param availableAdmins A list of available administrator, randomly user are selected to become administrator of divisions.
+     * @param rootDivision The current root division.
+     * @return A list containing all created divisions.
+     */
+    private List<Division> createExampleDivision(List<User> availableAdmins, Division rootDivision)
+    {
+        ArrayList<Division> divisions = new ArrayList<>();
+        Random r = new Random();
+        divisions.add(new Division("Rugby", null, availableAdmins.get(r.nextInt(availableAdmins.size())), rootDivision));
+        divisions.add(new Division("Soccer", null, availableAdmins.get(r.nextInt(availableAdmins.size())), rootDivision));
+        divisionRepository.save(divisions); // Need to do this or the referencing is going to fail
+        divisions.add(new Division("Rugby - 1st team", null, availableAdmins.get(r.nextInt(availableAdmins.size())), divisions.get(0)));
+        divisions.add(new Division("Rugby - 2nd team", null, availableAdmins.get(r.nextInt(availableAdmins.size())), divisions.get(0)));
+        divisionRepository.save(divisions);
+        return divisions;
+    }
+
+    /**
+     * This function creates a set of example events.
+     * @param availableAdmins A list of available administrator, randomly user are selected to become administrator of events.
+     * @param availableDivisions A list of available divisions, randomly divisions are selected to get invited to the event.
+     * @return A list of created events.
+     */
+    private List<Event> createExampleEvents(List<User> availableAdmins, List<Division> availableDivisions)
+    {
+        Random r = new Random();
+        ArrayList<Event> events = new ArrayList<>();
+        int thisMonth = LocalDateTime.now().getMonthValue();
+        int thisYear = LocalDateTime.now().getYear();
+
+        Event testEvent = new Event();
+        testEvent.setStartDateTime(LocalDateTime.of(thisYear, thisMonth, 20, 13, 0));
+        testEvent.setEndDateTime(LocalDateTime.of(thisYear, thisMonth, 20, 14, 0));
+        testEvent.setName("Super Event 1");
+        testEvent.setLocation("DHBW Stuttgart");
+        testEvent.setLocationLat(48.7735272);
+        testEvent.setLocationLng(9.171102399999995);
+        testEvent.setDescription("Super event at awesome location with great people");
+        testEvent.addDivision(availableDivisions.get(r.nextInt(availableDivisions.size())));
+        testEvent.setEventAdmin(availableAdmins.get(r.nextInt(availableAdmins.size())));
+        testEvent.setLastChanged(LocalDateTime.now());
+
+        events.add(testEvent);
+
+        testEvent = new Event();
+        testEvent.setStartDateTime(LocalDateTime.of(thisYear, thisMonth, 20, 13, 0));
+        testEvent.setEndDateTime(LocalDateTime.of(thisYear, thisMonth, 21, 13, 0));
+        testEvent.setName("Super Event 2");
+        testEvent.addDivision(availableDivisions.get(r.nextInt(availableDivisions.size())));
+        testEvent.setEventAdmin(availableAdmins.get(r.nextInt(availableAdmins.size())));
+        testEvent.setLastChanged(LocalDateTime.now());
+
+        events.add(testEvent);
+
+        testEvent = new Event();
+        testEvent.setStartDateTime(LocalDateTime.of(thisYear, thisMonth, 21, 13, 0));
+        testEvent.setEndDateTime(LocalDateTime.of(thisYear, thisMonth, 21, 13, 5));
+        testEvent.setName("Super Event 3");
+        testEvent.addDivision(availableDivisions.get(r.nextInt(availableDivisions.size())));
+        testEvent.setEventAdmin(availableAdmins.get(r.nextInt(availableAdmins.size())));
+        testEvent.setLastChanged(LocalDateTime.now());
+
+        events.add(testEvent);
+
+        testEvent = new Event();
+        testEvent.setStartDateTime(LocalDateTime.of(thisYear, thisMonth, 11, 13, 0));
+        testEvent.setEndDateTime(LocalDateTime.of(thisYear, thisMonth, 15, 13, 5));
+        testEvent.setName("Super Event 4");
+        testEvent.addDivision(availableDivisions.get(r.nextInt(availableDivisions.size())));
+        testEvent.setEventAdmin(availableAdmins.get(r.nextInt(availableAdmins.size())));
+        testEvent.setLastChanged(LocalDateTime.now());
+
+        events.add(testEvent);
+
+        eventRepository.save(events);
+        return events;
+    }
+
+    /**
+     * This function adds a random amount of divisions to every user.
+     * @param availableUser The list of available user.
+     * @param availableDivision The list of available division.
+     */
+    private void subscribeUserToDivision(List<User> availableUser, List<Division> availableDivision)
+    {
+        Random r = new Random();
+        for(User user: availableUser)
+        {
+            int iteration = r.nextInt(availableDivision.size());
+            HashSet<Division> divisionHashSet = new HashSet<>();
+            for(int i = 0; i<= iteration; i++)
             {
-                logger.debug("Trying to drop the current collection.");
-                mongoTemplate.getDb().dropDatabase();
-                logger.debug("Successfully dropped current collection");
-            } catch (MongoTimeoutException e)
+                divisionHashSet.add(availableDivision.get(r.nextInt(availableDivision.size())));
+            }
+            user.replaceDivisions(divisionRepository, eventRepository, divisionHashSet.stream().collect(Collectors.toList()));
+        }
+        userRepository.save(availableUser);
+    }
+
+    /**
+     * This function creates a set of example messages.
+     * @param availableDivision A list of available division. Each division is going to get a set of messages.
+     * @return The list of created messages.
+     */
+    private List<Message> createExampleMessages(List<Division> availableDivision)
+    {
+        Random r = new Random();
+        final int maxMessagesPerDiv = 10;
+        List<Message> messages = new ArrayList<>();
+
+        // Create messages for each division.
+        for(Division division: availableDivision)
+        {
+            Message testMessage;
+            List <String> memberList = division.getMemberList();
+            if(memberList != null && !memberList.isEmpty())
             {
-                logger.debug("Unable to drop database, because the database is not available.");
-            }}).run();
+                // Create a random amount of messages for this division
+                for (int i = r.nextInt(maxMessagesPerDiv); i >= 0; i--)
+                {
+                    // Select a random sender who is part of the division.
+                    User thisSender = userRepository.findById(memberList.get(r.nextInt(memberList.size())));
+                    // Create a random message
+                    switch (r.nextInt(5))
+                    {
+                        case 0:
+                            testMessage = new Message("Hello world", thisSender, division);
+                            break;
+                        case 1:
+                            testMessage = new Message("Example messages are a cool thing", thisSender, division);
+                            break;
+                        case 2:
+                            testMessage = new Message("Very convenient thing!", thisSender, division);
+                            break;
+                        case 3:
+                            testMessage = new Message("I love it!", thisSender, division);
+                            break;
+                        case 4:
+                            testMessage = new Message("Did you know an unprotected human can survive up to 2 minutes in space?", thisSender, division);
+                            break;
+                        default:
+                            testMessage = new Message("This message should never appear, if it did: Hi to everyone :)", thisSender, division);
+                            break;
+                    }
+                    messages.add(testMessage);
+                }
+            } else
+            {
+                logger.warn("Member list for division {} is empty", division);
+            }
+        }
+
+        messageRepository.save(messages);
+        return messages;
+    }
+
+    /**
+     * This function is resetting the current collection in the database.
+     */
+    private boolean resetDatabase()
+    {
+        try
+        {
+            logger.debug("Trying to drop the current collection.");
+            mongoTemplate.getDb().dropDatabase();
+            logger.debug("Successfully dropped current collection");
+            return true;
+        } catch (MongoTimeoutException e)
+        {
+            logger.debug("Unable to drop database, because the database is not available: {}", e.getMessage());
+            return false;
+        }
     }
 }
