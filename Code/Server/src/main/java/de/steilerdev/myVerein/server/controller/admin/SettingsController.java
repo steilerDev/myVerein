@@ -77,32 +77,70 @@ public class SettingsController
     public ResponseEntity<Map<String, Object>> loadSettings(@CurrentUser User currentUser)
     {
         logger.trace("[{}] Starting to load settings", currentUser);
-        Map<String, Object> settings;
+        Map<String, Object> settingsMap;
+        Settings settings;
         if(!currentUser.isAdmin())
         {
             logger.warn("[{}] The user is a non-admin and tries to access the settings", currentUser);
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        } else if((settings = SettingsHelper.loadSettings(settingsRepository)) == null)
+        {
+            logger.warn("[{}] Unable to load current settings", currentUser);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         } else if(!currentUser.isSuperAdmin())
         {
             logger.info("[{}] The user is a non-superadmin and is accessing the settings", currentUser);
-            settings = new HashMap<>();
-            settings.put("administrationNotAllowedMessage", "You are not the super admin, and therefore you cannot adjust system settings.");
+            settingsMap = new HashMap<>();
+            settingsMap.put("administrationNotAllowedMessage", "You are not the super admin, and therefore you cannot adjust system settings.");
         } else
         {
             logger.debug("[{}] Loading settings for super admin", currentUser);
 
-            settings = SettingsHelper.loadSettings(settingsRepository).getSettingsMap();
+
+            settingsMap = settings.getSettingsMap();
 
             if(gridFSRepository.findClubLogo() != null)
             {
                 logger.debug("[{}] The club logo is available", currentUser);
-                settings.put("clubLogoAvailable", true);
+                settingsMap.put("clubLogoAvailable", true);
             }
         }
 
-        settings.put("currentAdmin", currentUser.getSendingObjectOnlyEmailNameId());
+        settingsMap.put("currentAdmin", currentUser.getSendingObjectOnlyEmailNameId());
         logger.info("[{}] Finished loading settings", currentUser);
-        return new ResponseEntity<>(settings, HttpStatus.OK);
+        return new ResponseEntity<>(settingsMap, HttpStatus.OK);
+    }
+
+    /**
+     * This function resets the system, by setting the init flag within the settings document. The database is not wipped until the initial configuration is executed.
+     * @param currentUser The currently logged in user.
+     * @param password The current user's password, needed to execute request.
+     * @return A response entity containing either a success code with a success message or an error code with an error message.
+     */
+    @RequestMapping(method = RequestMethod.DELETE)
+    public ResponseEntity<String> resetSystem(@RequestParam String password, @CurrentUser User currentUser)
+    {
+        logger.trace("[{}] Setting initial setup flag and therefore resetting the system", currentUser);
+        Settings currentSettings;
+        if(!currentUser.isSuperAdmin())
+        {
+            logger.warn("[{}] A non-superadmin tries to reset the system", currentUser);
+            return new ResponseEntity<>("You are not allowed to perform this action", HttpStatus.FORBIDDEN);
+        } else if(!passwordEncoder.isPasswordValid(currentUser.getPassword(), password, currentUser.getSalt()))
+        {
+            logger.warn("[{}] The stated password is invalid", currentUser);
+            return new ResponseEntity<>("The stated password is incorrect, please try again", HttpStatus.FORBIDDEN);
+        } else if((currentSettings = SettingsHelper.loadSettings(settingsRepository)) == null)
+        {
+            logger.warn("[{}] Unable to load settings", currentUser);
+            return new ResponseEntity<>("Unable to load settings", HttpStatus.INTERNAL_SERVER_ERROR);
+        } else
+        {
+            currentSettings.setInitialSetup(true);
+            settingsRepository.save(currentSettings);
+            logger.info("[{}] Successfully set initial setup flag", currentUser);
+            return new ResponseEntity<>("Successfully set initial setup flag and therefore reset the system", HttpStatus.OK);
+        }
     }
 
     /**
@@ -342,14 +380,14 @@ public class SettingsController
     {
         logger.trace("[{}] Gathering custom user fields", currentUser);
         List<String> customUserFields = SettingsHelper.loadSettings(settingsRepository).getCustomUserFields();
-        if(customUserFields != null)
-        {
-            logger.debug("[{}] Returning custom user fields", currentUser);
-            return new ResponseEntity<>(customUserFields, HttpStatus.OK);
-        } else
+        if(customUserFields == null)
         {
             logger.warn("[{}] Unable to gather custom user fields", currentUser);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        } else
+        {
+            logger.debug("[{}] Returning custom user fields", currentUser);
+            return new ResponseEntity<>(customUserFields, HttpStatus.OK);
         }
     }
 }

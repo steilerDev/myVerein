@@ -6,6 +6,7 @@
  */
 
 var settingsSubmitButton,
+    settingsDeleteButton,
     clubLogoDeleteButton,
     currentAdminSelectize,
     settingsFormBootstrapValidator,
@@ -14,6 +15,7 @@ var settingsSubmitButton,
 
 function disableSettings() {
     //Disable the complete form
+    settingsDeleteButton.disable();
     settingsFormBootstrapValidator.find('input').prop("disabled", true);
     $('#clubLogoButton').addClass('btn-disabled');
     currentAdminSelectize[0].selectize.disable();
@@ -39,6 +41,7 @@ function resetSettingsForm() {
 
     settingsSubmitButton.enable();
     clubLogoDeleteButton.enable();
+    settingsDeleteButton.enable();
 
     $('#currentAdminLabel').addClass("hidden");
     $('#superAdminLabel').addClass("hidden");
@@ -113,6 +116,7 @@ function loadSettings() {
         error: function (response) {
             settingsSubmitButton.stopAnimation(-1, function(button){
                 button.disable();
+                settingsDeleteButton.disable();
             });
             //console.log(response.responseText);
         },
@@ -129,6 +133,7 @@ function loadSettings() {
                 } else {
                     $('#clubLogoDelete').addClass("hidden");
                 }
+                settingsDeleteButton.enable();
 
                 if(response.customUserFields) {
                     response.customUserFields.forEach(function (entry) {
@@ -180,6 +185,36 @@ function loadSettingsPage(){
                     processData: false
                 });
             });
+    }
+
+    if(!settingsDeleteButton) {
+        //Enabling progress button
+        settingsDeleteButton = new UIProgressButton(document.getElementById('settingsDeleteButton'));
+        $('#settingsDeleteButton').click(function(e) {
+            var currentPassword = $('#currentAdminPassword').val();
+            // Only submit request if password is non-empty
+            if (currentPassword) {
+                e.preventDefault();
+                settingsDeleteButton.startAnimation();
+                $.ajax({
+                    url: '/api/admin/settings?password=' + currentPassword,//Workaround since DELETE request needs to be identified by the URI only and jQuery is not attaching the data to the URI, which leads to a Spring error.
+                    type: 'DELETE',
+                    //data: {
+                    //    password: $('#currentAdminPassword').val()
+                    //},
+                    error: function (response) {
+                        settingsDeleteButton.stopAnimation(-1);
+                        showMessage(response.responseText, 'error', 'icon_error-triangle_alt');
+                    },
+                    success: function (response) {
+                        settingsDeleteButton.stopAnimation(0, function (button) {
+                            window.setTimeout('window.location.href = "/logout"', 2000);
+                        });
+                        showMessage(response, 'success', 'icon_check');
+                    }
+                });
+            }
+        })
     }
 
     if(!clubLogoDeleteButton) {

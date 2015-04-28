@@ -114,6 +114,11 @@ public class Settings extends BaseEntity
         return id == null? 0: id.hashCode();
     }
 
+    /**
+     * Equality is based on the same id String within the database.
+     * @param obj The object compared to the current object.
+     * @return True if the IDs of the two objects
+     */
     @Override
     public boolean equals(Object obj)
     {

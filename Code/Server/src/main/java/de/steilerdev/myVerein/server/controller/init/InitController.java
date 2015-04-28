@@ -29,6 +29,7 @@ import de.steilerdev.myVerein.server.model.settings.SettingsRepository;
 import de.steilerdev.myVerein.server.model.user.Gender;
 import de.steilerdev.myVerein.server.model.user.User;
 import de.steilerdev.myVerein.server.model.user.UserRepository;
+import de.steilerdev.myVerein.server.security.CurrentUser;
 import de.steilerdev.myVerein.server.security.SecurityHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -127,14 +128,20 @@ public class InitController
 
             User admin = new User(firstName, lastName, email, password);
             Division rootDivision = new Division(clubName, null, admin, null);
-            Settings settings = new Settings();
+            // Initial saving needed, to create id of the user.
+            userRepository.save(admin);
+            divisionRepository.save(rootDivision);
 
+            // Assigning admin user to root division
+            admin.replaceDivisions(divisionRepository, eventRepository, rootDivision);
+            userRepository.save(admin);
+            divisionRepository.save(rootDivision);
+
+            // Saving settings
+            Settings settings = new Settings();
             settings.setInitialSetup(false);
             settings.setClubName(clubName);
             settings.setRootDivision(rootDivision);
-
-            userRepository.save(admin);
-            divisionRepository.save(rootDivision);
             settingsRepository.save(settings);
 
             if(createExample != null && !createExample.isEmpty() && createExample.equals("on"))
