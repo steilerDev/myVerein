@@ -103,13 +103,16 @@ extension DivisionChatOverviewViewController {
     logger.debug("Going to subscribe to notification")
     initialSyncNotificationObserverToken = MVNotification.subscribeToInitialSyncCompletedNotification {
       _ in
+      self.logger.debug("Received initial sync finished notification")
       self.fetchedResultController = self.initFetchedResultsController()
+      self.collectionView?.reloadData()
     }
     
     // Fallback if fetched results controller is not properly resetted
     if let collectionView = collectionView where self.collectionView(collectionView, numberOfItemsInSection: 0) == 0 {
       fetchedResultController = initFetchedResultsController()
     }
+    collectionView?.reloadData()
   }
   
   /// Within this funciton the notification observer un-subscribes from the notification system.
@@ -346,14 +349,7 @@ extension DivisionChatOverviewViewController: NSFetchedResultsControllerDelegate
 extension DivisionChatOverviewViewController {
   func startRefresh(refreshControl: UIRefreshControl) {
     logger.info("Refresh started")
-    NSFetchedResultsController.deleteCacheWithName(fetchedResultController.cacheName)
-    // Accessing fetched result controller and therfore initiating it if it did not happen yet
-    var error: NSError?
-    if fetchedResultController.performFetch(&error) {
-      logger.info("Successfully initiated division chat overview data source")
-    } else {
-      logger.error("Unable to initiate division chat overview data source: \(error?.extendedDescription)")
-    }
+    fetchedResultController = initFetchedResultsController()
     collectionView?.reloadData()
     refreshControl.endRefreshing()
   }

@@ -196,9 +196,7 @@ class MVDropdownAlert: UIButton {
       },
       completion: {
         if $0 {
-          dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(duration * Double(NSEC_PER_SEC))), dispatch_get_main_queue()) {
-            self.hide()
-          }
+          duration~>{ self.hide() }
         }
       }
     )

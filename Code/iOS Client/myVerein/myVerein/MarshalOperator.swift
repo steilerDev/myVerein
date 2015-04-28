@@ -142,3 +142,13 @@ func <~/(repeatedClosure: () -> (), intervalBetweenExecutionInSeconds: Double) -
   dispatch_resume(timer)
   return timer
 }
+
+/// Executes the right hand closure after waiting the amount of seconds defined by the left hand double. The closure is guaranteed to be executed on the main queue.
+///
+/// :param: waitInSeconds The amount of time, the execution gets delayed.
+/// :param: mainClosure The closure that is going to be executed after the application waited the defined amount of time.
+func ~>(waitInSeconds: Double, mainClosure: () -> ()) {
+  dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(waitInSeconds * Double(NSEC_PER_SEC))), dispatch_get_main_queue()) {
+    mainClosure()
+  }
+}

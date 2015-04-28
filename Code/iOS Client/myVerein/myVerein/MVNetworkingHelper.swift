@@ -137,7 +137,7 @@ extension MVNetworkingHelper {
         },
         failure: {
           error in
-          XCGLogger.warning("Unable to sync message \(message)")
+          XCGLogger.warning("Unable to sync message: \(error.extendedDescription)")
           message.syncInProgress = false
         }
       )
@@ -211,7 +211,7 @@ extension MVNetworkingHelper {
         },
         failure: {
           error in
-          XCGLogger.warning("Unable to sync user \(user): \(error.extendedDescription)")
+          XCGLogger.warning("Unable to sync user: \(error.extendedDescription)")
           user.syncInProgress = false
         }
       )
@@ -255,7 +255,7 @@ extension MVNetworkingHelper {
         },
         failure: {
           error in
-          XCGLogger.warning("Unable to sync division \(division): \(error.extendedDescription)")
+          XCGLogger.warning("Unable to sync division: \(error.extendedDescription)")
           division.syncInProgress = false
         }
       )
@@ -407,7 +407,7 @@ extension MVNetworkingHelper {
         },
         failure: {
           error in
-          XCGLogger.warning("Unable to event division \(event): \(error.extendedDescription)")
+          XCGLogger.warning("Unable to sync event: \(error.extendedDescription)")
           event.syncInProgress = false
         }
       )
@@ -429,7 +429,7 @@ extension MVNetworkingHelper {
         },
         failure: {
           error in
-          XCGLogger.error("Unable to send response for event \(event): \(error.extendedDescription)")
+          XCGLogger.error("Unable to send response for event: \(error.extendedDescription)")
         }
       )
     } else {

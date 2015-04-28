@@ -74,10 +74,14 @@ class MVNetworking {
     // Reducing counter and trying to execute callback
     self.requestCounterLock.lock()
     self.requestCounter--
-    if let callback = self._requestCounterCallback where self.requestCounter == 0 {
-      self._requestCounterCallback = nil
+    if _requestCounterCallback != nil && self.requestCounter == 0 {
       self.requestCounterLock.unlock()
-      ~>callback
+      1.0~>{ // Waiting for 1 seconds before really executing the callback, since the counter might just hit zero by accident, while actually still executing requests
+          if let callback = self._requestCounterCallback where self.requestCounter == 0 {
+            self._requestCounterCallback = nil
+            callback()
+          }
+      }
     } else {
       self.requestCounterLock.unlock()
     }
