@@ -34,35 +34,23 @@ class DivisionChatOverviewViewController: UICollectionViewController {
   lazy var notificationDelegate: NotificationCountDelegate? = { self.tabBarController as? NotificationCountDelegate }()
   
   /// The token handed over by the notification subscription, stored to be able to release resources.
-  var notificationObserverToken: NSObjectProtocol?
+  var divisionNotificationObserverToken: NSObjectProtocol?
+  var initialSyncNotificationObserverToken: NSObjectProtocol?
   
   // Lazily initiating fetched result controller
-  lazy var fetchedResultController: NSFetchedResultsController = {
-    //Initializing data source (NSFetchedResultController)
-    let fetchRequest = NSFetchRequest(entityName: DivisionChatOverviewConstants.Entity)
-    fetchRequest.fetchBatchSize = DivisionChatOverviewConstants.BatchSize
-    
-    /// TODO: Improve sort
-    let sortDescriptor = NSSortDescriptor(key: DivisionChatOverviewConstants.SortField, ascending: false)
-    fetchRequest.sortDescriptors = [sortDescriptor]
-    
-    let predicate = NSCompoundPredicate(type: .OrPredicateType,
-      subpredicates: [
-        NSPredicate(format: "\(DivisionChatOverviewConstants.PredicateField) == %@", UserMembershipStatus.Member.rawValue),
-        NSPredicate(format: "\(DivisionChatOverviewConstants.PredicateField) == %@", UserMembershipStatus.FormerMember.rawValue)
-      ]
-    )
-    fetchRequest.predicate = predicate
-    var controller = NSFetchedResultsController(fetchRequest: fetchRequest,
-      managedObjectContext: (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext!,
-      sectionNameKeyPath: nil,
-      cacheName: DivisionChatOverviewConstants.CacheName
-    )
-    
-    controller.delegate = self
-    
-    return controller
-  }()
+  var fetchedResultController: NSFetchedResultsController! {
+    didSet {
+      // Performing fetch as soon as the controller is set
+      var error: NSError?
+      if fetchedResultController.performFetch(&error) {
+        logger.info("Successfully initiated division chat overview data source")
+      } else {
+        logger.error("Unable to initiate division chat overview data source: \(error?.extendedDescription)")
+      }
+      
+      collectionView?.reloadData()
+    }
+  }
   
   // MARK: Variables needed by NSFetchedResultsControllerDelegate 
   
@@ -92,14 +80,7 @@ extension DivisionChatOverviewViewController {
     super.viewDidLoad()
     
     logger.verbose("Initiating division chat overview data source")
-    
-    // Accessing fetched result controller and therfore initiating it if it did not happen yet
-    var error: NSError?
-    if fetchedResultController.performFetch(&error) {
-      logger.info("Successfully initiated division chat overview data source")
-    } else {
-      logger.error("Unable to initiate division chat overview data source: \(error?.extendedDescription)")
-    }
+    fetchedResultController = initFetchedResultsController()
     
     // Add pull to refresh controls and enable scrolling
     let refreshControl = UIRefreshControl()
@@ -107,28 +88,40 @@ extension DivisionChatOverviewViewController {
     self.collectionView?.addSubview(refreshControl)
     self.collectionView?.alwaysBounceVertical = true
     
-    
-    // Uncomment the following line to preserve selection between presentations
-    // self.clearsSelectionOnViewWillAppear = false
   }
   
   /// Within this function the notification observer subscribes to the notification system.
-  override func viewDidAppear(animated: Bool) {
-    super.viewDidAppear(animated)
+  override func viewWillAppear(animated: Bool) {
+    super.viewWillAppear(animated)
+    
     // This observer is monitoring all divisions. As soon as the notification without a sender is received the controller is starting to reload its view.
     logger.debug("Division chat overview controller subscribed to notification system")
-    notificationObserverToken = MVNotification.subscribeToDivisionSyncCompletedNotificationForDivision(nil) {
+    divisionNotificationObserverToken = MVNotification.subscribeToDivisionSyncCompletedNotificationForDivision(nil) {
       _ in
       self.collectionView?.reloadData()
+    }
+    logger.debug("Going to subscribe to notification")
+    initialSyncNotificationObserverToken = MVNotification.subscribeToInitialSyncCompletedNotification {
+      _ in
+      self.fetchedResultController = self.initFetchedResultsController()
+    }
+    
+    // Fallback if fetched results controller is not properly resetted
+    if let collectionView = collectionView where self.collectionView(collectionView, numberOfItemsInSection: 0) == 0 {
+      fetchedResultController = initFetchedResultsController()
     }
   }
   
   /// Within this funciton the notification observer un-subscribes from the notification system.
   override func viewWillDisappear(animated: Bool) {
     super.viewWillDisappear(animated)
-    if let notificationObserverToken = notificationObserverToken {
-      logger.debug("Division chat overview controller un-subscribed from notification system")
-      MVNotification.unSubscribeFromNotification(notificationObserverToken)
+    if let divisionNotificationObserverToken = divisionNotificationObserverToken {
+      logger.debug("Division chat overview controller un-subscribed from notification system for division changes")
+      MVNotification.unSubscribeFromNotification(divisionNotificationObserverToken)
+    }
+    if let initialSyncNotificationObserverToken = initialSyncNotificationObserverToken {
+      logger.debug("Division chat overview controller un-subscribed from notification system for initial sync changes")
+      MVNotification.unSubscribeFromNotification(initialSyncNotificationObserverToken)
     }
   }
   
@@ -213,6 +206,37 @@ extension DivisionChatOverviewViewController: UICollectionViewDelegate {
     } else {
       logger.error("Unable to perform segue to chat because the tapped cell was not found")
     }
+  }
+}
+
+// MARK: - NSFetchedResultsControllerDelegate
+extension DivisionChatOverviewViewController {
+  func initFetchedResultsController() -> NSFetchedResultsController {
+    //Initializing data source (NSFetchedResultController)
+    let fetchRequest = NSFetchRequest(entityName: DivisionChatOverviewConstants.Entity)
+    fetchRequest.fetchBatchSize = DivisionChatOverviewConstants.BatchSize
+    
+    /// TODO: Improve sort
+    let sortDescriptor = NSSortDescriptor(key: DivisionChatOverviewConstants.SortField, ascending: false)
+    fetchRequest.sortDescriptors = [sortDescriptor]
+    
+    let predicate = NSCompoundPredicate(type: .OrPredicateType,
+      subpredicates: [
+        NSPredicate(format: "\(DivisionChatOverviewConstants.PredicateField) == %@", UserMembershipStatus.Member.rawValue),
+        NSPredicate(format: "\(DivisionChatOverviewConstants.PredicateField) == %@", UserMembershipStatus.FormerMember.rawValue)
+      ]
+    )
+    fetchRequest.predicate = predicate
+    var controller = NSFetchedResultsController(fetchRequest: fetchRequest,
+      managedObjectContext: (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext!,
+      sectionNameKeyPath: nil,
+      cacheName: DivisionChatOverviewConstants.CacheName
+    )
+    
+    controller.delegate = self
+    collectionView?.reloadData()
+    
+    return controller
   }
 }
 

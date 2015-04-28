@@ -109,10 +109,12 @@ extension Message: JSQMessageData {
 // MARK: - Printable protocol function
 extension Message: Printable {
   override var description: String {
-    if let content = content, timestamp = timestamp {
+    if let sender = sender, division = division, content = content, timestamp = timestamp {
       return "Message from \(sender) to \(division): \(content) [\(timestamp)]"
-    } else {
+    } else if let sender = sender, division = division {
       return "Message from \(sender) to \(division): \(id)"
+    } else {
+      return "Message from unknwon to unknown: \(id)"
     }
   }
 }

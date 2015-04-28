@@ -190,7 +190,6 @@ extension AppDelegate {
     }
     persistentStoreCoordinator = createPersistentStoreCoordinator()
     managedObjectContext = createManagedObjectContext()
-    logger.info("Successfully flushed database")
     
     logger.debug("Resetting user defaults storing last sync timestamps")
     Defaults[MVUserDefaultsConstants.LastSynced.Event] = nil
@@ -198,7 +197,7 @@ extension AppDelegate {
   
   func showInitialSyncProgress() {
     logger.info("Showing initial sync")
-    SVProgressHUD.showWithStatus("Initial sync in progress, please wait")
+    SVProgressHUD.showWithStatus("Initial sync in progress, please wait", maskType: .Clear)
   }
   
   func hideInitialSyncProgress() {

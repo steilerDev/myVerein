@@ -30,9 +30,9 @@ class MVNotification {
 
 // MARK: - Send notifications
 extension MVNotification {
-  /// This function sends out a notification telling all subscriber that the message sync completed and that new messages have been retrieved. A notification for each new message is send out, where the sender is the division of the message. Finally a a notification with an empty sender is posted, to signal that all new messages have been proccessed.
+  /// This function sends out a notification telling all subscriber that the message sync completed and that new messages have been retrieved. A notification with the new message as sender is send out.
   ///
-  /// :param: messages An array of new events that are the reason why this notification is send.
+  /// :param: messages A new message that is the reason why this notification is send.
   class func sendMessageSyncCompletedNotificationForNewMessage(message: Message) {
     logger.debug("Sending message sync completion notification for \(message)")
     let notificationCenter = NSNotificationCenter.defaultCenter()
@@ -54,13 +54,21 @@ extension MVNotification {
     notificationCenter.postNotification(finalNotification)
   }
   
-  /// This function sends out a notification telling all subscriber that the calendar sync completed and that new events have been retrieved and/or existing events have been altered. A notification for each changed event is send out, where the sender is the event itself. After the batch of changed events has been processed a notification with an empty sender is posted, to singal that the bach of events has been processed.
-  ///
-  /// :param: events An array of new/changed events that are the reason why this notification is send.
+  /// This function sends out a notification telling all subscriber that the calendar sync completed and that new events have been retrieved and/or existing events have been altered. A notification with the changed event as sender is send out.
+  /// :param: events The new/changed event that is the reason why this notification is send.
   class func sendCalendarSyncCompletedNotificationForChangedEvent(event: Event) {
     logger.debug("Sending calendar sync completion notification for \(event)")
     let notificationCenter = NSNotificationCenter.defaultCenter()
     let notification = NSNotification(name: MVNotificationNames.MVCalendarSyncCompleted, object: event)
+    notificationCenter.postNotification(notification)
+  }
+  
+  /// This function sends out a notification telling all subscriber that the initial sync completed (according to the
+  ///
+  /// :param: events An array of new/changed events that are the reason why this notification is send.
+  class func sendInitialSyncFinishedNotification() {
+    let notificationCenter = NSNotificationCenter.defaultCenter()
+    let notification = NSNotification(name: MVNotificationNames.MVInitialSyncCompleted, object: nil)
     notificationCenter.postNotification(notification)
   }
 }
@@ -97,6 +105,15 @@ extension MVNotification {
     return subscribeToNotification(MVNotificationNames.MVCalendarSyncCompleted, sender: event, responseClosure: responseClosure)
   }
   
+  /// This function lets you subscribe to the initial sync completed notification by defining a closure that should be executed upon receival of the notification. The closure is guaranteed to be executed on the main thread. In general you subscribe to the notification within the 'viewDidAppear' function and un-subscribe within the 'viewWillDisappear' function to efficiently release unnecessary resources. 
+  ///
+  /// :param: responseClosure The closure that should be executed as soon as the notification is received.
+  /// :returns: A token associated with the notification, used to unsubscribe from the notification and therefore free resources. You should always unsubscribe from notification as soon as your subscriber is no longer needed, because the notification is possibly causing memory leaks because of captured elements within the response closure.
+  class func subscribeToInitialSyncCompletedNotification(responseClosure: (NSNotification!) -> ()) -> NSObjectProtocol {
+    logger.debug("Subscribing to initial sync completed notification")
+    return subscribeToNotification(MVNotificationNames.MVInitialSyncCompleted, sender: nil, responseClosure: responseClosure)
+  }
+  
   /// This function is subscribing to a notification defined by its name and sender object. The response closure is executed upon receival of the notification. The closure is guaranteed to be executed on the main thread. In general you subscribe to the notification within the 'viewDidAppear' function and un-subscribe within the 'viewWillDisappear' function to efficiently release unnecessary resources.
   ///
   /// :param: responseClosure The closure that should be executed as soon as the notification is received.
@@ -109,16 +126,16 @@ extension MVNotification {
       let newResponseClosure: (NSNotification!) -> () = {
         notification in
         if let notificationSender = notification.object as? CoreDataObject where notificationSender.id == sender.id {
-          XCGLogger.debug("Executing notification for \(notificationSender)")
+          XCGLogger.debug("Executing notification \(name) for \(notificationSender)")
           responseClosure(notification)
         } else {
-          XCGLogger.debug("Not executing notification because its sender is not the subscribed object \(sender)")
+          XCGLogger.debug("Not executing notification \(name) because its sender is not the subscribed object \(sender)")
         }
       }
-      logger.debug("Subscribing to notification, filtering with \(sender)")
+      logger.debug("Subscribing to notification \(name), filtering with \(sender)")
       return NSNotificationCenter.defaultCenter().addObserverForName(name, object: nil, queue: mainQueue, usingBlock: newResponseClosure)
     } else {
-      logger.debug("Subscribing to notification, without filtering")
+      logger.debug("Subscribing to notification \(name), without filtering")
       return NSNotificationCenter.defaultCenter().addObserverForName(name, object: nil, queue: mainQueue, usingBlock: responseClosure)
     }
   }
@@ -139,4 +156,5 @@ struct MVNotificationNames {
   static let MVMessageSyncCompleted = "mvMessageSyncCompleted"
   static let MVDivisionSyncCompleted = "mvDivisionSyncCompleted"
   static let MVCalendarSyncCompleted = "mvCalendarSyncCompleted"
+  static let MVInitialSyncCompleted = "mvInitialSyncCompleted"
 }
