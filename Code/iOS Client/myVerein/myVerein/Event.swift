@@ -231,12 +231,11 @@ extension Event {
     let fireDate = startDate!.dateByAddingTimeInterval(-secondsBeforeEvent)
     if !fireDate.isBefore(NSDate()) {
       notification.fireDate = startDate!.dateByAddingTimeInterval(-secondsBeforeEvent)
-      notification.alertTitle = self.title
       
       if let bodyString = TimeIntervalPickerAlertView.intervalStringIn(secondsBeforeEvent) {
-        notification.alertBody = "Starts \(bodyString)"
+        notification.alertBody = "\(self.title) starts \(bodyString)"
       } else {
-        notification.alertBody = "Starts soon"
+        notification.alertBody = "\(self.title) starts soon"
       }
       
       notification.applicationIconBadgeNumber = 1
