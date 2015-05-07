@@ -21,7 +21,7 @@ PODS:
   - AFNetworking/UIKit (2.5.3):
     - AFNetworking/NSURLConnection
     - AFNetworking/NSURLSession
-  - JSQMessagesViewController (7.0.1):
+  - JSQMessagesViewController (7.0.2):
     - JSQSystemSoundPlayer (~> 2.0.1)
   - JSQSystemSoundPlayer (2.0.1)
   - JTCalendar (1.2.3)
@@ -49,7 +49,7 @@ DEPENDENCIES:
 SPEC CHECKSUMS:
   1PasswordExtension: fcf300204bda5b5c78936dbb937a7d661f1ca796
   AFNetworking: e1d86c2a96bb5d2e7408da36149806706ee122fe
-  JSQMessagesViewController: 03fba8a3021a3ddc1c91847f180ffe549f2e8cf2
+  JSQMessagesViewController: bb6649691182b1899dc52b42266ad69efc473510
   JSQSystemSoundPlayer: c5850e77a4363ffd374cd851154b9af93264ed8d
   JTCalendar: 246ea3e338fb97624846ec77cdcde448242c4d5c
   Locksmith: 770f6c5c6e5c5c712d1f00e709c62b8a7240c716
@@ -60,4 +60,4 @@ SPEC CHECKSUMS:
   UIImageView-Letters: ea2b315919f0c50bb98999c3a3d7208db0c7064b
   XCGLogger: 90570901ddf86d5479672d61a1b0a639235b851a
 
-COCOAPODS: 0.36.4
+COCOAPODS: 0.37.0
