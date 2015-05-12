@@ -5,7 +5,7 @@
 
 \chapter{Introduction}
 
-Especially in rural areas, today's world of clubs is dominated by small and medium size organizations. Based on my experience, these clubs are mostly managed using outdated techniques and their communication channels are mostly handled through existing social networks, electronic or non-electronic mail. This is due to the fact that most of the members and management boards of the societies are either not familiar enough with the complexity of the few modern club management solutions, do not know of their existence or can't see the implications of using them.
+Especially in rural areas, today's world of clubs is dominated by small and medium size organisations. Based on my experience, these clubs are mostly managed using outdated techniques and their communication channels are mostly handled through existing social networks, electronic or non-electronic mail. This is due to the fact that most of the members and management boards of the societies are either not familiar enough with the complexity of the few modern club management solutions, do not know of their existence or can't see the implications of using them.
 
 \emph{myVerein} is trying to solve these problems and provide a comprehensive and intuitive solutions for small and medium size clubs. This solution should use the benefits of the recent developments of the IT industry and the principles of cloud and mobility solutions to create the club management solution of the 21\textsuperscript{st} century. 
 
@@ -14,15 +14,42 @@ In the following chapters the process of planning and designing as well as the e
 \section{Market analysis}
 A common principle in todays business is analysing all comparable products and solutions, that are used by potential customers. These solutions might not even be designed for that purpose, but could be misused by the user, because they fit their need.
 
-The most important part of this step is to find the mistakes your competitors made and learn from their behaviour \cite{Hunter:2015aa}. From these findings, it is possible and important to draw parallels and use them to \enquote{model what is working for your competition and [...] not copy your competition directly} \cite{Hunter:2015aa}. 
+The most important part is the identification of the mistakes the competitors made and learn from their behaviour \cite{Hunter:2015aa}. From these findings, it is possible and important to draw parallels and use them to \enquote{model what is working for your competition and [...] not copy your competition directly} \cite{Hunter:2015aa}. 
 
-There exists several ways of identifying and monitoring competitors. When talking to potential customer, it is possible to get a closer look at their current solution to the proposed problem \cite{Philips:2015aa}. Another possible way is to use web searches to try and find solution targeted at your problem. With the help of a search engine it is also possible to get a first look on the presentation and marketing concepts of the identified rivals \cite{Philips:2015aa}. Of course there are additional steps available, including gathering information within social media platforms, at trade conferences or email newsletter \cite{Dahl:2011aa}. 
+There exists several ways of identifying and monitoring competitors. When talking to potential customer, it is possible to get a closer look at their current solutions \cite{Philips:2015aa}. Another possible way is to use web searches to try and find solution targeted at your problem. With the help of a search engine it is also possible to get a first look on the presentation and marketing concepts of the identified rivals \cite{Philips:2015aa}. Of course there are additional steps available, including gathering information within social media platforms, at trade conferences or email newsletter \cite{Dahl:2011aa}. 
 
-Within this section these competing services that have been identified and analysed in preparation for this work are going to be presented. The following concept and implementation is based on these findings.
+Within this section the competing services that have been found and analysed in preparation for this work are going to be presented. This analysis was possible thanks to the help and feedback of administrators from the \emph{Freiwillige Feuerwehr Lohr} and \emph{Melomania Helmstadt}. Only one direct competitor could be identified. This product is created by \emph{Buhl Data Service}. Nevertheless a mix of different services is combined by the users, since there is no comprehensive solution available for them. The presented concept and implementation in the upcoming chapters is based on these findings.
 
 \subsection{Buhl Data Service}
 
+The \emph{Buhl Data Service} company offers several solutions for the private and small to medium size business sector. Among them are applications used for the creation of tax statements and private banking. All solutions are intended to be used on the German market, since they cover country specific topics. Besides the above mentioned products \emph{Buhl Data Service} is also offering an application called \enquote{WISO Mein Verein}, whose purpose is the managing of members of a society as well as several other related tasks.
+
+\emph{WISO Mein Verein} was initially designed to only be used by a single user at once. Later the developer introduced a team edition, which offered the ability to upload the database backing the application to a centralised repository, but while the data was modified, it is still not possible for a second user to access the data. In general this process of lock - modify - unlock is very unintuitive and lacks of transparency. This process therefore reduces the usability dramatically, especially for administration without a technical background.
+
+The functionalities provided by the application are very rich. They range from simply listing all members, to the creation of automated debit transfers as well as storing and populating templates for non-electronic newsletter. The suite itself is a very mature product, only its graphical user interface is not completely meeting today's standards. 
+
+During this project the company launched the public beta of a newly created online social network, targeting member and administrators of clubs. The service is integrated into the \emph{WISO Mein Verein} environment and called \emph{Mein Verein}. An administrator has the possibility to import the data from his \emph{WISO Mein Verein} suite and invite all users to use the social network. 
+
+The network is accessible through a web portal and an Android and iOS app. The portal covers all expected functionalities of a modern social network targeted at members of clubs, including messaging, calendar functions and the ability to search, join and create societies. 
+
+Unfortunately this service was very new, and therefore the time did not permit the extensive testing of this portal. Some question did arise while research on this product. It was unclear how well the process of managing the club is integrated in the web portal, specifically speaking if all functionalities known from \emph{WISO Mein Verein} are available through \emph{Mein Verein} or if the administration needs to maintain two separated data sets, that might become inconsistent. 
+
+Both solutions do not share a common pricing scheme. \emph{WISO Mein Verein} is charged separately for each major upgrade, starting at XX Euro for the single user version and XX Euro for the team version. On the other hand the usage of the web portal \emph{Mein Verein} is completely free of charge and advertisement free. This leads to the question how \emph{Buhl Data Service} is planing on earning money through that product. Since the portal is handling private user data and is also holding private bank details, in case it is connected to the \emph{WISO Mein Verein} suite, it is crucial that these data is not shared with a third party. [PROOF!!]
+
+\subsection{In-comprehensive solution}
+
+A comprehensive solution covering both, managing a club as well as creating a unified communication channel is only partly realised through the \emph{Mein Verein} portal. On top of that the network just recently left it's beta testing phase and is therefore a very young and probably unknown application. Concluding a lot of users as well as administrators started trying to create their own way of handling this problem. 
+
+While talking to several club members of different societies as well as my own experience a couple of existing social network and messaging application are misused to connect the user informing them about news concerning their club. 
+
+One very popular option is the usage of hidden \emph{Facebook} groups, creating a broadcasting channel for administrators as well as user. Depending on the size of these groups, the personal notification system of the user's \emph{Facebook} may be flooded by unrelated and therefore uninteresting information. On top of that many user do not provide their actual personal information or aren't part of the network because of privacy reasons and therefore the user register created by these groups is incomplete, especially if the administrator is trying to communicate using traditional channels as well. 
+
+Another possibility is the usage of instant messaging services like \emph{WhatsApp}. They are providing group messaging features. Unfortunately every user receives a notification for each message send through the group. Especially if there is a vivid discussion a user is not part of, the amount of received notification might get annoying. This system also does not provide any user or event management at all. So this needs to be done either through a separate channel, or the users need to manually maintain their calendar.
+
+In total all these products have a unique use-case, but do not offer any comprehensive solution to the problem of managing a club and unifying its communication. 
+
 \section{User analysis}
+
 
 \chapter{Unique selling point}
 
