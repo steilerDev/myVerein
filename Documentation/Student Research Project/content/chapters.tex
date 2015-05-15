@@ -22,11 +22,11 @@ Within this section the competing services that have been found and analysed in 
 
 \subsection{Buhl Data Service}
 
-The \emph{Buhl Data Service} company offers several solutions for the private and small to medium size business sector. Among them are applications used for the creation of tax statements and private banking. All solutions are intended to be used on the German market, since they cover country specific topics. Besides the above mentioned products \emph{Buhl Data Service} is also offering an application called \enquote{WISO Mein Verein}, whose purpose is the managing of members of a society as well as several other related tasks.
+The \emph{Buhl Data Service} company offers several solutions for the private and small to medium size business sector. Among them are applications used for the creation of tax statements and private banking. All solutions are intended to be used on the German market, since they cover country specific topics \cite{Buhl:2015aa}. Besides the above mentioned products \emph{Buhl Data Service} is also offering an application called \enquote{WISO Mein Verein}, whose purpose is the managing of members of a society as well as several other related tasks.
 
 \emph{WISO Mein Verein} was initially designed to only be used by a single user at once. Later the developer introduced a team edition, which offered the ability to upload the database backing the application to a centralised repository, but while the data was modified, it is still not possible for a second user to access the data. In general this process of lock - modify - unlock is very unintuitive and lacks of transparency. This process therefore reduces the usability dramatically, especially for administration without a technical background.
 
-The functionalities provided by the application are very rich. They range from simply listing all members, to the creation of automated debit transfers as well as storing and populating templates for non-electronic newsletter. The suite itself is a very mature product, only its graphical user interface is not completely meeting today's standards. 
+The functionalities provided by the application are very rich. They range from simply listing all members, to the creation of automated debit transfers as well as storing and populating templates for non-electronic newsletter. The suite itself is a very mature product, only its graphical user interface and missing cross platform functionalities are not completely meeting today's standards \cite{Buhl:2015ab}. 
 
 During this project the company launched the public beta of a newly created online social network, targeting member and administrators of clubs. The service is integrated into the \emph{WISO Mein Verein} environment and called \emph{Mein Verein}. An administrator has the possibility to import the data from his \emph{WISO Mein Verein} suite and invite all users to use the social network. 
 
@@ -34,22 +34,29 @@ The network is accessible through a web portal and an Android and iOS app. The p
 
 Unfortunately this service was very new, and therefore the time did not permit the extensive testing of this portal. Some question did arise while research on this product. It was unclear how well the process of managing the club is integrated in the web portal, specifically speaking if all functionalities known from \emph{WISO Mein Verein} are available through \emph{Mein Verein} or if the administration needs to maintain two separated data sets, that might become inconsistent. 
 
-Both solutions do not share a common pricing scheme. \emph{WISO Mein Verein} is charged separately for each major upgrade, starting at XX Euro for the single user version and XX Euro for the team version. On the other hand the usage of the web portal \emph{Mein Verein} is completely free of charge and advertisement free. This leads to the question how \emph{Buhl Data Service} is planing on earning money through that product. Since the portal is handling private user data and is also holding private bank details, in case it is connected to the \emph{WISO Mein Verein} suite, it is crucial that these data is not shared with a third party. [PROOF!!]
+Both solutions do not share a common pricing scheme. \emph{WISO Mein Verein} is charged separately yearly, starting at 69,99 Euro for the single user version and 139,95 Euro for the team version \cite{Buhl:2015ab}. On the other hand the usage of the web portal \emph{Mein Verein} is completely free of charge and advertisement free. This leads to the question how \emph{Buhl Data Service} is planing monetising that product. Since the portal is handling private user data and is also holding private bank details, in case it is connected to the \emph{WISO Mein Verein} suite, it is crucial that these data is not shared with a third party.
 
 \subsection{In-comprehensive solution}
 
 A comprehensive solution covering both, managing a club as well as creating a unified communication channel is only partly realised through the \emph{Mein Verein} portal. On top of that the network just recently left it's beta testing phase and is therefore a very young and probably unknown application. Concluding a lot of users as well as administrators started trying to create their own way of handling this problem. 
 
-While talking to several club members of different societies as well as my own experience a couple of existing social network and messaging application are misused to connect the user informing them about news concerning their club. 
+While talking to several club members of different societies as well as my own experience a couple of existing social network and messaging application are misused to connect the user and informing them about news concerning their club. 
 
 One very popular option is the usage of hidden \emph{Facebook} groups, creating a broadcasting channel for administrators as well as user. Depending on the size of these groups, the personal notification system of the user's \emph{Facebook} may be flooded by unrelated and therefore uninteresting information. On top of that many user do not provide their actual personal information or aren't part of the network because of privacy reasons and therefore the user register created by these groups is incomplete, especially if the administrator is trying to communicate using traditional channels as well. 
 
 Another possibility is the usage of instant messaging services like \emph{WhatsApp}. They are providing group messaging features. Unfortunately every user receives a notification for each message send through the group. Especially if there is a vivid discussion a user is not part of, the amount of received notification might get annoying. This system also does not provide any user or event management at all. So this needs to be done either through a separate channel, or the users need to manually maintain their calendar.
 
-In total all these products have a unique use-case, but do not offer any comprehensive solution to the problem of managing a club and unifying its communication. 
+In total all these products have a unique use-case, but do not offer any comprehensive solution to the problem of managing a club and unifying its communication. Nevertheless there is a reason that these products are very popular among users. Therefore the positive aspects should be closely examined and adopted, while resolving the shown problems.
 
 \section{User analysis}
 
+During the creation of a product it is crucial to meet the requirements of the user. Especially during the creation of an user interface this holds true. In general a user is not going to spend much time on searching functionalities, which means he might be less satisfied with the product and consequentially use it less frequent \cite{Frank:2013aa}. Therefore every functionality needs to be arranged logically and specifically tailored to the target audience.
+
+This process is called usability engineering and focuses on guiding through the necessary steps resulting into a satisfying user experience \cite{Nielsen:1993aa}. The most important part is \enquote{the process of identifying users’ needs to ensure a product can achieve specific goals effectively and efficiently, which results in overall satisfaction and success} \cite{Frank:2013aa}.
+
+The importance of usability engineering can also be seen in the fact, that the \acrfull{ISO} is covering this topic as part of the ISO 9241 standard. The author is referring to section 210 of the standard, which is labelled \enquote{Human-centred design for interactive systems}.It is describing the general development cycle of an user interface, where the user analysis itself is playing an important part \cite[p. 13]{Gulzow:2015aa}.
+
+The usability engineering describes 3 different kinds of methods for analysing the user: analytical, empiric and creative ones \cite[p. 20]{Gulzow:2015aa}.
 
 \chapter{Unique selling point}
 
