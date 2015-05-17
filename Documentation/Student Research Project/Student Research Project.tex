@@ -71,10 +71,10 @@
 	\listoffigures
 
 	%Tabellenverzeichnis
-	%\cleardoublepage
-	%\phantomsection \label{listoftab}
-	%\addcontentsline{toc}{chapter}{List of tables}
-	%\listoftables
+	\cleardoublepage
+	\phantomsection \label{listoftab}
+	\addcontentsline{toc}{chapter}{List of tables}
+	\listoftables
 
 	% Quellcodeverzeichnis
 	\cleardoublepage
@@ -99,5 +99,7 @@
 	\phantomsection \label{glos}
 	\addcontentsline{toc}{chapter}{Glossary}
 	\printglossary[style=altlist,title=Glossary]
+	
+	\input{appendix}
 
 \end{document}

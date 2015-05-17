@@ -4,6 +4,7 @@
 \setlength{\headheight}{14pt}
 
 \chapter{Introduction}
+\label{chapter:Intro}
 
 Especially in rural areas, today's world of clubs is dominated by small and medium size organisations. Based on my experience, these clubs are mostly managed using outdated techniques and their communication channels are mostly handled through existing social networks, electronic or non-electronic mail. This is due to the fact that most of the members and management boards of the societies are either not familiar enough with the complexity of the few modern club management solutions, do not know of their existence or can't see the implications of using them.
 
@@ -12,13 +13,15 @@ Especially in rural areas, today's world of clubs is dominated by small and medi
 In the following chapters the process of planning and designing as well as the execution is going to be discussed. 
 
 \section{Market analysis}
+\label{sec:MarketAnalysis}
+
 A common principle in todays business is analysing all comparable products and solutions, that are used by potential customers. These solutions might not even be designed for that purpose, but could be misused by the user, because they fit their need.
 
 The most important part is the identification of the mistakes the competitors made and learn from their behaviour \cite{Hunter:2015aa}. From these findings, it is possible and important to draw parallels and use them to \enquote{model what is working for your competition and [...] not copy your competition directly} \cite{Hunter:2015aa}. 
 
 There exists several ways of identifying and monitoring competitors. When talking to potential customer, it is possible to get a closer look at their current solutions \cite{Philips:2015aa}. Another possible way is to use web searches to try and find solution targeted at your problem. With the help of a search engine it is also possible to get a first look on the presentation and marketing concepts of the identified rivals \cite{Philips:2015aa}. Of course there are additional steps available, including gathering information within social media platforms, at trade conferences or email newsletter \cite{Dahl:2011aa}. 
 
-Within this section the competing services that have been found and analysed in preparation for this work are going to be presented. This analysis was possible thanks to the help and feedback of administrators from the \emph{Freiwillige Feuerwehr Lohr} and \emph{Melomania Helmstadt}. Only one direct competitor could be identified. This product is created by \emph{Buhl Data Service}. Nevertheless a mix of different services is combined by the users, since there is no comprehensive solution available for them. The presented concept and implementation in the upcoming chapters is based on these findings.
+Within this section the competing services that have been found and analysed in preparation of this work are going to be presented. This analysis was possible thanks to the help and feedback of administrators from the \emph{Freiwillige Feuerwehr Lohr} and \emph{Melomania Helmstadt}. Only one direct competitor could be identified. This product is created by \emph{Buhl Data Service}. Nevertheless a mix of different services is combined by the users, since there is no comprehensive solution available for them. The presented concept and implementation in the upcoming chapters is based on these findings.
 
 \subsection{Buhl Data Service}
 
@@ -49,16 +52,48 @@ Another possibility is the usage of instant messaging services like \emph{WhatsA
 In total all these products have a unique use-case, but do not offer any comprehensive solution to the problem of managing a club and unifying its communication. Nevertheless there is a reason that these products are very popular among users. Therefore the positive aspects should be closely examined and adopted, while resolving the shown problems.
 
 \section{User analysis}
+\label{sec:UserAnalysis}
 
-During the creation of a product it is crucial to meet the requirements of the user. Especially during the creation of an user interface this holds true. In general a user is not going to spend much time on searching functionalities, which means he might be less satisfied with the product and consequentially use it less frequent \cite{Frank:2013aa}. Therefore every functionality needs to be arranged logically and specifically tailored to the target audience.
+During the creation of a product it is crucial to meet the requirements of the user. Especially during the creation of an user interface this holds true. In general a user is not going to spend much time on searching functionalities, which means he might be less satisfied with the product and consequentially use it less frequent, even though it implements all necessary requirements \cite{Frank:2013aa}. Therefore every functionality needs to be arranged logically and specifically tailored to the target audience.
 
 This process is called usability engineering and focuses on guiding through the necessary steps resulting into a satisfying user experience \cite{Nielsen:1993aa}. The most important part is \enquote{the process of identifying users’ needs to ensure a product can achieve specific goals effectively and efficiently, which results in overall satisfaction and success} \cite{Frank:2013aa}.
 
 The importance of usability engineering can also be seen in the fact, that the \acrfull{ISO} is covering this topic as part of the ISO 9241 standard. The author is referring to section 210 of the standard, which is labelled \enquote{Human-centred design for interactive systems}.It is describing the general development cycle of an user interface, where the user analysis itself is playing an important part \cite[p. 13]{Gulzow:2015aa}.
 
-The usability engineering describes 3 different kinds of methods for analysing the user: analytical, empiric and creative ones \cite[p. 20]{Gulzow:2015aa}.
+The usability engineering describes 2 major kinds of methods to analyse an user: analytical and empiric \cite[p. 20]{Gulzow:2015aa}. Within an analytical approach the developer is trying to see things from a user's perspective, where empiric methods involve the user directly. 
+
+For this project the \emph{Persona} method was used to perform a user analysis. Personas are several relevant users, who are described by their archetypal properties. Additionally their behaviour and objectives are presented \cite[p. 30]{Gulzow:2015aa} These findings are mainly based on personal experience, as well as information received by different club administrators. The different personas are presented ordered from the most to the least relevant one.
+
+\subsubsection{Jacob - 41}
+\label{sec:Jacob}
+
+Jacob is father of two children. He lives in a small house with his family in the outskirts of a small German town. Besides his work at a global oriented medium sized technology company, he is a volunteering member at the local sports club. Generally speaking he is technology affine, but not an expert. His job is managing all members of the club. This includes the listing of all active and passive members, as well as ensuring that everyone paid their membership fees. Additionally he has the responsibility to invite all members to events organised by the club. 
+
+The utilities Jacob is using to do his job at the club include an Excel sheet with all names and contact details, as well as a Word template for his invitations for several events. Recently he created an email distribution list to save the money he always spend on mailing the paper letters. Besides a handful older members everyone is receiving these emails. Nevertheless the constantly changing club structure and contact details are hard to manage and he spends a lot of time updating his member list.
+
+\subsubsection{Marie - 21}
+Marie is a student and recently moved out of her parent's house. She is an active soccer player since nearly 10 years at the sport club. Unfortunately she often misses special events organised by her club, because in the past she barely paid attention for the club mail, handled by her parents. Since she is receiving emails from her club on her smartphone she regularly updates her calendar according to the events, but slowly gets annoyed by the amount of data she has to organise besides her studies.
+
+On top of that she is part of a \emph{WhatsApp} group dedicated to her team where all kinds of topics are discussed, ranging from the last party to the next game. On top of that a soccer group dedicated to her club was created on \emph{Facebook}, where additional information are shared.
+
+Since she just lately moved she is trying to change her contact details registered at the club. Unfortunately after asking her coach and the head of the club to change the information she is currently waiting for a conformation from Jacob about the successful change. All in all she is not very satisfied with the current infrastructure and possibilities offered by the club.
+
+\subsubsection{Karl - 58}
+Karl is a farther of 2 and grandfather of 5. He had lived together with his wife in the same house for nearly 30 years. Even longer he has been a part of the local sports club. Because of his age he is not as active as he used to be, but he helps everywhere he can. The electrician plays an important part in maintaining the club house and supporting teams during their game days.
+
+Even though he owns a PC, which was a present from his children, he is not very confident using it. Therefore he does not receive any information through email, but through traditional non-electronic mail, as well as through personal contact with the responsible parties.  
 
 \chapter{Unique selling point}
+
+The result of the market analysis in section \vref{sec:MarketAnalysis} as well as the user analysis in section \vref{sec:UserAnalysis} lead to the conclusion that there is the need for a comprehensive solution. Using these findings, the key points of the application can now be derived. 
+
+The first and most important point of the application is to reduce the workload on the person managing the members of the club as well as advertising events, described as Jacob in section \vref{sec:Jacob}. Since this person is already spending at lot of his time on keeping the club running, mostly free of any charge, he should perform his work as efficient as possible. This should also include the possibility to delegate work to other people, e.g. every user could be responsible to keep his contact information up-to-date, without the need of the administrator being actively involved.
+
+The second point of the application is reducing the personal organisation overhead for a single user. Specifically talking a user should be automatic reminded of upcoming events and he should have an easy way of checking a personalised, up to date schedule of her club related events.
+
+Lastly the group pressure on individuals to join one or multiple social networks or applications should be removed, by providing a safe and trustfully environment. On top of that people that are not able or do not feel confident with using latest technology should not be forced into using it. In contrast a viable alternative should be offered to these users. 
+
+These three points basically cover the main idea behind this project. Of course, several more key points could be concluded from the findings in chapter \vref{chapter:Intro}. Unfortunately these would push the boundaries of this project. Nevertheless they are briefly discussed in chapter \vref{chapter:OngoingWork}.
 
 \chapter{Concept}
 (Was will ich machen, was kann ich mir vorstellen kein ziel brainstorming, Planung, Alternativen)
@@ -77,5 +112,6 @@ color, logo, GUI
 fancy features
 
 \chapter{Ongoing work}
+\label{chapter:OngoingWork}
 ausblick (max 1/8 vom text)
 
