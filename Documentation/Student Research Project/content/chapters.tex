@@ -84,6 +84,7 @@ Karl is a farther of 2 and grandfather of 5. He had lived together with his wife
 Even though he owns a PC, which was a present from his children, he is not very confident using it. Therefore he does not receive any information through email, but through traditional non-electronic mail, as well as through personal contact with the responsible parties.  
 
 \chapter{Unique selling point}
+\label{chapter:SellingPoint}
 
 The result of the market analysis in section \vref{sec:MarketAnalysis} as well as the user analysis in section \vref{sec:UserAnalysis} lead to the conclusion that there is the need for a comprehensive solution. Using these findings, the key points of the application can now be derived. 
 
@@ -96,10 +97,100 @@ Lastly the group pressure on individuals to join one or multiple social networks
 These three points basically cover the main idea behind this project. Of course, several more key points could be concluded from the findings in chapter \vref{chapter:Intro}. Unfortunately these would push the boundaries of this project. Nevertheless they are briefly discussed in chapter \vref{chapter:OngoingWork}.
 
 \chapter{Concept}
+Within this chapter the initial thoughts, leading to the concept of the application, are described, respecting the findings from chapter \ref{chapter:Intro}. This chapter will present different approaches that could have been chosen to solve the problem. An evaluation of these possibilities, based on feasibility, necessity and user value is going to be provided as well.
+
 (Was will ich machen, was kann ich mir vorstellen kein ziel brainstorming, Planung, Alternativen)
+
+\section{Platform} % Mapping to deployment model/ER model/architectural overview
+Nowadays a solution can be created focusing on a wide area of devices and using several technologies supported by these platforms. In general, the workload increases with each platform, and/or technology that is included into the development process. Concluding a well balanced trade-off needs to be made when choosing platform and technology for a project.
+
+
+The most conservative approach is developing a stand-alone desktop application. The interaction using mouse and keyboard is the most established one and possibly the only point of contact with modern \acrshort{IT} systems for non-technology oriented people. Nevertheless this platform and technology is concluding several negative aspects: A single platform needs to be chosen and every additional platform would include a massive amount of supplementary work, based on the assumption of not using cross platform technologies, like \emph{\Acrfull{WOCA}} or \emph{\Acrfull{WORA}}. On top of that the time spend online on mobile devices recently surpassed desktop application \cite{Murtagh:2014aa}, which reduces the importance of a desktop application. 
+
+\begin{figure}[h]
+	\centering
+	\begin{subfigure}{.49\textwidth}
+  		\centering
+  		\includegraphics[width=0.98\linewidth]{./images/smartphone-os-market-share.png}
+  		\caption{Operating Systems}
+  		\label{fig:OSMarketShare}
+	\end{subfigure}
+	\begin{subfigure}{.49\textwidth}
+  		\centering
+  		\includegraphics[width=0.98\linewidth]{./images/smartphone-vendor-market-share.png}
+  		\caption{Vendors}
+  		\label{fig:VendorMarketShare}
+	\end{subfigure}
+	\caption[Smartphone operating system's and vendor's market share, Q4 2014, retrieved from \cite{IDC:2015aa} and \cite{IDC:2015ab}]{Smartphone market share, Q4 2014}
+	\label{fig:Shares}
+\end{figure}
+\nocite{IDC:2015aa, IDC:2015ab}
+
+As shown in the last paragraph the importance of mobile applications rose tremendously within the last couple of years. Therefore it is essential to take this platform into consideration. When looking at the market shares of mobile \acrlong{OS}, shown in figure \vref{fig:OSMarketShare}, it seems obvious that an application should initially be developed for the \emph{Android} platform, since it got a market share of 76.6\% \cite{IDC:2015aa}. Later the development for \emph{iOS} (19.7\%) and \emph{Windows Phone} (2.8\%) might be considered \cite{IDC:2015aa}. But when looking at vendor market shares, shown in figure \vref{fig:VendorMarketShare}, this picture is not so obvious anymore. \emph{Apple}, the only vendor distributing devices with the \emph{iOS} \acrlong{OS}, has nearly the same market share as \emph{Samsung}, the biggest vendor of \emph{Android} running mobile devices \cite{IDC:2015ab}.
+
+\begin{figure}[h]
+	\centering
+	\begin{subfigure}{.49\textwidth}
+  		\centering
+  		\includegraphics[width=0.98\linewidth]{./images/android-os.png}
+  		\caption{Android}
+  		\label{fig:AndroidOSFragmentation}
+	\end{subfigure}
+	\begin{subfigure}{.49\textwidth}
+  		\centering
+  		\includegraphics[width=0.98\linewidth]{./images/ios-os.png}
+  		\caption{iOS}
+  		\label{fig:iOSOSFragmentation}
+	\end{subfigure}
+	\caption[Mobile \acrfull{OS} fragmentation, retrieved from \cite{OpenSignal:2014aa}]{Mobile \acrfull{OS} fragmentation}
+	\label{fig:MobileOSFragmentation}
+\end{figure}
+\nocite{OpenSignal:2014aa}
+
+As already hinted, the \emph{Android} platform seems more fragmented than the \emph{iOS} eco-system. This is due to the fact that the \acrlong{OS} is distributed by several vendors, which create device with different specification. On top of that the support for the latest version of the \acrshort{OS} is not guaranteed, which not only leaves devices open for security vulnerabilities, but also increases the workload for the developer. As shown in figure \vref{fig:MobileOSFragmentation}, nearly 99\% of the \emph{iOS} devices were running the two latest versions of the \acrlong{OS} in 2014. In opposite to that, not even 50\% of the \emph{Android} devices were running the three latest revisions of the platform. This fragmentation is also reflected by figure \vref{fig:MobileScreenFragmentation}, which is showing all screen sizes of mobile devices running \emph{Android}, respectively \emph{iOS}, as of 2014.
+
+\begin{figure}[h]
+	\centering
+	\begin{subfigure}{.49\textwidth}
+  		\centering
+  		\includegraphics[width=0.98\linewidth]{./images/android-screen.png}
+  		\caption{Android}
+  		\label{fig:AndroidScreenFragmentation}
+	\end{subfigure}
+	\begin{subfigure}{.49\textwidth}
+  		\centering
+  		\includegraphics[width=0.98\linewidth]{./images/ios-screen.png}
+  		\caption{iOS}
+  		\label{fig:iOSScreenFragmentation}
+	\end{subfigure}
+	\caption[Screen size fragmentation of mobile devices grouped by \acrfull{OS}, retrieved from \cite{OpenSignal:2014aa}]{Screen size fragmentation of mobile devices grouped by \acrfull{OS}}
+	\label{fig:MobileScreenFragmentation}
+\end{figure}
+\nocite{OpenSignal:2014aa}
+
+Concluding, when creating an app for the \emph{Android} platform, the developer is facing several design decisions, which either increase the complexity of the program or reduce its functionality or accessibility. In opposite to that a developer choosing the \emph{iOS} platform can easily create an application which is optimised for all available devices, as well as exploiting all recent features offered by the \acrlong{OS} without excluding a big amount of users, who are not running on the latest version. 
+
+Another decision that needs to be made is the amount of functionalities available on the different platforms. Eventually it is smarter to restrict certain functionalities to a platform or technology. This might decrease the complexity of a single application, but increase the development complexity.
+
+In opposite of creating an application that includes all functionalities offered by the system there might be a dedicated application for administrative tasks and a member related tasks. This would reduce the complexity of the application for an administrator 
+
+
+\section{Architecture} % Mapping to deployment model/ER model/architectural overview
+
+\section{Functionality} %Mapping to final use cases
+
+A brief wrap up and explanation of the key functionalities was given in chapter \vref{chapter:SellingPoint}. 
+
+\section{User Interface} %% Mapping to wireframes
 
 \chapter{Design}
 (Wie kann ich mir es in der Umsetzung vorstellen, konzeptionelle umsetzung, wireframes, uml)
+
+Requirements
+Deployment model/Architectural model
+Wireframes
+
+Use case
 
 \chapter{Implementation}
 Umsetzung (Wie sieht es am ende aus, besonderheiten, tests aus entwurf -> Def aus pflichtenheft)
