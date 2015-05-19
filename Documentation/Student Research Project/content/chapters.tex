@@ -99,8 +99,6 @@ These three points basically cover the main idea behind this project. Of course,
 \chapter{Concept}
 Within this chapter the initial thoughts, leading to the concept of the application, are described, respecting the findings from chapter \ref{chapter:Intro}. This chapter will present different approaches that could have been chosen to solve the problem. An evaluation of these possibilities, based on feasibility, necessity and user value is going to be provided as well.
 
-(Was will ich machen, was kann ich mir vorstellen kein ziel brainstorming, Planung, Alternativen)
-
 \section{Platform} % Mapping to deployment model/ER model/architectural overview
 Nowadays a solution can be created focusing on a wide area of devices and using several technologies supported by these platforms. In general, the workload increases with each platform, and/or technology that is included into the development process. Concluding a well balanced trade-off needs to be made when choosing platform and technology for a project.
 
@@ -172,10 +170,27 @@ Concluding, when creating an app for the \emph{Android} platform, the developer 
 
 Another decision that needs to be made is the amount of functionalities available on the different platforms. Eventually it is smarter to restrict certain functionalities to a platform or technology. This might decrease the complexity of a single application, but increase the development complexity.
 
-In opposite of creating an application that includes all functionalities offered by the system there might be a dedicated application for administrative tasks and a member related tasks. This would reduce the complexity of the application for an administrator 
-
+In opposite of creating an application that includes all functionalities offered by the system there might be a dedicated application for administrative tasks and member related tasks. This would reduce the complexity of the respective app and hide uninteresting features from the regular user, while only creating a minor overhead for the small group of administrators. Since the tasks might be very different, even the adoption of a different platform or technology could be considered. 
 
 \section{Architecture} % Mapping to deployment model/ER model/architectural overview
+
+The architectural decision highly depends on the platform and technology chosen. When making this decision, it comes to choose between a multi-tier, also known as client-server, and a single-tier, also known as client-only, architecture.
+
+In comparison to a multi-tier web application that is accessed by multiple users at the same time, the complexity of a single tier desktop application is reduced. Inevitable this comes with several negative implications. The biggest impact for an administrator is the missing possibility to delegate certain tasks to other members. On top of that locally stored information can not be accessed by any user, because of availability and security limitations of a personal computer.
+
+\begin{figure}[h]
+  	\centering
+  	\includegraphics[width=0.7\linewidth]{./images/tier-architecture.jpg}
+  	\caption[2-tier and 3-tier architecture, retrieved from \cite{Wright:2015aa}]{2-tier and 3-tier architecture}
+	\label{fig:TierArchitecture}
+\end{figure}
+\nocite{Wright:2015aa}
+
+In opposite to that, a multi-tier architecture enables the user to access and modify data through a centralised data provider. As shown in figure \vref{fig:TierArchitecture}, within a 2-tier architecture, the data is directly available, where a 3-tier architecture adds another abstraction or presentation layer between the raw data and the user. The decision, which kind of architecture to choose, highly depends on the application itself. 
+
+The security of a 3-tier architecture might be more sophisticated, since the logic provided by a dynamic web server offers more possibilities to define user groups and access rights, but if the policy is not well designed, this might lead to violations. Therefore a 2-tier architecture might be a better pick, since it's configuration possibilities are more basic and therefore lead to less problems \cite{Wright:2015aa}.
+
+Costs as well as maintainability is dependent on the complexity of the architecture. The 3-tier architecture is implicitly more complex and therefore leads to a higher costs and -in general- poorer maintainability. In opposite to that, a 3-tier application offers in most cases a better performance and its usability is more satisfying, since it provides a presentation layer \cite{Wright:2015aa}.
 
 \section{Functionality} %Mapping to final use cases
 
