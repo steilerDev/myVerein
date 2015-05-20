@@ -102,7 +102,6 @@ Within this chapter the initial thoughts, leading to the concept of the applicat
 \section{Platform} % Mapping to deployment model/ER model/architectural overview
 Nowadays a solution can be created focusing on a wide area of devices and using several technologies supported by these platforms. In general, the workload increases with each platform, and/or technology that is included into the development process. Concluding a well balanced trade-off needs to be made when choosing platform and technology for a project.
 
-
 The most conservative approach is developing a stand-alone desktop application. The interaction using mouse and keyboard is the most established one and possibly the only point of contact with modern \acrshort{IT} systems for non-technology oriented people. Nevertheless this platform and technology is concluding several negative aspects: A single platform needs to be chosen and every additional platform would include a massive amount of supplementary work, based on the assumption of not using cross platform technologies, like \emph{\Acrfull{WOCA}} or \emph{\Acrfull{WORA}}. On top of that the time spend online on mobile devices recently surpassed desktop application \cite{Murtagh:2014aa}, which reduces the importance of a desktop application. 
 
 \begin{figure}[h]
@@ -194,7 +193,27 @@ Costs as well as maintainability is dependent on the complexity of the architect
 
 \section{Functionality} %Mapping to final use cases
 
-A brief wrap up and explanation of the key functionalities was given in chapter \vref{chapter:SellingPoint}. 
+A brief wrap up and explanation of the key functionalities was given in chapter \vref{chapter:SellingPoint}. Based on these findings several distinct functionalities of the application can be derived. Because of the limited timeframe only a subset of the presented functionalities was realised within this project.
+
+\subsection{Administrator related functionalities}
+
+Initially the administrator should be able to represent the organisational structure of his club within the application. In general a club is hierarchical organised, containing several divisions, with an arbitrary amount of sub-divisions. This structure is highly dependent on the respective club and therefore needs to be as customisable as possible. 
+
+As explained in chapter \vref{chapter:SellingPoint} the administrator should be able to delegate the administration as easily as possible. Concluding it should be feasible to assign second level administrators to each division, splitting up the workload into easily manageable pieces. It is important to note that the second level administrators only have restricted access and modification rights. For example, they should only be able to view personal information of users they are directly administrating.
+
+To manage the users of the club, the administrator needs to be able to create them. Each user should be associated with one or more division. On top of that several personal information need to be stored together with the user. These might include his address, banking information or club related information like his membership number or the dates he became active, passive or resigned from the club. This structure is dependent on the data, the club needs to operate and therefore the possibility should be given to add custom fields to the profiles of user. Upon the creation of a user, he might be informed about his new account through an automated email, where he is introduced to all features of the system and is invited to start using it.
+
+Another time consuming task of an administrator is the management and promotion of internal events. Those events should be created by any administrator, but a second-level administrator should only be able to invite users that are part of his managed divisions. Therefore the administrator cannot invite users to events that probably are not relevant to them. For administrative purposes it would be useful to receive feedback on the participation of certain events. To simplify the process, user should be invited on a division based selection, concluding the administrator does not need to pick each relevant member but only the relevant division.
+
+The process of collecting membership fees is complicated and in comprehensive. The application could simplify and centralise the process by offering automated debit transfer from the member's bank account to the club. Therefore the application needs to interact with the club's bank account to authorise and supervise the membership fee transactions. The usage of this feature would need a high level of trust towards the application and its creator.
+
+Besides the promotion of events, a club -in general- needs to inform the users regular about news concerning certain division or the club. Some of these information might get shared with the public in parallel which would resolve in an unnecessary overhead. Concluding, besides the implementation of a personalised news feed, the system could also offer the possibility to connect to webpage hosting frameworks, like Wordpress or Joomla and social media platforms, enabling the administrator to share information with the user's of the society as well as the public.
+
+Lastly the application could aggregate interesting information for the administrator and present them within a dashboard. This might include upcoming events or statics about the usage of the platform. On top of that the system could provide reminder about anniversaries or milestone birthdays of users, which would enable the club to reliable provide congratulations.
+
+\subsection{User related functionalities}
+
+messaging, events + resposnes, profile maintainance, newsfeed, photo sharing
 
 \section{User Interface} %% Mapping to wireframes
 
