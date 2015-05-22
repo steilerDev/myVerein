@@ -229,7 +229,37 @@ Another problem, a lot of clubs are facing is the problem of collecting useful a
 
 \section{User Interface} %% Mapping to wireframes
 
-As discussed in chapter \vref{sec:UserAnalysis}, one of the most crucial parts of a system is the user interface, since this is the only part the user is directly interacting with. 
+As discussed in chapter \vref{sec:UserAnalysis}, one of the most crucial parts of a system is the user interface, since this is the only part of the system the user is directly interacting with. Concluding a bad designed user interface can increase the complexity of an application as well as decrease user satisfaction 
+
+The design concepts for an administrator focused web application and a user focused iOS application are presented in the following section. In general the navigation concept is a crucial piece of these application. A very popular option to manage the navigation on webpages and mobile application is the so called \enquote{Hamburger Menu} \cite{Abreu:2014aa}. The three parallel horizontal lines indicating that there are more options available are widely used. Unfortunately there are several problems with this concept, including but not limited to lower discoverability, less efficiency, a clash with platform navigation concepts and the inability to get a glance view on the available options \cite{Abreu:2014aa}.
+
+\subsection{Web application}
+
+In general a web application has the possibility to display its information either horizontal or vertical. A combination through dropdown boxes is possible but should be avoided, because of the lower discoverability and less efficiency, already discussed above. \cite{Crestodina:2015aa}
+
+On top of that it is important to put only a small amount of items in the navigation bar. This is based on the fact that the human short term memory in general is only able to hold an average of 7 items, and therefore the user would start forgetting items at the top of the list while scanning through the available navigation items. When limiting the amount to 5 items this would increase the importance of the remaining items, while increasing simplicity of the webpage itself. \cite{Crestodina:2015aa}. 
+
+Psychology studies have shown that the most important items within a list are the first and last ones. Therefore a designer should consider the placement of important navigation items either at the beginning or end of the list. \cite{Crestodina:2015aa}
+
+It is important to note that a user faster adopts well known structures and navigation concepts. Therefore using a non-standard navigation concept could decrease the usability even if it would solve problems of existing solutions, just because of the fact, that the user is not used to it. Especially when placing the navigation items in an unfamiliar place could lead to confusion. \cite{Crestodina:2015aa}
+
+To increase usability, the user should always be aware of his current position within the application. On top of that the user should given the possibility to change his current position at any time. This requires the need of always visible navigation elements. 
+
+While all of this holds true in general the exceptions of these rules, are the concepts that a user is going to remember later. Although creating a new navigation concept, which is respecting only a subset of the above stated suggestions, or none of them, requires a lot of conceptional work. Besides that, the implementation of a non-standardised system also requires the need of starting from the scratch, which increases the workload drastically. \cite{Hampton-Smith:2013aa}
+
+Besides the consideration of different navigation concepts the overall design of the different functionalities were also considered. However for the sake of simplicity only their final designs are presented in chapter \vref{sec:Wireframes} and \vref{sec:GUI}. Especially since the formal definition of all functionalities, that are going to be implemented within this project, has not been given yet, this list would exceed the scope of this paper.
+
+\subsection{iOS application}
+
+
+
+\begin{figure}[h]
+  	\centering
+  	\includegraphics[width=0.8\linewidth]{./images/ui-concept.jpg}
+  	\caption[Early navigation concept drawing, own figure]{Early navigation concept drawing}
+	\label{fig:NavConcept}
+\end{figure}
+
 
 \chapter{Design}
 (Wie kann ich mir es in der Umsetzung vorstellen, konzeptionelle umsetzung, wireframes, uml)
@@ -240,11 +270,15 @@ Wireframes
 
 Use case
 
+\label{sec:Wireframes}
+
 \chapter{Implementation}
 Umsetzung (Wie sieht es am ende aus, besonderheiten, tests aus entwurf -> Def aus pflichtenheft)
 
 \section{UI}
 color, logo, GUI
+
+\label{sec:GUI}
 
 \section{Technical implementation}
 
