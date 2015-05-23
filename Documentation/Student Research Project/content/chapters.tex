@@ -250,8 +250,8 @@ While all of this holds true in general the exceptions of these rules, are the c
 Besides the consideration of different navigation concepts the overall design of the different functionalities were also considered. However for the sake of simplicity only their final designs are presented in chapter \vref{sec:Wireframes} and \vref{sec:GUI}. Especially since the formal definition of all functionalities, that are going to be implemented within this project, has not been given yet, this list would exceed the scope of this paper.
 
 \subsection{iOS application}
-
-
+\subsubsection{Navigation}
+When creating an iOS application, a lot of design elements are pre-defined by the \acrlong{OS}. On the one hand this leads to well known design and navigation principles and following the guidelines will -in general- lead to a well designed application. On the other hand the applications are not very distinguishable based on their design and might become boring for the user. Concluding using an adjusted layout or navigation concept might lead to a better recognisability of the brand. 
 
 \begin{figure}[h]
   	\centering
@@ -260,7 +260,51 @@ Besides the consideration of different navigation concepts the overall design of
 	\label{fig:NavConcept}
 \end{figure}
 
+Figure \vref{fig:NavConcept} shows early design concept drawings. On the left, a standard tab bar concept is presented. The bar contains a total of five elements, including \emph{Messages}, \emph{News}, \emph{Photos}, \emph{Events} and \emph{Settings}. This design is an example of a predefined layout provided by \emph{Apple}. It is important to note that there is no default design that uses the \enquote{Hamburger menu} described above. The tab bar is therefore a viable alternative, which would fit into the design-system of \emph{iOS} and consequentially might perish between the millions of other available application. Nevertheless very popular companies use this concept with minor adjustments, including \emph{Facebook}, \emph{Yelp} and \emph{Twitter}.
 
+In opposite to that the left side of figure \vref{fig:NavConcept} describes a very different navigation concept. The author did not find this concept in any other application, although it was inspired by \emph{Todo Movie}'s sharing layout, as well as \emph{Google}'s material design. The main idea is the positioning of a fixed menu button in the lower part of the screen. When pressing this visual element, one of the two frames shown in the middle of figure \vref{fig:NavConcept}, would appear, revealing the menu. It might either be a \enquote{Navigation Wheel}, that could be operated using swipe gestures, or the available items could appear by moving up.
+
+This concept has several advantages and disadvantages. By choosing a full screen presentation of the menu items, the amount of elements could be increased from a maximum of five, when using a tab bar, to about seven. This is the suggested maximum of navigation items, since the average person has a short term memory of seven elements \cite{Crestodina:2015aa}. On top of that, most of the user prefer well designed swipe gestures over taps, which might be adopted using the \enquote{Navigation wheel} menu. Since the menu button is a fixed item on top of most of the screens, this would attract the attention of the user and improve the engagement. On the opposite, this concept has similar downsides as the previously presented \emph{Hamburger menu}, which is, amongst others, missing the possibility to glance the available items \cite{Abreu:2014aa}.
+
+\subsubsection{Chat overview}
+For the sake of simplicity only the layout of the chat overview page is going to be discussed besides the navigation concept. Figure \vref{fig:ChatScreens} shows these screens of the two most established chat applications on the \emph{iPhone}, \emph{WhatsApp} and \emph{iMessage} CITE!!. Obviously both concepts are very similar, since they both use a table view with slightly different cell layouts. This kind of concept is very useful, when there is the need of showing a big amount of items in an precise and easy to retrievable way. 
+
+\begin{figure}[h]
+	\centering
+	\begin{subfigure}{.49\textwidth}
+  		\centering
+  		\includegraphics[width=0.98\linewidth]{./images/android-screen.png}
+  		\caption{WhatsApp}
+  		\label{fig:ChatWA}
+	\end{subfigure}
+	\begin{subfigure}{.49\textwidth}
+  		\centering
+  		\includegraphics[width=0.98\linewidth]{./images/ios-screen.png}
+  		\caption{iMessage}
+  		\label{fig:ChatiMessage}
+	\end{subfigure}
+	\caption[Chat overview screen shots of established messaging apps]{Chat overview screen shots of established messaging apps}
+	\label{fig:ChatScreens}
+\end{figure}
+%\nocite{OpenSignal:2014aa}
+
+Nevertheless the amount of available chats within \emph{myVerein} is very likely being limited to a foreseeable small quantity. Therefore, other concepts, besides the established list might be considered to increase the uniqueness and recognisability as well as usability. The proposed concept includes two circles per row with a caption, each representing an available chat. The chat with the latest message would be shown on the top left of the screen. Every chat bubble would have a caption stating the name of the division, whose chat it is representing. The image of the bubble would show the image representing the user, who sent the latest message. This might help the user to estimate the importance of the message. A \enquote{tap-and-hold} feature could also be included, showing a preview of the last couple of messages without entering the chat.
+
+\subsubsection{App icon}
+Maybe one of the most important visual items of a mobile application is its icon. It needs to be well designed, since a user is going to put it on his home screen and probably see it every day. On top of that it needs to be interesting enough to regularly click on it, but not too distractive. Lastly and most importantly the user needs to be able to look at the app icon and directly associated it with the product. Since an application icon always comes with a caption, the usage of words should be avoided, while still being recognisable.
+
+\begin{figure}[h]
+  	\centering
+  	\includegraphics[width=0.5\linewidth]{./images/app-sketch.jpg}
+  	\caption[Early application icon sketch, own figure]{Early application icon sketch}
+	\label{fig:AppSketch}
+\end{figure}
+
+After some brainstorming, the best suitable association with a club was an emblem. Figure \vref{fig:AppSketch} is showing an early sketched, created during this session. This very generic object is widely used as a foundation for many logos of different clubs. By leaving the banner empty, it leaves space for the user to imagine his club name or description into it. 
+
+It was considered to form the emblem in a way to resemble to letter \enquote{V}. This could have let to an association with the application's name \emph{myVerein}, similar to the \emph{Facebook} logo. 
+
+\subsection{Colour scheme} %Move up
 \chapter{Design}
 (Wie kann ich mir es in der Umsetzung vorstellen, konzeptionelle umsetzung, wireframes, uml)
 
