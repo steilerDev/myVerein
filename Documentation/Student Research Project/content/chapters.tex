@@ -97,12 +97,12 @@ Lastly the group pressure on individuals to join one or multiple social networks
 These three points basically cover the main idea behind this project. Of course, several more key points could be concluded from the findings in chapter \vref{chapter:Intro}. Unfortunately these would push the boundaries of this project. Nevertheless they are briefly discussed in chapter \vref{chapter:OngoingWork}.
 
 \chapter{Concept}
-Within this chapter the initial thoughts, leading to the concept of the application, are described, respecting the findings from chapter \ref{chapter:Intro}. This chapter will present different approaches that could have been chosen to solve the problem. An evaluation of these possibilities, based on feasibility, necessity and user value is going to be provided as well.
+Within this chapter the initial thoughts, leading to the concept of the application, are described, respecting the findings from chapter \ref{chapter:Intro}. This chapter will present different approaches that could have been chosen to solve the problem. An evaluation of these possibilities, based on feasibility, necessity and user value is going to be provided later.
 
 \section{Platform} % Mapping to deployment model/ER model/architectural overview
 Nowadays a solution can be created focusing on a wide area of devices and using several technologies supported by these platforms. In general, the workload increases with each platform, and/or technology that is included into the development process. Concluding a well balanced trade-off needs to be made when choosing platform and technology for a project.
 
-The most conservative approach is developing a stand-alone desktop application. The interaction using mouse and keyboard is the most established one and possibly the only point of contact with modern \acrshort{IT} systems for non-technology oriented people. Nevertheless this platform and technology is concluding several negative aspects: A single platform needs to be chosen and every additional platform would include a massive amount of supplementary work, based on the assumption of not using cross platform technologies, like \emph{\Acrfull{WOCA}} or \emph{\Acrfull{WORA}}. On top of that the time spend online on mobile devices recently surpassed desktop application \cite{Murtagh:2014aa}, which reduces the importance of a desktop application. 
+The most conservative approach is developing a stand-alone desktop application. The interaction using mouse and keyboard is the most established one and possibly the only point of contact with modern \acrshort{IT} systems for non-technology oriented people. Nevertheless this platform and technology is concluding several negative aspects: A single platform needs to be chosen and every additional platform would include a massive amount of supplementary work, based on the assumption of not using cross platform technologies, like \emph{\Acrfull{WOCA}} or \emph{\Acrfull{WORA}}. On top of that the time spend online on mobile devices recently surpassed desktop application \cite{Murtagh:2014aa}, which reduces the importance of them. 
 
 \begin{figure}[h]
 	\centering
@@ -144,7 +144,7 @@ As shown in the last paragraph the importance of mobile applications rose tremen
 \end{figure}
 \nocite{OpenSignal:2014aa}
 
-As already hinted, the \emph{Android} platform seems more fragmented than the \emph{iOS} eco-system. This is due to the fact that the \acrlong{OS} is distributed by several vendors, which create device with different specification. On top of that the support for the latest version of the \acrshort{OS} is not guaranteed, which not only leaves devices open for security vulnerabilities, but also increases the workload for the developer. As shown in figure \vref{fig:MobileOSFragmentation}, nearly 99\% of the \emph{iOS} devices were running the two latest versions of the \acrlong{OS} in 2014. In opposite to that, not even 50\% of the \emph{Android} devices were running the three latest revisions of the platform. This fragmentation is also reflected by figure \vref{fig:MobileScreenFragmentation}, which is showing all screen sizes of mobile devices running \emph{Android}, respectively \emph{iOS}, as of 2014.
+As already hinted, the \emph{Android} platform seems more fragmented than the \emph{iOS} eco-system. This is due to the fact that the \acrlong{OS} is distributed by several vendors, which create device with different specification. On top of that the support for the latest version of the \acrshort{OS} is not guaranteed, which not only leaves devices open for security vulnerabilities, but also increases the workload for the developer. As shown in figure \vref{fig:iOSOSFragmentation}, nearly 99\% of the \emph{iOS} devices were running the two latest versions of the \acrlong{OS} in 2014. In opposite to that, figure \ref{fig:AndroidOSFragmentation} shows that not even 50\% of the \emph{Android} devices were running the three latest revisions of the platform. This fragmentation is also reflected by figure \vref{fig:MobileScreenFragmentation}, which is showing all screen sizes of mobile devices running \emph{Android}, respectively \emph{iOS}, as of 2014.
 
 \begin{figure}[h]
 	\centering
@@ -231,7 +231,7 @@ Another problem, a lot of clubs are facing is the problem of collecting useful a
 
 As discussed in chapter \vref{sec:UserAnalysis}, one of the most crucial parts of a system is the user interface, since this is the only part of the system the user is directly interacting with. Concluding a bad designed user interface can increase the complexity of an application as well as decrease user satisfaction 
 
-The design concepts for an administrator focused web application and a user focused iOS application are presented in the following section. In general the navigation concept is a crucial piece of these application. A very popular option to manage the navigation on webpages and mobile application is the so called \enquote{Hamburger Menu} \cite{Abreu:2014aa}. The three parallel horizontal lines indicating that there are more options available are widely used. Unfortunately there are several problems with this concept, including but not limited to lower discoverability, less efficiency, a clash with platform navigation concepts and the inability to get a glance view on the available options \cite{Abreu:2014aa}.
+The design concepts for an administrator focused web application and a user focused iOS application are presented in the following sections. In general the navigation concept is a crucial piece of these application. A very popular option to manage the navigation on webpages and mobile application is the so called \enquote{Hamburger Menu} \cite{Abreu:2014aa}. The three parallel horizontal lines indicating that there are more options available are widely used. Unfortunately there are several problems with this concept, including but not limited to lower discoverability, less efficiency, a clash with platform navigation concepts and the inability to get a glance view on the available options \cite{Abreu:2014aa}.
 
 \subsection{Web application}
 
@@ -243,7 +243,7 @@ Psychology studies have shown that the most important items within a list are th
 
 It is important to note that a user faster adopts well known structures and navigation concepts. Therefore using a non-standard navigation concept could decrease the usability even if it would solve problems of existing solutions, just because of the fact, that the user is not used to it. Especially when placing the navigation items in an unfamiliar place could lead to confusion. \cite{Crestodina:2015aa}
 
-To increase usability, the user should always be aware of his current position within the application. On top of that the user should given the possibility to change his current position at any time. This requires the need of always visible navigation elements. 
+To increase usability, the user should always be aware of his current position within the application. On top of that the user should be given the possibility to change his current position at any time. This requires the need of always visible navigation elements. 
 
 While all of this holds true in general the exceptions of these rules, are the concepts that a user is going to remember later. Although creating a new navigation concept, which is respecting only a subset of the above stated suggestions, or none of them, requires a lot of conceptional work. Besides that, the implementation of a non-standardised system also requires the need of starting from the scratch, which increases the workload drastically. \cite{Hampton-Smith:2013aa}
 
@@ -267,31 +267,47 @@ In opposite to that the left side of figure \vref{fig:NavConcept} describes a ve
 This concept has several advantages and disadvantages. By choosing a full screen presentation of the menu items, the amount of elements could be increased from a maximum of five, when using a tab bar, to about seven. This is the suggested maximum of navigation items, since the average person has a short term memory of seven elements \cite{Crestodina:2015aa}. On top of that, most of the user prefer well designed swipe gestures over taps, which might be adopted using the \enquote{Navigation wheel} menu. Since the menu button is a fixed item on top of most of the screens, this would attract the attention of the user and improve the engagement. On the opposite, this concept has similar downsides as the previously presented \emph{Hamburger menu}, which is, amongst others, missing the possibility to glance the available items \cite{Abreu:2014aa}.
 
 \subsubsection{Chat overview}
-For the sake of simplicity only the layout of the chat overview page is going to be discussed besides the navigation concept. Figure \vref{fig:ChatScreens} shows these screens of the two most established chat applications on the \emph{iPhone}, \emph{WhatsApp} and \emph{iMessage} CITE!!. Obviously both concepts are very similar, since they both use a table view with slightly different cell layouts. This kind of concept is very useful, when there is the need of showing a big amount of items in an precise and easy to retrievable way. 
+For the sake of simplicity only the layout of the chat overview page is going to be discussed besides the navigation concept. Figure \vref{fig:ChatScreens} shows these screens of the two most established chat applications on the \emph{iPhone}, \emph{WhatsApp} and \emph{iMessage}. Obviously both concepts are very similar, since they both use a table view with slightly different cell layouts. This kind of concept is very useful, when there is the need of showing a big amount of items in an precise and easy to retrievable way. 
 
 \begin{figure}[h]
 	\centering
-	\begin{subfigure}{.49\textwidth}
+	\begin{subfigure}{.33\textwidth}
   		\centering
-  		\includegraphics[width=0.98\linewidth]{./images/android-screen.png}
+  		\includegraphics[width=0.98\linewidth]{./images/whatsapp-screen.jpg}
   		\caption{WhatsApp}
   		\label{fig:ChatWA}
 	\end{subfigure}
-	\begin{subfigure}{.49\textwidth}
+	\begin{subfigure}{.66\textwidth}
   		\centering
-  		\includegraphics[width=0.98\linewidth]{./images/ios-screen.png}
+  		\includegraphics[width=0.98\linewidth]{./images/imessage-screen.jpg}
   		\caption{iMessage}
   		\label{fig:ChatiMessage}
 	\end{subfigure}
-	\caption[Chat overview screen shots of established messaging apps]{Chat overview screen shots of established messaging apps}
+	\caption[Chat overview screen shots of established messaging apps retrieved from \cite{Inc.:2015aa} and \cite{Stuckler:2013aa}]{Chat overview screen shots of established messaging apps}
 	\label{fig:ChatScreens}
 \end{figure}
-%\nocite{OpenSignal:2014aa}
+\nocite{Inc.:2015aa, Stuckler:2013aa}
 
 Nevertheless the amount of available chats within \emph{myVerein} is very likely being limited to a foreseeable small quantity. Therefore, other concepts, besides the established list might be considered to increase the uniqueness and recognisability as well as usability. The proposed concept includes two circles per row with a caption, each representing an available chat. The chat with the latest message would be shown on the top left of the screen. Every chat bubble would have a caption stating the name of the division, whose chat it is representing. The image of the bubble would show the image representing the user, who sent the latest message. This might help the user to estimate the importance of the message. A \enquote{tap-and-hold} feature could also be included, showing a preview of the last couple of messages without entering the chat.
 
 \subsubsection{App icon}
-Maybe one of the most important visual items of a mobile application is its icon. It needs to be well designed, since a user is going to put it on his home screen and probably see it every day. On top of that it needs to be interesting enough to regularly click on it, but not too distractive. Lastly and most importantly the user needs to be able to look at the app icon and directly associated it with the product. Since an application icon always comes with a caption, the usage of words should be avoided, while still being recognisable.
+Maybe one of the most important visual items of a mobile application is its icon. It needs to be well designed, since the users are going to put it on his home screen and probably see it every day. On top of that it needs to be interesting enough to regularly click on it, but not too distractive. Lastly and most importantly the user needs to be able to look at the app icon and directly associated it with the product. \cite{Flarup:2015aa}
+
+As shortly covered above it is essential to keep some things in mind when working on a good app icon for mobile phones. The first thing to note is scalability. When developing an application for \emph{iOS 8} a developer has to bundle 12 different resolution for the application icon and it has to look good in every one. Concluding \enquote{[o]verly complicated icons that try to cram too much onto the canvas often fall victim to bad scalability} \cite{Flarup:2015aa}, therefore the designer should embrace simplicity and check that the icon looks good on top of different background colours. \cite{Flarup:2015aa}
+
+\begin{figure}[h]
+  	\centering
+  	\includegraphics[width=0.7\linewidth]{./images/productivity-icons.png}
+  	\caption[App-Icon design within the productivity category, retrieved from \cite{Flarup:2015aa}]{App-Icon design within the productivity category}
+	\label{fig:AppProd}
+\end{figure}
+\nocite{Flarup:2015aa}
+
+While keeping the icon scalable it is important to create a design that is recognisable. Therefore the app should not be overcomplicated. When trying to create such an icon it is useful to observe competitors in the same field as well as other popular app icon designs. \cite{Flarup:2015aa}
+
+When looking at the competitor's app icons, it is important to note that a developer should not copy there design. Because uniqueness is another very important aspect of the icon layout, since it needs to attract the attention of the user, and should stand out of the competition. A negative example is the productivity category on the app store, shown in figure \vref{fig:AppProd}. Since all of the shown apps trying to solve a similar problem, they all end up having a more or less identical icon. When ending up, choosing a single glyph, like a checkmark, the designer needs to to make a difference by using a rich colour design. \cite{Flarup:2015aa}
+
+Last but not least it is crucial to avoid text within an app icon. On the one hand, this text scales very badly, on the other hand the app is always accompanied with a caption, stating its name. Consequently a logo should not be used as an icon, since these two are very distinct \cite{Flarup:2015ab}. Nevertheless a single letter, used for example by the \emph{Facebook} app, might be a good way to create a distinguishable brand.
 
 \begin{figure}[h]
   	\centering
@@ -300,11 +316,31 @@ Maybe one of the most important visual items of a mobile application is its icon
 	\label{fig:AppSketch}
 \end{figure}
 
-After some brainstorming, the best suitable association with a club was an emblem. Figure \vref{fig:AppSketch} is showing an early sketched, created during this session. This very generic object is widely used as a foundation for many logos of different clubs. By leaving the banner empty, it leaves space for the user to imagine his club name or description into it. 
+After considering all of the above stated concerns and doing some brainstorming, the best suitable association and unique association with a club, that was found, was an emblem. Figure \vref{fig:AppSketch} is showing an early sketched, created during this session. This very generic object is widely used as a foundation for many logos of different clubs. By leaving the banner empty, it leaves space for the user to imagine his club name or description into it. 
 
 It was considered to form the emblem in a way to resemble to letter \enquote{V}. This could have let to an association with the application's name \emph{myVerein}, similar to the \emph{Facebook} logo. 
 
-\subsection{Colour scheme} %Move up
+\subsection{Colour scheme}
+
+Within the last sections we only looked at the different geometric aspects that can be altered within the application to change the visual appearance. Within this section another very important part of the \acrshort{UI} is considered: The colours used to tint the visual elements. 
+
+The field of colour theory is a very complex one, therefore the time only permitted a very basic analysis on this specific matter. The first thing to note is that different colours have different very distinct meanings. In general a slight change in saturation might lead to a completely new impression of a colour \cite{Chapman:2010aa}. For example the colour red is considered as a violent or aggressive colour, while green is more balancing, relaxing and down to earth \cite{Chapman:2010aa}.
+
+After choosing an appropriate base colour, it is important to create a colour palette, since a single colour would make the application boring, and the developer would be unable to highlight certain entries using a different tint. There are several techniques to create a colour pattern. When using a \emph{Monochromatic} colour scheme the base colour is only altered using different tones, shades and tints \cite{Chapman:2010ab}. 
+
+\begin{figure}[h]
+  	\centering
+  	\includegraphics[width=0.5\linewidth]{./images/colorwheel.jpg}
+  	\caption[12-spoke colour wheel, retrieved from \cite{Chapman:2010ab}]{12-spoke colour wheel}
+	\label{fig:ColourWheel}
+\end{figure}
+
+Figure \vref{fig:ColourWheel} is showing a 12-spoke colour wheel, which is used when creating an \emph{Analogous} colour scheme. It is created by picking three colours that are next to each other and adjust their tones, shades and tints, just like the \emph{Monochromatic} colour scheme would do it \cite{Chapman:2010ab}. This scheme is creating a set of colours, that are very close to each other.
+
+Since the \emph{Analogous} colour scheme is sometimes regarded as being boring, since the colours are very similar, the \emph{Complementary} scheme introduces a wider range, by selecting the colour opposite of the base within the colour wheel \cite{Chapman:2010ab}. This one is most likely being very different to the base colour and adds depth to the palette.
+
+The most diverse colour scheme is called \emph{Tetradic} or \emph{Double-Complementary}. It is regarded as the most difficult scheme when trying to create an efficient palette \cite{Chapman:2010ab}. The scheme is \enquote{based on the tetrade — the foursome of colors evenly distributed on the fourths of the color wheel} \cite{Stanicek:2011aa}. Since this scheme is considered more nervous than the other ones \cite{Stanicek:2011aa}, the primary colour should be used for the main design, while the others are only sparely used for accents \cite{Chapman:2010ab}.
+
 \chapter{Design}
 (Wie kann ich mir es in der Umsetzung vorstellen, konzeptionelle umsetzung, wireframes, uml)
 
