@@ -258,7 +258,7 @@ When creating an iOS application, a lot of design elements are pre-defined by th
 \begin{figure}[h]
   	\centering
   	\includegraphics[width=0.8\linewidth]{./images/ui-concept.jpg}
-  	\caption[Early navigation concept drawing, own figure]{Early navigation concept drawing}
+  	\caption[Early navigation concept drawing [own figure]]{Early navigation concept drawing}
 	\label{fig:NavConcept}
 \end{figure}
 
@@ -314,7 +314,7 @@ Last but not least it is crucial to avoid text within an app icon. On the one ha
 \begin{figure}[h]
   	\centering
   	\includegraphics[width=0.5\linewidth]{./images/app-sketch.jpg}
-  	\caption[Early application icon sketch, own figure]{Early application icon sketch}
+  	\caption[Early application icon sketch [own figure]]{Early application icon sketch}
 	\label{fig:AppSketch}
 \end{figure}
 
@@ -453,8 +453,30 @@ The following requirements are not in the scope of this product.
 \end{itemize}
 
 \section{Use cases}
+Within this section the  use cases derived from the requirements defined in 
+
+
+
+
+
+
+
+
+
 
 \section{Architectural model}
+The author of this worked decided to create a 3-tier architecture, based on the possibility for more sophisticated security policies and an advanced business logic. See chapter \vref{sec:Architecture} for more details on this matter. Figure \vref{fig:Architecture} shows the architectural model used to implement the specified system.
+
+\begin{figure}[h]
+  	\centering
+  	\includegraphics[width=0.95\linewidth]{./images/architecture.png}
+  	\caption[System architecture [own figure]]{System architecture}
+	\label{fig:Architecture}
+\end{figure}
+
+The central As a backend software the \emph{Java Spring} framework was chosen. This mature open source framework provides sophisticate security configurations as well as several access frameworks for data provider. On top of this platform several other additional frameworks are available, including messaging and social media connection, that can be used to extent the functionalities of the application.
+
+
 
 \section{Database layout}
 
