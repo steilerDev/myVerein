@@ -97,9 +97,11 @@ Lastly the group pressure on individuals to join one or multiple social networks
 These three points basically cover the main idea behind this project. Of course, several more key points could be concluded from the findings in chapter \vref{chapter:Intro}. Unfortunately these would push the boundaries of this project. Nevertheless they are briefly discussed in chapter \vref{chapter:OngoingWork}.
 
 \chapter{Concept}
+\label{chapter:Concept}
 Within this chapter the initial thoughts, leading to the concept of the application, are described, respecting the findings from chapter \ref{chapter:Intro}. This chapter will present different approaches that could have been chosen to solve the problem. An evaluation of these possibilities, based on feasibility, necessity and user value is going to be provided later.
 
 \section{Platform} % Mapping to deployment model/ER model/architectural overview
+\label{sec:Platform}
 Nowadays a solution can be created focusing on a wide area of devices and using several technologies supported by these platforms. In general, the workload increases with each platform, and/or technology that is included into the development process. Concluding a well balanced trade-off needs to be made when choosing platform and technology for a project.
 
 The most conservative approach is developing a stand-alone desktop application. The interaction using mouse and keyboard is the most established one and possibly the only point of contact with modern \acrshort{IT} systems for non-technology oriented people. Nevertheless this platform and technology is concluding several negative aspects: A single platform needs to be chosen and every additional platform would include a massive amount of supplementary work, based on the assumption of not using cross platform technologies, like \emph{\Acrfull{WOCA}} or \emph{\Acrfull{WORA}}. On top of that the time spend online on mobile devices recently surpassed desktop application \cite{Murtagh:2014aa}, which reduces the importance of them. 
@@ -172,7 +174,7 @@ Another decision that needs to be made is the amount of functionalities availabl
 In opposite of creating an application that includes all functionalities offered by the system there might be a dedicated application for administrative tasks and member related tasks. This would reduce the complexity of the respective app and hide uninteresting features from the regular user, while only creating a minor overhead for the small group of administrators. Since the tasks might be very different, even the adoption of a different platform or technology could be considered. 
 
 \section{Architecture} % Mapping to deployment model/ER model/architectural overview
-
+\label{sec:Architecture}
 The architectural decision highly depends on the platform and technology chosen. When making this decision, it comes to choose between a multi-tier, also known as client-server, and a single-tier, also known as client-only, architecture.
 
 In comparison to a multi-tier web application that is accessed by multiple users at the same time, the complexity of a single tier desktop application is reduced. Inevitable this comes with several negative implications. The biggest impact for an administrator is the missing possibility to delegate certain tasks to other members. On top of that locally stored information can not be accessed by any user, because of availability and security limitations of a personal computer.
@@ -342,14 +344,121 @@ Since the \emph{Analogous} colour scheme is sometimes regarded as being boring, 
 The most diverse colour scheme is called \emph{Tetradic} or \emph{Double-Complementary}. It is regarded as the most difficult scheme when trying to create an efficient palette \cite{Chapman:2010ab}. The scheme is \enquote{based on the tetrade — the foursome of colors evenly distributed on the fourths of the color wheel} \cite{Stanicek:2011aa}. Since this scheme is considered more nervous than the other ones \cite{Stanicek:2011aa}, the primary colour should be used for the main design, while the others are only sparely used for accents \cite{Chapman:2010ab}.
 
 \chapter{Design}
-(Wie kann ich mir es in der Umsetzung vorstellen, konzeptionelle umsetzung, wireframes, uml)
 
-Requirements
-Deployment model/Architectural model
-Wireframes
+Using the initial thoughts and concept alternatives presented in chapter \vref{chapter:Concept} a design is going to be developed within this chapter. Based on this design the final implementation of the project is executed.
 
-Use case
+The author of this paper decided to implement the system using a three tier architecture (see section \vref{sec:Architecture}) using a user facing mobile iOS app and an administrator facing web application (see section \vref{sec:Platform}. The remaining details are discussed below.
 
+\section{Requirements}
+The software requirement specification \cite{Steiler:2014aa} and in more details the server requirement specification \cite{Steiler:2014ab} state the formal requirements of the product. The requirements are separated in obligatory, optional and additional requirements as well as isolating several functionalities within the non-requirements. The basic requirements on the application are presented in the following, respecting the thoughts and findings from the earlier chapters.
+
+\subsection{Obligatory requirements} % must-have
+The fulfilment of the following criteria is mandatory:
+
+\paragraph{User}
+\begin{itemize}
+\item The user needs to be able to log himself into the server provided by his club at the start of the application
+\item The user needs to be able to check the upcoming schedule of the club
+\item The user needs to be able to send and receive messages
+\end{itemize}
+
+\paragraph{Administrator}
+\begin{itemize}
+\item The administrator needs to be able to modify the server according to the clubs name etc. during the initial setup
+\item The administrator needs to be able to modify the access rights of all members of the club
+\item The administrator needs to be able to schedule an event
+\item The system needs to ensure a fault tolerant, consistent operation.
+\item The system needs to be configurable
+\item The system needs to provide a secure user authentication
+\item The system needs to handle the login of multiple users at the same time
+\item The system needs to handle several messages at the same time
+\item The system should be configurable through a web interface, that enables the administrator to manage user
+\item The system needs to operate according to the data privacy act
+\item The system needs to be designed in a way that a user can only access a minimum amount of private data of the other users
+\item The system needs to be designed to be easily extensible
+\item The system needs to save and gather the data from a persistent data storage system
+\item The system needs to be developed in Java 8
+\end{itemize}
+
+\paragraph{Application (Client)}
+\begin{itemize}
+\item The application needs to be optimised for the operation with an iPhone 6
+\item The application needs to ensure an intuitive operation
+\item The application needs to have a logic menu structure
+\item The application needs a basic graphical user interface
+\end{itemize}
+
+\paragraph{System (Server)}
+\begin{itemize}
+\item The system needs to ensure a fault tolerant, consistent operation.
+\item The system needs to be configurable
+\item The system needs to provide a secure user authentication
+\item The system needs to handle the login of multiple users at the same time
+\item The system needs to handle several messages at the same time
+\item The system should be configurable through a web interface, that enables the administrator to manage user
+\item The system needs to operate according to the data privacy act
+\item The system needs to be designed in a way that a user can only access a minimum amount of private data of the other users
+\item The system needs to be designed to be easily extensible
+\item The system needs to gather the data from a relational database
+\item The system needs to be developed in Java 8
+\end{itemize}
+
+\subsection{Optional requirements} % nice-to-have
+The following requirements are optional, but their implementation is nice to have.
+\begin{itemize}
+\item The application should have a sophisticated graphical user interface through a web interface
+\item The administrator should be able to create divisions
+\item Each user should be able to be part of one or more divisions, to only receive relevant information.
+\item The system should support private chats for each division
+\item Invitations to events should be send to divisions
+\item The user should be able to request access to a division, this access is granted by a higher level user
+\item The user should be able to share photos that are relevant to the club
+\item The application should use push notifications to effectively alert the user about incoming messages, news or upcoming events
+\item The system should be designed to ensure extensibility
+\item The user should be able to optional create a public profile containing contact information
+\item The system should be designed to allow a multi-lingual implementation
+\item The administrator should be able to manage the divisional arrangement via the web interface
+\item The mobile application should be developed using Swift
+\item The mobile application should be created according to the Apple Developer Guidelines
+\end{itemize}
+
+\subsection{Additional requirements}
+The following requirements would improve the overall user experience, but their implementation is not business critical.
+\begin{itemize}
+
+\item The application could have a central news feed, which contains the latest information provided by the administrator
+\item The administrator could be able to publish relevant information through the web interface
+\item Approved user besides the administrator could be able to manage user or publish news and events
+\item The system could send an Email newsletter for members that are not owning a smartphone running iOS, or allow the print out of the newsletter for a non-digital distribution
+\item The events could support assignment of supporting roles needed during the event
+\item The events could support voting buttons to find the ideal date for the meeting
+\item The system could support the download of shared pictures
+\item The system could support the use of shared pictures within the news of the club
+\item The system could allow the administrator to share news through the clubs homepage using plugins within Joomla, Wordpress, Facebook or other systems.
+\item The application could be implemented bilingual (English, German)
+\item The system could have a second member type, that is allowed to publish news and events
+\item The application could be able to send and receive attachments in messages, like photos or audio messages
+\item The application could handle multiple accounts on different or on the same server
+\item The application could support the native resolution of different devices, like the iPad or the iPad mini
+\item The system could support the use of shared pictures within the news of the club
+\end{itemize}
+
+\subsection{Non-requirements} %need-not-to-have
+The following requirements are not in the scope of this product.
+\begin{itemize}
+\item The system is not designed to create a homepage for the club
+\item The application is not designed to provide access to non-members of a club
+\item The application is not designed to work without a server where the user is able to authenticate himself
+\item The system should not be used to collect statistics about the users
+\end{itemize}
+
+\section{Use cases}
+
+\section{Architectural model}
+
+\section{Database layout}
+
+\section{Wireframes}
 \label{sec:Wireframes}
 
 \chapter{Implementation}
