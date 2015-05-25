@@ -236,6 +236,7 @@ As discussed in chapter \vref{sec:UserAnalysis}, one of the most crucial parts o
 The design concepts for an administrator focused web application and a user focused iOS application are presented in the following sections. In general the navigation concept is a crucial piece of these application. A very popular option to manage the navigation on webpages and mobile application is the so called \enquote{Hamburger Menu} \cite{Abreu:2014aa}. The three parallel horizontal lines indicating that there are more options available are widely used. Unfortunately there are several problems with this concept, including but not limited to lower discoverability, less efficiency, a clash with platform navigation concepts and the inability to get a glance view on the available options \cite{Abreu:2014aa}.
 
 \subsection{Web application}
+\label{sec:UIConceptWeb}
 
 In general a web application has the possibility to display its information either horizontal or vertical. A combination through dropdown boxes is possible but should be avoided, because of the lower discoverability and less efficiency, already discussed above. \cite{Crestodina:2015aa}
 
@@ -252,6 +253,7 @@ While all of this holds true in general the exceptions of these rules, are the c
 Besides the consideration of different navigation concepts the overall design of the different functionalities were also considered. However for the sake of simplicity only their final designs are presented in chapter \vref{sec:Wireframes} and \vref{sec:GUI}. Especially since the formal definition of all functionalities, that are going to be implemented within this project, has not been given yet, this list would exceed the scope of this paper.
 
 \subsection{iOS application}
+\label{sec:UIConceptiOS}
 \subsubsection{Navigation}
 When creating an iOS application, a lot of design elements are pre-defined by the \gls{OS}. On the one hand this leads to well known design and navigation principles and following the guidelines will -in general- lead to a well designed application. On the other hand the applications are not very distinguishable based on their design and might become boring for the user. Concluding using an adjusted layout or navigation concept might lead to a better recognisability of the brand. 
 
@@ -269,6 +271,7 @@ In opposite to that the left side of figure \vref{fig:NavConcept} describes a ve
 This concept has several advantages and disadvantages. By choosing a full screen presentation of the menu items, the amount of elements could be increased from a maximum of five, when using a tab bar, to about seven. This is the suggested maximum of navigation items, since the average person has a short term memory of seven elements \cite{Crestodina:2015aa}. On top of that, most of the user prefer well designed swipe gestures over taps, which might be adopted using the \enquote{Navigation wheel} menu. Since the menu button is a fixed item on top of most of the screens, this would attract the attention of the user and improve the engagement. On the opposite, this concept has similar downsides as the previously presented \emph{Hamburger menu}, which is, amongst others, missing the possibility to glance the available items \cite{Abreu:2014aa}.
 
 \subsubsection{Chat overview}
+\label{sec:ChatOverview}
 For the sake of simplicity only the layout of the chat overview page is going to be discussed besides the navigation concept. Figure \vref{fig:ChatScreens} shows these screens of the two most established chat applications on the \emph{iPhone}, \emph{WhatsApp} and \emph{iMessage}. Obviously both concepts are very similar, since they both use a table view with slightly different cell layouts. This kind of concept is very useful, when there is the need of showing a big amount of items in an precise and easy to retrievable way. 
 
 \begin{figure}[h]
@@ -465,6 +468,13 @@ To be added...
 
 
 
+
+
+
+
+
+
+
 \section{Architectural model}
 After reviewing the findings in section \vref{sec:Architecture} and considering the requirements in section \vref{sec:Requirements} the decision was made to use a 3-tier architecture, based on the possibility of a more sophisticated security policy and an advanced business logic. The design was created, keeping scalability in mind. Figure \vref{fig:Architecture} shows the planned architecture of the system. 
 
@@ -528,10 +538,46 @@ Since the user is able to upload pictures that are relevant to the club, a docum
 
 Each picture is uploaded by a specific user and the user can associate up to one division to the picture.
 
-\section{Wireframes}
+\section{Wireframes and Mockups}
 \label{sec:Wireframes}
 
+During the design phase wireframes have been created to get an initial sense of how the application is going to look like. The findings from section \vref{sec:UIConceptWeb} and \vref{sec:UIConceptiOS} have been included into this early \gls{UI} design. The wireframes were designed, trying to meet all requirements from section \vref{sec:Requirements}.
+
+\subsection{Web application}
+
+The wireframes for the web application can be found in appendix \vref{app:WebWireframe}. The top of the page is representing the navigation area. A conservative navigation approach was chosen, because of the limited amount of time for this project as well as the small amount of negative aspects of this concept. A total of six elements is placed in the top bar which is more than the optimum of five elements but not quite the suggested maximum amount of seven items.
+
+The first frame is showing the log in screen. The placeholder on top of the login fields could either hold the default logo, or a custom logo provided by the club's administrator. Every user is going to be able to access this page and enter his credentials. All upcoming pages can only be accessed if the user is an administrator.
+
+The second page is showing the dashboard of the application. This page gives statistics about the system and its users and might also inform the administrator about upcoming birthdays or anniversaries. From this page the administrator is also able to publish news, that later can be received by the user.
+
+The next pages shows the user management page, where the administrator is able to view, alter, create and delete users. The left hand side lists all registered users and the right hand side presents all available information about the currently selected user. Within this form the administrator is able to subscribe the user to every available division. The user list on the left can be filtered using the search field on top of the list.
+
+The fourth page is the division management page, which shows the arrangement of all created divisions on the left in a division tree. The tree can be altered in every possible way, as long as a tree-like structure is maintained. Every division can consequentially have an unlimited amount of subdivisions. The administrator is able to rearrange the divisions to fit his needs. On top of that he can view and alter the divisions on the right side after selecting the appropriate one. 
+
+The events management page is the fifth page presented in this section. On the left hand side a calendar is presented and after selecting a date all events that are scheduled for the selected date are presented underneath the calendar. When selecting one of the events, its details are loaded into the right hand form, where they can be modified. Within this form the invited divisions are listed and can be added or removed.
+
+The next page shows the picture management page, that shows all uploaded images by the user. The pictures are filtered according to the division they were uploaded through. The user can filter the picture using the division tree on the left side.
+
+The last wireframe is the settings page, where the admin can adjust settings for the system. Only the super admin can alter information on this page. The system enables the user to upload a custom club logo on this page and change information like the club name. Second level administrator can only change their password on this page. 
+
+\subsection{iOS application}
+The mockups for the iOS application can be found in appendix \vref{app:iOSWireframe}. The mockup is displayed using a storyboard presentation, showing the connection between each view.
+
+For the initial implementation of the application the decision was made to use the conventional navigation concept of a tab bar located at the bottom of the window. This is mainly due to the fact that the implementation of an alternative navigation concept is very time consuming and would need additional user testing to ensure its usefulness.
+
+Starting at the bottom of the mockup page, the screen shown there is the event management tab. This view shows a calendar in the upper half of the screen and the list of events, scheduled for the currently selected date, in the lower half of the screen. Only events are shown, where the user has been invited to. Additionally another screen could be implemented showing more details of a specific event.
+
+Continuing clockwise, the news feed is the next screen. Within this view each posted news, that is applicable for the user is shown. The user is able to scroll through the posts and thereby inform himself about the club.
+
+The next screen is the messages screen, which is showing all currently subscribed divisions, which have an enabled chat functionality. Within the mockup the conservative table view approach is shown, but the implementation of the alternative overview discussed in section \vref{sec:ChatOverview} is still considered. From this screen the user is able to access the chat screen. This screen is based on the design of the stock \emph{iMessage} app.
+
+The upper right screen is the photos section, where the user is able to shoot pictures within the app. After taking the picture he is able tag it with a division he is part of and upload it to the \emph{myVerein} server. The user is also able to choose an already taken picture from his camera roll.
+
+The last screen, which is not described yet, is the settings tab. In this view, the user is able to change his personal profile and change general settings that apply for his local device. This might include preferences about event reminder, in app notifications and other behaviours.
+
 \section{Licensing}
+
 
 \chapter{Implementation}
 Umsetzung (Wie sieht es am ende aus, besonderheiten, tests aus entwurf -> Def aus pflichtenheft)
@@ -548,7 +594,12 @@ Umsetzung (Wie sieht es am ende aus, besonderheiten, tests aus entwurf -> Def au
 \label{sec:GUI}
 color, logo, GUI
 
+\chapter{Retrospection}
+
+What is done, what isn't, what would I do different next time?
+
 \chapter{Ongoing work}
 \label{chapter:OngoingWork}
+Further development not mentioned in this work + monetarizing and automatic rollout
 ausblick (max 1/8 vom text)
 
