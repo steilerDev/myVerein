@@ -98,7 +98,7 @@
 \usepackage{listings}
 \lstloadlanguages{Java}
 \lstset{%
-	%language=PHP,            % Sprache des Quellcodes
+	%language=PHP,           % Sprache des Quellcodes
 	%numbers=left,           % Zeilennummern links
 	frame=single,            % Frame around the listing
 	keepspaces=true,         
@@ -129,6 +129,10 @@
 	%section,     % Show glossary as section within TOC
 	%toc,          % Show entries within TOC
 ]{glossaries}
+\setacronymstyle{long-short}
+\makeglossaries
+\loadglsentries{glossary.tex}
+\makeglossaries
 
 % Appendix
 \usepackage[toc,page]{appendix}

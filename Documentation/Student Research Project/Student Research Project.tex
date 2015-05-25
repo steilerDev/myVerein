@@ -18,12 +18,11 @@
 \newcommand{\betreuer}{Alfred Becker}
 \newcommand{\zeitraum}{34 Weeks}
 
-\makeglossaries
-\input{glossary}
-
 \begin{document}
     % Set counter of listings global (Only possible within document)
     \counterwithout{lstlisting}{chapter}
+    % Add all glossary entries
+    \glsaddall 
 
 	% Deckblatt
 	\begin{spacing}{1}
@@ -51,8 +50,6 @@
 		\tableofcontents
 	\end{spacing}
 	\newpage
-
-
 
 	\renewcommand{\thepage}{\arabic{page}}
 	\setcounter{page}{1}
@@ -100,6 +97,7 @@
 	\addcontentsline{toc}{chapter}{Glossary}
 	\printglossary[style=altlist,title=Glossary]
 	
-	\input{appendix}
-
+	\include{appendix}
+	
 \end{document}
+
