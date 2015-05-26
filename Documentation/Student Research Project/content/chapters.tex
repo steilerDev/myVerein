@@ -6,105 +6,105 @@
 \chapter{Introduction}
 \label{chapter:Intro}
 
-Especially in rural areas, today's world of clubs is dominated by small and medium size organisations. Based on my experience, these clubs are mostly managed using outdated techniques and their communication channels are mostly handled through existing social networks, electronic or non-electronic mail. This is due to the fact that most of the members and management boards of the societies are either not familiar enough with the complexity of the few modern club management solutions, do not know of their existence or can't see the implications of using them.
+Especially in rural areas, today's world of clubs is dominated by small and medium size organisations. Based on my personal experience, these clubs are mostly managed using outdated techniques and their communication channels are mostly handled through existing social networks, electronic or non-electronic mail. This is due to the fact that most of the members and management boards of the societies are either not familiar enough with the complexity of the few modern club management solutions, do not know of their existence or can't see the implications of using them.
 
-\emph{myVerein} is trying to solve these problems and provide a comprehensive and intuitive solutions for small and medium size clubs. This solution should use the benefits of the recent developments of the IT industry and the principles of cloud and mobility solutions to create the club management solution of the 21\textsuperscript{st} century. 
+\emph{myVerein} is trying to solve these problems and provides a comprehensive and intuitive solution for small and medium size clubs. Using the benefits of the recent developments of the IT industry and the principles of cloud and mobility solutions it can be the management solution of the 21\textsuperscript{st} century. 
 
-In the following chapters the process of planning and designing as well as the execution is going to be discussed. 
+In the following chapters, first the analysis of the existing market and the targeted user group is discussed. Afterwards the initial concept is defined, followed by the process of planning and designing. In the end I will go into the final implementation and present the current state of the application, followed by a retrospection on the whole project as well as an outlook into the future work of the system.
 
 \section{Market analysis}
 \label{sec:MarketAnalysis}
 
-A common principle in todays business is analysing all comparable products and solutions, that are used by potential customers. These solutions might not even be designed for that purpose, but could be misused by the user, because they fit their need.
+A common principle in todays business is analysing all comparable products and solutions, that are used by potential customers. These solutions might not even be designed for that purpose, but are misused by the user, because there is no real alternative available.
 
-The most important part is the identification of the mistakes the competitors made and learn from their behaviour \cite{Hunter:2015aa}. From these findings, it is possible and important to draw parallels and use them to \enquote{model what is working for your competition and [...] not copy your competition directly} \cite{Hunter:2015aa}. 
+The most important part is the identification of the mistakes the competitors make and learn from their semantic errors \cite{Hunter:2015aa}. With these findings it is possible and important as well, to draw parallels and use them to \enquote{model what is working for your competition and [...] not copy your competition directly} \cite{Hunter:2015aa}. 
 
-There exists several ways of identifying and monitoring competitors. When talking to potential customer, it is possible to get a closer look at their current solutions \cite{Philips:2015aa}. Another possible way is to use web searches to try and find solution targeted at your problem. With the help of a search engine it is also possible to get a first look on the presentation and marketing concepts of the identified rivals \cite{Philips:2015aa}. Of course there are additional steps available, including gathering information within social media platforms, at trade conferences or email newsletter \cite{Dahl:2011aa}. 
+There are several ways to identify competitors and keep an eye on their software solutions: Talsk to potential customers to better get a closer look at their current needs as well as to study their present working environment, use web research to find more brilliant answers to the requirements and needs of the clubs \cite{Philips:2015aa}. Take benefit of search engines to study the presentation and marketing concepts of identified competitors \cite{Philips:2015aa}. Last but not least you can gather additional information within social media platforms, at trade shows or on various email newsletter \cite{Dahl:2011aa}. 
 
-Within this section the competing services that have been found and analysed in preparation of this work are going to be presented. This analysis was possible thanks to the help and feedback of administrators from the \emph{Freiwillige Feuerwehr Lohr} and \emph{Melomania Helmstadt}. Only one direct competitor could be identified. This product is created by \emph{Buhl Data Service}. Nevertheless a mix of different services is combined by the users, since there is no comprehensive solution available for them. The presented concept and implementation in the upcoming chapters is based on these findings.
+Within this section the competing services that have been found and analysed in preparation of this work are going to be presented. Here I'd like to thank all administrators with the \emph{Freiwillige Feuerwehr Lohr} and \emph{Melomania Helmstadt} for their remarkable support and feedback they gave my to analyse market needs. With their help I could identify just one substantial provider named \emph{Buhl Data Service}. Nevertheless most of all clubs use combinations of various services and applications since there are hardly comprehensive and affordable remedies for them to find. The resulting concept and its implementation, which are strongly based on these findings, can be found in the upcoming chapters.
 
 \subsection{Buhl Data Service}
 
-The \emph{Buhl Data Service} company offers several solutions for the private and small to medium size business sector. Among them are applications used for the creation of tax statements and private banking. All solutions are intended to be used on the German market, since they cover country specific topics \cite{Buhl:2015aa}. Besides the above mentioned products \emph{Buhl Data Service} is also offering an application called \enquote{WISO Mein Verein}, whose purpose is the managing of members of a society as well as several other related tasks.
+The \emph{Buhl Data Service} company offers several solutions for the private and small to medium size business sector. Among them are applications used for the creation of tax statements and private banking. All solutions are tailored to the German market, since they cover country specific topics \cite{Buhl:2015aa}. Besides the above mentioned products \emph{Buhl Data Service} is also offering an application called \enquote{WISO Mein Verein}, whose purpose is the managing of members of a society as well as several other related tasks.
 
 \emph{WISO Mein Verein} was initially designed to only be used by a single user at once. Later the developer introduced a team edition, which offered the ability to upload the database backing the application to a centralised repository, but while the data was modified, it is still not possible for a second user to access the data. In general this process of lock - modify - unlock is very unintuitive and lacks of transparency. This process therefore reduces the usability dramatically, especially for administration without a technical background.
 
-The functionalities provided by the application are very rich. They range from simply listing all members, to the creation of automated debit transfers as well as storing and populating templates for non-electronic newsletter. The suite itself is a very mature product, only its graphical user interface and missing cross platform functionalities are not completely meeting today's standards \cite{Buhl:2015ab}. 
+The functionalities provided by the application are widely ranged from simply listing all members, to the creation of automated debit transfers as well as storing and populating templates for non-electronic newsletter. The suite itself looks like a very mature product, only its graphical user interface and missing cross platform functionalities are not completely meeting today's standards \cite{Buhl:2015ab}. 
 
 During this project the company launched the public beta of a newly created online social network, targeting member and administrators of clubs. The service is integrated into the \emph{WISO Mein Verein} environment and called \emph{Mein Verein}. An administrator has the possibility to import the data from his \emph{WISO Mein Verein} suite and invite all users to use the social network. 
 
-The network is accessible through a web portal and an Android and iOS app. The portal covers all expected functionalities of a modern social network targeted at members of clubs, including messaging, calendar functions and the ability to search, join and create societies. 
+The network is accessible through a web portal and an Android and iOS app. The portal is said to cover all expected functionalities of a modern social network targeted at members of clubs, including messaging, calendar functions and the ability to search, join and create societies. 
 
-Unfortunately this service was very new, and therefore the time did not permit the extensive testing of this portal. Some question did arise while research on this product. It was unclear how well the process of managing the club is integrated in the web portal, specifically speaking if all functionalities known from \emph{WISO Mein Verein} are available through \emph{Mein Verein} or if the administration needs to maintain two separated data sets, that might become inconsistent. 
+Unfortunately the deadline for my research project did not permit an extensive testing of this portal but still raises questions with me: How well the managing of the club is integrated in the web portal. Specifically speaking if all functionalities known from \emph{WISO Mein Verein} are available through \emph{Mein Verein} or if the administration needs to maintain two separated data sets, that might become inconsistent. 
 
-Both solutions do not share a common pricing scheme. \emph{WISO Mein Verein} is charged separately yearly, starting at 69,99 Euro for the single user version and 139,95 Euro for the team version \cite{Buhl:2015ab}. On the other hand the usage of the web portal \emph{Mein Verein} is completely free of charge and advertisement free. This leads to the question how \emph{Buhl Data Service} is planing monetising that product. Since the portal is handling private user data and is also holding private bank details, in case it is connected to the \emph{WISO Mein Verein} suite, it is crucial that these data is not shared with a third party.
+Both solutions do not share a common pricing scheme. \emph{WISO Mein Verein} is charged separately yearly, starting at 69,99 Euro for the single user version and 139,95 Euro for the team version \cite{Buhl:2015ab}. On the other hand the usage of the web portal \emph{Mein Verein} is completely free of charge and advertisement free. This leads to the question how \emph{Buhl Data Service} is planing monetising that product. Since the portal is handling private user data and is also holding private bank details, in case it is connected to the \emph{WISO Mein Verein} suite, it is crucial that these data are not shared with a third party.
 
-\subsection{In-comprehensive solution}
+\subsection{Incomprehensive solution}
 
-A comprehensive solution covering both, managing a club as well as creating a unified communication channel is only partly realised through the \emph{Mein Verein} portal. On top of that the network just recently left it's beta testing phase and is therefore a very young and probably unknown application. Concluding a lot of users as well as administrators started trying to create their own way of handling this problem. 
+A comprehensive solution covering both, managing a club as well as creating a unified communication channel is poorly realised through the \emph{Mein Verein} portal. On top of that the network just recently left its beta state and is a rather young and unknown application. Concluding most of the users as well as administrators still go their own way of handling their club business so they haven't got any reasonable alternatives.
 
-While talking to several club members of different societies as well as my own experience a couple of existing social network and messaging application are misused to connect the user and informing them about news concerning their club. 
+While talking to several club members of different societies as well as from my own experience a couple of existing social networks and messaging applications are misused to connect the user and informing them about news concerning their club. 
 
-One very popular option is the usage of hidden \emph{Facebook} groups, creating a broadcasting channel for administrators as well as user. Depending on the size of these groups, the personal notification system of the user's \emph{Facebook} may be flooded by unrelated and therefore uninteresting information. On top of that many user do not provide their actual personal information or aren't part of the network because of privacy reasons and therefore the user register created by these groups is incomplete, especially if the administrator is trying to communicate using traditional channels as well. 
+One very popular option is the usage of hidden \emph{Facebook} groups, creating a broadcasting channel for administrators as well as user. Depending on the size of these groups, the personal notification system of the user's \emph{Facebook} will be flooded by unrelated and therefore uninteresting information. On top of that many user do not provide their actual personal information or aren't part of the network because of privacy reasons and therefore the user register created by these groups is incomplete, especially if the administrator is trying to communicate using traditional channels as well. 
 
-Another possibility is the usage of instant messaging services like \emph{WhatsApp}. They are providing group messaging features. Unfortunately every user receives a notification for each message send through the group. Especially if there is a vivid discussion a user is not part of, the amount of received notification might get annoying. This system also does not provide any user or event management at all. So this needs to be done either through a separate channel, or the users need to manually maintain their calendar.
+Another famous way to communicate are instant messaging services like \emph{WhatsApp} where group messaging features are provided. Unfortunately every user receives a notification for each message send through the group. If, for example, there is a vivid discussion a user is not part of, the amount of received notification gets annoying. This system also does not provide any user or event management at all. So this needs to be done either through a separate channel, or the users need to manually maintain their calendar.
 
-In total all these products have a unique use-case, but do not offer any comprehensive solution to the problem of managing a club and unifying its communication. Nevertheless there is a reason that these products are very popular among users. Therefore the positive aspects should be closely examined and adopted, while resolving the shown problems.
+In total all these products have a unique use-case, but do not offer any comprehensive solution to the problem of managing a club and unifying its communication. Nevertheless there is a reason that these products are popular among users. Therefore the positive aspects should be closely examined and adopted, while resolving the shown problems.
 
 \section{User analysis}
 \label{sec:UserAnalysis}
 
-During the creation of a product it is crucial to meet the requirements of the user. Especially during the creation of an user interface this holds true. In general a user is not going to spend much time on searching functionalities, which means he might be less satisfied with the product and consequentially use it less frequent, even though it implements all necessary requirements \cite{Frank:2013aa}. Therefore every functionality needs to be arranged logically and specifically tailored to the target audience.
+During the creation of a product and especially during the creation of an user interface it is crucial to meet the requirements of the user and to never loose sight of them. A user is not going to spend much time on searching functionalities, which means he might be less satisfied with the product and consequentially use it less frequent, even though it implements all necessary requirements \cite{Frank:2013aa}. Therefore every functionality needs to be arranged logically and specifically tailored to the target audience.
 
 This process is called usability engineering and focuses on guiding through the necessary steps resulting into a satisfying user experience \cite{Nielsen:1993aa}. The most important part is \enquote{the process of identifying users’ needs to ensure a product can achieve specific goals effectively and efficiently, which results in overall satisfaction and success} \cite{Frank:2013aa}.
 
-The importance of usability engineering can also be seen in the fact, that the \gls{ISO} is covering this topic as part of the ISO 9241 standard. The author is referring to section 210 of the standard, which is labelled \enquote{Human-centred design for interactive systems}.It is describing the general development cycle of an user interface, where the user analysis itself is playing an important part \cite[p. 13]{Gulzow:2015aa}.
+The importance of usability engineering can also be seen in the fact, that the \gls{ISO} is covering this topic as part of the ISO 9241 standard. The author is referring to section 210 of the standard, which is labelled \enquote{Human-centred design for interactive systems}.It describes the general development cycle of an user interface, where the user analysis itself plays an important role \cite[p. 13]{Gulzow:2015aa}.
 
 The usability engineering describes 2 major kinds of methods to analyse an user: analytical and empiric \cite[p. 20]{Gulzow:2015aa}. Within an analytical approach the developer is trying to see things from a user's perspective, where empiric methods involve the user directly. 
 
-For this project the \emph{Persona} method was used to perform a user analysis. Personas are several relevant users, who are described by their archetypal properties. Additionally their behaviour and objectives are presented \cite[p. 30]{Gulzow:2015aa} These findings are mainly based on personal experience, as well as information received by different club administrators. The different personas are presented ordered from the most to the least relevant one.
+For this project the \emph{Persona} method was used to perform a user analysis. Personae are several relevant users, described by their archetypal properties. Additionally their behaviour and objectives are presented \cite[p. 30]{Gulzow:2015aa}. This method is useful since the developer gets a better picture of the people using his application later and can therefor focus on their needs. Within this sections three key personae are presented, which are used in section \vref{sec:Requirements} to identify the requirements on the system. These presented findings are mainly based on personal experience, as well as information received by different club administrators. The personae are ordered from the most to the least relevant one.
 
 \subsubsection{Jacob - 41}
 \label{sec:Jacob}
 
-Jacob is father of two children. He lives in a small house with his family in the outskirts of a small German town. Besides his work at a global oriented medium sized technology company, he is a volunteering member at the local sports club. Generally speaking he is technology affine, but not an expert. His job is managing all members of the club. This includes the listing of all active and passive members, as well as ensuring that everyone paid their membership fees. Additionally he has the responsibility to invite all members to events organised by the club. 
+Jacob is father of two and lives in a small house with his family in the outskirts of a small German town. Besides his work at a global oriented medium sized technology company, he is a volunteering member at the local sports club. Generally speaking he is technology affine, but not an expert. His honorary post is managing all members of the club. This includes the listing of all active and passive members, as well as ensuring that everyone paid their membership fees. Additionally he has the responsibility to invite all members to events organised by the club. 
 
 The utilities Jacob is using to do his job at the club include an Excel sheet with all names and contact details, as well as a Word template for his invitations for several events. Recently he created an email distribution list to save the money he always spend on mailing the paper letters. Besides a handful older members everyone is receiving these emails. Nevertheless the constantly changing club structure and contact details are hard to manage and he spends a lot of time updating his member list.
 
 \subsubsection{Marie - 21}
-Marie is a student and recently moved out of her parent's house. She is an active soccer player since nearly 10 years at the sport club. Unfortunately she often misses special events organised by her club, because in the past she barely paid attention for the club mail, handled by her parents. Since she is receiving emails from her club on her smartphone she regularly updates her calendar according to the events, but slowly gets annoyed by the amount of data she has to organise besides her studies.
+Marie is a student and recently moved out of her parent's house. She is an active soccer player since nearly 10 years at the sport club. Unfortunately she often misses special events organised by her club, because in the past she barely paid attention to the club mail, handled by her parents. Since she receives emails from her club on her smartphone she regularly updates her calendar according to the events, but slowly gets annoyed by the amount of data she has to organise besides her studies.
 
-On top of that she is part of a \emph{WhatsApp} group dedicated to her team where all kinds of topics are discussed, ranging from the last party to the next game. On top of that a soccer group dedicated to her club was created on \emph{Facebook}, where additional information are shared.
+On top of that she is part of a \emph{WhatsApp} group dedicated to her team where all kinds of topics are discussed, ranging from the last party to the next game. Over and above a soccer group dedicated to her club was created on \emph{Facebook}, where additional information are shared.
 
-Since she just lately moved she is trying to change her contact details registered at the club. Unfortunately after asking her coach and the head of the club to change the information she is currently waiting for a conformation from Jacob about the successful change. All in all she is not very satisfied with the current infrastructure and possibilities offered by the club.
+Since she just shortly changed her address she is tying to get her new contact details registered at the club. Unfortunately after asking her coach and the head of the club to change the information she is currently waiting for a conformation from Jacob about the successful change. All in all she is not very satisfied with the current infrastructure and possibilities offered by the club.
 
 \subsubsection{Karl - 58}
 Karl is a farther of 2 and grandfather of 5. He had lived together with his wife in the same house for nearly 30 years. Even longer he has been a part of the local sports club. Because of his age he is not as active as he used to be, but he helps everywhere he can. The electrician plays an important part in maintaining the club house and supporting teams during their game days.
 
 Even though he owns a PC, which was a present from his children, he is not very confident using it. Therefore he does not receive any information through email, but through traditional non-electronic mail, as well as through personal contact with the responsible parties.  
 
-\chapter{Unique selling point}
-\label{chapter:SellingPoint}
+\section{Unique selling point}
+\label{sec:SellingPoint}
 
-The result of the market analysis in section \vref{sec:MarketAnalysis} as well as the user analysis in section \vref{sec:UserAnalysis} lead to the conclusion that there is the need for a comprehensive solution. Using these findings, the key points of the application can now be derived. 
+The result of the market and user analysis above lead to the conclusion that there is the a real need for a comprehensive solution. Considering all facts and findings discussed in this chapter, the key points of the application can now be derived. 
 
 The first and most important point of the application is to reduce the workload on the person managing the members of the club as well as advertising events, described as Jacob in section \vref{sec:Jacob}. Since this person is already spending at lot of his time on keeping the club running, mostly free of any charge, he should perform his work as efficient as possible. This should also include the possibility to delegate work to other people, e.g. every user could be responsible to keep his contact information up-to-date, without the need of the administrator being actively involved.
 
-The second point of the application is reducing the personal organisation overhead for a single user. Specifically talking a user should be automatic reminded of upcoming events and he should have an easy way of checking a personalised, up to date schedule of her club related events.
+The second point of the application is reducing the personal organisation overhead for a single user. Specifically talking a user should be automatically reminded of upcoming events and he have an easy way of checking a personalised, up to date schedule of his club related events.
 
-Lastly the group pressure on individuals to join one or multiple social networks or applications should be removed, by providing a safe and trustfully environment. On top of that people that are not able or do not feel confident with using latest technology should not be forced into using it. In contrast a viable alternative should be offered to these users. 
+Finally the group pressure on individuals to join one or multiple social networks or applications must get stopped by providing a safe and trustfully environment. People not able to do or not feeling confident with using latest technology should not get forced into using it. In contrast a viable alternative have to be offered to these users. 
 
-These three points basically cover the main idea behind this project. Of course, several more key points could be concluded from the findings in chapter \vref{chapter:Intro}. Unfortunately these would push the boundaries of this project. Nevertheless they are briefly discussed in chapter \vref{chapter:OngoingWork}.
+These three points basically cover the main idea behind this project. Of course, more items out of the findings in this chapter can get taken into concern but it would push the boudaries of this project to deeply discuss them. Nevertheless they are briefly discussed in chapter \vref{chapter:OngoingWork}.
 
 \chapter{Concept}
 \label{chapter:Concept}
-Within this chapter the initial thoughts, leading to the concept of the application, are described, respecting the findings from chapter \ref{chapter:Intro}. This chapter will present different approaches that could have been chosen to solve the problem. An evaluation of these possibilities, based on feasibility, necessity and user value is going to be provided later.
+Within this chapter the initial thoughts, leading to the concept of the application, are described, respecting the findings from chapter \ref{chapter:Intro}. This chapter will present different approaches that could have been chosen to solve the problem. An evaluation of these possibilities, based on feasibility, necessity and user value is going to be provided in chapter \vref{chapter:Design} and \vref{chapter:Implementation}.
 
 \section{Platform} % Mapping to deployment model/ER model/architectural overview
 \label{sec:Platform}
-Nowadays a solution can be created focusing on a wide area of devices and using several technologies supported by these platforms. In general, the workload increases with each platform, and/or technology that is included into the development process. Concluding a well balanced trade-off needs to be made when choosing platform and technology for a project.
+Nowadays a solution can be created focusing on a wide area of devices and using several technologies supported by these platforms. In general, the workload increases with each platform and/or technology that is included into the development process. Concluding a well balanced trade-off, based on the available time, needs to be made when choosing the platform and technology for a project.
 
-The most conservative approach is developing a stand-alone desktop application. The interaction using mouse and keyboard is the most established one and possibly the only point of contact with modern \gls{IT} systems for non-technology oriented people. Nevertheless this platform and technology is concluding several negative aspects: A single platform needs to be chosen and every additional platform would include a massive amount of supplementary work, based on the assumption of not using cross platform technologies, like \emph{\Acrfull{WOCA}} or \emph{\Acrfull{WORA}}. On top of that the time spend online on mobile devices recently surpassed desktop application \cite{Murtagh:2014aa}, which reduces the importance of them. 
+The most conservative approach is developing a stand-alone desktop application. The interaction using mouse and keyboard is the most established one and possibly the only point of contact with modern \gls{IT} systems for non-technology oriented people. Nevertheless this platform and technology is concluding several negative aspects: A single \gls{OS} needs to be chosen and every additional one would include a massive amount of supplementary work, based on the assumption of not using cross platform technologies, like \emph{\Acrfull{WOCA}} or \emph{\Acrfull{WORA}}. On top of that time spend online on mobile devices recently surpassed desktop application \cite{Murtagh:2014aa}, which reduces the importance of them. 
 
 \begin{figure}[h]
 	\centering
@@ -125,7 +125,7 @@ The most conservative approach is developing a stand-alone desktop application. 
 \end{figure}
 \nocite{IDC:2015aa, IDC:2015ab}
 
-As shown in the last paragraph the importance of mobile applications rose tremendously within the last couple of years. Therefore it is essential to take this platform into consideration. When looking at the market shares of mobile \gls{OS}, shown in figure \vref{fig:OSMarketShare}, it seems obvious that an application should initially be developed for the \emph{Android} platform, since it got a market share of 76.6\% \cite{IDC:2015aa}. Later the development for \emph{iOS} (19.7\%) and \emph{Windows Phone} (2.8\%) might be considered \cite{IDC:2015aa}. But when looking at vendor market shares, shown in figure \vref{fig:VendorMarketShare}, this picture is not so obvious anymore. \emph{Apple}, the only vendor distributing devices with the \emph{iOS} \gls{OS}, has nearly the same market share as \emph{Samsung}, the biggest vendor of \emph{Android} running mobile devices \cite{IDC:2015ab}.
+As shown in the last paragraph the importance of mobile applications rose tremendously within the last couple of years. Therefore I believe it is essential to take this platform into consideration. When looking at the market shares of mobile \gls{OS}, shown in figure \vref{fig:OSMarketShare}, it seems obvious that an application should initially be developed for the \emph{Android} platform, since it holds a market share of 76.6\% \cite{IDC:2015aa}. Later the development for \emph{iOS} (19.7\%) and \emph{Windows Phone} (2.8\%) might be considered \cite{IDC:2015aa}. But when looking at vendor market shares, shown in figure \vref{fig:VendorMarketShare}, this picture is not so obvious anymore. \emph{Apple}, the only vendor distributing devices with the \emph{iOS} \gls{OS}, has nearly the same market share as \emph{Samsung}, the biggest vendor of \emph{Android} running mobile devices \cite{IDC:2015ab}.
 
 \begin{figure}[h]
 	\centering
@@ -141,12 +141,12 @@ As shown in the last paragraph the importance of mobile applications rose tremen
   		\caption{iOS}
   		\label{fig:iOSOSFragmentation}
 	\end{subfigure}
-	\caption[Mobile \gls{OS} fragmentation, retrieved from \cite{OpenSignal:2014aa}]{Mobile \gls{OS} fragmentation}
+	\caption{Mobile \gls{OS} fragmentation, retrieved from \cite{OpenSignal:2014aa}}
 	\label{fig:MobileOSFragmentation}
 \end{figure}
 \nocite{OpenSignal:2014aa}
 
-As already hinted, the \emph{Android} platform seems more fragmented than the \emph{iOS} eco-system. This is due to the fact that the \gls{OS} is distributed by several vendors, which create device with different specification. On top of that the support for the latest version of the \gls{OS} is not guaranteed, which not only leaves devices open for security vulnerabilities, but also increases the workload for the developer. As shown in figure \vref{fig:iOSOSFragmentation}, nearly 99\% of the \emph{iOS} devices were running the two latest versions of the \gls{OS} in 2014. In opposite to that, figure \ref{fig:AndroidOSFragmentation} shows that not even 50\% of the \emph{Android} devices were running the three latest revisions of the platform. This fragmentation is also reflected by figure \vref{fig:MobileScreenFragmentation}, which is showing all screen sizes of mobile devices running \emph{Android}, respectively \emph{iOS}, as of 2014.
+As you can see in figure \vref{fig:MobileOSFragmentation}, the \emph{Android} platform seems more fragmented than the \emph{iOS} eco-system. This is due to the fact that the \gls{OS} is distributed by several vendors, who create device with different specification. On top of that the support for the latest version of the \gls{OS} is never guaranteed. Finally this will not only leave devices open for security vulnerabilities, but also increases the workload for the developer. As shown in figure \vref{fig:iOSOSFragmentation}, nearly 99\% of the \emph{iOS} devices were running the two latest versions of the \gls{OS} in 2014. In opposite to that, figure \ref{fig:AndroidOSFragmentation} shows that not even 50\% of the \emph{Android} devices use the three latest revisions of the platform. This fragmentation is also reflected by figure \vref{fig:MobileScreenFragmentation}, which is showing all screen sizes of mobile devices running \emph{Android}, respectively \emph{iOS}, as of 2014. Obviously \emph{Android} has more distinct screen sizes and aspect ratios than \emph{iOS}, which makes it more difficult for the developer to create a good \gls{UI}.
 
 \begin{figure}[h]
 	\centering
@@ -162,14 +162,14 @@ As already hinted, the \emph{Android} platform seems more fragmented than the \e
   		\caption{iOS}
   		\label{fig:iOSScreenFragmentation}
 	\end{subfigure}
-	\caption[Screen size fragmentation of mobile devices grouped by \gls{OS}, retrieved from \cite{OpenSignal:2014aa}]{Screen size fragmentation of mobile devices grouped by \gls{OS}}
+	\caption{Screen sizes of mobile devices grouped by \gls{OS}, retrieved from \cite{OpenSignal:2014aa}}
 	\label{fig:MobileScreenFragmentation}
 \end{figure}
 \nocite{OpenSignal:2014aa}
 
-Concluding, when creating an app for the \emph{Android} platform, the developer is facing several design decisions, which either increase the complexity of the program or reduce its functionality or accessibility. In opposite to that a developer choosing the \emph{iOS} platform can easily create an application which is optimised for all available devices, as well as exploiting all recent features offered by the \gls{OS} without excluding a big amount of users, who are not running on the latest version. 
+Concluding, when creating an app for the \emph{Android} platform the developer is facing several design decisions, which either increase the complexity of the program or reduce its functionality or accessibility. In opposite to that a developer choosing the \emph{iOS} platform can easily create an application which is optimised for all available devices, as well as exploiting all recent features offered by the \gls{OS} without excluding users, who are not running on the latest version. 
 
-Another decision that needs to be made is the amount of functionalities available on the different platforms. Eventually it is smarter to restrict certain functionalities to a platform or technology. This might decrease the complexity of a single application, but increase the development complexity.
+Another decision that needs to be made is the amount of functionalities available on the different platforms. Eventually it is smarter to restrict certain functionalities to a platform or technology. This might decrease the complexity of a single application, but increase the development complexity, since the there are going to be more smaller applications.
 
 In opposite of creating an application that includes all functionalities offered by the system there might be a dedicated application for administrative tasks and member related tasks. This would reduce the complexity of the respective app and hide uninteresting features from the regular user, while only creating a minor overhead for the small group of administrators. Since the tasks might be very different, even the adoption of a different platform or technology could be considered. 
 
@@ -177,12 +177,12 @@ In opposite of creating an application that includes all functionalities offered
 \label{sec:Architecture}
 The architectural decision highly depends on the platform and technology chosen. When making this decision, it comes to choose between a multi-tier, also known as client-server, and a single-tier, also known as client-only, architecture.
 
-In comparison to a multi-tier web application that is accessed by multiple users at the same time, the complexity of a single tier desktop application is reduced. Inevitable this comes with several negative implications. The biggest impact for an administrator is the missing possibility to delegate certain tasks to other members. On top of that locally stored information can not be accessed by any user, because of availability and security limitations of a personal computer.
+In comparison to a multi-tier web application that is accessed by multiple users at the same time, the complexity of a single tier desktop application is is surely easier to manage though it comes along with several negative implications. The biggest impact for the administrator would be the missing possibility to delegate certain tasks to other members. On top of that locally stored information can not be accessed by any user, because of availability and security limitations of a personal computer.
 
 \begin{figure}[h]
   	\centering
   	\includegraphics[width=0.7\linewidth]{./images/tier-architecture.jpg}
-  	\caption[2-tier and 3-tier architecture, retrieved from \cite{Wright:2015aa}]{2-tier and 3-tier architecture}
+  	\caption{2-tier and 3-tier architecture, retrieved from \cite{Wright:2015aa}}
 	\label{fig:TierArchitecture}
 \end{figure}
 \nocite{Wright:2015aa}
@@ -191,33 +191,34 @@ In opposite to that, a multi-tier architecture enables the user to access and mo
 
 The security of a 3-tier architecture might be more sophisticated, since the logic provided by a dynamic web server offers more possibilities to define user groups and access rights, but if the policy is not well designed, this might lead to violations. Therefore a 2-tier architecture might be a better pick, since it's configuration possibilities are more basic and therefore lead to less problems \cite{Wright:2015aa}.
 
-Costs as well as maintainability is dependent on the complexity of the architecture. The 3-tier architecture is implicitly more complex and therefore leads to a higher costs and -in general- poorer maintainability. In opposite to that, a 3-tier application offers in most cases a better performance and its usability is more satisfying, since it provides a presentation layer \cite{Wright:2015aa}.
+Costs as well as maintainability is dependent on the complexity of the architecture. The 3-tier architecture is implicitly more complex and leads to higher costs and often poorer maintainability. On the other hand, a 3-tier application offers in most cases a better performance and its usability is more satisfying, since it provides a presentation layer \cite{Wright:2015aa}.
 
 \section{Functionality} %Mapping to final use cases
+\label{sec:Functionality}
 
-A brief wrap up and explanation of the key functionalities was given in chapter \vref{chapter:SellingPoint}. Based on these findings several distinct functionalities of the application can be derived. Because of the limited timeframe only a subset of the presented functionalities was realised within this project.
+A brief wrap up and explanation of the key functions was given in section \vref{sec:SellingPoint}. Based on these findings several distinct functionalities of the application can be derived. Due to the limited timeframe only a subset of the presented conclusions and ideas can get realised within this confined student research project.
 
 \subsection{Administrator related functionalities}
 
-Initially the administrator should be able to represent the organisational structure of his club within the application. In general a club is hierarchical organised, containing several divisions, with an arbitrary amount of sub-divisions. This structure is highly dependent on the respective club and therefore needs to be as customisable as possible. 
+Initially the administrator should be able to represent the organisational structure of his club within the application. In general a club is hierarchical organised, containing several divisions, with an arbitrary amount of subdivisions. This structure is highly dependent on the respective club and therefore needs to be as customisable as possible. 
 
-As explained in chapter \vref{chapter:SellingPoint} the administrator should be able to delegate the administration as easily as possible. Concluding it should be feasible to assign second level administrators to each division, splitting up the workload into easily manageable pieces. It is important to note that the second level administrators only have restricted access and modification rights. For example, they should only be able to view personal information of users they are directly administrating.
+As explained in chapter \vref{sec:SellingPoint} the administrator should have the ability to delegate the administration as easily as possible. Concluding it has to be technically feasible to assign a second level administrators to each division, splitting up the workload into easily manageable pieces. It is important to note that the second level administrators only have restricted access and modification rights. For example, they should only be able to view personal information of users they do directly administrate.
 
-To manage the users of the club, the administrator needs to be able to create them. Each user should be associated with one or more division. On top of that several personal information need to be stored together with the user. These might include his address, banking information or club related information like his membership number or the dates he became active, passive or resigned from the club. This structure is dependent on the data, the club needs to operate and therefore the possibility should be given to add custom fields to the profiles of user. Upon the creation of a user, he might be informed about his new account through an automated email, where he is introduced to all features of the system and is invited to start using it.
+To manage the users of the club, the administrator needs to be able to create them. Each user should be associated with one or more divisions. On top of that several personal information need to be stored together with the user. These might include his address, banking information or club related information like his membership number or the dates he became active, passive or resigned from the club. This structure is dependent on the data, the club needs to operate and therefore the possibility should be given to add custom fields to the profiles of user. Upon the creation of a user, he might be informed about his new account through an automated email, where he is introduced to all features of the system and is invited to start using it.
 
-Another time consuming task of an administrator is the management and promotion of internal events. Those events should be created by any administrator, but a second-level administrator should only be able to invite users that are part of his managed divisions. Therefore the administrator cannot invite users to events that probably are not relevant to them. For administrative purposes it would be useful to receive feedback on the participation of certain events. To simplify the process, user should be invited on a division based selection, concluding the administrator does not need to pick each relevant member but only the relevant division.
+Another time-consuming task of an administrator is the management and promotion of internal events. Those events should be created by any administrator, but a second-level administrator should only be able to invite users that are part of his managed divisions. Therefore the administrator cannot invite users to events that probably are not relevant to them. For administrative purposes it would be useful to receive feedback on the participation of certain events. To simplify the process, user should be invited on a division based selection, concluding the administrator does not need to pick each relevant member but only the relevant division.
 
-The process of collecting membership fees is complicated and in comprehensive. The application could simplify and centralise the process by offering automated debit transfer from the member's bank account to the club. Therefore the application needs to interact with the club's bank account to authorise and supervise the membership fee transactions. The usage of this feature would need a high level of trust towards the application and its creator.
+The process of collecting membership fees is complicated and in-comprehensive, since some people use an automated debit transfer, some are transferring the money manually and others are paying cash. This process is hard to track and the application could simplify and centralise it by offering automated debit transfer from the member's bank account to the club and account monitoring. Therefore the application needs to interact with the club's bank account to authorise and supervise the membership fee transactions. The usage of this feature would need a high level of trust towards the application and its creator.
 
-Besides the promotion of events, a club -in general- needs to inform the users regular about news concerning certain division or the club. Some of these information might get shared with the public in parallel which would resolve in an unnecessary overhead. Concluding, besides the implementation of a personalised news feed, the system could also offer the possibility to connect to webpage hosting frameworks, like Wordpress or Joomla and social media platforms, enabling the administrator to share information with the user's of the society as well as the public.
+Besides the promotion of events, a club needs to inform the users regular about news concerning certain division or the club. Some of these information might get shared with the public in parallel which would resolve in an unnecessary overhead. Concluding, besides the implementation of a personalised news feed, the system could also offer the possibility to connect to webpage hosting frameworks, like Wordpress or Joomla and social media platforms, enabling the administrator to share information with the user's of the society as well as the public.
 
-Additionally the application should also respect user that are not using the application, because of security concerns or their aversion towards modern technology. It is also possible that certain user do not own a system that is supported by the application. Concluding the system should support a fall back solution for these persons and offer information through standardized channels, like electronic or non-electronic mail.
+Additionally the application should also respect user that are not using the application, because of security concerns or their aversion towards modern technology. It is also possible that certain users do not own a system that is supported by the application. Concluding the software should support a fall back solution for these persons and offer information through standardised channels, like electronic or non-electronic mail.
 
-Lastly the application could aggregate interesting information for the administrator and present them within a dashboard. This might include upcoming events or statics about the usage of the platform. On top of that the system could provide reminder about anniversaries or milestone birthdays of users, which would enable the club to reliable provide congratulations.
+Finally the application could aggregate interesting information for the administrator and present them within a dashboard. This might include upcoming events or statics about the usage of the platform. Last but not least the system could provide reminder about anniversaries or milestone birthdays of users, which would enable the club to reliable provide congratulations.
 
 \subsection{User related functionalities}
 
-As shown in chapter \vref{chapter:SellingPoint} two of the three presented key functionalities are user oriented. Therefore the final application is probably going to have a fairly big amount of user related functionalities.
+As shown in chapter \vref{sec:SellingPoint} two of the three presented key functionalities are user oriented. Therefore the final application is probably going to have a fairly big amount of user related functionalities.
 
 To get rid of different messaging technologies used within the club, a centralised group chat feature should be offered. These group chats should be created automatically for each division. User that are part of the respective division should have the ability to participate within this group chats. For the sake of simplicity, a group chat should only be available for divisions where this feature is useful, therefore the administrator should be able to select divisions where this feature is not available. To reduce the amount of notification received through a group chat, the user might only be reminded about an incoming message if he is explicitly mentioned.
 
@@ -225,13 +226,13 @@ The application should also support the user to manage his personalised club cal
 
 It is a difficult task for an club administrator to maintain the complete records of every user, especially if the user's contact detail change frequently. Therefore it would be a good way to delegate this task to the users. By enabling the user to update their profile on their own, the process is simplified for the administrator and the user. It also enables the user to give his appearance a personal touch, which might be discoverable by other users, if the permission was given.
 
-The application could also provide a counterpart for the news published by administrators. This centralised newsfeed could provide user tailored information about relevant topics. The user could also decide about the amount and kind of notification he receives about these information. On top of that the user might be able to opt-in an email newsletter system or rss feed of the club.
+The application could also provide a counterpart for the news published by administrators. This centralised newsfeed could provide user tailored information about relevant topics. The user could also decide about the amount and kind of notification he receives about these information. On top of that the he might be able to additionally subscribe to an email newsletter system or \gls{RSS} feed of the club.
 
-Another problem, a lot of clubs are facing is the problem of collecting useful and up to date information that can be used to promote the club or events on their webpage, in the newspaper or internally. The system could enable every user to hand in articles written about recent activities or to upload pictures and videos that are club related. These information should only be published if they are approved by an administrator, or handed in by a trusted user.
+Another problem a lot of clubs are facing is the problem of collecting useful and up to date information that can be used to promote the club or events on their webpage, in the newspaper or internally. The system could enable every user to hand in articles written about recent activities or to upload pictures and videos that are club related. These information should only be published if they are approved by an administrator, or handed in by a trusted user.
 
 \section{User Interface} %% Mapping to wireframes
 
-As discussed in chapter \vref{sec:UserAnalysis}, one of the most crucial parts of a system is the user interface, since this is the only part of the system the user is directly interacting with. Concluding a bad designed user interface can increase the complexity of an application as well as decrease user satisfaction 
+As discussed in chapter \vref{sec:UserAnalysis}, one of the most crucial parts of a system is the user interface, since this is the only part of the system the user is directly interacting with. A bad designed user interface can increase the complexity of an application, but also decrease user satisfaction.
 
 The design concepts for an administrator focused web application and a user focused iOS application are presented in the following sections. In general the navigation concept is a crucial piece of these application. A very popular option to manage the navigation on webpages and mobile application is the so called \enquote{Hamburger Menu} \cite{Abreu:2014aa}. The three parallel horizontal lines indicating that there are more options available are widely used. Unfortunately there are several problems with this concept, including but not limited to lower discoverability, less efficiency, a clash with platform navigation concepts and the inability to get a glance view on the available options \cite{Abreu:2014aa}.
 
@@ -260,7 +261,7 @@ When creating an iOS application, a lot of design elements are pre-defined by th
 \begin{figure}[h]
   	\centering
   	\includegraphics[width=0.8\linewidth]{./images/ui-concept.jpg}
-  	\caption[Early navigation concept drawing (own figure)]{Early navigation concept drawing}
+  	\caption{Early navigation concept drawing, own figure}
 	\label{fig:NavConcept}
 \end{figure}
 
@@ -288,7 +289,7 @@ For the sake of simplicity only the layout of the chat overview page is going to
   		\caption{iMessage}
   		\label{fig:ChatiMessage}
 	\end{subfigure}
-	\caption[Chat overview screen shots of established messaging apps retrieved from \cite{Inc.:2015aa} and \cite{Stuckler:2013aa}]{Chat overview screen shots of established messaging apps}
+	\caption{Chat overview screenshots of established messaging apps retrieved from \cite{Inc.:2015aa} and \cite{Stuckler:2013aa}}
 	\label{fig:ChatScreens}
 \end{figure}
 \nocite{Inc.:2015aa, Stuckler:2013aa}
@@ -303,7 +304,7 @@ As shortly covered above it is essential to keep some things in mind when workin
 \begin{figure}[h]
   	\centering
   	\includegraphics[width=0.7\linewidth]{./images/productivity-icons.png}
-  	\caption[App-Icon design within the productivity category, retrieved from \cite{Flarup:2015aa}]{App-Icon design within the productivity category}
+  	\caption{App-Icon design within the productivity category, retrieved from \cite{Flarup:2015aa}}
 	\label{fig:AppProd}
 \end{figure}
 \nocite{Flarup:2015aa}
@@ -317,7 +318,7 @@ Last but not least it is crucial to avoid text within an app icon. On the one ha
 \begin{figure}[h]
   	\centering
   	\includegraphics[width=0.5\linewidth]{./images/app-sketch.jpg}
-  	\caption[Early application icon sketch (own figure)]{Early application icon sketch}
+  	\caption{Early application icon sketch, own figure}
 	\label{fig:AppSketch}
 \end{figure}
 
@@ -329,16 +330,17 @@ It was considered to form the emblem in a way to resemble to letter \enquote{V}.
 
 Within the last sections we only looked at the different geometric aspects that can be altered within the application to change the visual appearance. Within this section another very important part of the \gls{UI} is considered: The colours used to tint the visual elements. 
 
+\begin{figure}[h]
+  	\centering
+  	\includegraphics[width=0.5\linewidth]{./images/colorwheel.jpg}
+  	\caption{12-spoke colour wheel, retrieved from \cite{Chapman:2010ab}}
+	\label{fig:ColourWheel}
+\end{figure}
+
 The field of colour theory is a very complex one, therefore the time only permitted a very basic analysis on this specific matter. The first thing to note is that different colours have different very distinct meanings. In general a slight change in saturation might lead to a completely new impression of a colour \cite{Chapman:2010aa}. For example the colour red is considered as a violent or aggressive colour, while green is more balancing, relaxing and down to earth \cite{Chapman:2010aa}.
 
 After choosing an appropriate base colour, it is important to create a colour palette, since a single colour would make the application boring, and the developer would be unable to highlight certain entries using a different tint. There are several techniques to create a colour pattern. When using a \emph{Monochromatic} colour scheme the base colour is only altered using different tones, shades and tints \cite{Chapman:2010ab}. 
 
-\begin{figure}[h]
-  	\centering
-  	\includegraphics[width=0.5\linewidth]{./images/colorwheel.jpg}
-  	\caption[12-spoke colour wheel, retrieved from \cite{Chapman:2010ab}]{12-spoke colour wheel}
-	\label{fig:ColourWheel}
-\end{figure}
 
 Figure \vref{fig:ColourWheel} is showing a 12-spoke colour wheel, which is used when creating an \emph{Analogous} colour scheme. It is created by picking three colours that are next to each other and adjust their tones, shades and tints, just like the \emph{Monochromatic} colour scheme would do it \cite{Chapman:2010ab}. This scheme is creating a set of colours, that are very close to each other.
 
@@ -347,6 +349,7 @@ Since the \emph{Analogous} colour scheme is sometimes regarded as being boring, 
 The most diverse colour scheme is called \emph{Tetradic} or \emph{Double-Complementary}. It is regarded as the most difficult scheme when trying to create an efficient palette \cite{Chapman:2010ab}. The scheme is \enquote{based on the tetrade — the foursome of colors evenly distributed on the fourths of the color wheel} \cite{Stanicek:2011aa}. Since this scheme is considered more nervous than the other ones \cite{Stanicek:2011aa}, the primary colour should be used for the main design, while the others are only sparely used for accents \cite{Chapman:2010ab}.
 
 \chapter{Design}
+\label{chapter:Design}
 
 Using the initial thoughts and concept alternatives presented in chapter \vref{chapter:Concept} a design is going to be developed within this chapter. Based on this design the final implementation of the project is executed.
 
@@ -354,134 +357,68 @@ The author of this paper decided to implement the system using a three tier arch
 
 \section{Requirements}
 \label{sec:Requirements}
-The software requirement specification \cite{Steiler:2014aa} and in more details the server requirement specification \cite{Steiler:2014ab} state the formal requirements of the product. The requirements are separated in obligatory, optional and additional requirements as well as isolating several functionalities within the non-requirements. The basic requirements on the application are presented in the following, respecting the thoughts and findings from the earlier chapters.
+Within this section the most important requirements for the system are going to be presented. The complete formal list of all objectives can be found in the software requirement specification \cite{Steiler:2014aa} and the server requirement specification \cite{Steiler:2014ab}. The requirements are based on the options shown in chapter \vref{chapter:Design}. The decision, that were made are mainly justified, using the findings from chapter \vref{chapter:Intro}.
 
 \subsection{Obligatory requirements} % must-have
-The fulfilment of the following criteria is mandatory:
+\label{sec:ObligatoryReq}
 
-\paragraph{User}
-\begin{itemize}
-\item The user needs to be able to log himself into the server provided by his club at the start of the application
-\item The user needs to be able to check the upcoming schedule of the club
-\item The user needs to be able to send and receive messages
-\end{itemize}
+This section states the obligatory requirements of the project. The functionalities described in this section are the most basic ones, that are needed to operate the system. Therefore the fulfilment of the following criteria is mandatory.
 
-\paragraph{Administrator}
-\begin{itemize}
-\item The administrator needs to be able to modify the server according to the clubs name etc. during the initial setup
-\item The administrator needs to be able to modify the access rights of all members of the club
-\item The administrator needs to be able to schedule an event
-\item The system needs to ensure a fault tolerant, consistent operation.
-\item The system needs to be configurable
-\item The system needs to provide a secure user authentication
-\item The system needs to handle the login of multiple users at the same time
-\item The system needs to handle several messages at the same time
-\item The system should be configurable through a web interface, that enables the administrator to manage user
-\item The system needs to operate according to the data privacy act
-\item The system needs to be designed in a way that a user can only access a minimum amount of private data of the other users
-\item The system needs to be designed to be easily extensible
-\item The system needs to save and gather the data from a persistent data storage system
-\item The system needs to be developed in Java 8
-\end{itemize}
+\subsubsection{iOS application}
 
-\paragraph{Application (Client)}
-\begin{itemize}
-\item The application needs to be optimised for the operation with an iPhone 6
-\item The application needs to ensure an intuitive operation
-\item The application needs to have a logic menu structure
-\item The application needs a basic graphical user interface
-\end{itemize}
+Through the provided \emph{iOS} app the user needs to be able to authenticate himself against the back end server. As shown in section \vref{sec:SellingPoint} one of the main objective of this software is the unification of the communication channels. Therefore every registered user has to be able to use the app to review his personal event calendar, as well as sending and receiving messages. By providing this information without the need of any interaction from the user, these functionalities provide a maximum amount of usability for every persona presented in \vref{sec:UserAnalysis}. 
 
-\paragraph{System (Server)}
-\begin{itemize}
-\item The system needs to ensure a fault tolerant, consistent operation.
-\item The system needs to be configurable
-\item The system needs to provide a secure user authentication
-\item The system needs to handle the login of multiple users at the same time
-\item The system needs to handle several messages at the same time
-\item The system should be configurable through a web interface, that enables the administrator to manage user
-\item The system needs to operate according to the data privacy act
-\item The system needs to be designed in a way that a user can only access a minimum amount of private data of the other users
-\item The system needs to be designed to be easily extensible
-\item The system needs to gather the data from a relational database
-\item The system needs to be developed in Java 8
-\end{itemize}
+By using the auto layout capability of the \emph{iOS} development suite, an application's layout is automatically adjusted to the screen size and ratio of the user's device. Nevertheless an \emph{iPad} has obviously a bigger screen than an \emph{iPhone} or \emph{iPod touch} and therefore a layout optimised for a smaller device might be less user friendly on a tablet. Since the information provided by the system are going to be checked at home as often as on-the-go, a phone app is more applicable than a tablet app. Therefore it is an obligatory requirement to optimise this application for the operation with the latest \emph{iOS} device generation, more specifically the \emph{iPhone 6}.
+
+To be able to ensure the usage of the latest features provided by the \emph{iOS} \gls{SDK} throughout the next couple of years, the application needs to be developed using the recently released programming language \gls{SWIFT}.
+
+\subsubsection{Web application}
+
+An administrator obviously needs to be able to provide the information requested by the member's app through the web application. This includes the possibility to schedule an event, and create user. The administrator needs to populate each user's profile with information provided by the user. On top of that the user needs to be able to modify the basic behaviour of the system as flexible as possible.
+
+Since the system is storing private user data is is necessary to secure the application and pursue the \gls{LeastPrivileges} principle. Therefore the log in should only be allowed for user that are at least second level administrators and these user should only be able to view users directly managed by them.
+
+As shown in section \vref{sec:UserAnalysis}, the administrator has only basic skills in using technology. Concluding the the above discussed functionalities need to be as straight forward as possible. It is especially difficult when trying to combine usability and flexibility. The implementation of this trade off has to be considered closely.
+
+\subsubsection{Back-end}
+
+Since the application needs to be accessed from different devices, only a 2- or 3-tier architecture is applicable for this system. After reviewing the findings in section \vref{sec:Architecture} the decision was made to use a 3-tier architecture, based on the possibility of a more sophisticated security policy and an advanced business logic. The design should also keep scalability in mind, to ensure the flexibility to manage growing clubs.
+
+To run the back-end application on a variety of operating systems the cross platform programming language \emph{Java} has been chosen. To take advantage of the latest features of \emph{Java} the 2014 released version 8 is going to be used within this project. To simplify the development of a web application with \emph{Java} the open-source \emph{Java Spring} framework was chosen. It is providing straight forward techniques to create a web server, which is incorporating sophisticated security features and the access of a durable data provider, which is also needed within this project.
 
 \subsection{Optional requirements} % nice-to-have
-The following requirements are optional, but their implementation is nice to have.
-\begin{itemize}
-\item The application should have a sophisticated graphical user interface through a web interface
-\item The administrator should be able to create divisions
-\item Each user should be able to be part of one or more divisions, to only receive relevant information.
-\item The system should support private chats for each division
-\item Invitations to events should be send to divisions
-\item The user should be able to request access to a division, this access is granted by a higher level user
-\item The user should be able to share photos that are relevant to the club
-\item The application should use push notifications to effectively alert the user about incoming messages, news or upcoming events
-\item The system should be designed to ensure extensibility
-\item The user should be able to optional create a public profile containing contact information
-\item The system should be designed to allow a multi-lingual implementation
-\item The administrator should be able to manage the divisional arrangement via the web interface
-\item The mobile application should be developed using Swift
-\item The mobile application should be created according to the Apple Developer Guidelines
-\end{itemize}
+The requirements presented in this section are not implicitly necessary for the system to work, nevertheless the overall usability of the system would be highly reduced, when these functionalities would not be part of the initial implementation.
+
+To enhance the convenience of the application, the organisation of user into divisions should be introduced. The administrator needs to be able to assign divisions to the user's profile through the web application. This includes the need of being able to create and modify the division. As discussed in \vref{sec:Functionality} the arrangement of the divisions needs to be as flexible as possible. This would enable the focus of received messages on certain topics, by automatically creating groups, according to the divisions a user is part of. Following the same principle, the invitation to events could be filtered using the membership of users within divisions.
+
+The web and \emph{iOS} applications should both have a user friendly and sophisticated user interface. This includes the need of a well designed navigation concept and a unified colour scheme. The details of the \gls{UI} design are presented in section \vref{sec:Wireframes}. 
+
+The platform should also support the sharing of user taken photos with the club's administration. Therefore the \emph{iOS} application needs to offer the ability to shoot photos, or select previously taken ones and upload them to the server. Additionally the administrator needs to be able to review the uploaded pictures and download them, so he can use them for any club related activity.
 
 \subsection{Additional requirements}
-The following requirements would improve the overall user experience, but their implementation is not business critical.
-\begin{itemize}
+\label{sec:AdditionalReq}
 
-\item The application could have a central news feed, which contains the latest information provided by the administrator
-\item The administrator could be able to publish relevant information through the web interface
-\item Approved user besides the administrator could be able to manage user or publish news and events
-\item The system could send an Email newsletter for members that are not owning a smartphone running iOS, or allow the print out of the newsletter for a non-digital distribution
-\item The events could support assignment of supporting roles needed during the event
-\item The events could support voting buttons to find the ideal date for the meeting
-\item The system could support the download of shared pictures
-\item The system could support the use of shared pictures within the news of the club
-\item The system could allow the administrator to share news through the clubs homepage using plugins within Joomla, Wordpress, Facebook or other systems.
-\item The application could be implemented bilingual (English, German)
-\item The system could have a second member type, that is allowed to publish news and events
-\item The application could be able to send and receive attachments in messages, like photos or audio messages
-\item The application could handle multiple accounts on different or on the same server
-\item The application could support the native resolution of different devices, like the iPad or the iPad mini
-\item The system could support the use of shared pictures within the news of the club
-\end{itemize}
+The following features are not required and their implementation is probably exceeding the time frame provided by this project. Nevertheless their definition is given here since they would increase the usability significantly. 
+
+The system could support the news feed feature addressed in section \vref{sec:Functionality}. On the one side, this would require the web application to enable the administrators to publish news and relate them to existing divisions. On the other side the \emph{iOS} application needs to be able to display a user specific news feed, presenting all relevant information. On top of that the backend could provide a \gls{RSS} feed, an automated email newsletter containing summaries of the published news, or extensions for blog hosting webpages, like \emph{Joomla} or \emph{Wordpress}. This would improve the integration of user, that do not own a supported smartphone, or do not want to directly participate with the system.
+
+The \emph{iOS} application could gain additional functionalities, including the possibility to access multiple \emph{myVerein} instances from a single device. This is due to the fact that people engaged in a club, might also engage in other clubs. If both of them are running an instance of \emph{myVerein} it would be very inconvenient for the user to constantly change between the accounts within the application. Additionally the application could be optimised for the operation on an \emph{iPad}, which would improve the usability, when using the application at home on this device.
 
 \subsection{Non-requirements} %need-not-to-have
-The following requirements are not in the scope of this product.
-\begin{itemize}
-\item The system is not designed to create a homepage for the club
-\item The application is not designed to provide access to non-members of a club
-\item The application is not designed to work without a server where the user is able to authenticate himself
-\item The system should not be used to collect statistics about the users
-\end{itemize}
 
-\section{Use cases}
-%Within this section the  use cases derived from the requirements defined in 
-To be added...
+It is important to delimit the functionalities of a system and therefore define ones that are NOT part of the development of a software. The following features fall into this category of non-requirements.
 
+The \emph{myVerein} system should not replace a club homepage. Therefore it should not provide any non-member facing functionalities or information. This means that the system is not replacing software packages like \emph{Joomla} or \emph{Wordpress}. Nevertheless as outlined in section \vref{sec:AdditionalReq}, it might be possible to integrate \emph{myVerein} into these systems.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+Finally the \emph{iOS} application is not designed to operate stand-alone, as a private club managing application. Therefore a user who wants to use the app needs to be part of a club, which installed, configured and uses the \emph{myVerein} environment.
 
 \section{Architectural model}
-After reviewing the findings in section \vref{sec:Architecture} and considering the requirements in section \vref{sec:Requirements} the decision was made to use a 3-tier architecture, based on the possibility of a more sophisticated security policy and an advanced business logic. The design was created, keeping scalability in mind. Figure \vref{fig:Architecture} shows the planned architecture of the system. 
+After evaluating the findings from section \vref{sec:Architecture}, in section \vref{sec:ObligatoryReq} the decision was made to use a 3-tier architecture, keeping scalability in mind. Figure \vref{fig:Architecture} shows the planned architecture of the system. 
 
 \begin{figure}[h]
   	\centering
   	\includegraphics[width=0.95\linewidth]{./images/architecture.png}
-  	\caption[System architecture (own figure)]{System architecture}
+  	\caption{System architecture, own figure}
 	\label{fig:Architecture}
 \end{figure}
 
@@ -580,25 +517,32 @@ The last screen, which is not described yet, is the settings tab. In this view, 
 
 
 \chapter{Implementation}
+\label{chapter:Implementation}
 Umsetzung (Wie sieht es am ende aus, besonderheiten, tests aus entwurf -> Def aus pflichtenheft)
-
-\section{Backend}
-\subsection{Database}
-\subsection{Business logic}
-
-\section{Front-end}
-\subsection{Web-Application}
-\subsection{iOS Application}
 
 \section{Logo and colour scheme}
 \label{sec:GUI}
 color, logo, GUI
 
+\section{Back-end}
+\subsection{Frameworks}
+\subsection{Business logic}
+\subsubsection{Messaging}
+\subsubsection{Division management}
+\subsubsection{User management}
+\subsubsection{Event management}
+\subsubsection{REST API}
+\subsection{Database}
+
+\section{Front-end}
+\subsection{Web-Application}
+\subsection{iOS Application}
+
 \chapter{Retrospection}
 
 What is done, what isn't, what would I do different next time?
 
-\chapter{Ongoing work}
+\chapter{Future work}
 \label{chapter:OngoingWork}
 Further development not mentioned in this work + monetarizing and automatic rollout
 ausblick (max 1/8 vom text)
