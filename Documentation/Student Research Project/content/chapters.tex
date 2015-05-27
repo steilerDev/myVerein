@@ -146,7 +146,7 @@ As shown in the last paragraph the importance of mobile applications rose tremen
 \end{figure}
 \nocite{OpenSignal:2014aa}
 
-As you can see in figure \vref{fig:MobileOSFragmentation}, the \emph{Android} platform seems more fragmented than the \emph{iOS} eco-system. This is due to the fact that the \gls{OS} is distributed by several vendors, who create device with different specification. On top of that the support for the latest version of the \gls{OS} is never guaranteed. Finally this will not only leave devices open for security vulnerabilities, but also increases the workload for the developer. As shown in figure \vref{fig:iOSOSFragmentation}, nearly 99\% of the \emph{iOS} devices were running the two latest versions of the \gls{OS} in 2014. In opposite to that, figure \ref{fig:AndroidOSFragmentation} shows that not even 50\% of the \emph{Android} devices use the three latest revisions of the platform. This fragmentation is also reflected by figure \vref{fig:MobileScreenFragmentation}, which is showing all screen sizes of mobile devices running \emph{Android}, respectively \emph{iOS}, as of 2014. Obviously \emph{Android} has more distinct screen sizes and aspect ratios than \emph{iOS}, which makes it more difficult for the developer to create a good \gls{UI}.
+As you can see in figure \vref{fig:MobileOSFragmentation}, the \emph{Android} platform seems more fragmented than the \emph{iOS} eco-system. This is due to the fact that the \gls{OS} is distributed by several vendors, who create device with different specification. On top of that the support for the latest version of the \gls{OS} is never guaranteed. Finally this will not only leave devices open for security vulnerabilities, but also increases the workload for the developer. As shown in figure \vref{fig:iOSOSFragmentation}, nearly 99\% of the \emph{iOS} devices were running the two latest versions of the \gls{OS} in 2014. In opposite to that, figure \ref{fig:AndroidOSFragmentation} shows that not even 50\% of the \emph{Android} devices use the three latest revisions of the platform. This fragmentation is also reflected by figure \vref{fig:MobileScreenFragmentation}, which is showing all screen sizes of mobile devices running \emph{Android}, respectively \emph{iOS}, as of 2014. Obviously \emph{Android} has more distinct screen sizes and aspect ratios than \emph{iOS}, which makes it more difficult for the developer to create a suitable \gls{UI}.
 
 \begin{figure}[h]
 	\centering
@@ -251,7 +251,7 @@ To increase usability, the user should always be aware of his current position w
 
 While all of this holds true in general the exceptions of these rules, are the concepts that a user is going to remember later. Although creating a new navigation concept, which is respecting only a subset of the above stated suggestions, or none of them, requires a lot of conceptional work. Besides that, the implementation of a non-standardised system also requires the need of starting from the scratch, which increases the workload drastically. \cite{Hampton-Smith:2013aa}
 
-Besides the consideration of different navigation concepts the overall design of the different functionalities were also considered. However for the sake of simplicity only their final designs are presented in chapter \vref{sec:Wireframes} and \vref{sec:GUI}. Especially since the formal definition of all functionalities, that are going to be implemented within this project, has not been given yet, this list would exceed the scope of this paper.
+Besides the consideration of different navigation concepts the overall design of the different functionalities were also considered. However for the sake of simplicity only their mockups and final designs are presented in chapter \vref{sec:Wireframes}, respectively  \vref{sec:FrontEnd}. Especially since the formal definition of all functionalities, that are going to be implemented within this project, has not been given yet, this list would exceed the scope of this paper.
 
 \subsection{iOS application}
 \label{sec:UIConceptiOS}
@@ -296,10 +296,39 @@ For the sake of simplicity only the layout of the chat overview page is going to
 
 Nevertheless the amount of available chats within \emph{myVerein} is very likely being limited to a foreseeable small quantity. Therefore, other concepts, besides the established list might be considered to increase the uniqueness and recognisability as well as usability. The proposed concept includes two circles per row with a caption, each representing an available chat. The chat with the latest message would be shown on the top left of the screen. Every chat bubble would have a caption stating the name of the division, whose chat it is representing. The image of the bubble would show the image representing the user, who sent the latest message. This might help the user to estimate the importance of the message. A \enquote{tap-and-hold} feature could also be included, showing a preview of the last couple of messages without entering the chat.
 
-\subsubsection{App icon}
-Maybe one of the most important visual items of a mobile application is its icon. It needs to be well designed, since the users are going to put it on his home screen and probably see it every day. On top of that it needs to be interesting enough to regularly click on it, but not too distractive. Lastly and most importantly the user needs to be able to look at the app icon and directly associated it with the product. \cite{Flarup:2015aa}
+\subsection{Visual branding concept}
+\label{sec:BrandingConcept}
 
-As shortly covered above it is essential to keep some things in mind when working on a good app icon for mobile phones. The first thing to note is scalability. When developing an application for \emph{iOS 8} a developer has to bundle 12 different resolution for the application icon and it has to look good in every one. Concluding \enquote{[o]verly complicated icons that try to cram too much onto the canvas often fall victim to bad scalability} \cite{Flarup:2015aa}, therefore the designer should embrace simplicity and check that the icon looks good on top of different background colours. \cite{Flarup:2015aa}
+To create a unique and recognisable brand it is important to have a visual branding scheme associated with it. For example, seeing a white tinted \enquote{F} in front of a blue background instantly leads to the \enquote{Facebook} brand. Therefore this section is devoted to the concept behind the creation of such a branding scheme. This includes the development of a colour scheme and an (app) icon.
+
+\subsubsection{Colour scheme}
+\label{sec:ColourConcept}
+
+The field of colour theory is a very complex one, therefore the time only permitted a very basic analysis on this specific matter. The first thing to note is that different colours have different very distinct meanings. In general a slight change in saturation might lead to a completely new impression of a colour \cite{Chapman:2010aa}. For example the colour red is considered as a violent or aggressive colour, while green is more balancing, relaxing and down to earth \cite{Chapman:2010aa}.
+
+\begin{figure}[h]
+  	\centering
+  	\includegraphics[width=0.5\linewidth]{./images/colorwheel.jpg}
+  	\caption{12-spoke colour wheel, retrieved from \cite{Chapman:2010ab}}
+	\label{fig:ColourWheel}
+\end{figure}
+
+After choosing an appropriate base colour, it is important to create a colour palette, since a single colour would make the application boring, and the developer would be unable to highlight certain entries using a different tint. There are several techniques to create a colour pattern. When using a \emph{Monochromatic} colour scheme the base colour is only altered using different tones, shades and tints \cite{Chapman:2010ab}. 
+
+
+Figure \vref{fig:ColourWheel} is showing a 12-spoke colour wheel, which is used when creating an \emph{Analogous} colour scheme. It is created by picking three colours that are next to each other and adjust their tones, shades and tints, just like the \emph{Monochromatic} colour scheme would do it \cite{Chapman:2010ab}. This scheme is creating a set of colours, that are very close to each other.
+
+Since the \emph{Analogous} colour scheme is sometimes regarded as being boring, since the colours are very similar, the \emph{Complementary} scheme introduces a wider range, by selecting the colour opposite of the base within the colour wheel \cite{Chapman:2010ab}. This one is most likely being very different to the base colour and adds depth to the palette.
+
+The most diverse colour scheme is called \emph{Tetradic} or \emph{Double-Complementary}. It is regarded as the most difficult scheme when trying to create an efficient palette \cite{Chapman:2010ab}. The scheme is \enquote{based on the tetrade — the foursome of colors evenly distributed on the fourths of the color wheel} \cite{Stanicek:2011aa}. Since this scheme is considered more nervous than the other ones \cite{Stanicek:2011aa}, the primary colour should be used for the main design, while the others are only sparely used for accents \cite{Chapman:2010ab}.
+
+\subsubsection{App icon}
+\label{sec:Icon}
+Maybe one of the most important visual items of an application is its icon. It needs to be well designed, since the users are going to put it on his home screens or desktops and probably see it every day. On top of that it needs to be interesting enough to regularly click on it, but not too distractive. Lastly and most importantly the user needs to be able to look at the icon and directly associated it with the product. \cite{Flarup:2015aa}
+
+Within this section we will only focus on the creation of an icon for the user facing \emph{iOS} app, since the web application does not necessarily need this icon, but might adopt it, to increase the visual connection between both of them.
+
+As shortly covered above it is essential to keep some things in mind when working on a good icon. The first thing to note is scalability. When developing an application for \emph{iOS 8} a developer has to bundle 12 different resolution for the application icon and it has to look good in every one. Concluding \enquote{[o]verly complicated icons that try to cram too much onto the canvas often fall victim to bad scalability} \cite{Flarup:2015aa}, therefore the designer should embrace simplicity and check that the icon looks good on top of different background colours. \cite{Flarup:2015aa}
 
 \begin{figure}[h]
   	\centering
@@ -325,28 +354,6 @@ Last but not least it is crucial to avoid text within an app icon. On the one ha
 After considering all of the above stated concerns and doing some brainstorming, the best suitable association and unique association with a club, that was found, was an emblem. Figure \vref{fig:AppSketch} is showing an early sketched, created during this session. This very generic object is widely used as a foundation for many logos of different clubs. By leaving the banner empty, it leaves space for the user to imagine his club name or description into it. 
 
 It was considered to form the emblem in a way to resemble to letter \enquote{V}. This could have let to an association with the application's name \emph{myVerein}, similar to the \emph{Facebook} logo. 
-
-\subsection{Colour scheme}
-
-Within the last sections we only looked at the different geometric aspects that can be altered within the application to change the visual appearance. Within this section another very important part of the \gls{UI} is considered: The colours used to tint the visual elements. 
-
-\begin{figure}[h]
-  	\centering
-  	\includegraphics[width=0.5\linewidth]{./images/colorwheel.jpg}
-  	\caption{12-spoke colour wheel, retrieved from \cite{Chapman:2010ab}}
-	\label{fig:ColourWheel}
-\end{figure}
-
-The field of colour theory is a very complex one, therefore the time only permitted a very basic analysis on this specific matter. The first thing to note is that different colours have different very distinct meanings. In general a slight change in saturation might lead to a completely new impression of a colour \cite{Chapman:2010aa}. For example the colour red is considered as a violent or aggressive colour, while green is more balancing, relaxing and down to earth \cite{Chapman:2010aa}.
-
-After choosing an appropriate base colour, it is important to create a colour palette, since a single colour would make the application boring, and the developer would be unable to highlight certain entries using a different tint. There are several techniques to create a colour pattern. When using a \emph{Monochromatic} colour scheme the base colour is only altered using different tones, shades and tints \cite{Chapman:2010ab}. 
-
-
-Figure \vref{fig:ColourWheel} is showing a 12-spoke colour wheel, which is used when creating an \emph{Analogous} colour scheme. It is created by picking three colours that are next to each other and adjust their tones, shades and tints, just like the \emph{Monochromatic} colour scheme would do it \cite{Chapman:2010ab}. This scheme is creating a set of colours, that are very close to each other.
-
-Since the \emph{Analogous} colour scheme is sometimes regarded as being boring, since the colours are very similar, the \emph{Complementary} scheme introduces a wider range, by selecting the colour opposite of the base within the colour wheel \cite{Chapman:2010ab}. This one is most likely being very different to the base colour and adds depth to the palette.
-
-The most diverse colour scheme is called \emph{Tetradic} or \emph{Double-Complementary}. It is regarded as the most difficult scheme when trying to create an efficient palette \cite{Chapman:2010ab}. The scheme is \enquote{based on the tetrade — the foursome of colors evenly distributed on the fourths of the color wheel} \cite{Stanicek:2011aa}. Since this scheme is considered more nervous than the other ones \cite{Stanicek:2011aa}, the primary colour should be used for the main design, while the others are only sparely used for accents \cite{Chapman:2010ab}.
 
 \chapter{Design}
 \label{chapter:Design}
@@ -525,14 +532,58 @@ In general releasing a software under an open-source license has three major ben
 
 \chapter{Implementation}
 \label{chapter:Implementation}
-Umsetzung (Wie sieht es am ende aus, besonderheiten, tests aus entwurf -> Def aus pflichtenheft)
+Within this chapter the final implementation is presented. All findings of the previous chapters build up to the execution described here. Because of technical difficulties and a limited amount of time, certain things discussed in \vref{chapter:Design} had to be discarded or changed. Nevertheless most of the requirements could be realised. It is important to note that the time did not permit an extensive testing phase, therefore this software should be considered as an early beta product. There are several known issues at the time of this writeup, which can be found within \emph{Github}'s bug-tracker located at \url{https://www.github.com/steilerDev/myVerein/issues}.
 
-\section{Logo and colour scheme}
-\label{sec:GUI}
-color, logo, GUI
+\section{Visual branding}
+As discussed in section \vref{sec:BrandingConcept} the branding and therefore recognisability of a brand is one of the most important part of creating a new system, that needs to be placed on the market. 
+
+\subsection{Color scheme}
+After considering the findings in section \vref{sec:ColourConcept} the author decided to use a \emph{Tetradic} colour scheme. The base colour should be the most dominant one, where the other three ones should be used to draw the user's attention. 
+
+
+MORE COLOR THEORY!
+
+After considering different colour tones as base colour, the decision was made to go for a soft green colour, more specificly the one defined through the hex code \texttt{0x13CD78}. It was chosen, because of it's calming property, which qualifies it for a base colour and based on the fact that the author liked the tone very much.
+
+\begin{figure}[h]
+  	\centering
+  	\includegraphics[width=0.95\linewidth]{./images/architecture.png}
+  	\caption{Colour scheme created using \cite{Paletton:2015aa}}
+	\label{fig:ColourScheme}
+\end{figure}
+
+Figure \vref{fig:ColourScheme} shows the applied \emph{Tetradic} method on the above mentioned base colour. The three other colours, which fit very well to each other, are very suitable to draw attention in a green/white dominated environment, that is going to be created within the \emph{web} and \emph{iOS} app. The blue colours are going to be used for general information, where the orange tones are used for warning and the red ones for errors.
+
+\subsection{Logo}
+Using the colour scheme presented in the previous chapter, a logo, used among others as app icon, is going to be presented within this section. The concept shown in section \vref{sec:Icon} was selected and advanced. 
+
+\begin{figure}[h]
+  	\centering
+  	\includegraphics[width=0.45\linewidth]{./images/logo-final.png}
+  	\caption{Final logo and app icon, own figure}
+	\label{fig:Logo}
+\end{figure}
+
+Figure \vref{fig:Logo} is showing the final logo, which is similar to early concept shown in figure \vref{fig:AppSketch}. The only main difference is the adoption of the system wide colour scheme. The logo itself is therefore kept very simple and flat, while adding a 3D effect through the banner, making it more interesting. The dominant colour of the logo is the base colour of the brand's colour scheme, which is used to create a strong connection with the application itself.
+
+\begin{figure}[h]
+  	\centering
+  	\includegraphics[width=0.6\linewidth]{./images/icon-context.png}
+  	\caption{App icon within context and \emph{iOS} guideline grind, created using \emph{Pixel Resort}'s template}
+	\label{fig:IconFinal}
+\end{figure}
+
+Finally the simplicity and lack of writing allows the logo to scale perfectly. Actually the logo was created using a vector program, allowing it to scale in any possible way. Figure \vref{fig:IconFinal} shows the final icon rendered using the different resolutions and context it is going to appear within the \gls{OS}. Important to note is, that the icon itself is backgrounded by a gradient going from the green base colour on the upper left to the blue alternative colour of the scheme in the bottom right.
 
 \section{Back-end}
+The architecture of the system presented in section \vref{sec:Architecture} did not change during the implementation. Therefore the back-end was created using the Java programming language and with the aspect of scalability in mind. The development of the server is presented in this section, highlighting the most important parts of the system, but not going into every detail.
+
 \subsection{Frameworks}
+\label{sec:FrameworksServer}
+
+In todays world a lot of open-source frameworks are available to simplify the creation of complex systems, by providing fundamental functionalities. To efficiently manage the growing amount of dependencies within such a project a dependency management framework is highly recommended. By using the state-of-the-art \emph{Maven 3} framework managing third party libraries and their version is highly simplified. Especially when working within a time this management system is ensuring, that every developer is using the exact same version of a library, without the need of pushing it into the version controlling system. It also helps to keep track of the currently used version and might help migrating to never revisions.
+
+\subsection{Scalability}
 \subsection{Business logic}
 \subsubsection{Messaging}
 \subsubsection{Division management}
@@ -542,6 +593,7 @@ color, logo, GUI
 \subsection{Database}
 
 \section{Front-end}
+\label{sec:FrontEnd}
 \subsection{Web-Application}
 \subsection{iOS Application}
 
