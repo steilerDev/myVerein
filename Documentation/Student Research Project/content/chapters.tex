@@ -64,21 +64,21 @@ The usability engineering describes 2 major kinds of methods to analyse an user:
 
 For this project the \emph{Persona} method was used to perform a user analysis. Personae are several relevant users, described by their archetypal properties. Additionally their behaviour and objectives are presented \cite[p. 30]{Gulzow:2015aa}. This method is useful since the developer gets a better picture of the people using his application later and can therefor focus on their needs. Within this sections three key personae are presented, which are used in section \vref{sec:Requirements} to identify the requirements on the system. These presented findings are mainly based on personal experience, as well as information received by different club administrators. The personae are ordered from the most to the least relevant one.
 
-\subsubsection{Jacob - 41}
+\paragraph{Jacob - 41}
 \label{sec:Jacob}
 
 Jacob is father of two and lives in a small house with his family in the outskirts of a small German town. Besides his work at a global oriented medium sized technology company, he is a volunteering member at the local sports club. Generally speaking he is technology affine, but not an expert. His honorary post is managing all members of the club. This includes the listing of all active and passive members, as well as ensuring that everyone paid their membership fees. Additionally he has the responsibility to invite all members to events organised by the club. 
 
 The utilities Jacob is using to do his job at the club include an Excel sheet with all names and contact details, as well as a Word template for his invitations for several events. Recently he created an email distribution list to save the money he always spend on mailing the paper letters. Besides a handful older members everyone is receiving these emails. Nevertheless the constantly changing club structure and contact details are hard to manage and he spends a lot of time updating his member list.
 
-\subsubsection{Marie - 21}
+\paragraph{Marie - 21}
 Marie is a student and recently moved out of her parent's house. She is an active soccer player since nearly 10 years at the sport club. Unfortunately she often misses special events organised by her club, because in the past she barely paid attention to the club mail, handled by her parents. Since she receives emails from her club on her smartphone she regularly updates her calendar according to the events, but slowly gets annoyed by the amount of data she has to organise besides her studies.
 
 On top of that she is part of a \emph{WhatsApp} group dedicated to her team where all kinds of topics are discussed, ranging from the last party to the next game. Over and above a soccer group dedicated to her club was created on \emph{Facebook}, where additional information are shared.
 
 Since she just shortly changed her address she is tying to get her new contact details registered at the club. Unfortunately after asking her coach and the head of the club to change the information she is currently waiting for a conformation from Jacob about the successful change. All in all she is not very satisfied with the current infrastructure and possibilities offered by the club.
 
-\subsubsection{Karl - 58}
+\paragraph{Karl - 58}
 Karl is a farther of 2 and grandfather of 5. He had lived together with his wife in the same house for nearly 30 years. Even longer he has been a part of the local sports club. Because of his age he is not as active as he used to be, but he helps everywhere he can. The electrician plays an important part in maintaining the club house and supporting teams during their game days.
 
 Even though he owns a PC, which was a present from his children, he is not very confident using it. Therefore he does not receive any information through email, but through traditional non-electronic mail, as well as through personal contact with the responsible parties.  
@@ -420,6 +420,7 @@ The \emph{myVerein} system should not replace a club homepage. Therefore it shou
 Finally the \emph{iOS} application is not designed to operate stand-alone, as a private club managing application. Therefore a user who wants to use the app needs to be part of a club, which installed, configured and uses the \emph{myVerein} environment.
 
 \section{Architectural model}
+\label{sec:ArchitecturalModel}
 After evaluating the findings from section \vref{sec:Architecture}, in section \vref{sec:ObligatoryReq} the decision was made to use a 3-tier architecture, keeping scalability in mind. Figure \vref{fig:Architecture} shows the planned architecture of the system. 
 
 \begin{figure}[h]
@@ -431,7 +432,7 @@ After evaluating the findings from section \vref{sec:Architecture}, in section \
 
 The central server software is written in \emph{Java 8} and uses the \emph{Java Spring} framework. This mature open source framework provides sophisticate security configurations as well as several access frameworks for data provider. On top of this platform several other additional frameworks are available, including messaging and social media connection, that can be used to easily extent the functionalities of the application. The complete business logic is implemented on top of this framework.
 
-Since the server application needs to be run within the \gls{JVM} and be able to communicate with other machines, an application server is neccessary. For this test environment a \emph{Tomcat 8} application server was chosen to host the application. For the possibility to easily and efficient server static content, the application server is connected to an Apache web server using the \gls{AJP}. 
+Since the server application needs to be run within the \gls{JVM} and be able to communicate with other machines, an application server is necessary. For this test environment a \emph{Tomcat 8} application server was chosen to host the application. For the possibility to easily and efficient server static content, the application server is connected to an Apache web server using the \gls{AJP}. 
 
 The data provider was chosen to be a \emph{MongoDB} \gls{NoSQL} database system. This schema free database enables flexibility, as well as extensibility and speed, which is not comparable to existing relational database applications \cite{Moschetti:2014aa}. The database itself is connected with the server application using the \emph{Spring Data} framework, which supports the use of \emph{MongoDB}. This framework provides a concise and object oriented access to the database using the native \emph{Java} driver developed by \emph{MongoDB}. Most importantly it integrates very well into the \emph{Java Spring} framework.
 
@@ -444,8 +445,9 @@ The web application is intended to be used by the administrator only to manage t
 The iOS application's target group are the member's of the clubs using this system. The application is going to be developed using \emph{Apple}'s new programming language \gls{SWIFT}. Additionally the dependency manager \emph{CocoaPods} is going to be used for adding existing frameworks to the project. This is done to simplify the development of the application, while increasing the usability.
 
 \section{Database layout}
+\label{sec:DatabaseLayout}
 
-As presented in section \vref{sec:Architecture} the data provider used for this project is going to be the \gls{NoSQL} database system \emph{MongoDB}. Even though this system uses a dynamic schema, it is important to model the organisation of the data in advance, to later ensure a reliant and consistent operation. Nevertheless this schema is very likely going to change during development, but the dynamic aspect is very helpful within the context of this agile development approach.
+As presented in section \vref{sec:ArchitecturalModel} the data provider used for this project is going to be the \gls{NoSQL} database system \emph{MongoDB}. Even though this system uses a dynamic schema, it is important to model the organisation of the data in advance, to later ensure a reliant and consistent operation. Nevertheless this schema is very likely going to change during development, but the dynamic aspect is very helpful within the context of this agile development approach.
 
 A database schema can be depicted using an \gls{ER} diagram. This visual representation of a database layout was originally introduced for relational databases, nevertheless it was adopted for this work into the context of \gls{NoSQL} databases. The diagram created during the design phase and used as orientation during the development can be found in appendix \vref{app:ERDesignPhase}. It is important to note, that during the design of the database schema all requirements discussed in \vref{sec:Requirements} have been considered.
 
@@ -576,21 +578,62 @@ Figure \vref{fig:Logo} is showing the final logo, which is similar to early conc
 Finally the simplicity and lack of writing allows the logo to scale perfectly. Actually the logo was created using a vector program, allowing it to scale in any possible way. Figure \vref{fig:IconFinal} shows the final icon rendered using the different resolutions and context it is going to appear within the \gls{OS}. Important to note is, that the icon itself is backgrounded by a gradient going from the green base colour on the upper left to the blue alternative colour of the scheme in the bottom right.
 
 \section{Back-end}
-The architecture of the system presented in section \vref{sec:Architecture} did not change during the implementation. Therefore the back-end was created using the Java programming language and with the aspect of scalability in mind. The development of the server is presented in this section, highlighting the most important parts of the system, but not going into every detail.
+The architecture of the system presented in section \vref{sec:ArchitecturalModel} did not change during the implementation. Therefore the back-end was created using the Java programming language and with the aspect of scalability in mind. The development of the server is presented in this section, highlighting the most important parts of the system, but not going into every detail.
 
 \subsection{Frameworks}
 \label{sec:FrameworksServer}
 
-In todays world a lot of open-source frameworks are available to simplify the creation of complex systems, by providing fundamental functionalities. To efficiently manage the growing amount of dependencies within such a project a dependency management framework is highly recommended. By using the state-of-the-art \emph{Maven 3} framework managing third party libraries and their version is highly simplified. Especially when working within a time this management system is ensuring, that every developer is using the exact same version of a library, without the need of pushing it into the version controlling system. It also helps to keep track of the currently used version and might help migrating to never revisions.
+In todays world a lot of open-source frameworks are available to simplify the creation of complex systems, by providing fundamental functionalities. To efficiently manage the growing amount of dependencies within such a project, a dependency management framework is highly recommended. By using the state-of-the-art \emph{Maven 3} framework managing third party libraries and their versions is highly simplified. Especially when working within a team, this management system is ensuring, the usage of the same library versions across the team, without the need of pushing them into the version controlling system. It also helps to keep track of the currently used version and might help migrating to never revisions. To simplify this project several well tested frameworks have been used.
+
+The most dominant framework used is called \emph{Spring}. This suite of frameworks is aiming on simplifying \emph{Java} and \emph{Java EE} application. Three main branches of \emph{Spring} have been used: The first one is the \emph{Spring WebMVC} framework, enabling the fast development of \gls{MVC} conform web applications. The second one is the \emph{Spring Data MongoDB} framework, allowing an easy and object oriented access of the database. For more information see section \vref{sec:ImplementationDB}. Finally the \emph{Spring Security} framework is the last \emph{Spring} framework used within the project, providing a concise interface for securing the platform. A detailed presentation on the used policies is shown in section \vref{sec:ImplementationSec}.
+
+Another very important aspect during development is logging. The logging overhead should be as small as possible, to reduce a performance impact on the application. Nevertheless a sufficient amount of log messages need to be written, to simplify the process of backtracking bugs and security breaches. To combine these two requirements a professional logging framework is necessary. One of the most important logging frameworks within the \emph{Java} programming language is \emph{Log4j2}. It provides an easy interface, is highly customisable and delivers a high performance. Additionally the \emph{SLF4J} bridging framework was used, enabling the inclusion of logging messages from 3\textsuperscript{rd} party libraries like \emph{Spring}.
+
+The configuration of the logging framework is possible by manipulating the \texttt{log4j2.xml}, located within the class path. A manually added \texttt{log4j2.xml} always overwrites the default one provided by application. The configuration file for this project can be found in appendix \vref{app:log4jConf}. It has a third party log level of \enquote{Info} and a log level of the \emph{myVerein} application of \enquote{Trace}. The log is written to the \texttt{stdout} (in general this is the console) and into a rolling file called \texttt{myVerein.log}, located within the default tomcat log directory. This log file can be analysed to find vulnerabilities of the application.
 
 \subsection{Scalability}
+
+As shown in section \vref{sec:ArchitecturalModel}, one instance of the \emph{myVerein} system should be able to run on multiple servers at the same time. The load should be distributed on the servers using a load balancer. By enforcing this architecture the platform is able to dynamically scale, depending on the workload on the system.
+
+This kind of architecture is only possible if each instance of the server is stateless and retrieves all variable settings from a central data repository. By using this technique any settings change made to one system is instantly adopted by instances. 
+
+\begin{lstlisting}[caption = "Example layout of settings document", label=lst:SettingsDoc]
+{
+	"clubName" : "myVerein", 
+	"initialSetup" : false, 
+	"customUserFields" : [
+		"Membership Number",
+		"Nickname"
+	],
+	"rootDivision" : DBRef("division", ObjectId("553f92eb45661c558b00c0e9")) 
+}
+\end{lstlisting}
+
+This behaviour is realised by storing all settings within a dedicated document store on the MongoDB data provider. Listing \vref{lst:SettingsDoc} shows an example document within the settings document store. The available settings are currently very limited and only provide the possibility to set a club name, define the root division and add custom fields to every user profile. It is important to note that there is only one document allowed within the document store, since the systems cannot know which of the documents to choose. As soon as an instance encounters more than one document, every document but the first retrieved one is removed and a warning is issued. 
+
+Of course a stand alone instance cannot know how to access the database. One way to solve this problem would be to hard code the information about the data provider within the source code, but that would lead to a low customisability. Therefore every instance has a local \texttt{myVerein.properties} file within their resources folder, which is loaded during start up. This files holds the information about the hostname, port, username, password and database name of the \emph{MongoDB}. The remaining \texttt{developmentMode} property is only important for debugging purposes and decides if the server should server the minified versions of the \emph{JavaScript} files or the larger, non-minified ones. Concluding the only thing that needs to be modified when adding a new instance to a cluster is this properties file.
+
+An initial setup is only possible, if there is no document within the settings document store of the database, specified by the above mentioned properties file, or if this document's \texttt{initialSetup} flag is set to true. If either of the previous properties holds true, the access of the index page will present a page, leading through the initial setup. When specifying all required information, the provided database is going to get dropped and the system needs to be restarted manually. This method is used when trying to reset the system through the settings page of the administration panel. 
+
+\subsection{Database}
+\label{sec:ImplementationDB}
+
+In the first part of this section the final layout of the database is presented, and the second part is showing the object-oriented mapping provided by the \emph{Spring Data} framework. The decision made in section \vref{sec:ArchitecturalModel} did not change during the implementation and therefore the data-provider is the \gls{NoSQL} database \emph{MongoDB}.
+
+\subsubsection{Final layout}
+
+In section \vref{sec:DatabaseLayout} the initial layout of the data provider was presented and explained. Even though the planning was well-conceived, some functionalities had to be changed, because of unforeseen technical difficulties or changes within the feature set. The final \gls{ER} diagram can be found in appendix \vref{app:ERFinal}. The differences between the final layout and the one presented in section \vref{sec:DatabaseLayout} are going to be discussed in this section.
+
+\subsubsection{Spring Data}
+
+\subsection{Security}
+\label{sec:ImplementationSec}
 \subsection{Business logic}
 \subsubsection{Messaging}
 \subsubsection{Division management}
 \subsubsection{User management}
 \subsubsection{Event management}
 \subsubsection{REST API}
-\subsection{Database}
 
 \section{Front-end}
 \label{sec:FrontEnd}
