@@ -1,0 +1,69 @@
+<html>
+<head>
+<title>log4j2.xml</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.ln { color: rgb(0,0,0); font-weight: normal; font-style: normal; }
+.s0 { color: rgb(232,191,106); }
+.s1 { color: rgb(186,186,186); }
+.s2 { color: rgb(165,194,97); }
+.s3 { color: rgb(169,183,198); }
+</style>
+</head>
+<BODY BGCOLOR="#2b2b2b">
+<TABLE CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#C0C0C0" >
+<TR><TD><CENTER>
+<FONT FACE="Arial, Helvetica" COLOR="#000000">
+log4j2.xml</FONT>
+</center></TD></TR></TABLE>
+<pre>
+
+<a name="l1"><span class="ln">1    </span></a><span class="s0">&lt;?</span><span class="s1">xml version</span><span class="s2">=&quot;1.0&quot; </span><span class="s1">encoding</span><span class="s2">=&quot;UTF-8&quot;</span><span class="s0">?&gt;</span><span class="s3"> 
+<a name="l2"><span class="ln">2    </span></a></span><span class="s0">&lt;Configuration </span><span class="s1">status</span><span class="s2">=&quot;WARN&quot;</span><span class="s0">&gt;</span><span class="s3"> 
+<a name="l3"><span class="ln">3    </span></a>    </span><span class="s0">&lt;Properties&gt;</span><span class="s3"> 
+<a name="l4"><span class="ln">4    </span></a>        </span><span class="s0">&lt;Property </span><span class="s1">name</span><span class="s2">=&quot;third-party-log-level&quot;</span><span class="s0">&gt;</span><span class="s3">info</span><span class="s0">&lt;/Property&gt;</span><span class="s3"> 
+<a name="l5"><span class="ln">5    </span></a>    </span><span class="s0">&lt;/Properties&gt;</span><span class="s3"> 
+<a name="l6"><span class="ln">6    </span></a> 
+<a name="l7"><span class="ln">7    </span></a>    </span><span class="s0">&lt;Appenders&gt;</span><span class="s3"> 
+<a name="l8"><span class="ln">8    </span></a>        </span><span class="s0">&lt;Console </span><span class="s1">name</span><span class="s2">=&quot;console&quot; </span><span class="s1">target</span><span class="s2">=&quot;SYSTEM_OUT&quot;</span><span class="s0">&gt;</span><span class="s3"> 
+<a name="l9"><span class="ln">9    </span></a>            </span><span class="s0">&lt;PatternLayout </span><span class="s1">pattern</span><span class="s2">=&quot;%d{ISO8601} %p [%t] %c{1} [%M] - %m%throwable{short}%n&quot;</span><span class="s0">/&gt;</span><span class="s3"> 
+<a name="l10"><span class="ln">10   </span></a>        </span><span class="s0">&lt;/Console&gt;</span><span class="s3"> 
+<a name="l11"><span class="ln">11   </span></a> 
+<a name="l12"><span class="ln">12   </span></a>        </span><span class="s0">&lt;RollingFile </span><span class="s1">name</span><span class="s2">=&quot;tomcat-file-log&quot; </span><span class="s1">fileName</span><span class="s2">=&quot;${sys:catalina.base}/logs/myVerein.log&quot; </span><span class="s1">filePattern</span><span class="s2">=&quot;myVerein-%d{yyyy-MM-dd}.log&quot; </span><span class="s1">append</span><span class="s2">=&quot;true&quot;</span><span class="s0">&gt;</span><span class="s3"> 
+<a name="l13"><span class="ln">13   </span></a>            </span><span class="s0">&lt;PatternLayout </span><span class="s1">pattern</span><span class="s2">=&quot;%d{ISO8601} %p [%t] %c{1} [%M] - %m%throwable{short}%n&quot;</span><span class="s0">/&gt;</span><span class="s3"> 
+<a name="l14"><span class="ln">14   </span></a>            </span><span class="s0">&lt;Policies&gt;</span><span class="s3"> 
+<a name="l15"><span class="ln">15   </span></a>                </span><span class="s0">&lt;TimeBasedTriggeringPolicy </span><span class="s1">interval</span><span class="s2">=&quot;1&quot; </span><span class="s1">modulate</span><span class="s2">=&quot;true&quot;</span><span class="s0">/&gt;</span><span class="s3"> 
+<a name="l16"><span class="ln">16   </span></a>                </span><span class="s0">&lt;SizeBasedTriggeringPolicy </span><span class="s1">size</span><span class="s2">=&quot;50 MB&quot; </span><span class="s0">/&gt;</span><span class="s3"> 
+<a name="l17"><span class="ln">17   </span></a>            </span><span class="s0">&lt;/Policies&gt;</span><span class="s3"> 
+<a name="l18"><span class="ln">18   </span></a>        </span><span class="s0">&lt;/RollingFile&gt;</span><span class="s3"> 
+<a name="l19"><span class="ln">19   </span></a>    </span><span class="s0">&lt;/Appenders&gt;</span><span class="s3"> 
+<a name="l20"><span class="ln">20   </span></a> 
+<a name="l21"><span class="ln">21   </span></a>    </span><span class="s0">&lt;Loggers&gt;</span><span class="s3"> 
+<a name="l22"><span class="ln">22   </span></a>        </span><span class="s0">&lt;Logger </span><span class="s1">name</span><span class="s2">=&quot;de.steilerdev.myVerein&quot; </span><span class="s1">level</span><span class="s2">=&quot;trace&quot; </span><span class="s0">/&gt;</span><span class="s3"> 
+<a name="l23"><span class="ln">23   </span></a> 
+<a name="l24"><span class="ln">24   </span></a>        </span><span class="s0">&lt;Logger </span><span class="s1">name</span><span class="s2">=&quot;org.springframework.core&quot; </span><span class="s1">level</span><span class="s2">=&quot;${third-party-log-level}&quot; </span><span class="s0">/&gt;</span><span class="s3"> 
+<a name="l25"><span class="ln">25   </span></a> 
+<a name="l26"><span class="ln">26   </span></a>        </span><span class="s0">&lt;Logger </span><span class="s1">name</span><span class="s2">=&quot;org.springframework.data.mongodb&quot; </span><span class="s1">level</span><span class="s2">=&quot;${third-party-log-level}&quot; </span><span class="s0">/&gt;</span><span class="s3"> 
+<a name="l27"><span class="ln">27   </span></a> 
+<a name="l28"><span class="ln">28   </span></a>        </span><span class="s0">&lt;Logger </span><span class="s1">name</span><span class="s2">=&quot;org.springframework.beans&quot; </span><span class="s1">level</span><span class="s2">=&quot;${third-party-log-level}&quot; </span><span class="s0">/&gt;</span><span class="s3"> 
+<a name="l29"><span class="ln">29   </span></a> 
+<a name="l30"><span class="ln">30   </span></a>        </span><span class="s0">&lt;Logger </span><span class="s1">name</span><span class="s2">=&quot;org.springframework.context&quot; </span><span class="s1">level</span><span class="s2">=&quot;${third-party-log-level}&quot; </span><span class="s0">/&gt;</span><span class="s3"> 
+<a name="l31"><span class="ln">31   </span></a> 
+<a name="l32"><span class="ln">32   </span></a>        </span><span class="s0">&lt;Logger </span><span class="s1">name</span><span class="s2">=&quot;org.springframework.http&quot; </span><span class="s1">level</span><span class="s2">=&quot;${third-party-log-level}&quot; </span><span class="s0">/&gt;</span><span class="s3"> 
+<a name="l33"><span class="ln">33   </span></a> 
+<a name="l34"><span class="ln">34   </span></a>        </span><span class="s0">&lt;Logger </span><span class="s1">name</span><span class="s2">=&quot;org.springframework.web&quot; </span><span class="s1">level</span><span class="s2">=&quot;${third-party-log-level}&quot; </span><span class="s0">/&gt;</span><span class="s3"> 
+<a name="l35"><span class="ln">35   </span></a> 
+<a name="l36"><span class="ln">36   </span></a>        </span><span class="s0">&lt;Logger </span><span class="s1">name</span><span class="s2">=&quot;org.springframework.security&quot; </span><span class="s1">level</span><span class="s2">=&quot;${third-party-log-level}&quot; </span><span class="s0">/&gt;</span><span class="s3"> 
+<a name="l37"><span class="ln">37   </span></a> 
+<a name="l38"><span class="ln">38   </span></a>        </span><span class="s0">&lt;Logger </span><span class="s1">name</span><span class="s2">=&quot;org.thymeleaf.TemplateEngine&quot; </span><span class="s1">level</span><span class="s2">=&quot;${third-party-log-level}&quot; </span><span class="s0">/&gt;</span><span class="s3"> 
+<a name="l39"><span class="ln">39   </span></a> 
+<a name="l40"><span class="ln">40   </span></a>        </span><span class="s0">&lt;Logger </span><span class="s1">name</span><span class="s2">=&quot;com.relayrides.pushy&quot; </span><span class="s1">level</span><span class="s2">=&quot;trace&quot; </span><span class="s0">/&gt;</span><span class="s3"> 
+<a name="l41"><span class="ln">41   </span></a> 
+<a name="l42"><span class="ln">42   </span></a>        </span><span class="s0">&lt;Root </span><span class="s1">level</span><span class="s2">=&quot;error&quot;</span><span class="s0">&gt;</span><span class="s3"> 
+<a name="l43"><span class="ln">43   </span></a>            </span><span class="s0">&lt;AppenderRef </span><span class="s1">ref</span><span class="s2">=&quot;console&quot;</span><span class="s0">/&gt;</span><span class="s3"> 
+<a name="l44"><span class="ln">44   </span></a>            </span><span class="s0">&lt;AppenderRef </span><span class="s1">ref</span><span class="s2">=&quot;tomcat-file-log&quot;</span><span class="s0">/&gt;</span><span class="s3"> 
+<a name="l45"><span class="ln">45   </span></a>        </span><span class="s0">&lt;/Root&gt;</span><span class="s3"> 
+<a name="l46"><span class="ln">46   </span></a>    </span><span class="s0">&lt;/Loggers&gt;</span><span class="s3"> 
+<a name="l47"><span class="ln">47   </span></a></span><span class="s0">&lt;/Configuration&gt;</span></pre>
+</body>
+</html>

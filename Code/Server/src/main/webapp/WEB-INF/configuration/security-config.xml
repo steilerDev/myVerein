@@ -64,7 +64,8 @@
         </http>
 
         <!-- Remember me configuration -->
-        <beans:bean id="rememberMeServices" class="org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices">
+        <beans:bean id="rememberMeServices"
+                    class="org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices">
             <beans:constructor-arg value="myVereinRememberMeKey"/>
             <beans:constructor-arg ref="userAuthenticationService"/>
             <beans:constructor-arg ref="tokenDataProvider"/>
@@ -80,7 +81,8 @@
 
         <!-- Authentication configuration -->
         <authentication-manager>
-              <!--  Plain text authentication without database as a fall back solution if a password got lost, or the system compromised -->
+              <!--  Plain text authentication without database as a fall back solution if
+                    a password got lost, or the system compromised -->
               <authentication-provider>
                      <user-service properties="classpath:myVereinUser.properties" />
               </authentication-provider>

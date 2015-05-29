@@ -467,19 +467,19 @@ Divisions are organised hierarchical within a club, so this structure has to be 
 
 Each division is administrated by up to one user, who gains access to the administrator panel through this position. If there is no administrator specified, the super admin takes his role. This super user is defined by being administrator of the root division.
 
-\subsection{Messages}
+\subsection{Message}
 Each member of a division automatically joins a group chat between all members of this division. To ensure privacy for each chat, messages are only saved on the server as long as necessary. Therefore a \emph{Message stack} document store is created. Every sent message is stored there until the recipient accesses it, or the system deletes the message after its expiration. The expiration of the message is handled by MongoDB through the functionality to set a Time-To-Life for collections \cite[p. 198]{Mongo:2014aa}.
 
 Each entry contains the message to one member of the group chat. When the user syncs his application with the server, the server returns all messages from the stack for the user. The rows are deleted as soon as the user receives the message. 
 
-\subsection{Events}
+\subsection{Event}
 A core feature of the application is the creation and management of events for each division. The events are managed within the \emph{Event} data store. An event invites whole divisions, and every member can send a response to the invitation. 
 
 The invited divisions are stored as embedded documents according to the \emph{One-to-Many Relationships with Embedded Documents} model \cite[p. 141]{Mongo:2014aa}, because it is unlikely that the user is going to add values to that field. If the amount of data added to these fields extends the reserved space for the document, the database has to reallocate the space, which leads to fragmentation and a slow write performance. Concluding the responses of the users is stored according to the \emph{One-to-Many Relationships with Document References} model \cite[p. 143]{Mongo:2014aa}, since these fields are constantly extended.
 
 The database is trying to keep the used storage low and therefore tries to delete all events that have already passed. Besides that the event has several properties, e.g. a short description, a location, the date of the event and its last change.
 
-\subsection{Pictures}
+\subsection{Picture}
 Since the user is able to upload pictures that are relevant to the club, a document store is created to manage these pictures. The picture's metadata is handled through that store, as well as the URL pointing to the file and an array with tags for the picture.
 
 Each picture is uploaded by a specific user and the user can associate up to one division to the picture.
@@ -589,9 +589,10 @@ The most dominant framework used is called \emph{Spring}. This suite of framewor
 
 Another very important aspect during development is logging. The logging overhead should be as small as possible, to reduce a performance impact on the application. Nevertheless a sufficient amount of log messages need to be written, to simplify the process of backtracking bugs and security breaches. To combine these two requirements a professional logging framework is necessary. One of the most important logging frameworks within the \emph{Java} programming language is \emph{Log4j2}. It provides an easy interface, is highly customisable and delivers a high performance. Additionally the \emph{SLF4J} bridging framework was used, enabling the inclusion of logging messages from 3\textsuperscript{rd} party libraries like \emph{Spring}.
 
-The configuration of the logging framework is possible by manipulating the \texttt{log4j2.xml}, located within the class path. A manually added \texttt{log4j2.xml} always overwrites the default one provided by application. The configuration file for this project can be found in appendix \vref{app:log4jConf}. It has a third party log level of \enquote{Info} and a log level of the \emph{myVerein} application of \enquote{Trace}. The log is written to the \texttt{stdout} (in general this is the console) and into a rolling file called \texttt{myVerein.log}, located within the default tomcat log directory. This log file can be analysed to find vulnerabilities of the application.
+The configuration of the logging framework is possible by manipulating the \texttt{log4j2.xml}, located within the class path. A manually added \texttt{log4j2.xml} always overwrites the default one provided by application. The configuration file for this project can be found in appendix \vref{app:log4jConf}. It has a third party log level of \enquote{Info} defined in line 4 and a log level of the \emph{myVerein} application of \enquote{Trace} specified in line 22. Lines 43 and 44 define, that the log is written to the \texttt{stdout} (in general this is the console) and into a rolling file called \texttt{myVerein.log}, located within the default tomcat log directory. This log file can be analysed to find vulnerabilities of the application.
 
 \subsection{Scalability}
+\label{sec:Scalability}
 
 As shown in section \vref{sec:ArchitecturalModel}, one instance of the \emph{myVerein} system should be able to run on multiple servers at the same time. The load should be distributed on the servers using a load balancer. By enforcing this architecture the platform is able to dynamically scale, depending on the workload on the system.
 
@@ -621,19 +622,74 @@ An initial setup is only possible, if there is no document within the settings d
 In the first part of this section the final layout of the database is presented, and the second part is showing the object-oriented mapping provided by the \emph{Spring Data} framework. The decision made in section \vref{sec:ArchitecturalModel} did not change during the implementation and therefore the data-provider is the \gls{NoSQL} database \emph{MongoDB}.
 
 \subsubsection{Final layout}
+\label{sec:DatabaseFinal}
 
 In section \vref{sec:DatabaseLayout} the initial layout of the data provider was presented and explained. Even though the planning was well-conceived, some functionalities had to be changed, because of unforeseen technical difficulties or changes within the feature set. The final \gls{ER} diagram can be found in appendix \vref{app:ERFinal}. The differences between the final layout and the one presented in section \vref{sec:DatabaseLayout} are going to be discussed in this section.
 
+\paragraph{User}
+Within the user object only small design changes have been made. The amount of default entries within the document has been increased, e.g. every profile has the fields \enquote{Member since}, \enquote{Passive since}, \enquote{Resignation date} and \enquote{Birthday}. This changes have been performed to be able to create a powerful dashboard for the administrator. On top of that the dynamic \enquote{Private Information} and \enquote{Public Information} have been merged into a single array called \emph{Custom user fields}, because implementing a rich public profile is not going to be provided within this version. Besides that, all connections between the user and other documents, that are stored within the user remain as shown in section \vref{sec:DatabaseLayout}.
+
+\paragraph{Division}
+The only changed made to the division object, is the member list. This element contains the id's of all members that are part of the division. Unfortunately the maintenance of this list is very expensive, since it needs to be update for every division change of a user. Nevertheless it's implication is a significant speedup of the message sending process. This is due to the fact that this member list is needed during each send request of a message and it's computation is rather expensive.
+
+\paragraph{Message}
+
+Besides the initials thoughts of creating a self-destroying message stack, the decision was made to store all messages permanently. This is mainly due to the fact to later be able to support the access of one account on multiple devices. On top of that this would enable the possibility of storing meta-information about the delivery status of the message. Every receiver of a message is stored within the \enquote{Receiver} map, where the key is the user id string and the value is the delivery status. Therefore the retrieval of all non-delivered messages of a certain user is very fast and easy.
+
+\paragraph{Event}
+
+The event document's properties were expanded, similar to the user's. Additional information like the precise coordinates of a location (stored in \enquote{Location Lat} and \enquote{Location Lng}) are now part of the object. Additionally the pattern of storing the message status together with the user id was adopted within the \enquote{Invited user} relationship, where the response is the value to the invited user's id.
+
+\paragraph{Settings}
+
+As explained in section \vref{sec:Scalability} the system needs a central settings document. During the design phase this property was not considered and missing. Within the final design it is part of the database design. It has a relationship to exactly one division, which is the root division. This root division's name needs to be equal to the club name by design. 
+
+\paragraph{Remember me token}
+
+This document store wasn't considered during the initial design either. It is an independent document with no direct relation ship to any other document and used to keep a user logged, even if the session expires. A detailed explanation is given in section \vref{sec:ImplementationSec}. 
+
+\paragraph{Picture}
+
+Due to limited time resources the feature of uploading and inspecting photos needed to be rescheduled for a future release. Therefore the document store related to this feature is no longer part of the final database design, but might be added to the system at a later point in time.
+
 \subsubsection{Spring Data}
+
+To access the data from the \emph{Java} program a developer has several options. He can either use the official \emph{MongoDB} driver library provided by \emph{MongoDB}, or a state of the art object-oriented mapping library like \emph{Hibernate}. Since the \emph{Spring WebMVC} framework was used within the project, another part of the \emph{Spring} framework was chosen to provide access to the database: \emph{Spring Data MongoDB}.
+
+This framework is build on top of \emph{Hibernate} and provides the same mapping capabilities from \emph{MongoDB} documents to objects within \emph{Java}, adding \emph{JavaEE} functionalities like annotations. Each document stored in the database should be represented by a class of the project. \emph{Spring Data} also has the possibility to return a map containing the entry, but this is a very in concise solution, which was not used within this project. Every document described in the previous chapter is therefore represented by a class located within the package \texttt{de.steilerdev.myVerein.server.model}. 
+
+To enable the usage of an object within the context of \emph{Spring Data} it needs to inherit from the \texttt{BaseEntity} class. Afterwards every property of the object is mapped to the appropriate attribute of the document, unless it was annotated with \texttt{@Transient}, which is disabling the storage of the respective property in the database. 
+
+Additionally validator annotations are available, ensuring that a specific property is \texttt{@NotEmpty}, \texttt{@NotNull} or an \texttt{@Email}. If these requirements are not met during the save process, an exception is thrown. 
+
+Within \emph{MongoDB} the relation between two documents can be expressed by storing them either as a nested document or using a reference to the document. Both techniques have their pros and cons and can be used within \emph{Spring Data}. When just specifying the object as a member field within the class stored within the database, this results into a nested document, where the annotation \texttt{@DBRef} specifies a relation between two independent documents.
+
+It is important to note that the references to other documents are automatically resolved, which simplifies the retrieval of nested documents. However this process is not done lazily, which resulted into a bad query performance for highly nested documents. \emph{Spring Data} therefore introduced the (optional) \texttt{lazy} property of the \texttt{@DBRef} annotation, indicating that this property is loaded upon access. Unfortunately this feature is not working in every context and could therefore not be used for every reference.
 
 \subsection{Security}
 \label{sec:ImplementationSec}
+
+To create a sophisticated and secure policy for the access of the resources provided by \emph{myVerin} the \emph{Spring Security} framework was used. This framework is providing a concise configuration interface based on user roles.
+
+The system introduces three different roles: \texttt{ROLE\_USER}, \texttt{ROLE\_ADMIN} and a non-authenticated guest user. Appendix \vref{app:SpringSec} shows the configuration used within this system. Lines 11 and 12 refer to the publicly available content, including static content (\gls{JS} and \gls{CSS} files within \texttt{/resources}) and dynamic content (Club logo within \texttt{/content}). They are both specified to use no security checking at all which improves the performance when accessing these resources.
+
+Fortunately the data provider of the framework is very flexible and therefore the \emph{MongoDB} could be used to provide the necessary information about the users. Line 82 - 108 specify this configuration. A plain text fallback solution is also provided, in case the database is not available, but the system needs to be accessed anyway or the administrator's password got lost. By default the \texttt{myVereinUser.properties} file within the resources folder is empty, but can be modified by the server administrator to enable this feature.
+
+Line 44 to 64 use the default behaviour of \emph{Spring Security} to enforce the specific policies within the web app environment. In case a user is not authenticated, the server response would be a \texttt{302} HTTP status code, meaning \enquote{moved temporarily}. A standard web browser redirects the user to a specified page, which is in this case the login page defined in line 51. The policies for this range are defined within line 46 and 49: Besides the login, logout and error page, only a user with the role \texttt{ROLE\_ADMIN} can access the resources of the web app. It is important to note that the configuration will use the first matched rule, starting at the top, when trying to find the appropriate policy.
+
+Even though the behaviour presented in the last paragraph is very user friendly, it is not compatible with the \gls{REST} standard. A \gls{REST}ful \gls{API} needs to return appropriate status codes according to the availability of a resources, this includes a \texttt{401} status codes for an unauthenticated user. Therefore custom handler needed to be created and applied to the \gls{URI} that define the \gls{REST} interface. These overwriting handlers can be found within the \texttt{de.steilerdev.myVerein.server.security.rest} package. Their definition and usage within the configuration file can be found within lines 35 - 42, 15, 22 and 23. The remaining notable entries within the \gls{REST} block (lines 14 to 42) are the permission for every user to access the login, logout and initial setup \gls{URI} of the \gls{REST} \gls{API} and the distinction between the user's area (\texttt{/api/user}) and administrator's area (\texttt{/api/admin}). For security reasons every other resource within the \texttt{/api} \gls{URI} is matched by a rule restricting the access to administrators. Therefore new functionalities, that did not get an own policy yet are secured.
+
+As mentioned in section \vref{sec:DatabaseFinal} the back end supports a remember me functionality, keeping a user logged in, even if the session expires. Besides the regular session token, which gets deleted after the session ends, a second \enquote{remember-me} cookie is set, if the user wants to stay logged in. Within this cookie the user's username, a random token and a series number is handed to the user and stored within a database table. The user is later automatically logged in if he presents this cookie and the username, series and token match the currently stored database entry. Upon a successful authentication a new token is issued and overwrites the one currently present in the database. The series number stays the same. In case a \enquote{remember-me} cookie is presented, where the series and the username match an entry within the database, but the token is different a cookie theft is assumed and all cookies associated with the user are invalidated. Therefore a thief would only be able to use a stolen cookie until the user logs in the next time. Additionally the system is able to notify the user about the detection of a possible cookie theft. \cite{Jaspan:2006aa}
+
+The configuration for this \enquote{remember-me} service can be found from line 66 to 80 within the configuration from appendix \vref{app:SpringSec}. The required data provider can be found within the class \texttt{de.steilerdev.myVerein.server.security.RememberMeTokenDataProvider}.
+
 \subsection{Business logic}
 \subsubsection{Messaging}
 \subsubsection{Division management}
 \subsubsection{User management}
 \subsubsection{Event management}
 \subsubsection{REST API}
+\label{sec:REST}
 
 \section{Front-end}
 \label{sec:FrontEnd}
