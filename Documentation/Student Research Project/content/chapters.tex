@@ -666,6 +666,8 @@ Within \emph{MongoDB} the relation between two documents can be expressed by sto
 
 It is important to note that the references to other documents are automatically resolved, which simplifies the retrieval of nested documents. However this process is not done lazily, which resulted into a bad query performance for highly nested documents. \emph{Spring Data} therefore introduced the (optional) \texttt{lazy} property of the \texttt{@DBRef} annotation, indicating that this property is loaded upon access. Unfortunately this feature is not working in every context and could therefore not be used for every reference.
 
+The retrieval and storage of information within the database is done through repositories. One repository for each object class that should be stored within the database is created. These repositories are defined as interfaces and by analysing the function name or reading the provided annotation \emph{Spring Data} is able to create the appropriate function and query to retrieve the objects. The repositories also provide a \texttt{save()} function, storing a specified object, or a list of objects durably, if all validation requirements are met. 
+
 \subsection{Security}
 \label{sec:ImplementationSec}
 
@@ -684,11 +686,28 @@ As mentioned in section \vref{sec:DatabaseFinal} the back end supports a remembe
 The configuration for this \enquote{remember-me} service can be found from line 66 to 80 within the configuration from appendix \vref{app:SpringSec}. The required data provider can be found within the class \texttt{de.steilerdev.myVerein.server.security.RememberMeTokenDataProvider}.
 
 \subsection{Business logic}
-\subsubsection{Messaging}
-\subsubsection{Division management}
-\subsubsection{User management}
-\subsubsection{Event management}
-\subsubsection{REST API}
+
+A core aspect of the system is how the server uses the data provided by a user to store it in the database, as well as the retrieval and processing of the information to present them to the user. Within this section three examples of the implementation of this logic are going to be presented. The only way to fully understand the complete code base, is by reviewing the source code and \emph{JavaDoc}s of the back-end system. 
+
+\subsubsection{Replace user division}
+Every time a user's division change, the data needs to be updated in several places. At first the subscribed divisions of the user's object need to be changed, then the list of invited users of an event needs to be updated, because the user is either no longer or newly invited to an event and finally the user list stored together with the divisions needs to be modified accordingly. Since this is obviously a very expensive procedure it needs to be as efficient as possible. Fortunately a user does not change divisions too often which compensates this complexity.
+
+Appendix \vref{app:ReplaceDivision} shows the relevant code snippet performing most of the logic of this use case. The code was taken from the \texttt{User} class located within the package \texttt{de.steilerdev.myVerein.server.model.user}. The method \texttt{replaceDivisions} takes three argument, the \texttt{UserRepository} and \texttt{EventRepository} used to interact with the database as well as a list of \texttt{Division} object. This list contains the new divisions for the user. The initial list of division is still held by the \texttt{User} object, where this method is executed on.
+
+The method can be separated into four different branches. The first one is the most trivial one, presented in line 526 to 529. In this case the current as well as the new list of divisions is empty. Therefore no changes have to be made to the user, to any event or division.
+
+The next branch from line 530 to 542 covers the case, where the new list of divisions is empty and the old one is not and therefore the user only needs to unsubscribe from all old divisions and get removed from all events. The user is removed from all of his divisions in line 533 and 53. Each event, that invited the old divisions is found and updated in parallel within line 537 to 541. The parallelism should speedup this very expensive operation.
+
+The third branch is very similar to the last one and shown from line 543 to 555. In this case the user was not part of any division before this update and therefore only the new divisions and their events are going to be updated. The user is added to the divisions in line 546 and 547 and the events are updated in parallel within the lines 550 to 554. 
+
+The last branch is the most complex one. It covers the case where the user has been part of divisions before the change and will be part of divisions afterwards. In this case the first step is to perform set operations on the two list. By creating the intersect in line 559, the divisions that are in both sets are determined. These ones do not need to be changed at all, since the user was part of the division before and will be after. From line 564 to 578 this intersection is used while iterating over the list of new and old divisions to determine whether or not the user needs to be added or removed from the division. Each changed division is put into a list, specifying the division's events that needs to get updated within line 583 to 587. Since the collection is accessed from different threads at once, a synchronised list is needed, or otherwise an unexpected behaviour could occur.
+
+After all divisions and events have changed, the altered user can be stored durably and no inconsistency should be present.
+
+\subsubsection{Getting events of date}
+\subsubsection{User role assessment}
+
+\subsection{REST API}
 \label{sec:REST}
 
 \section{Front-end}

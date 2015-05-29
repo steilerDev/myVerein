@@ -1,0 +1,104 @@
+<html>
+<head>
+<title>User.java</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.ln { color: rgb(0,0,0); font-weight: normal; font-style: normal; }
+.s0 { color: rgb(169,183,198); }
+.s1 { color: rgb(98,151,85); font-style: italic; }
+.s2 { color: rgb(98,151,85); font-weight: bold; font-style: italic; }
+.s3 { color: rgb(204,120,50); }
+.s4 { color: rgb(106,135,89); }
+.s5 { color: rgb(128,128,128); }
+.s6 { color: rgb(104,151,187); }
+</style>
+</head>
+<BODY BGCOLOR="#2b2b2b">
+<TABLE CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#C0C0C0" >
+<TR><TD><CENTER>
+<FONT FACE="Arial, Helvetica" COLOR="#000000">
+User.java</FONT>
+</center></TD></TR></TABLE>
+<pre>
+<span class="s0"> 
+<a name="l512"><span class="ln">512  </span></a> 
+<a name="l513"><span class="ln">513  </span></a>    </span><span class="s1">/** 
+<a name="l514"><span class="ln">514  </span></a>     * This function replaces the set of divisions by the stated divisions. The function guarantees that the inverse membership is handled correctly. 
+<a name="l515"><span class="ln">515  </span></a>     * </span><span class="s2">@param </span><span class="s1">divisionRepository The division repository needed to save the altered divisions. 
+<a name="l516"><span class="ln">516  </span></a>     * </span><span class="s2">@param </span><span class="s1">eventRepository The event repository needed to save the altered events. 
+<a name="l517"><span class="ln">517  </span></a>     * </span><span class="s2">@param </span><span class="s1">divs The new list of divisions for the user. 
+<a name="l518"><span class="ln">518  </span></a>     */</span><span class="s0"> 
+<a name="l519"><span class="ln">519  </span></a>    </span><span class="s3">public void </span><span class="s0">replaceDivisions(DivisionRepository divisionRepository</span><span class="s3">, </span><span class="s0">EventRepository eventRepository</span><span class="s3">, </span><span class="s0">List&lt;Division&gt; divs) 
+<a name="l520"><span class="ln">520  </span></a>    { 
+<a name="l521"><span class="ln">521  </span></a>        logger.debug(</span><span class="s4">&quot;[{}] Replacing division set&quot;</span><span class="s3">, this</span><span class="s0">)</span><span class="s3">;</span><span class="s0"> 
+<a name="l522"><span class="ln">522  </span></a> 
+<a name="l523"><span class="ln">523  </span></a>        List&lt;Division&gt; finalDivisions = DivisionHelper.getExpandedSetOfDivisions(divs</span><span class="s3">, </span><span class="s0">divisionRepository)</span><span class="s3">;</span><span class="s0"> 
+<a name="l524"><span class="ln">524  </span></a>        List&lt;Division&gt; oldDivisions = divisions</span><span class="s3">;</span><span class="s0"> 
+<a name="l525"><span class="ln">525  </span></a> 
+<a name="l526"><span class="ln">526  </span></a>        </span><span class="s3">if</span><span class="s0">((finalDivisions == </span><span class="s3">null </span><span class="s0">|| finalDivisions.isEmpty()) &amp;&amp; (oldDivisions == </span><span class="s3">null </span><span class="s0">|| oldDivisions.isEmpty())) 
+<a name="l527"><span class="ln">527  </span></a>        { 
+<a name="l528"><span class="ln">528  </span></a>            logger.debug(</span><span class="s4">&quot;[{}] Division sets before and after are both empty&quot;</span><span class="s3">, this</span><span class="s0">)</span><span class="s3">;</span><span class="s0"> 
+<a name="l529"><span class="ln">529  </span></a>            divisions = </span><span class="s3">new </span><span class="s0">ArrayList&lt;&gt;()</span><span class="s3">;</span><span class="s0"> 
+<a name="l530"><span class="ln">530  </span></a>        } </span><span class="s3">else if</span><span class="s0">(finalDivisions == </span><span class="s3">null </span><span class="s0">|| finalDivisions.isEmpty()) 
+<a name="l531"><span class="ln">531  </span></a>        { 
+<a name="l532"><span class="ln">532  </span></a>            logger.debug(</span><span class="s4">&quot;[{}] Division set after is empty, before is not. Removing membership subscription from old divisions&quot;</span><span class="s3">, this</span><span class="s0">)</span><span class="s3">;</span><span class="s0"> 
+<a name="l533"><span class="ln">533  </span></a>            oldDivisions.stream().forEach(div -&gt; div.removeMember(</span><span class="s3">this</span><span class="s0">))</span><span class="s3">;</span><span class="s0"> 
+<a name="l534"><span class="ln">534  </span></a>            divisionRepository.save(oldDivisions)</span><span class="s3">;</span><span class="s0"> 
+<a name="l535"><span class="ln">535  </span></a> 
+<a name="l536"><span class="ln">536  </span></a>            </span><span class="s5">//Updating events, affected by division change</span><span class="s0"> 
+<a name="l537"><span class="ln">537  </span></a>            oldDivisions.parallelStream().forEach(div -&gt; { 
+<a name="l538"><span class="ln">538  </span></a>                List&lt;Event&gt; changedEvents = eventRepository.findByInvitedDivision(div)</span><span class="s3">;</span><span class="s0"> 
+<a name="l539"><span class="ln">539  </span></a>                changedEvents.parallelStream().forEach(event -&gt; event.updateInvitedUser(divisionRepository))</span><span class="s3">;</span><span class="s0"> 
+<a name="l540"><span class="ln">540  </span></a>                eventRepository.save(changedEvents)</span><span class="s3">;</span><span class="s0"> 
+<a name="l541"><span class="ln">541  </span></a>            })</span><span class="s3">;</span><span class="s0"> 
+<a name="l542"><span class="ln">542  </span></a>            divisions = </span><span class="s3">new </span><span class="s0">ArrayList&lt;&gt;()</span><span class="s3">;</span><span class="s0"> 
+<a name="l543"><span class="ln">543  </span></a>        } </span><span class="s3">else if</span><span class="s0">(oldDivisions == </span><span class="s3">null </span><span class="s0">|| oldDivisions.isEmpty()) 
+<a name="l544"><span class="ln">544  </span></a>        { 
+<a name="l545"><span class="ln">545  </span></a>            logger.debug(</span><span class="s4">&quot;[{}] Division set before is empty, after is not. Adding membership subscription to new divisions&quot;</span><span class="s3">, this</span><span class="s0">)</span><span class="s3">;</span><span class="s0"> 
+<a name="l546"><span class="ln">546  </span></a>            finalDivisions.stream().forEach(div -&gt; div.addMember(</span><span class="s3">this</span><span class="s0">))</span><span class="s3">;</span><span class="s0"> 
+<a name="l547"><span class="ln">547  </span></a>            divisionRepository.save(finalDivisions)</span><span class="s3">;</span><span class="s0"> 
+<a name="l548"><span class="ln">548  </span></a> 
+<a name="l549"><span class="ln">549  </span></a>            </span><span class="s5">//Updating events, affected by division change</span><span class="s0"> 
+<a name="l550"><span class="ln">550  </span></a>            finalDivisions.parallelStream().forEach(div -&gt; { 
+<a name="l551"><span class="ln">551  </span></a>                List&lt;Event&gt; changedEvents = eventRepository.findByInvitedDivision(div)</span><span class="s3">;</span><span class="s0"> 
+<a name="l552"><span class="ln">552  </span></a>                changedEvents.parallelStream().forEach(event -&gt; event.updateInvitedUser(divisionRepository))</span><span class="s3">;</span><span class="s0"> 
+<a name="l553"><span class="ln">553  </span></a>                eventRepository.save(changedEvents)</span><span class="s3">;</span><span class="s0"> 
+<a name="l554"><span class="ln">554  </span></a>            })</span><span class="s3">;</span><span class="s0"> 
+<a name="l555"><span class="ln">555  </span></a>            divisions = finalDivisions</span><span class="s3">;</span><span class="s0"> 
+<a name="l556"><span class="ln">556  </span></a>        } </span><span class="s3">else</span><span class="s0"> 
+<a name="l557"><span class="ln">557  </span></a>        { 
+<a name="l558"><span class="ln">558  </span></a>            logger.debug(</span><span class="s4">&quot;[{}] Division set after and before are not empty. Applying changed membership subscriptions&quot;</span><span class="s3">, this</span><span class="s0">)</span><span class="s3">;</span><span class="s0"> 
+<a name="l559"><span class="ln">559  </span></a>            List&lt;Division&gt; intersect = finalDivisions.stream().filter(oldDivisions::contains).collect(Collectors.toList())</span><span class="s3">; </span><span class="s5">//These items are already in the list, and do not need to be modified</span><span class="s0"> 
+<a name="l560"><span class="ln">560  </span></a> 
+<a name="l561"><span class="ln">561  </span></a>            </span><span class="s5">//Collecting changed division for batch save</span><span class="s0"> 
+<a name="l562"><span class="ln">562  </span></a>            List&lt;Division&gt; changedDivisions = Collections.synchronizedList(</span><span class="s3">new </span><span class="s0">ArrayList&lt;&gt;())</span><span class="s3">;</span><span class="s0"> 
+<a name="l563"><span class="ln">563  </span></a> 
+<a name="l564"><span class="ln">564  </span></a>            </span><span class="s5">//Removing membership from removed divisions</span><span class="s0"> 
+<a name="l565"><span class="ln">565  </span></a>            oldDivisions.parallelStream() 
+<a name="l566"><span class="ln">566  </span></a>                    .filter(div -&gt; !intersect.contains(div)) 
+<a name="l567"><span class="ln">567  </span></a>                    .forEach(div -&gt; { 
+<a name="l568"><span class="ln">568  </span></a>                        div.removeMember(</span><span class="s3">this</span><span class="s0">)</span><span class="s3">;</span><span class="s0"> 
+<a name="l569"><span class="ln">569  </span></a>                        changedDivisions.add(div)</span><span class="s3">;</span><span class="s0"> 
+<a name="l570"><span class="ln">570  </span></a>                    })</span><span class="s3">;</span><span class="s0"> 
+<a name="l571"><span class="ln">571  </span></a> 
+<a name="l572"><span class="ln">572  </span></a>            </span><span class="s5">//Adding membership to added divisions</span><span class="s0"> 
+<a name="l573"><span class="ln">573  </span></a>            finalDivisions.parallelStream() 
+<a name="l574"><span class="ln">574  </span></a>                    .filter(div -&gt; !intersect.contains(div)) 
+<a name="l575"><span class="ln">575  </span></a>                    .forEach(div -&gt; { 
+<a name="l576"><span class="ln">576  </span></a>                        div.addMember(</span><span class="s3">this</span><span class="s0">)</span><span class="s3">;</span><span class="s0"> 
+<a name="l577"><span class="ln">577  </span></a>                        changedDivisions.add(div)</span><span class="s3">;</span><span class="s0"> 
+<a name="l578"><span class="ln">578  </span></a>                    })</span><span class="s3">;</span><span class="s0"> 
+<a name="l579"><span class="ln">579  </span></a> 
+<a name="l580"><span class="ln">580  </span></a>            divisionRepository.save(changedDivisions)</span><span class="s3">;</span><span class="s0"> 
+<a name="l581"><span class="ln">581  </span></a> 
+<a name="l582"><span class="ln">582  </span></a>            </span><span class="s5">//Updating events, affected by division change</span><span class="s0"> 
+<a name="l583"><span class="ln">583  </span></a>            changedDivisions.parallelStream().distinct().forEach(div -&gt; { 
+<a name="l584"><span class="ln">584  </span></a>                List&lt;Event&gt; changedEvents = eventRepository.findByInvitedDivision(div)</span><span class="s3">;</span><span class="s0"> 
+<a name="l585"><span class="ln">585  </span></a>                changedEvents.parallelStream().distinct().forEach(event -&gt; event.updateInvitedUser(divisionRepository))</span><span class="s3">;</span><span class="s0"> 
+<a name="l586"><span class="ln">586  </span></a>                eventRepository.save(changedEvents)</span><span class="s3">;</span><span class="s0"> 
+<a name="l587"><span class="ln">587  </span></a>            })</span><span class="s3">;</span><span class="s0"> 
+<a name="l588"><span class="ln">588  </span></a>            divisions = finalDivisions</span><span class="s3">;</span><span class="s0"> 
+<a name="l589"><span class="ln">589  </span></a>        } 
+<a name="l590"><span class="ln">590  </span></a>    }</span></pre>
+</body>
+</html>

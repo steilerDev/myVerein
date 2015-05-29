@@ -547,9 +547,9 @@ public class User extends BaseEntity implements UserDetails
             divisionRepository.save(finalDivisions);
 
             //Updating events, affected by division change
-            finalDivisions.stream().forEach(div -> {
+            finalDivisions.parallelStream().forEach(div -> {
                 List<Event> changedEvents = eventRepository.findByInvitedDivision(div);
-                changedEvents.stream().forEach(event -> event.updateInvitedUser(divisionRepository));
+                changedEvents.parallelStream().forEach(event -> event.updateInvitedUser(divisionRepository));
                 eventRepository.save(changedEvents);
             });
             divisions = finalDivisions;
@@ -580,9 +580,9 @@ public class User extends BaseEntity implements UserDetails
             divisionRepository.save(changedDivisions);
 
             //Updating events, affected by division change
-            changedDivisions.parallelStream().forEach(div -> {
+            changedDivisions.parallelStream().distinct().forEach(div -> {
                 List<Event> changedEvents = eventRepository.findByInvitedDivision(div);
-                changedEvents.parallelStream().forEach(event -> event.updateInvitedUser(divisionRepository));
+                changedEvents.parallelStream().distinct().forEach(event -> event.updateInvitedUser(divisionRepository));
                 eventRepository.save(changedEvents);
             });
             divisions = finalDivisions;
