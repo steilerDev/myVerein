@@ -557,6 +557,7 @@ After considering different colour tones as base colour, the decision was made t
 Figure \vref{fig:ColourScheme} shows the applied \emph{Tetradic} method on the above mentioned base colour. The three other colours, which fit very well to each other, are very suitable to draw attention in a green/white dominated environment, that is going to be created within the \emph{web} and \emph{iOS} app. The blue colours are going to be used for general information, where the orange tones are used for warning and the red ones for errors.
 
 \subsection{Logo}
+\label{sec:Logo}
 Using the colour scheme presented in the previous chapter, a logo, used among others as app icon, is going to be presented within this section. The concept shown in section \vref{sec:Icon} was selected and advanced. 
 
 \begin{figure}[h]
@@ -598,7 +599,7 @@ As shown in section \vref{sec:ArchitecturalModel}, one instance of the \emph{myV
 
 This kind of architecture is only possible if each instance of the server is stateless and retrieves all variable settings from a central data repository. By using this technique any settings change made to one system is instantly adopted by instances. 
 
-\begin{lstlisting}[caption = "Example layout of settings document", label=lst:SettingsDoc]
+\begin{lstlisting}[caption ={Example layout of settings document}, label=lst:SettingsDoc]
 {
 	"clubName" : "myVerein", 
 	"initialSetup" : false, 
@@ -656,7 +657,7 @@ Due to limited time resources the feature of uploading and inspecting photos nee
 
 To access the data from the \emph{Java} program a developer has several options. He can either use the official \emph{MongoDB} driver library provided by \emph{MongoDB}, or a state of the art object-oriented mapping library like \emph{Hibernate}. Since the \emph{Spring WebMVC} framework was used within the project, another part of the \emph{Spring} framework was chosen to provide access to the database: \emph{Spring Data MongoDB}.
 
-This framework is build on top of \emph{Hibernate} and provides the same mapping capabilities from \emph{MongoDB} documents to objects within \emph{Java}, adding \emph{JavaEE} functionalities like annotations. Each document stored in the database should be represented by a class of the project. \emph{Spring Data} also has the possibility to return a map containing the entry, but this is a very in concise solution, which was not used within this project. Every document described in the previous chapter is therefore represented by a class located within the package \texttt{de.steilerdev.myVerein.server.model}. 
+This framework is build on top of \emph{Hibernate} and provides the same mapping capabilities from \emph{MongoDB} documents to objects within \emph{Java}, adding \emph{JavaEE} functionalities like annotations. Each document stored in the database should be represented by a class of the project. \emph{Spring Data} also has the possibility to return a map containing the entry, but this is a very in concise solution, which was not used within this project. Every document described in the previous chapter is therefore represented by a class located within the package \path{de.steilerdev.myVerein.server.model}. 
 
 To enable the usage of an object within the context of \emph{Spring Data} it needs to inherit from the \texttt{BaseEntity} class. Afterwards every property of the object is mapped to the appropriate attribute of the document, unless it was annotated with \texttt{@Transient}, which is disabling the storage of the respective property in the database. 
 
@@ -679,11 +680,11 @@ Fortunately the data provider of the framework is very flexible and therefore th
 
 Line 44 to 64 use the default behaviour of \emph{Spring Security} to enforce the specific policies within the web app environment. In case a user is not authenticated, the server response would be a \texttt{302} HTTP status code, meaning \enquote{moved temporarily}. A standard web browser redirects the user to a specified page, which is in this case the login page defined in line 51. The policies for this range are defined within line 46 and 49: Besides the login, logout and error page, only a user with the role \texttt{ROLE\_ADMIN} can access the resources of the web app. It is important to note that the configuration will use the first matched rule, starting at the top, when trying to find the appropriate policy.
 
-Even though the behaviour presented in the last paragraph is very user friendly, it is not compatible with the \gls{REST} standard. A \gls{REST}ful \gls{API} needs to return appropriate status codes according to the availability of a resources, this includes a \texttt{401} status codes for an unauthenticated user. Therefore custom handler needed to be created and applied to the \gls{URI} that define the \gls{REST} interface. These overwriting handlers can be found within the \texttt{de.steilerdev.myVerein.server.security.rest} package. Their definition and usage within the configuration file can be found within lines 35 - 42, 15, 22 and 23. The remaining notable entries within the \gls{REST} block (lines 14 to 42) are the permission for every user to access the login, logout and initial setup \gls{URI} of the \gls{REST} \gls{API} and the distinction between the user's area (\texttt{/api/user}) and administrator's area (\texttt{/api/admin}). For security reasons every other resource within the \texttt{/api} \gls{URI} is matched by a rule restricting the access to administrators. Therefore new functionalities, that did not get an own policy yet are secured.
+Even though the behaviour presented in the last paragraph is very user friendly, it is not compatible with the \gls{REST} standard. A \gls{REST}ful \gls{API} needs to return appropriate status codes according to the availability of a resources, this includes a \texttt{401} status codes for an unauthenticated user. Therefore custom handler needed to be created and applied to the \gls{URI} that define the \gls{REST} interface. These overwriting handlers can be found within the \path{de.steilerdev.myVerein.server.security.rest} package. Their definition and usage within the configuration file can be found within lines 35 - 42, 15, 22 and 23. The remaining notable entries within the \gls{REST} block (lines 14 to 42) are the permission for every user to access the login, logout and initial setup \gls{URI} of the \gls{REST} \gls{API} and the distinction between the user's area (\texttt{/api/user}) and administrator's area (\texttt{/api/admin}). For security reasons every other resource within the \texttt{/api} \gls{URI} is matched by a rule restricting the access to administrators. Therefore new functionalities, that did not get an own policy yet are secured.
 
 As mentioned in section \vref{sec:DatabaseFinal} the back end supports a remember me functionality, keeping a user logged in, even if the session expires. Besides the regular session token, which gets deleted after the session ends, a second \enquote{remember-me} cookie is set, if the user wants to stay logged in. Within this cookie the user's username, a random token and a series number is handed to the user and stored within a database table. The user is later automatically logged in if he presents this cookie and the username, series and token match the currently stored database entry. Upon a successful authentication a new token is issued and overwrites the one currently present in the database. The series number stays the same. In case a \enquote{remember-me} cookie is presented, where the series and the username match an entry within the database, but the token is different a cookie theft is assumed and all cookies associated with the user are invalidated. Therefore a thief would only be able to use a stolen cookie until the user logs in the next time. Additionally the system is able to notify the user about the detection of a possible cookie theft. \cite{Jaspan:2006aa}
 
-The configuration for this \enquote{remember-me} service can be found from line 66 to 80 within the configuration from appendix \vref{app:SpringSec}. The required data provider can be found within the class \texttt{de.steilerdev.myVerein.server.security.RememberMeTokenDataProvider}.
+The configuration for this \enquote{remember-me} service can be found from line 66 to 80 within the configuration from appendix \vref{app:SpringSec}. The required data provider can be found within the class \path{de.steilerdev.myVerein.server.security.RememberMeTokenDataProvider}.
 
 \subsection{Business logic}
 
@@ -692,7 +693,7 @@ A core aspect of the system is how the server uses the data provided by a user t
 \subsubsection{Replace user division}
 Every time a user's division change, the data needs to be updated in several places. At first the subscribed divisions of the user's object need to be changed, then the list of invited users of an event needs to be updated, because the user is either no longer or newly invited to an event and finally the user list stored together with the divisions needs to be modified accordingly. Since this is obviously a very expensive procedure it needs to be as efficient as possible. Fortunately a user does not change divisions too often which compensates this complexity.
 
-Appendix \vref{app:ReplaceDivision} shows the relevant code snippet performing most of the logic of this use case. The code was taken from the \texttt{User} class located within the package \texttt{de.steilerdev.myVerein.server.model.user}. The method \texttt{replaceDivisions} takes three argument, the \texttt{UserRepository} and \texttt{EventRepository} used to interact with the database as well as a list of \texttt{Division} object. This list contains the new divisions for the user. The initial list of division is still held by the \texttt{User} object, where this method is executed on.
+Appendix \vref{app:ReplaceDivision} shows the relevant code snippet performing most of the logic of this use case. The code was taken from the \texttt{User} class located within the package \path{de.steilerdev.myVerein.server.model.user}. The method \texttt{replaceDivisions} takes three argument, the \texttt{UserRepository} and \texttt{EventRepository} used to interact with the database as well as a list of \texttt{Division} object. This list contains the new divisions for the user. The initial list of division is still held by the \texttt{User} object, where this method is executed on.
 
 The method can be separated into four different branches. The first one is the most trivial one, presented in line 526 to 529. In this case the current as well as the new list of divisions is empty. Therefore no changes have to be made to the user, to any event or division.
 
@@ -704,23 +705,343 @@ The last branch is the most complex one. It covers the case where the user has b
 
 After all divisions and events have changed, the altered user can be stored durably and no inconsistency should be present.
 
-\subsubsection{Getting events of date}
+\subsubsection{Getting events over period}
+
+Another very complex task was getting all events that occur over a defined period. This functionality is especially needed within the web interface, where the user specifies a date and expects all relevant events to show up. These include not only the ones taking place between the defined period but also the ones spanning completely or partially over this time frame.
+
+Initially this task was realised using a lot of back-end computing, iterating over all events within a given timeframe. This had two down sides: On the one hand the request took a fair amount of time to finish and very long spanning events were ignored. This was due to the fact that only events within a timeframe (+/- 1 month) around the specified period were gathered and checked if they are relevant. With commit \texttt{20f8155}, created on the 26\textsuperscript{th} of April, this behaviour improved significantly.
+
+\begin{figure}[h]
+  	\centering
+  	\includegraphics[width=0.9\linewidth]{./images/event-period.png}
+  	\caption{Possibilities of events occuping a period, own figure}
+	\label{fig:EventPeriod}
+\end{figure}
+
+This change in behaviour could be realised, by updating \emph{Spring Data MongoDB} to the latest release, which included the support of comparing \emph{Java 8} \texttt{LocalDateTime} objects within a query. By shifting the workload from the application to the database the process is benefitting from internal query optimiser, a reduces result set and an overall improved responsiveness. 
+
+Figure \vref{fig:EventPeriod} is showing the four possibilities any event can occupy a part or the complete time period. Either it is within the period (event 1), starts before and ends within the period (event 2), starts within the period and ends after (event 3), or starts before and ends after the period (event 4). When analysing the problem, event 4 can actually be removed since it can be covered by a combination of event 2 and event 3 as shown below. This leads to a total of 3 relatively simple conditions that can easily implemented as a query for the \emph{MongoDB}.
+
+\begin{lstlisting}[caption ={MongoDB query for getting events over a period}, label=lst:MongoEvent]
+{$or: [
+	{$and: [
+		{'startDateTime': {$gte: ?0}},
+		{'startDateTime': {$lte: ?1}},
+		{'endDateTime': {$gte: ?0}},
+		{'endDateTime': {$lte: ?1}}
+	]},
+	{$and: [
+		{'startDateTime': {$lt: ?0}},
+		{'endDateTime': {$gt: ?0}}
+	]},
+	{$and: [
+		{'startDateTime': {$lt: ?1}}
+		{'endDateTime': {$gt: ?1}}
+	]}
+]}
+\end{lstlisting}
+
+Listing \ref{lst:MongoEvent} is showing the query used to gather all events spanning over a period defined by a start and end time. Within the query, the placeholder \texttt{?0} and \texttt{?1} will be replaced by the start, respectively end of the period during runtime. The whole query is a \enquote{or}-connection of three different statements. 
+
+The first statement from line 2 to 7 covers event 1 from figure \vref{fig:EventPeriod}. Line 3 and 4 check if the start of the event is between the start and end of the period, where line 5 and 6 check if the end of the event satisfies this condition as well. 
+
+The second block from line 8 to 11 covers event 2. By only checking if the event is spanning over the start of the period, it is possible to also match event 4, reducing the amount of cases by 25\%. Finally the block from line 12 to 15 is matching event 3 as well as event 4, by checking if the event is spanning over the end of the period. 
+
+This query is used within several functions in classes related to the event management. The specification of the query can be found in the \texttt{EventRepository} class located in the \path{de.steilerdev.myVerein.server.model.event} package. It is defined as a custom query, using the \texttt{@Query} annotation for the \texttt{findBySpanningOverPeriod} function. This function accepts two \emph{Java 8} \texttt{LocalDateTime} objects stating the period.
+
 \subsubsection{User role assessment}
+
+During log in it is important to evaluate the role of an authenticated user to be able to evaluate which policies apply for him. As noted in section \vref{sec:ImplementationSec} the security back-end uses the \emph{MongoDB} as a data provider for authentication. This is realised through the implementation of the \path{org.springframework.security.core.userdetails.UserDetails} interface within the user object. Besides authentication properties, like the password, username and information about the validity of the account, this interface expects the object to provide a list of granted authorities. These authorities match the user roles presented in section \vref{sec:ImplementationSec}. 
+
+\begin{lstlisting}[caption ={User role assessment executed upon authentication (slightly modified for readability)}, label=lst:UserAuthentication, language=Java]
+/**
+  * Checks and returns the user authorities. The authorities are assigned according to the {@link de.steilerdev.myVerein.server.security.UserAuthenticationService.AuthorityRoles AuthorityRoles} enum.
+  * @param user The user, whose authorities need to be checked.
+  * @return A list of the roles of the user.
+  */
+private ArrayList<GrantedAuthority> getUserAuthorities(User user)
+{
+  logger.trace("[{}] Checking user's granted authorities", user);
+  ArrayList<GrantedAuthority> authorities = new ArrayList<>();
+  authorities.add(new SimpleGrantedAuthority(AuthorityRoles.USER));
+  List<Division> administratedDiv = divisionRepository.findByAdminUser(user);
+  if(!administratedDiv.isEmpty())
+  {
+    authorities.add(new SimpleGrantedAuthority(AuthorityRoles.ADMIN));
+    if(administratedDiv.stream().anyMatch(div -> div.getParent() == null))
+    {
+      authorities.add(new SimpleGrantedAuthority(AuthorityRoles.SUPERADMIN));
+    }
+  }
+  logger.info("[{}] Retrieved user authorities: {}", user, authorities);
+  return authorities;
+}
+\end{lstlisting}
+
+Upon each authentication request, the user gets loaded by the \texttt{UserAuthenticationService} located in the \path{de.steilerdev.myVerein.server.security} package and gets his authorities assigned. As long as the user's session is active these authorities are cached within the system, to avoid reloading all the information. Listing \ref{lst:UserAuthentication} shows the function evaluating and returning the list of authorities. It was taken from the \texttt{UserAuthenticationService} class mentioned above. 
+
+Since this function is only called, if the user could be authenticated successfully, he is automatically becoming part of the \texttt{ROLE\_USER} group in line 10. Afterwards all divisions, administrated by the selected user, are retrieved, . If this list is not empty, which means that this user is administrating at least one division, he becomes part of the \texttt{ROLE\_ADMIN} authority. If one of the divisions within this list is the root division he get the role \texttt{ROLE\_SUPERADMIN} and can therefore manipulate all settings within the system. Since the root division does not have a parent, this field is set to \texttt{NULL}. Using this assumption the list is checked for containing the root division within line 15.
+
+Finally the list of granted authorities is returned to \emph{Spring Security} which can proceed with the log in of the user. Additionally it is now able to evaluate if the user is allowed to access the specified resource.
 
 \subsection{REST API}
 \label{sec:REST}
 
+Within this section, the available \gls{REST} \gls{API} is presented. Every available \gls{URI} of the backend is shown. The \gls{API}s are grouped according to their purpose. The tables are going to give information about the functionality that can be expected. Besides that the policy protecting this resource is stated as well. These \gls{API} always return a \gls{JSON} formatted response, if there is data expected to be returned, otherwise just the appropriate HTTP status code is present. For more details on these functionalities, please look at the source code and the \emph{JavaDoc}.
+
+\subsubsection{Authentication}
+
+Table \vref{tab:RESTAuthentication} shows the interface that needs to be used to authenticate against this platform. After the authentication was successful the system will send a session cookie that needs to be used on every successive request.
+
+\begin{RESTTable}{Authentication API}{tab:RESTAuthentication}
+	\RESTEntry{/api/login}
+		{POST}
+		{\texttt{username}, \texttt{password}, \texttt{rememberMe} (optional)}
+		{If the \texttt{username} and \texttt{password} match an entry within the database a success status code is returned. Additionally details about the system are present in the header of the response. These include the \texttt{System-ID}, the \texttt{System-Version} and the user's \texttt{User-ID}. If the \texttt{rememberMe} parameter is present, the user will receive a remember me token, which will not expire after 60 minutes like the session cooke. This behaviour was discussed in section \vref{sec:ImplementationSec}. If the authentication was not successful a \texttt{401} status code is returned}
+	\RESTEntry{/api/logout}
+		{POST}
+		{}
+		{Using this \gls{API} will invalidate the session and remember me cookie and therefore log the user out of the system}
+\end{RESTTable}
+
+
+
+\subsubsection{User}
+This section will cover all functionalities provided by the \gls{REST} \gls{API} concerning user retrieval or manipulation.
+
+\paragraph{Member facing}
+
+Table \vref{tab:RESTUserMember} will focus on all member facing functionalities of the \gls{REST} \gls{API}, within the context of this section. They are implemented in the \texttt{UserController} class, which can be found in the \path{de.steilerdev.myVerein.server.controller.user} package. These functionalities can only be accessed by a user it he is authenticated and is part of the \texttt{ROLE\_USER} group.
+
+\begin{RESTTable}{Member facing user API}{tab:RESTUserMember}
+	\RESTEntry{/api/user/user}
+		{GET}
+		{\texttt{id}}
+		{Returns the complete profile of the user identified by his user id. The fields of the returned profile are populated according to the security settings of the user}
+	\RESTEntry{/api/user/user}
+		{POST}
+		{\texttt{deviceToken}}
+		{This function updates the device token associated with the currently logged in user. This functionality is needed as soon as an notification service for the \emph{iOS} app is established. }
+\end{RESTTable}
+
+\paragraph{Administrator facing}
+
+Table \vref{tab:RESTUserAdmin} is showing all administrator related \gls{API}, within the context of this section. The implementation can be found in the \texttt{UserManagementController} class, located inside the \path{de.steilerdev.myVerein.server.controller.admin} package. Since they are only performing administrator related tasks, the user needs to be part of the \texttt{ROLE\_ADMIN} authority.
+
+\begin{RESTTable}{Admin facing user API}{tab:RESTUserAdmin}
+	\RESTEntry{/api/admin/user}
+		{GET}
+		{\texttt{term} (optional)} 
+		{Returns a list of all user. If the \texttt{term} parameter is present, the list is filtered and only user, where the first name, last name or email contains \texttt{term} are returned}
+	\RESTEntry{/api/admin/user}
+		{GET}
+		{\texttt{email}}
+		{Returns the user identified by \texttt{email}. If the user is not allowed to modify the user, all private information are hidden and a parameter is set including a message telling the application that the selected user cannot be manipulated}
+	\RESTEntry{/api/admin/user}
+		{POST}
+		{\texttt{firstName}, \texttt{lastName}, \texttt{email}, \texttt{birthday}, \texttt{password}, \texttt{gender} (not required), \texttt{street}, \texttt{streetNumber}, \texttt{zip}, \texttt{city}, \texttt{country}, \texttt{activeMemberSince}, \texttt{passiveMemberSince}, \texttt{resignationDate}, \texttt{iban}, \texttt{bic}, \texttt{divisions}, \texttt{userFlag}, \texttt{cuf\_*}} 
+		{Saves/creates a user. The \texttt{userFlag} needs to state the email of the user who needs to be changed or \texttt{true} if a new user is created. The \texttt{password} field is only respected when creating a new user, concluding you can`t change the password of a user using this API. All other parameter specification can be found within the corresponding \emph{JavaDoc}}
+	\RESTEntry{/api/admin/user}
+		{DELETE}
+		{\texttt{email}}
+		{Deletes the user identified by his \texttt{email}}
+\end{RESTTable}
+
+\subsubsection{Division}
+The following tables are focused around the ability to create, modify, retrieve and delete divisions through the \gls{REST} {API}.
+
+\paragraph{Member facing}
+Table \vref{tab:RESTDivMember} shows all division related tasks, that are available for a regular member. The \texttt{DivisionController} class, providing the presented functionalities can be found in the \path{de.steilerdev.myVerein.server.controller.user} package. To access the resources shown in the table the user needs to be part of the \texttt{ROLE\_USER} authority.
+
+\begin{RESTTable}{Member facing division API}{tab:RESTDivMember}
+	\RESTEntry{/api/user/division}
+		{GET}
+		{\texttt{id}}
+		{This function returns the division identified by its id}
+	\RESTEntry{/api/user/division}
+		{GET}
+		{}
+		{This function returns a list containing all division id's, the user is part of}
+\end{RESTTable}
+
+\paragraph{Administrator facing}
+For modifying, creating and deleting divisions a user needs to be part of the \texttt{ROLE\_ADMIN} authority. Table \vref{tab:RESTDivAdmin} is presenting the \gls{API} needed to perform these tasks. The presented functionality is implemented within the \texttt{DivisionManagementController} within the \path{de.steilerdev.myVerein.server.controller.admin} package.
+
+\begin{RESTTable}{Admin facing division API}{tab:RESTDivAdmin}
+	\RESTEntry{/api/admin/division}
+		{POST}
+		{\texttt{name}, \texttt{id}, \texttt{description}, \texttt{admin}}
+		{Saves the division defined by its \texttt{id}, using the provided parameters. The division needs to exist}
+	\RESTEntry{/api/admin/division}
+		{POST} 
+		{\texttt{new}}
+		{Creates a new division, located directly underneath one of the user's administrated divisions. The request returns a JSON map, containing a success message and the name of the new division}
+	\RESTEntry{/api/admin/division}
+		{DELETE}
+		{\texttt{id}}
+		{Deletes the division defined by its \texttt{id}. The user needs to administrate the division or a parent division of the stated division}
+	\RESTEntry{/api/admin/division}
+		{GET}
+		{\texttt{term} (optional)}
+		{Returns a list of all divisions. If the \texttt{term} parameter is present, the list is filtered and only divisions, whose division name contains \texttt{term} are returned}
+	\RESTEntry{/api/admin/division}
+		{GET}
+		{\texttt{id}}
+		{Returns the division defined by its \texttt{id}, including its administrator, reduced to his email and name}
+	\RESTEntry{/api/admin/division/divisionTree}
+		{POST}
+		{\texttt{moved\_node}, \texttt{target\_node}, \texttt{position}, \texttt{previous\_parent}}
+		{Moves the division defined by \texttt{moved\_node} from \texttt{previous\_parent} to \texttt{target\_node}, while \texttt{position} defines the relation between the division and its new parent}
+	\RESTEntry{/api/admin/division/divisionTree}
+		{GET}
+		{} 
+		{Returns the division tree administrated by the current user, represented by a nested JSON object}
+\end{RESTTable}
+
+\subsubsection{Event}
+
+The \gls{API} that can be used to retrieve and manipulate events is going to be presented within this section. 
+
+\paragraph{Member facing}
+The member facing part of the event \gls{API} is shown in table \vref{tab:RESTEventMember}. To access events, the user needs to be authenticated as \texttt{ROLE\_USER}. The \gls{API} is provided by the \texttt{EventController} class within the \path{de.steilerdev.myVerein.server.controller.user} package.
+
+\begin{RESTTable}{Member facing event API}{tab:RESTEventMember}
+	\RESTEntry{/api/user/event}
+		{GET}
+		{\texttt{lastChanged} (optional)}
+		{Returns the ids of all events the user is invited to. If the \texttt{lastChanged} parameter is set, only events that changed after this date are returned. The \texttt{lastChanged} parameter needs to be formatted according to the pattern \texttt{YYYY-MM-DDTHH:mm:ss}}
+	\RESTEntry{/api/user/event}
+		{GET}
+		{\texttt{id}}
+		{Returns the event specified by the \texttt{id}, containing all available information}
+	\RESTEntry{/api/user/event}
+		{POST}
+		{\texttt{id}, \texttt{response}}
+		{Saves the user's response to the event specified by the \texttt{id}. The \texttt{resonse} needs to be a string representation of a value from the enumeration defined in \path{de.steilerdev.myVerein.server.model.event.EventStatus}}
+	\RESTEntry{/api/user/event}
+		{GET}
+		{\texttt{id}, \texttt{response}}
+		{Returns a list of user ids that gave the response specified by \texttt{response} for the event specified by \texttt{id}. The \texttt{resonse} needs to be a string representation of a value from the enumeration defined in \path{de.steilerdev.myVerein.server.model.event.EventStatus}}
+\end{RESTTable}
+
+\paragraph{Administrator facing}
+The management of the events is done through the administrator facing \gls{API} shown in table \vref{tab:RESTEventAdmin}. The usage of this interface requires the user to be authentication as \texttt{ROLE\_ADMIN}. The functionality presented here is implemented within the \texttt{EventManagementController} within the \path{de.steilerdev.myVerein.server.controller.admin} package.
+
+\begin{RESTTable}{Admin facing event API}{tab:RESTEventAdmin}
+	\RESTEntry{/api/admin/event/month}
+		{GET}
+		{\texttt{year}, \texttt{month}}
+		{Returns a list of dates within the specified month. Each date is converted to a String using the \texttt{toString()} method of \texttt{LocalDateTime}. Each date of the list indicates, that an event is scheduled on the specific date. This function considers all events stored in the system and not the ones that are user specific}
+	\RESTEntry{/api/admin/event/date}
+		{GET}
+		{\texttt{date}}
+		{Returns a list of events, scheduled for the \texttt{date}. The \texttt{date} parameter needs to be formatted according to the pattern \texttt{YYYY/MM/DD}}
+	\RESTEntry{/api/admin/event}
+		{GET}
+		{\texttt{id}}
+		{Returns an event identified by its \texttt{id}. If the user is not allowed to change the event, an administration not allowed parameter is present}
+	\RESTEntry{/api/admin/event}
+		{POST}
+		{\texttt{eventFlag}, \texttt{eventName}, \texttt{eventDescription}, \texttt{startDate}, \texttt{startTime}, \texttt{endDate}, \texttt{endTime}, \texttt{location}, \texttt{locationLat}, \texttt{locationLng}, \texttt{invitedDivisions}}
+		{This function updates the event identified by its id within the \texttt{eventFlag} field, or creates a new event, if \texttt{eventFlag} is set to true. All other parameter specification can be found within the corresponding \emph{JavaDoc}. An event can only be modified, if the user either created it, or the user is the super admin. If the event was saved successfully a JSON map is returned containing a success message and the id of the event}
+	\RESTEntry{/api/admin/event}
+		{DELETE}
+		{\texttt{id}}
+		{Deletes the event specified by the \texttt{id}. An event can only be deleted, if the user either created it, or the user is the super admin}	
+\end{RESTTable}
+
+\subsubsection{Message}
+
+The messages \gls{API} does not have any administrator facing functionalities, therefore only member facing ones are available. Concluding to use the messaging service of the system, the authenticated user needs to be part of the \texttt{ROLE\_USER} authority. Table \vref{tab:RESTMsg} shows all provided functionalities. The implementation of the message handling can be found in the class \texttt{MessageController} within the package \paragraph{de.steilerdev.myVerein.controller.user}.
+
+\begin{RESTTable}{Message API}{tab:RESTMsg}
+	\RESTEntry{/api/user/message}
+		{GET}
+		{\texttt{id}}
+		{Returns the complete message specified by \texttt{id}. If the message is delivered the first time, it's message status is going to be set to delivered}	
+	\RESTEntry{/api/user/message}
+		{GET}
+		{\texttt{all} (optional)}
+		{Returns a list with the ids of all unread messages of the currently logged in user, unless the \texttt{all} parameter is set. This will return the list with all messages ever send to the user}
+	\RESTEntry{/api/user/message}
+		{POST}
+		{\texttt{division}, \texttt{content}, \texttt{timestamp}}
+		{Sends a message with a specified \texttt{content} to the server. The receiving \texttt{division}, specified by its id, needs to exists and the user needs to be part of it. If the send was successful the response contains the send message, containing the message's system generated id as well as the timestamp assigned by the server}
+\end{RESTTable}
+
+\subsubsection{Initial setup}
+
+Since there is no user setup during the initial setup, this resource is, in theory accessible by every user, even if he is unauthorised. Nevertheless, the system will only accept requests using this \gls{API} if either the database is unavailable, or the initial setup flag is set. The functionality presented in table \vref{tab:RESTInit} is implemented by the \texttt{InitController} class, located within the \paragraph{de.steilerdev.myVerein.server.controller.init} package.
+
+\begin{RESTTable}{Initial setup API}{tab:RESTInit}
+	\RESTEntry{/api/init}
+		{POST}
+		{\texttt{clubName}, \texttt{firstName}, \texttt{lastName}, \texttt{email}, \texttt{password}, \texttt{passwordRe}, \texttt{createExample} (optional)}
+		{If this call is valid, the function clears the database specified within the local \texttt{myVerein.properties} file, creates a new user specified by \texttt{firstName}, \texttt{lastName} and \texttt{email} securing the account with the \texttt{password}, as well as a root division with the name \texttt{clubName}. The newly created user is becoming administrator of the root division and therefore super admin. If the \texttt{createExample} parameter is set to \enquote{on}, the system is going to get populated with example user, divisions, events and messages}	
+\end{RESTTable}
+
+\subsubsection{Settings}
+
+This section is presenting the \gls{API} that can be used to alter the system settings. To use this interface shown in table \vref{tab:RESTSettings} the user needs to be authenticated as \texttt{ROLE\_ADMIN}. Unfortunately a regular admin only has a limited set of options to alter the settings, to user the full set he needs to be \texttt{ROLE\_SUPERADMIN}. The presented functionality is provided by the \texttt{SettingsController} class within the \path{de.steilerdev.myVerein.server.controller.admin}.
+
+\begin{RESTTable}{Settings API}{tab:RESTSettings}
+	\RESTEntry{/api/admin/settings}
+		{GET}
+		{}
+		{This function returns all available settings, unless the user is not the super admin, then the response will only contain his email, name and id together with an administration not allowed message.}
+	\RESTEntry{/api/admin/settings}
+		{DELETE}
+		{\texttt{password}}
+		{This functionality can only be used by the super admin. It will set the \texttt{initialSetup} flag within the settings and therefore enable a new initial setup, deleting the current state of the system, if the administrator's password is correct}
+	\RESTEntry{/api/admin/settings}
+		{POST}
+		{\texttt{currentAdmin}, \texttt{adminPasswordNew} (optional), \texttt{adminPasswordNewRe}, \texttt{clubName} (optional), \texttt{clubLogo} (optional), \texttt{cuf\_*} (optional), \texttt{currentPassword}}
+		{If the \texttt{currentPassword} is correct and the user is the super admin, all parameters from this request are saved. The \texttt{clubLogo} needs to be a multipart image file, either a \texttt{JPG} or \texttt{PNG}. The parameters prefixed with \texttt{cuf\_} are the custom user fields that are going to be available in all user profiles. The \texttt{currentAdmin} parameters defines the new super admin, unless the current user is only an administrator. In this case the field needs to match the user's email. A regular administrator can only change his password through this \gls{API}.}
+\end{RESTTable}
+
+\subsubsection{Content}
+
+This system takes advantage of \emph{MonogDB}'s \emph{GridFS}, which allows a user to efficiently store big binary data within the database. The content \gls{API} presented in table \vref{tab:RESTContent} allows access to files stored for the \emph{myVerein} system. The files are currently publicly available and not secured in any way. This interface is provided by \texttt{ContentController}, located within the \path{de.steilerdev.myVerein.server.controller} package.
+
+\begin{RESTTable}{Content API}{tab:RESTContent}
+	\RESTEntry{/content/clubLogo}
+		{GET}
+		{\texttt{defaultLogo} (optional)}
+		{This resource returns the current logo of the system. If the \texttt{defaultLogo} parameter is present or the there is no custom logo the default \emph{myVerein} logo, shown in \vref{sec:Logo} is going to be served.}
+	\RESTEntry{/content/clubLogo}
+		{DELETE}
+		{}
+		{This interface can only be used if the user is authenticated as super admin. It will delete the currently stored custom club logo and only show the default one}
+	\RESTEntry{/content/clubName}
+		{GET}
+		{}
+		{Returns the current name of the club}
+\end{RESTTable}
+
 \section{Front-end}
 \label{sec:FrontEnd}
-\subsection{Web-Application}
-\subsection{iOS Application}
 
-\chapter{Retrospection}
+As discussed in section \vref{sec:ArchitecturalModel}, there were two front-end application developed for this system. The first one is the administrator facing web interface, enabling the management of the club, the other one is the member facing \emph{iOS} app, containing messaging and a summary about the upcoming schedule. Unfortunately not all features requested in section \vref{sec:Requirements} were realised, nevertheless all of the obligatory requirements and most of the optional requirements were implemented.
+
+\subsection{Web-Application}
+
+
+
+\subsubsection{Template Engine}
+
+\subsubsection{UI}
+
+\subsection{iOS Application}
+\subsubsection{Frameworks}
+\subsubsection{UI}
+\subsubsection{Networking}
+\subsubsection{Multi-Threading}
+
+\chapter{Retrospection and future work}
+\label{chapter:OngoingWork}
 
 What is done, what isn't, what would I do different next time?
 
-\chapter{Future work}
-\label{chapter:OngoingWork}
 Further development not mentioned in this work + monetarizing and automatic rollout
 ausblick (max 1/8 vom text)
 

@@ -47,8 +47,37 @@
 
 % Tables for first page
 \usepackage{longtable}
-\setlength{\tabcolsep}{10pt} %Abstand zwischen Spalten
+\setlength{\tabcolsep}{.015\textwidth} %Abstand zwischen Spalten
 \renewcommand{\arraystretch}{1.5} %Zeilenabstand
+
+% Predefined table with header etc.
+\newenvironment{RESTTable}[2]{
+	% total width = 1 - number of columns * 2 * \tabcolsep (above)
+	\begin{longtable}{p{.20\textwidth} | p{.1\textwidth} | p{.22\textwidth} | p{.36\textwidth}}
+    	\caption{#1} \label{#2} \\
+			\textbf{URI} & \textbf{Request method} & \textbf{Parameters} & \textbf{Description} \\
+		\endfirsthead
+			\multicolumn{4}{c}
+			{{\bfseries \tablename\ \thetable{} -- continued from previous page}} \\
+			\textbf{URI} & \textbf{Request method} & \textbf{Parameters} & \textbf{Description} \\
+		\endhead
+			\multicolumn{4}{c}{{Continued on next page}} \\ 
+		\endfoot
+		\endlastfoot
+}
+{
+	\end{longtable}
+}
+
+% Creates an entry for the RESTTable environment
+\newcommand{\RESTEntry}[4]{
+\hline
+	\path{#1} &
+	\texttt{#2} &
+	#3 &
+	#4. \\
+}
+
 
 % Graphics
 \usepackage{graphicx}
@@ -99,7 +128,7 @@
 \lstloadlanguages{Java}
 \lstset{%
 	%language=PHP,           % Sprache des Quellcodes
-	%numbers=left,           % Zeilennummern links
+	numbers=left,            % Zeilennummern links
 	frame=single,            % Frame around the listing
 	keepspaces=true,         
 	stepnumber=1,            % Jede Zeile nummerieren.
@@ -115,11 +144,9 @@
 	extendedchars=true,      % Alle Zeichen vom Latin1 Zeichensatz anzeigen.
 	captionpos=b,            % sets the caption-position to bottom
 	backgroundcolor=\color{ListingBackground} % Hintergrundfarbe des Quellcodes setzen.
-}
-\lstset{
-    extendedchars=true,
-    literate={->}{{\ding{213}}}1,
-    moredelim=[is][\underbar]{@}{@}
+%    extendedchars=true,
+%    literate={->}{{\ding{213}}}1,
+%    moredelim=[is][\underbar]{@}{@}
 }
 
 % Glossary
