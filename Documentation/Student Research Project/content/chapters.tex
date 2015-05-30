@@ -377,7 +377,7 @@ Through the provided \emph{iOS} app the user needs to be able to authenticate hi
 
 By using the auto layout capability of the \emph{iOS} development suite, an application's layout is automatically adjusted to the screen size and ratio of the user's device. Nevertheless an \emph{iPad} has obviously a bigger screen than an \emph{iPhone} or \emph{iPod touch} and therefore a layout optimised for a smaller device might be less user friendly on a tablet. Since the information provided by the system are going to be checked at home as often as on-the-go, a phone app is more applicable than a tablet app. Therefore it is an obligatory requirement to optimise this application for the operation with the latest \emph{iOS} device generation, more specifically the \emph{iPhone 6}.
 
-To be able to ensure the usage of the latest features provided by the \emph{iOS} \gls{SDK} throughout the next couple of years, the application needs to be developed using the recently released programming language \gls{SWIFT}.
+To be able to ensure the usage of the latest features provided by the \emph{iOS} \gls{SDK} throughout the next couple of years, the application needs to be developed using the recently released programming language \gls{Swift}.
 
 \subsubsection{Web application}
 
@@ -442,7 +442,7 @@ The front end of the system consists of an iOS app and a web application. Both o
 
 The web application is intended to be used by the administrator only to manage the system. Within this web application only the features that are relevant for the administrator need to be accessible. This application should avoid the reloading of the current page by using the principles of \gls{AJAX}. On top of that the application should be designed to be as mobile friendly as possible, to enable administrators to use it on their mobile devices as well. To create a rich \gls{UI} and feature set, while keeping the workload on the developer as small as possible, several \gls{CSS} and \gls{JS} frameworks are going to be used.
 
-The iOS application's target group are the member's of the clubs using this system. The application is going to be developed using \emph{Apple}'s new programming language \gls{SWIFT}. Additionally the dependency manager \emph{CocoaPods} is going to be used for adding existing frameworks to the project. This is done to simplify the development of the application, while increasing the usability.
+The iOS application's target group are the member's of the clubs using this system. The application is going to be developed using \emph{Apple}'s new programming language \gls{Swift}. Additionally the dependency manager \emph{CocoaPods} is going to be used for adding existing frameworks to the project. This is done to simplify the development of the application, while increasing the usability.
 
 \section{Database layout}
 \label{sec:DatabaseLayout}
@@ -508,6 +508,7 @@ The next page shows the picture management page, that shows all uploaded images 
 The last wireframe is the settings page, where the admin can adjust settings for the system. Only the super admin can alter information on this page. The system enables the user to upload a custom club logo on this page and change information like the club name. Second level administrator can only change their password on this page. 
 
 \subsection{iOS application}
+\label{sec:iOSMockup}
 The mockups for the iOS application can be found in appendix \vref{app:iOSWireframe}. The mockup is displayed using a storyboard presentation, showing the connection between each view.
 
 For the initial implementation of the application the decision was made to use the conventional navigation concept of a tab bar located at the bottom of the window. This is mainly due to the fact that the implementation of an alternative navigation concept is very time consuming and would need additional user testing to ensure its usefulness.
@@ -537,9 +538,10 @@ In general releasing a software under an open-source license has three major ben
 Within this chapter the final implementation is presented. All findings of the previous chapters build up to the execution described here. Because of technical difficulties and a limited amount of time, certain things discussed in \vref{chapter:Design} had to be discarded or changed. Nevertheless most of the requirements could be realised. It is important to note that the time did not permit an extensive testing phase, therefore this software should be considered as an early beta product. There are several known issues at the time of this writeup, which can be found within \emph{Github}'s bug-tracker located at \url{https://www.github.com/steilerDev/myVerein/issues}.
 
 \section{Visual branding}
+\label{sec:BrandingImplementation}
 As discussed in section \vref{sec:BrandingConcept} the branding and therefore recognisability of a brand is one of the most important part of creating a new system, that needs to be placed on the market. 
 
-\subsection{Color scheme}
+\subsection{Colour scheme}
 After considering the findings in section \vref{sec:ColourConcept} the author decided to use a \emph{Tetradic} colour scheme. The base colour should be the most dominant one, where the other three ones should be used to draw the user's attention. 
 
 
@@ -1021,21 +1023,88 @@ This system takes advantage of \emph{MonogDB}'s \emph{GridFS}, which allows a us
 \section{Front-end}
 \label{sec:FrontEnd}
 
-As discussed in section \vref{sec:ArchitecturalModel}, there were two front-end application developed for this system. The first one is the administrator facing web interface, enabling the management of the club, the other one is the member facing \emph{iOS} app, containing messaging and a summary about the upcoming schedule. Unfortunately not all features requested in section \vref{sec:Requirements} were realised, nevertheless all of the obligatory requirements and most of the optional requirements were implemented.
+As discussed in section \vref{sec:ArchitecturalModel}, there were two front-end application developed for this system. The first one is the administrator facing web interface, enabling the management of the club, the other one is the member facing \emph{iOS} app, containing messaging and a personalise club schedule. Unfortunately not all features requested in section \vref{sec:Requirements} were realised, nevertheless all of the obligatory requirements and most of the optional requirements were implemented.
 
 \subsection{Web-Application}
 
+Strictly speaking the web application is part of the back-end server, since it's files are hosted there, and the resources are protected using \emph{Spring Security}. The user is able to browse to the root of the \gls{URL} and will be presented with the login form of the interface. By providing his credentials, the user is able to access the secured area, as long as he is part of the \texttt{ROLE\_ADMIN} authority.
 
+The presented interface is designed to operate without any page reload, and therefore behaves like a desktop application within the browser. This is done by using the \gls{AJAX} principles and taking full advantages of \gls{JS} and several libraries for efficient visual manipulation of the content. Every requested content is asynchronously loaded and presented. Therefore we can always ensure that the requested data is up-to-date.
+
+The performance is improved by using aggressive caching techniques and reducing the loading time by aggregating all required \gls{JS} and \gls{CSS} resources within a single, minified file. By combining all of these techniques, the portal should behave and feel as responsive as possible and therefore increase the usability tremendously.
+
+During the development the \enquote{mobile first} approach of the \emph{Bootstrap} library was enforced and therefore a mobile view is available. It is yet to be optimised and therefore not completely tuned for production use. Nevertheless the basic work has been done and therefore the workload of improving the interface shouldn't be too high.
 
 \subsubsection{Template Engine}
 
+To manipulate a web page on the server side within the \emph{Java} environment, a template engine needs to be used. A developer can choose between the default \gls{JSP} engine or pick one of the many libraries. At the beginning of the development process the possibilities have been evaluated and the author of this work chose to use the \emph{Thymeleaf} engine.
+
+This library was specifically designed to remove the problem of not being able to accurate display the \gls{JSP} templates within a browser, without needing an application to process it first. This is due to the fact, that \gls{JSP} adds tags, which are not compatible with the \gls{HTML} syntax. This leads to the inability of a correct rendering of the webpage. In contrast to that \emph{Thymeleaf} introduces additional attributes within the valid \gls{HTML} tags, which are ignored by a browser. Therefore the design of a dynamic web page can be inspected, without the need of a functional server.
+
+Within this project the template engine was mainly used to enable the localisation of the webpages. Unfortunately the time did not permit a full execution of this process, but the \texttt{init.html} webpage is implementing the skeleton needed to easily translate the content. For example every tag containing text has the \texttt{th:text} attribute added, which is telling \emph{Thymeleaf} to replace the text within the tag with the one specified by this attribute. The value of \texttt{th:text} is pointing to a resource bundle containing the translations. The correct resource bundle, if available, is automatically chosen by \emph{Spring Web} depending on the language requested by the browser.
+
+The other benefit of \emph{Thymeleaf} was the ability to have a runtime combination of multiple template files. This enabled the developer to separate functionalities, event though they were later delivered to the user combined. This improved the structure of the project, as well as the readability.
+
+Finally the produced \gls{HTML} is very well structured. \emph{Thymeleaf} enforces the uses of \emph{XHTML} and produces a clean output. In opposite to that, \gls{JSP} creates an unvalidated \gls{HTML} containing a lot of white spaces , unnecessarily blowing up the size of the request.
+
 \subsubsection{UI}
 
+During the development of the \gls{UI}, the presented wireframes in section \vref{sec:Wireframes} were respected. As shown in appendix \vref{app:WebScreen} the wireframes and the actual implementation are very similar. 
+
+The main difference are the missing views. Unfortunately the time did not permit to implement the photo library nor the dashboard. Because of that, it is not possible to present these views.
+
+The web page itself is endorsing the colour scheme and branding introduced in section \vref{sec:BrandingImplementation}. The dominant colour is the green base colour. In several contexts the tone was slightly modified to meet the requirements, e.g. the month view in the calendar header is darker than the weekday view, to separate the both. The complementary colours, not visible on the screenshots, are used within notifications, signalling errors or the need of user actions.
+
 \subsection{iOS Application}
+
+The more important front-end application is the \emph{iOS} app, since it is going to be used much more often than the web interace. The application was written in \emph{Apple}'s latest programming language \gls{Swift}, providing a concise language interface, which is secure and high performant. The application is not released to the \emph{App Store} yet, because the whole system is still in a beta stadium and therefore not ready for a release.
+
+Comparable to the web application above, not all of the features discussed in section \vref{sec:Requirements} could be realised, due to the missing amount of time. Nevertheless a lot of the principles discussed earlier could be implemented, like the alternative layout of the chat overview discussed in section \vref{sec:UIConceptiOS}.
+
 \subsubsection{Frameworks}
-\subsubsection{UI}
+Having the same motivation as already presented in section \vref{sec:FrameworksServer}, a dependency management software was chosen for the \emph{iOS} application as well. The industry standard is \emph{CocoaPods}. Fortunately the support for the \gls{Swift} programming language was added shortly before the work on the app was started. 
+
+Thanks to the use of 3\textsuperscript{rd} party libraries the amount of work needed for the app was highly reduced. Several frameworks were used to simplify the usage of \emph{Apple}'s legacy \gls{API}s within the modern \gls{Swift} environment. These include the access of the keychain and the user defaults.
+
+The more complex frameworks were used to create a sophisticated \gls{UI}, that wasn't provided by the default ones. These include the chat view, as well as the calendar view. But also the default avatar images, consisting of the initials of the user, are created dynamically by a third party library. All of these helped, to create a rich interface without the need of a professional designer, or a lot of work on the actual implementation. 
+
+Finally logging and networking frameworks are used behind the scenes to simplify the process as well as improving its performance.
+
 \subsubsection{Networking}
+
+When running a mobile app that needs to connect itself to a server, reliable networking is one of the most hardest thing to do, especially if a user needs to get logged into a system in order to perform any task. For simplifying the networking layer itself, the \emph{AFNetworking} library was chosen. This library is one of the most widely used frameworks within the \emph{iOS} community. Besides providing an easier \gls{API} for performing network related tasks, it also offers the ability to perform SSL pinning and automated response parsing.
+
+The process of sending a request is depicted as a flow chart in appendix \vref{app:FlowiOS}. Obviously this process is very complicated and therefore I will only highlight some of its important properties. First of all thanks to the \emph{AFNetworking} library and some own effort, every request is executed non-blocking. That means that after the execution flow issued the wish to execute a network request, everything is dispatched asynchronously to a  separate thread, not disturbing the responsiveness of the main queue.
+
+Secondly the amount of running requests is tracked within a global counter. This value is made thread-safe, by installing a lock, protecting the critical region. This counter is increased, before the request is send, and decreased before the success or failure callbacks are executed.
+
+Finally the system is able to distinct between a general network error and an authentication problem. In case of a general error, the failure function defined during the request creation is executed and a warning is shown to the user, where in case of an authentication error another process is started: The current and all upcoming requests, until the user is logged in, are put onto a thread safe queue. Meanwhile the application tries to execute the login request using the stored user credentials. If this execution succeeds, the requests that were put on the queue earlier are getting resend. In case the authentication failed, the failure callback for each queued request is executed and the user is presented with an log in screen, since obviously his credentials are not valid anymore. 
+
 \subsubsection{Multi-Threading}
+
+As hinted in the last section, multi-threading is a very important part of a responsive mobile application. In case of the \emph{iOS} \acrlong{OS} this is mainly based on the fact that the \gls{UI} library is not thread safe and only executed on the main queue. Concluding a computing intensive execution or a blocking network request might freeze the \gls{UI}, leading to a bad user experience. Every task that might block the execution for a recognisable amount of time, needs to be executed on a separate queue.
+
+The easiest way to achieve high performance multi-threading with \gls{Swift}, is by using the legacy \gls{GCD} \gls{API}. This low-level interface is inherited from the C language. Implicitly this \gls{API} is not using any object-oriented paradigms, but follows procedural oriented flows. 
+
+By taking advantage of the \gls{Swift} feature, that enables a developer to overload or create own operators, a thin layer \gls{API} is introduced based on the marshal operator described by \cite{Smith:2014aa}. The implementation of this operator is shown in appendix \vref{app:Marshal}. Shown in lines 33 to 39, the operator can be used either infix, postfix or prefix.
+
+The most simple version is the \enquote{$\sim>$} operator, called \enquote{simple marshal operator}. A closure left of the operator is always executed on the background thread, and the one on the right is always executed on the main thread. 
+
+When the \enquote{simple marshal operator} is used as a prefix operator it runs the closure asynchronously on the main queue, which is defined by lines 47 to 52. On the opposite it can  be used as a postfix operator, where the closure is asynchronously run on a background queue, which is defined by line 54 to 70. Since the \emph{CoreData} framework is not thread safe, the retrieval of information on a background thread is not possible unless a \texttt{ManagedObjectContext} is created on the respective background queue. The postfix marshal operator provides a version, where the application is able to easily access the database from a background thread, by offering a suitable \texttt{ManagedObjectContext}.
+
+However the most important application is the usage as an infix operator, defined in lines 71 to 107, where at first the closure on the left is executed on the background queue followed by the execution of the right hand closure on the main queue. This model is widely used within the \emph{iOS} world. A version of this operator is provided, which is handing an arbitrary object from the background queue to the main queue.
+
+The \enquote{inverse marshal operator}, defined by line 109 to 144, is used to asynchronously execute a closure infinitely every couple of seconds. The infix or postfix operator uses the \enquote{$<\sim$} sign, where the left hand side is a closure and the right hand side is an optional double value. This value is defining the amount of seconds, the application should wait in between the executions of the closure. If the amount is not specified the current default value is 50 seconds. When performing this operation a \texttt{MarshalThreadingObject} is returned. As long as this object is referenced the execution of the thread will proceed, but without any reference to this object, the thread is going to get destroyed by the garbage collector.
+
+Last but not least the regular marshal operator can have a double value instead of a closure on its left hand side. This indicates, that the execution of the right hand queue should be delayed, by the amount of time defined by the value. The delayed execution is done on the main queue. This behaviour is defined in line 146 to 154.
+
+\subsubsection{UI}
+
+During the creation of the \gls{UI} the mockups discussed in section \vref{sec:iOSMockup} were closely analysed. Unfortunately not all of them could be realised, due to the reduced set of functionality, as well as the limited project resources. Nevertheless a suitable interface was created, shown in appendix \vref{app:iOSScreen}. This representation is similar to the original mockups in appendix \vref{app:iOSWireframe}, showing a storyboard with all reachable states from each view. 
+
+The storyboard is only showing the most important screens of the application. One of them is the chat overview, which is adopting the alternative design proposed in section \vref{sec:ChatOverview}. Another view, which was not considered during the initial design is the event details view, showing all information available for a specific event. These include the event times, a short description and a map view with the precise location of the event.
+
+Finally the colour scheme and app icon shown in section \vref{sec:BrandingImplementation} were adopted. The dominant colour is, similar to the web application, green. The alternative colours of the scheme are only used to attract attention to notifications and warnings. 
 
 \chapter{Retrospection and future work}
 \label{chapter:OngoingWork}
