@@ -8,7 +8,7 @@
 
 Especially in rural areas, today's world of clubs is dominated by small and medium size organisations. Based on my personal experience, these clubs are mainly managed using outdated techniques, while their communication channels are usually handled through existing social networks, electronic or non-electronic mail. This is due to the fact that most of the members and management boards of the societies are either not familiar enough with the complexity of the few modern club management solutions, do not know of their existence or don't see the implications of using them.
 
-\emph{myVerein} is trying to solve these problems to provide an easy, comprehensive and intuitive solution for small and medium size clubs. Using the benefits of recent IT industry developments and the principles of cloud and mobility solutions it could become the management solution of the 21\textsuperscript{st} century. 
+\emph{myVerein} is trying to solve these problems providing an easy, comprehensive and intuitive solution for small and medium size clubs. Using the benefits of recent IT industry developments and the principles of cloud and mobility solutions it could become the management solution of the 21\textsuperscript{st} century. 
 
 The following chapters will show you an analysis of the current market situation and what solutions can be found there. I will introduce the targeted group for this application and throughly discuss their wishes and needs within their club community. From there I will present the creation of the initial concept, how the process of planning and design evolved and the final implementation was done. The current state of the application will get shown and explained as well. At the end of this paper a retrospective on the whole project is given together with an outlook of what can be future improvements and work on the system.
 
@@ -86,11 +86,11 @@ Even though he owns a PC, which was a present from his children, he is not very 
 \section{Unique selling point}
 \label{sec:SellingPoint}
 
-The result of the market and user analysis above lead to the conclusion that there is the a real need for a comprehensive solution. Considering all facts and findings discussed in this chapter, the key points of the application can now be derived. 
+The result of the market and user analysis above lead to the conclusion that there is the real need for a comprehensive solution. Considering all facts and findings discussed in this chapter, the key points of the application can now be derived. 
 
 The first and most important point of the application is to reduce the workload on the person managing the members of the club as well as advertising events, described as Jacob in section \vref{sec:Jacob}. Since this person is already spending at lot of his time on keeping the club running, mostly free of any charge, he should perform his work as efficient as possible. This should also include the possibility to delegate work to other people, e.g. every user could be responsible to keep his contact information up-to-date, without the need of the administrator being actively involved.
 
-The second point of the application is reducing the personal organisation overhead for a single user. Specifically talking a user should be automatically reminded of upcoming events and he have an easy way of checking a personalised, up to date schedule of his club related events.
+The second point of the application is reducing the personal organisation overhead for a single user. Specifically talking a user should be automatically reminded of upcoming events and he has an easy way of checking a personalised, up to date schedule of his club related events.
 
 Finally the group pressure on individuals to join one or multiple social networks or applications must get stopped by providing a safe and trustfully environment. People not able to do or not feeling confident with using latest technology should not get forced into using it. In contrast a viable alternative have to be offered to these users. 
 
@@ -178,7 +178,7 @@ In contrary of creating an application that includes all options offered by the 
 \label{sec:Architecture}
 The architectural decision highly depends on the platform and technology chosen. When taking this decision, it comes to choose between a multi-tier, also known as client-server, and a single-tier, also known as client-only, architecture.
 
-Compared to a multi-tier web application that is accessed by several users simultaneously, the complexity of a single tier desktop application is is surely easier to manage though it comes along with several negative implications. The biggest impact for the administrator would be the missing possibility to delegate certain tasks to other members. Additionally, the locally stored information can not be accessed by any user, because of availability and security limitations of a personal computer.
+Compared to a multi-tier web application that is accessed by several users simultaneously, the complexity of a single tier desktop application is surely easier to manage though it comes along with several negative implications. The biggest impact for the administrator would be the missing possibility to delegate certain tasks to other members. Additionally, the locally stored information cannot be accessed by any user, because of availability and security limitations of a personal computer.
 
 \begin{figure}[h]
   	\centering
@@ -190,7 +190,7 @@ Compared to a multi-tier web application that is accessed by several users simul
 
 In opposite to that, a multi-tier architecture enables the user to access and modify data through a centralised data provider. As shown in figure \vref{fig:TierArchitecture}, within a 2-tier architecture, the data is directly available, where a 3-tier architecture adds another abstraction or presentation layer between the raw data and the user. The decision, which kind of architecture to choose, highly depends on the application itself. 
 
-The security of a 3-tier architecture might be more sophisticated, since the logic provided by a dynamic web server offers more possibilities to define user groups and access rights, but if the policy is not well designed, this might lead to violations. I assume that a 2-tier architecture might be a better pick, since it's configuration possibilities are more basic and lead to less problems \cite{Wright:2015aa}.
+The security of a 3-tier architecture might be more sophisticated, since the logic provided by a dynamic web server offers more possibilities to define user groups and access rights, but if the policy is not well designed, this might lead to violations. I assume that a 2-tier architecture might be a better pick, since its configuration possibilities are more basic and lead to less problems \cite{Wright:2015aa}.
 
 Ending up the 3-tier architecture is implicitly more complex, leads to higher costs and presumably poorer maintainability. On the other hand it offers a better performance and its usability is more satisfying, since it provides a presentation layer \cite{Wright:2015aa}.
 
@@ -205,7 +205,7 @@ Initially the administrator should be able to represent the organisational struc
 
 As shown in chapter \vref{sec:SellingPoint} the administrator should have the ability to delegate the administration as easily as possible. Concluding it has to be technically feasible to assign a second level administrators to each division, splitting up the workload into easily manageable pieces. It is important to note that the second level administrators only have restricted access and modification rights. For example, they should only be able to view personal information of users they do directly administrate.
 
-To manage the users of the club, the administrator needs to be able to create them. Each user should be associated with one or more divisions. On top of that several personal information need to be stored together with the user. These might include his address, banking information or club related information like his membership number or the dates he became active, passive or resigned from the club. This structure is dependend on the data, the club needs to operate and therefore the possibility should be given to add custom fields to the profiles of user. Upon the creation of a person's profile, he might be informed about his new account through an automated email, where he is introduced to all features of the system and is invited to start using it.
+To manage the users of the club, the administrator needs to be able to create them. Each user should be associated with one or more divisions. On top of that several personal information need to be stored together with the user. These might include his address, banking information or club related information like his membership number or the dates he became active, passive or resigned from the club. This structure is dependent on the data, the club needs to operate and therefore the possibility should be given to add custom fields to the profiles of user. Upon the creation of a person's profile, he might be informed about his new account through an automated email, where he is introduced to all features of the system and is invited to start using it.
 
 Another time-consuming task of an administrator is the management and promotion of internal events. Those events should be created by an administrator, who is able to invite user, he is administrating. For administrative purposes it would be useful to receive feedback from them about their participation of certain events. To simplify the process, user should be invited on a division based selection, concluding the administrator does not need to pick each relevant member but only the relevant division.
 
@@ -213,7 +213,7 @@ The process of collecting membership fees is complicated and in-comprehensive, s
 
 Besides the promotion of events, a club needs to inform the users regular about news concerning certain division or the club. Some of these information might get shared with the public in parallel which would resolve in an unnecessary overhead. Concluding, besides the implementation of a personalised news feed, the system could also offer the possibility to connect to webpage hosting frameworks, like Wordpress or Joomla and social media platforms, enabling the administrator to share information with the user's of the society as well as the public.
 
-Additionally the application should also respect user that are not using the application, because of security concerns or their aversion towards modern technology. It is also possible that certain users do not own a system that is supported by the application. Concluding the software should support a fall back solution for these persons and offer information through standardised channels, like electronic or non-electronic mail.
+Additionally the application should also respect users that are not using the application, because of security concerns or their aversion towards modern technology. It is also possible that certain users do not own a system that is supported by the application. Concluding the software should support a fall back solution for these persons and offer information through standardised channels, like electronic or non-electronic mail.
 
 Finally the application could aggregate interesting information for the administrator and present them within a dashboard. This might include upcoming events or statics about the usage of the platform. Last but not least the system could provide reminder about anniversaries or milestone birthdays of users, which would enable the club to reliable provide congratulations.
 
@@ -221,7 +221,7 @@ Finally the application could aggregate interesting information for the administ
 
 As shown in chapter \vref{sec:SellingPoint} two of the three presented key options are user oriented. Therefore the final application is probably going to have a fairly big amount of user related functionalities.
 
-To get rid of different messaging technologies, a centralised group chat feature should be offered. These group chats should be created automatically for each division. User that are part of the respective division will have the ability to participate within this group chats. For the sake of simplicity, a group chat should only be available for divisions where this feature is useful, so the administrator have to be able to select divisions where this feature is not available. To reduce the amount of notification received through a group chat, the user might only be reminded about an incoming message if he is explicitly mentioned.
+To get rid of different messaging technologies, a centralised group chat feature should be offered. These group chats should be created automatically for each division. Users that are part of the respective division will have the ability to participate within this group chats. For the sake of simplicity, a group chat should only be available for divisions where this feature is useful, so the administrator have to be able to select divisions where this feature is not available. To reduce the amount of notification received through a group chat, the user might only be reminded about an incoming message if he is explicitly mentioned.
 
 The application should also support the user to manage his personalised club calendar and remind him about the beginning of upcoming events. The user should only be invited to events that apply to divisions he is part of. To support the planning of these events, the user should be able to respond to the invitation. A connection between the calendar system of the application and the native system of the particular \gls{OS} could be given, by using a standardised technology, like \emph{iCal}.
 
@@ -339,9 +339,9 @@ Let's put the focus on creating an icon using an \emph{iOS} app as example. The 
 
 While keeping the icon scalable it is important to create a design that is recognisable. Therefore the app should not be overcomplicated. When trying to create such an icon first observe competitors in the same field as well as other popular app icon designs. \cite{Flarup:2015aa}
 
-When looking at the competitor's app icons, please note not to copy any existing design because uniqueness is a crucial aspect of icon layout. It needs to attract the user's attention and have to stay away of any competition. A negative example is the productivity category on the app store, shown in figure \vref{fig:AppProd}. Since all of the shown apps trying to solve a similar problem, they all end up having a more or less identical icon. When ending up, choosing a single glyph, like a checkmark, the designer needs to to make a difference by using a rich colour design. \cite{Flarup:2015aa}
+When looking at the competitor's app icons, please note not to copy any existing design because uniqueness is a crucial aspect of icon layout. It needs to attract the user's attention and have to stay away of any competition. A negative example is the productivity category on the app store, shown in figure \vref{fig:AppProd}. Since all of the shown apps trying to solve a similar problem, they all end up having a more or less identical icon. When ending up, choosing a single glyph, like a checkmark, the designer needs to make a difference by using a rich colour design. \cite{Flarup:2015aa}
 
-Last but not least you have to avoid text within an app icon. On the one hand, this text scales very badly, on the other hand the app is always accompanied with a caption, stating its name. Consequently a logo should not be used as an icon, since these two are very distinct \cite{Flarup:2015ab}. Nevertheless a single letter, used for example by the \emph{Facebook} app, might be a good way to create a distinguishable brand.
+Last but not least you have to avoid text within an app icon. On the one hand, this text scales very badly, on the other hand the app is always accompanied by a caption, stating its name. Consequently a logo should not be used as an icon, since these two are very distinct \cite{Flarup:2015ab}. Nevertheless a single letter, used for example by the \emph{Facebook} app, might be a good way to create a distinguishable brand.
 
 \begin{figure}[h]
   	\centering
@@ -357,22 +357,26 @@ It was considered to form the emblem in a way to resemble to letter \enquote{V}.
 \chapter{Design}
 \label{chapter:Design}
 
-Using the initial thoughts and concept alternatives presented in chapter \vref{chapter:Concept} a design is going to be developed within this chapter. Based on this design the final implementation of the project is executed.
+Using the initial thoughts and concept alternatives presented in chapter \vref{chapter:Concept} a design is going to be developed within this chapter followed up by introducing its final implementation. Concluding the discussion from the last chapter, I decided to provide the system with:
 
-The author of this paper decided to implement the system using a three tier architecture (see section \vref{sec:Architecture}) using a user facing mobile iOS app and an administrator facing web application (see section \vref{sec:Platform}. The remaining details are discussed below.
+\begin{enumerate}
+	\item A three-tier architecture (see section \vref{sec:Architecture})
+	\item A member facing mobile app for \emph{iOS} (see section \vref{sec:Platform})
+	\item An administrator facing web application (see section \vref{sec:Platform})
+\end{enumerate}
 
 \section{Requirements}
 \label{sec:Requirements}
-Within this section the most important requirements for the system are going to be presented. The complete formal list of all objectives can be found in the software requirement specification \cite{Steiler:2014aa} and the server requirement specification \cite{Steiler:2014ab}. The requirements are based on the options shown in chapter \vref{chapter:Design}. The decision, that were made are mainly justified, using the findings from chapter \vref{chapter:Intro}.
+The complete formal list of all objectives can be found in the software requirement specification \cite{Steiler:2014aa} and the server requirement specification \cite{Steiler:2014ab}. They are all based on the options shown in chapter \vref{chapter:Design}. The decision leading to the final implementation are consequential deductions out of the findings from chapter \vref{chapter:Intro}.
 
-\subsection{Obligatory requirements} % must-have
+\subsection{Obligatory requirements}
 \label{sec:ObligatoryReq}
 
 This section states the obligatory requirements of the project. The functionalities described in this section are the most basic ones, that are needed to operate the system. Therefore the fulfilment of the following criteria is mandatory.
 
 \subsubsection{iOS application}
 
-Through the provided \emph{iOS} app the user needs to be able to authenticate himself against the back end server. As shown in section \vref{sec:SellingPoint} one of the main objective of this software is the unification of the communication channels. Therefore every registered user has to be able to use the app to review his personal event calendar, as well as sending and receiving messages. By providing this information without the need of any interaction from the user, these functionalities provide a maximum amount of usability for every persona presented in \vref{sec:UserAnalysis}. 
+Through the provided \emph{iOS} app the user needs to be able to authenticate himself against the back end server. As shown in section \vref{sec:SellingPoint} one of the main objective of this software is the unification of the communication channels. Every registered user has to be able to use the app to review his personal event calendar, as well as sending and receiving messages. By providing this information without the need of any interaction from the user, these functionalities provide a maximum amount of usability for every persona presented in \vref{sec:UserAnalysis}. 
 
 By using the auto layout capability of the \emph{iOS} development suite, an application's layout is automatically adjusted to the screen size and ratio of the user's device. Nevertheless an \emph{iPad} has obviously a bigger screen than an \emph{iPhone} or \emph{iPod touch} and therefore a layout optimised for a smaller device might be less user friendly on a tablet. Since the information provided by the system are going to be checked at home as often as on-the-go, a phone app is more applicable than a tablet app. Therefore it is an obligatory requirement to optimise this application for the operation with the latest \emph{iOS} device generation, more specifically the \emph{iPhone 6}.
 
@@ -382,9 +386,9 @@ To be able to ensure the usage of the latest features provided by the \emph{iOS}
 
 An administrator obviously needs to be able to provide the information requested by the member's app through the web application. This includes the possibility to schedule an event, and create user. The administrator needs to populate each user's profile with information provided by the user. On top of that the user needs to be able to modify the basic behaviour of the system as flexible as possible.
 
-Since the system is storing private user data is is necessary to secure the application and pursue the \gls{LeastPrivileges} principle. Therefore the log in should only be allowed for user that are at least second level administrators and these user should only be able to view users directly managed by them.
+Since the system is storing private user data it is necessary to secure the application and pursue the \gls{LeastPrivileges} principle. Therefore the log in should only be allowed for users that are at least second level administrators and these user should only be able to view users directly managed by them.
 
-As shown in section \vref{sec:UserAnalysis}, the administrator has only basic skills in using technology. Concluding the the above discussed functionalities need to be as straight forward as possible. It is especially difficult when trying to combine usability and flexibility. The implementation of this trade off has to be considered closely.
+As shown in section \vref{sec:UserAnalysis}, the administrator has only basic skills in using technology. Concluding the above discussed functionalities should be as straight forward as possible. It is especially difficult when trying to combine usability and flexibility. The implementation of this trade off has to be considered closely.
 
 \subsubsection{Back-end}
 
@@ -395,28 +399,28 @@ To run the back-end application on a variety of operating systems the cross plat
 \subsection{Optional requirements} % nice-to-have
 The requirements presented in this section are not implicitly necessary for the system to work, nevertheless the overall usability of the system would be highly reduced, when these functionalities would not be part of the initial implementation.
 
-To enhance the convenience of the application, the organisation of user into divisions should be introduced. The administrator needs to be able to assign divisions to the user's profile through the web application. This includes the need of being able to create and modify the division. As discussed in \vref{sec:Functionality} the arrangement of the divisions needs to be as flexible as possible. This would enable the focus of received messages on certain topics, by automatically creating groups, according to the divisions a user is part of. Following the same principle, the invitation to events could be filtered using the membership of users within divisions.
+To enhance the convenience of the application, the organisation of user into divisions should be introduced. The administrator needs to be able to assign divisions to the user's profile through the web application. This includes the need of being able to create and modify the division. As discussed in \vref{sec:Functionality} the arrangement of the divisions needs high flexibility. This would enable the focus of received messages on certain topics, by automatically creating groups, according to the divisions a user is part of. Following the same principle, the invitation to events could be filtered using the membership of users within divisions.
 
-The web and \emph{iOS} applications should both have a user friendly and sophisticated user interface. This includes the need of a well designed navigation concept and a unified colour scheme. The details of the \gls{UI} design are presented in section \vref{sec:Wireframes}. 
+The web and \emph{iOS} applications should both have a user friendly and sophisticated user interface. This implies the need of a well designed navigation concept and a unified colour scheme. The details of the \gls{UI} design are presented in section \vref{sec:Wireframes}. 
 
-The platform should also support the sharing of user taken photos with the club's administration. Therefore the \emph{iOS} application needs to offer the ability to shoot photos, or select previously taken ones and upload them to the server. Additionally the administrator needs to be able to review the uploaded pictures and download them, so he can use them for any club related activity.
+The platform could also support the sharing of user taken photos with the club's administration. Then the \emph{iOS} application might offer the ability to shoot photos, or select previously taken ones and upload them to the server. Consequently the administrator has to have the ability to review the uploaded pictures and download them, so he can use them for any club related activity.
 
 \subsection{Additional requirements}
 \label{sec:AdditionalReq}
 
 The following features are not required and their implementation is probably exceeding the time frame provided by this project. Nevertheless their definition is given here since they would increase the usability significantly. 
 
-The system could support the news feed feature addressed in section \vref{sec:Functionality}. On the one side, this would require the web application to enable the administrators to publish news and relate them to existing divisions. On the other side the \emph{iOS} application needs to be able to display a user specific news feed, presenting all relevant information. On top of that the backend could provide a \gls{RSS} feed, an automated email newsletter containing summaries of the published news, or extensions for blog hosting webpages, like \emph{Joomla} or \emph{Wordpress}. This would improve the integration of user, that do not own a supported smartphone, or do not want to directly participate with the system.
+The system could support the news feed feature addressed in section \vref{sec:Functionality}. On the one side, this would require the web application to enable the administrators to publish news and relate them to existing divisions. On the other side the \emph{iOS} application has to be able to display a user specific news feed, presenting all relevant information. On top of that the backend could provide a \gls{RSS} feed, an automated email newsletter containing summaries of the published news, or extensions for blog hosting webpages, like \emph{Joomla} or \emph{Wordpress}. This would improve the integration of user, that do not own a supported smartphone, or do not want to directly participate with the system.
 
-The \emph{iOS} application could gain additional functionalities, including the possibility to access multiple \emph{myVerein} instances from a single device. This is due to the fact that people engaged in a club, might also engage in other clubs. If both of them are running an instance of \emph{myVerein} it would be very inconvenient for the user to constantly change between the accounts within the application. Additionally the application could be optimised for the operation on an \emph{iPad}, which would improve the usability, when using the application at home on this device.
+The \emph{iOS} application could gain additional functionalities, including the possibility to access multiple \emph{myVerein} instances from a single device. This is due to the fact that people committed in one club might also be dedicated to others. If both of them are running an instance of \emph{myVerein} it would be very inconvenient for the user to constantly change between the accounts within the application. Above that the application could be optimised for the operation on an \emph{iPad}, which would improve its usability at home.
 
-\subsection{Non-requirements} %need-not-to-have
+\subsection{Non-requirements}
 
-It is important to delimit the functionalities of a system and therefore define ones that are NOT part of the development of a software. The following features fall into this category of non-requirements.
+It is important to delimit the functionalities of a system and define items to NOT be part of the development at all. The following features fall into this category of non-requirements.
 
-The \emph{myVerein} system should not replace a club homepage. Therefore it should not provide any non-member facing functionalities or information. This means that the system is not replacing software packages like \emph{Joomla} or \emph{Wordpress}. Nevertheless as outlined in section \vref{sec:AdditionalReq}, it might be possible to integrate \emph{myVerein} into these systems.
+The \emph{myVerein} system must not replace a club homepage. Therefore it should not provide any non-member facing functionalities or information. This means that the system is not replacing software packages like \emph{Joomla} or \emph{Wordpress}. Nevertheless as outlined in section \vref{sec:AdditionalReq}, it might be possible to integrate \emph{myVerein} into these systems.
 
-Finally the \emph{iOS} application is not designed to operate stand-alone, as a private club managing application. Therefore a user who wants to use the app needs to be part of a club, which installed, configured and uses the \emph{myVerein} environment.
+Finally the \emph{iOS} application is not designed to operate stand-alone, as a private club managing application. A user who wants to use the app needs to be part of a club, which installed, configured and uses the \emph{myVerein} environment.
 
 \section{Architectural model}
 \label{sec:ArchitecturalModel}
@@ -429,40 +433,40 @@ After evaluating the findings from section \vref{sec:Architecture}, in section \
 	\label{fig:Architecture}
 \end{figure}
 
-The central server software is written in \emph{Java 8} and uses the \emph{Java Spring} framework. This mature open source framework provides sophisticate security configurations as well as several access frameworks for data provider. On top of this platform several other additional frameworks are available, including messaging and social media connection, that can be used to easily extent the functionalities of the application. The complete business logic is implemented on top of this framework.
+The central server software is written in \emph{Java 8} and uses the \emph{Java Spring} framework. This mature open source framework provides sophisticate security configurations as well as several access frameworks for data provider. With this platform several other additional frameworks are available, including messaging and social media connection, that can be used to easily extent the functionalities of the application. The complete business logic is implemented on top of this framework.
 
-Since the server application needs to be run within the \gls{JVM} and be able to communicate with other machines, an application server is necessary. For this test environment a \emph{Tomcat 8} application server was chosen to host the application. For the possibility to easily and efficient server static content, the application server is connected to an Apache web server using the \gls{AJP}. 
+Since the server application needs to be run within the \gls{JVM} and be able to communicate with other machines, an application server is necessary. For this test environment \emph{Tomcat 8}, connected to an \emph{Apache} web server using the \gls{AJP}, was selected to host the application.  
 
-The data provider was chosen to be a \emph{MongoDB} \gls{NoSQL} database system. This schema free database enables flexibility, as well as extensibility and speed, which is not comparable to existing relational database applications \cite{Moschetti:2014aa}. The database itself is connected with the server application using the \emph{Spring Data} framework, which supports the use of \emph{MongoDB}. This framework provides a concise and object oriented access to the database using the native \emph{Java} driver developed by \emph{MongoDB}. Most importantly it integrates very well into the \emph{Java Spring} framework.
+The data provider was chosen to be a \emph{MongoDB} \gls{NoSQL} database system. This schema free database enables flexibility, as well as extensibility and speed, which is far ahead of existing relational database applications \cite{Moschetti:2014aa}. The database itself is connected with the server application using the \emph{Spring Data} framework, which supports the use of \emph{MongoDB}. This framework provides a concise and object oriented access to the database using the native \emph{Java} driver developed by \emph{MongoDB}. Most importantly it integrates very well into the \emph{Java Spring} framework.
 
-To ensure high flexibility the system is designed to operate behind a load balancer. Therefore each system needs to be stateless and retrieve all necessary information and configuration from the central data provider. If this is the case, the necessary computing power to fulfil all requests can be automatically allocated and deallocated, by deploying additional \emph{myVerein Server Instances}, or removing them. This would allow a cost efficient, high available, large scale operation within a cloud environment.  
+To ensure high flexibility the system is designed to operate behind a load balancer. Therefore each system needs to be stateless retrieving all necessary information and configuration from the central data provider. If this is the case, the necessary computing power to fulfil all requests can be automatically allocated and deallocated, by adding or removing \emph{myVerein Server Instances}. This would allow a cost efficient, high available, large scale operation within a cloud environment.  
 
-The front end of the system consists of an iOS app and a web application. Both of them use a \gls{REST} \gls{API} to communicate with the system. The \gls{API} is designed to be used by many different application and should therefore simplify the process of adding new front-end components to the system. By using this model, the development of these components can be done independently from the development of the server as long as the existing \gls{API} is not changed.
+The front end of the system consists of an iOS app and a web application. Both of them use a \gls{REST} \gls{API} to communicate with the system. The \gls{API} is designed to be used by many different application and should therefore simplify the process of adding new front-end components to the system. Then the development of these components can be done independently from the server as long as the existing \gls{API} is not changed.
 
-The web application is intended to be used by the administrator only to manage the system. Within this web application only the features that are relevant for the administrator need to be accessible. This application should avoid the reloading of the current page by using the principles of \gls{AJAX}. On top of that the application should be designed to be as mobile friendly as possible, to enable administrators to use it on their mobile devices as well. To create a rich \gls{UI} and feature set, while keeping the workload on the developer as small as possible, several \gls{CSS} and \gls{JS} frameworks are going to be used.
+The web application is intended to be used by the administrator only to manage the system. Within this web application only the features that are relevant for the administrator need to be accessible. This application should avoid the reloading of the current page by using the principles of \gls{AJAX}. On top of that the application should be designed to be as mobile friendly as possible. To create a rich \gls{UI} and feature set, while keeping the workload on the developer manageable, several \gls{CSS} and \gls{JS} frameworks are going to be used.
 
-The iOS application's target group are the member's of the clubs using this system. The application is going to be developed using \emph{Apple}'s new programming language \gls{Swift}. Additionally the dependency manager \emph{CocoaPods} is going to be used for adding existing frameworks to the project. This is done to simplify the development of the application, while increasing the usability.
+The \emph{iOS} application's target group are the member's of the clubs using this system. The range of functions is therefore being limited accordingly. The application is going to be developed using \emph{Apple}'s new programming language \gls{Swift}. Additionally the dependency manager \emph{CocoaPods} is going to be used for adding existing frameworks to the project. This is done to simplify the development of the application, while increasing the usability.
 
 \section{Database layout}
 \label{sec:DatabaseLayout}
 
 As presented in section \vref{sec:ArchitecturalModel} the data provider used for this project is going to be the \gls{NoSQL} database system \emph{MongoDB}. Even though this system uses a dynamic schema, it is important to model the organisation of the data in advance, to later ensure a reliant and consistent operation. Nevertheless this schema is very likely going to change during development, but the dynamic aspect is very helpful within the context of this agile development approach.
 
-A database schema can be depicted using an \gls{ER} diagram. This visual representation of a database layout was originally introduced for relational databases, nevertheless it was adopted for this work into the context of \gls{NoSQL} databases. The diagram created during the design phase and used as orientation during the development can be found in appendix \vref{app:ERDesignPhase}. It is important to note, that during the design of the database schema all requirements discussed in \vref{sec:Requirements} have been considered.
+A database schema can be depicted using an \gls{ER} diagram. This visual representation of a database layout was originally introduced for relational databases, nevertheless it was adopted for this work into the context of \gls{NoSQL} databases. The diagram created during the design phase and used as orientation during the development can be found in appendix \vref{app:ERDesignPhase}.
 
-Within this sections each entity, in the context of a document oriented database like \emph{MongoDB} better known as document store, is going to be described in details. The connection between documents is also discussed.
+Above all, each set of entities in the context of a document oriented database like \emph{MongoDB} - better known as document store - is going to be described in detail in the upcoming chapter as well as the connections between the documents.
 
 \subsection{User}
 The user information are stored within the \emph{User} document store. The data is organised according to the \emph{One-to-Many Relationships with Embedded Documents} model \cite[p. 141]{Mongo:2014aa}.
 
-On the lowest level all required information about the user, like the user's email or his hashed password, are stored. The private information of a user, which can only be viewed by the administrator are saved within the \emph{PrivateInformation} array. The \emph{PublicInformation} array is holding all optional information stated by the user. These information can be accessed by every member of the club.
+On the lowest level all required information about the user, like the user's email or his hashed password, are stored. His private information that can only be viewed by the administrator are saved within the \emph{PrivateInformation} array. The \emph{PublicInformation} array is holding all optional information stated by the user. These information can be accessed by every member of the club.
 
-On top of that each user is part of one ore more divisions. The membership within the divisions is stored as nested arrays. These data structures hold the foreign key to the division as well as the date when the user joined the division.
+As each user is part of one ore more divisions the membership within the divisions is stored as nested arrays. These data structures hold the foreign key to the division as well as the date when the user joined the division.
 
 \subsection{Division}
 Each division is an entry within the division's document store. It is defined by its name and short description.
 
-Divisions are organised hierarchical within a club, so this structure has to be represented within the database. This data structure is going to be represented within MongoDB using the \emph{Model Tree Structures with an Array of Ancestors} \cite[p. 149]{Mongo:2014aa}. This structure is storing the direct parent of the node, as well as an array of all ancestors, to easily query all ancestors. Within the use case of this application this behaviour is needed, since the system needs to subscribe the user to all chats of the user's division as well as all chats above his division.
+Divisions are organised hierarchical within a club, so this structure has to be represented within the database. This data structure is going to be represented within MongoDB using the \emph{Model Tree Structures with an Array of Ancestors} \cite[p. 149]{Mongo:2014aa}. This structure is storing the direct parent of the node, as well as an array of all ancestors, to easily query them. Within the use case of this application this behaviour is needed, since the system needs to subscribe the user to all chats within his divisions as well as all chats above.
 
 Each division is administrated by up to one user, who gains access to the administrator panel through this position. If there is no administrator specified, the super admin takes his role. This super user is defined by being administrator of the root division.
 
@@ -510,25 +514,25 @@ The last wireframe is the settings page, where the admin can adjust settings for
 \label{sec:iOSMockup}
 The mockups for the iOS application can be found in appendix \vref{app:iOSWireframe}. The mockup is displayed using a storyboard presentation, showing the connection between each view.
 
-For the initial implementation of the application the decision was made to use the conventional navigation concept of a tab bar located at the bottom of the window. This is mainly due to the fact that the implementation of an alternative navigation concept is very time consuming and would need additional user testing to ensure its usefulness.
+For the initial implementation the decision was made to use the conventional navigation concept of a tab bar located at the bottom of the window. This is owing the fact of an alternative concept being very time consuming, needing additional user tests to ensure its usefulness.
 
 Starting at the bottom of the mockup page, the screen shown there is the event management tab. This view shows a calendar in the upper half of the screen and the list of events, scheduled for the currently selected date, in the lower half of the screen. Only events are shown, where the user has been invited to. Additionally another screen could be implemented showing more details of a specific event.
 
 Continuing clockwise, the news feed is the next screen. Within this view each posted news, that is applicable for the user is shown. The user is able to scroll through the posts and thereby inform himself about the club.
 
-The next screen is the messages screen, which is showing all currently subscribed divisions, which have an enabled chat functionality. Within the mockup the conservative table view approach is shown, but the implementation of the alternative overview discussed in section \vref{sec:ChatOverview} is still considered. From this screen the user is able to access the chat screen. This screen is based on the design of the stock \emph{iMessage} app.
+Next is the message screen, which is showing all currently subscribed divisions having an enabled chat functionality. Within the mockup the conservative table view approach is shown, but the implementation of the alternative overview discussed in section \vref{sec:ChatOverview} is still considered. From this screen the user is able to access the chat screen. This screen is based on the design of the stock \emph{iMessage} app.
 
-The upper right screen is the photos section, where the user is able to shoot pictures within the app. After taking the picture he is able tag it with a division he is part of and upload it to the \emph{myVerein} server. The user is also able to choose an already taken picture from his camera roll.
+The upper right screen is the photos' section, where the user is able to shoot pictures within the app. After taking the picture he is able tag it with any division he is part of and upload it to the \emph{myVerein} server. The user is also able to choose an already taken picture from his camera roll.
 
-The last screen, which is not described yet, is the settings tab. In this view, the user is able to change his personal profile and change general settings that apply for his local device. This might include preferences about event reminder, in app notifications and other behaviours.
+The last screen, which is not described yet, is the settings tab. In this view, the member can change his personal profile and change general settings that apply for his local device. This might include preferences about event reminder, in-app notifications and other behaviours.
 
 \section{Licensing}
 
-When creating any kind of intellectual property, that is supposed to be published, it is always necessary to think about the licensing of the work. Today an author or developer has the possibility to choose from a variety of available licenses, each with different purpose or restrictions. The main question on this topic is around the fact if the work should be part of the public domain, and therefore enable other people to use and share it freely, or not. 
+When creating any kind of intellectual property, that is supposed to be published, it is always necessary to think about the licensing of the work. Today an author or developer has the possibility to choose from a variety of available license tools, each with different purpose or restrictions. The main question on this topic is around the fact if the work should be part of the public domain, and therefore enable other people to use and share it freely, or not. 
 
 It is a personal attitude to enable other people to learn and benefit from my work, if the circumstances allow it. Therefore I decided to license the documentation work done within this project using a \gls{CCLicense}. This enables user to retrieve, distribute and alter the work free of charge, as long as it is not used within a commercial environment, the appropriate attributes have been given and the altered work is published under the same license. \cite{Commons:2015aa}
 
-The code written within this project is licensed using a \gls{GNUGPL}. This allows every person free of charge to use, modify and distribute the work, even in a commercial application, as long as the original source is included, the changed sections have been marked and the author received the appropriate attributions. On top of that every work that uses this system needs to be licensed using a license that is compatible with the \gls{GNUGPL}. Last but not least, a disclaimer is included, excluding the developer from his liability for damage caused by the software. \cite{Foundation:1991aa}
+The code written within this project is licensed using a \gls{GNUGPL}. This allows every person free of charge to use, modify and distribute the work, even in a commercial application, as long as the original source is included, the changed sections have been marked and the author received the appropriate attributions. On top of that every work that uses this system needs to use a license that is compatible with the \gls{GNUGPL}. Last but not least, a disclaimer is included, excluding the developer from his liability for damage caused by the software. \cite{Foundation:1991aa}
 
 In general releasing a software under an open-source license has three major benefits: First, the software itself can be reviewed for security or logical errors and every user can contribute fixing bugs or adding new content to the application. Additionally user trust open-sourced software more than proprietary ones, because of the possibility of these audits. This is a benefit when handling private data. Second, since the usage of the application is free, the adoption rate of the software could be higher compared to a non-open-sourced application. Last but not least the software can help other people to educate themselves and therefore support software developers to learn from the experience gained through this work.
 
@@ -538,12 +542,12 @@ Within this chapter the final implementation is presented. All findings of the p
 
 \section{Visual branding}
 \label{sec:BrandingImplementation}
-As discussed in section \vref{sec:BrandingConcept} the branding and therefore recognisability of a brand is one of the most important part of creating a new system, that needs to be placed on the market. 
+As discussed in section \vref{sec:BrandingConcept} the branding and moreover the recognisability of a brand is one of the most important parts of creating new system, that is going to be placed on the market. 
 
 \subsection{Colour scheme}
 After considering the findings in section \vref{sec:ColourConcept} the author decided to use a \emph{Tetradic} colour scheme. The base colour should be the most dominant one, where the other three ones should be used to draw the user's attention. 
 
-After considering different colour tones as base colour, the decision was made to go for a soft green colour, more specifically the one defined through the hex code \texttt{0x13CD78}. It was chosen, because of it's calming property, which qualifies it for a base colour \cite{Chapman:2010aa}. Green is described as \enquote{a very down-to-earth color. It can represent new beginnings and growth. It also signifies renewal and abundance} \cite{Chapman:2010aa}. It is very balancing and harmonising, which relates it to wealth and stability. 
+After considering different colour tones as base colour, the decision was made to go for a soft green colour, more specifically the one defined through the hex code \texttt{0x13CD78}. It was chosen, because of it's calming property, which qualifies it for a base colour \cite{Chapman:2010aa}. Green is described as \enquote{a very down-to-earth colour. It can represent new beginnings and growth. It also signifies renewal and abundance} \cite{Chapman:2010aa}. It is very balancing and harmonising, which relates it to wealth and stability. 
 
 \begin{figure}[h]
   	\centering
@@ -552,11 +556,11 @@ After considering different colour tones as base colour, the decision was made t
 	\label{fig:ColourScheme}
 \end{figure}
 
-Figure \vref{fig:ColourScheme} shows the applied \emph{Tetradic} method on the above mentioned base colour. The three other colours, which fit very well to each other, are very suitable to draw attention in a green/white dominated environment, that is going to be created within the \emph{web} and \emph{iOS} app. The blue colours are going to be used for general information, where the orange tones are used for warning and the red ones for errors.
+Figure \vref{fig:ColourScheme} shows the applied \emph{Tetradic} method on the above mentioned base colour. The three other colours, which fit well to each other are very suitable to draw attention in a green/white dominated environment, that is going to be created within the \emph{web} and \emph{iOS} app. The blue colours are going to be used for general information, where the orange tones are used for warning and the red ones for errors.
 
 \subsection{Logo}
 \label{sec:Logo}
-Using the colour scheme presented in the previous chapter, a logo, used among others as app icon, is going to be presented within this section. The concept shown in section \vref{sec:Icon} was selected and advanced. 
+With our preferred colour scheme a logo, used among others as app icon, is going to be presented within this section. The concept shown in section \vref{sec:Icon} was selected and enhanced. 
 
 \begin{figure}[h]
   	\centering
@@ -565,7 +569,7 @@ Using the colour scheme presented in the previous chapter, a logo, used among ot
 	\label{fig:Logo}
 \end{figure}
 
-Figure \vref{fig:Logo} is showing the final logo, which is similar to early concept shown in figure \vref{fig:AppSketch}. The only main difference is the adoption of the system wide colour scheme. The logo itself is therefore kept very simple and flat, while adding a 3D effect through the banner, making it more interesting. The dominant colour of the logo is the base colour of the brand's colour scheme, which is used to create a strong connection with the application itself.
+Figure \vref{fig:Logo} shows the final logo, which is similar to early concept in figure \vref{fig:AppSketch}. The only main difference is the adoption of the system wide colour scheme. The logo is kept very simple and flat, while adding a 3D effect through the banner, making it more interesting. The dominant colour of the logo is the base colour of the brand's colour scheme, which is used to create a strong connection with the application itself.
 
 \begin{figure}[h]
   	\centering
@@ -574,7 +578,7 @@ Figure \vref{fig:Logo} is showing the final logo, which is similar to early conc
 	\label{fig:IconFinal}
 \end{figure}
 
-Finally the simplicity and lack of writing allows the logo to scale perfectly. Actually the logo was created using a vector program, allowing it to scale in any possible way. Figure \vref{fig:IconFinal} shows the final icon rendered using the different resolutions and context it is going to appear within the \gls{OS}. Important to note is, that the icon itself is backgrounded by a gradient going from the green base colour on the upper left to the blue alternative colour of the scheme in the bottom right.
+Finally the simplicity and lack of writing allows the logo to scale perfectly. Actually the logo was created using a vector program, allowing it to do so in any possible way. Figure \vref{fig:IconFinal} shows the final icon rendered using the different resolutions and context it is going to appear within the \gls{OS}. Important to note is, that the icon itself is backgrounded by a gradient going from the green base colour on the upper left to the blue alternative colour of the scheme in the bottom right.
 
 \section{Back-end}
 The architecture of the system presented in section \vref{sec:ArchitecturalModel} did not change during the implementation. Therefore the back-end was created using the Java programming language and with the aspect of scalability in mind. The development of the server is presented in this section, highlighting the most important parts of the system, but not going into every detail.
@@ -582,9 +586,15 @@ The architecture of the system presented in section \vref{sec:ArchitecturalModel
 \subsection{Frameworks}
 \label{sec:FrameworksServer}
 
-In todays world a lot of open-source frameworks are available to simplify the creation of complex systems, by providing fundamental functionalities. To efficiently manage the growing amount of dependencies within such a project, a dependency management framework is highly recommended. By using the state-of-the-art \emph{Maven 3} framework managing third party libraries and their versions is highly simplified. Especially when working within a team, this management system is ensuring, the usage of the same library versions across the team, without the need of pushing them into the version controlling system. It also helps to keep track of the currently used version and might help migrating to never revisions. To simplify this project several well tested frameworks have been used.
+In todays world a lot of open-source frameworks are available to simplify the creation of complex systems, by providing fundamental functionalities. To efficiently manage the growing amount of dependencies within such a project, a dependency management framework is highly recommended. By using the state-of-the-art \emph{Maven 3} framework managing of third party libraries and their versions is highly simplified. Especially when working within a team, this management system is ensuring the usage of the same library versions across the team without the need of pushing them into the version controlling system. It also helps to keep track of the currently used version and might help migrating to never revisions. To simplify this project several well tested frameworks have been used.
 
-The most dominant framework used is called \emph{Spring}. This suite of frameworks is aiming on simplifying \emph{Java} and \emph{Java EE} application. Three main branches of \emph{Spring} have been used: The first one is the \emph{Spring WebMVC} framework, enabling the fast development of \gls{MVC} conform web applications. The second one is the \emph{Spring Data MongoDB} framework, allowing an easy and object oriented access of the database. For more information see section \vref{sec:ImplementationDB}. Finally the \emph{Spring Security} framework is the last \emph{Spring} framework used within the project, providing a concise interface for securing the platform. A detailed presentation on the used policies is shown in section \vref{sec:ImplementationSec}.
+The most dominant framework used is called \emph{Spring}. This suite of frameworks is aiming on simplifying \emph{Java} and \emph{Java EE} application. Three main branches of \emph{Spring} have been used:
+
+\begin{enumerate}
+    \item \emph{Spring WebMVC}: Enabling the fast development of \gls{MVC} conform web applications
+    \item \emph{Spring Data MongoDB}: Allowing easy and object oriented access of the database (see \vref{sec:ImplementationDB})
+    \item \emph{Spring Security}: Providing a concise interface for securing the platform (see \vref{sec:ImplementationSec})
+\end{enumerate}
 
 Another very important aspect during development is logging. The logging overhead should be as small as possible, to reduce a performance impact on the application. Nevertheless a sufficient amount of log messages need to be written, to simplify the process of backtracking bugs and security breaches. To combine these two requirements a professional logging framework is necessary. One of the most important logging frameworks within the \emph{Java} programming language is \emph{Log4j2}. It provides an easy interface, is highly customisable and delivers a high performance. Additionally the \emph{SLF4J} bridging framework was used, enabling the inclusion of logging messages from 3\textsuperscript{rd} party libraries like \emph{Spring}.
 
@@ -593,9 +603,7 @@ The configuration of the logging framework is possible by manipulating the \text
 \subsection{Scalability}
 \label{sec:Scalability}
 
-As shown in section \vref{sec:ArchitecturalModel}, one instance of the \emph{myVerein} system should be able to run on multiple servers at the same time. The load should be distributed on the servers using a load balancer. By enforcing this architecture the platform is able to dynamically scale, depending on the workload on the system.
-
-This kind of architecture is only possible if each instance of the server is stateless and retrieves all variable settings from a central data repository. By using this technique any settings change made to one system is instantly adopted by instances. 
+As shown in section \vref{sec:ArchitecturalModel}, one qualification of the \emph{myVerein} system should be the ability to run within a clustered environment. The load should be distributed on the servers using a load balancer. By enforcing this architecture the platform is able to dynamically scale, depending on the workload on the system. This is only possible if each instance of the server is headless retrieving all variable settings from a central data repository. 
 
 \begin{lstlisting}[caption ={Example layout of settings document}, label=lst:SettingsDoc]
 {
@@ -609,16 +617,16 @@ This kind of architecture is only possible if each instance of the server is sta
 }
 \end{lstlisting}
 
-This behaviour is realised by storing all settings within a dedicated document store on the MongoDB data provider. Listing \vref{lst:SettingsDoc} shows an example document within the settings document store. The available settings are currently very limited and only provide the possibility to set a club name, define the root division and add custom fields to every user profile. It is important to note that there is only one document allowed within the document store, since the systems cannot know which of the documents to choose. As soon as an instance encounters more than one document, every document but the first retrieved one is removed and a warning is issued. 
+This behaviour is realised by storing all settings within a dedicated document store on the MongoDB data provider. Listing \vref{lst:SettingsDoc} shows an example document within the settings document store. The available settings are currently very limited and only provide the possibility to set a club name, define the root division and add custom fields to every user profile. It is important to note that there is only one settings document allowed within its document store, since the systems cannot know which of them to choose. As soon as an instance encounters more than one configuration, all of them except the first one is removed and a warning is issued. 
 
-Of course a stand alone instance cannot know how to access the database. One way to solve this problem would be to hard code the information about the data provider within the source code, but that would lead to a low customisability. Therefore every instance has a local \texttt{myVerein.properties} file within their resources folder, which is loaded during start up. This files holds the information about the hostname, port, username, password and database name of the \emph{MongoDB}. The remaining \texttt{developmentMode} property is only important for debugging purposes and decides if the server should server the minified versions of the \emph{JavaScript} files or the larger, non-minified ones. Concluding the only thing that needs to be modified when adding a new instance to a cluster is this properties file.
+Of course a stand alone instance cannot know how to access the database. One way to solve this problem would be to hard-code the information about the data provider within the source code, but that would lead to a low customisability. Therefore every one has a local \texttt{myVerein.properties} file within their resources folder, which is loaded during start up. This files holds the information about the hostname, port, username, password and database name of the \emph{MongoDB}. Concluding the only thing that needs to be modified when deploying a new unit to a cluster is this file, all remaining information are consequentially retrieved from the database.
 
 An initial setup is only possible, if there is no document within the settings document store of the database, specified by the above mentioned properties file, or if this document's \texttt{initialSetup} flag is set to true. If either of the previous properties holds true, the access of the index page will present a page, leading through the initial setup. When specifying all required information, the provided database is going to get dropped and the system needs to be restarted manually. This method is used when trying to reset the system through the settings page of the administration panel. 
 
 \subsection{Database}
 \label{sec:ImplementationDB}
 
-In the first part of this section the final layout of the database is presented, and the second part is showing the object-oriented mapping provided by the \emph{Spring Data} framework. The decision made in section \vref{sec:ArchitecturalModel} did not change during the implementation and therefore the data-provider is the \gls{NoSQL} database \emph{MongoDB}.
+In the first part of this section the final layout of the database is presented, and the second part is showing the object-oriented mapping provided by the \emph{Spring Data} framework. 
 
 \subsubsection{Final layout}
 \label{sec:DatabaseFinal}
@@ -629,21 +637,21 @@ In section \vref{sec:DatabaseLayout} the initial layout of the data provider was
 Within the user object only small design changes have been made. The amount of default entries within the document has been increased, e.g. every profile has the fields \enquote{Member since}, \enquote{Passive since}, \enquote{Resignation date} and \enquote{Birthday}. This changes have been performed to be able to create a powerful dashboard for the administrator. On top of that the dynamic \enquote{Private Information} and \enquote{Public Information} have been merged into a single array called \emph{Custom user fields}, because implementing a rich public profile is not going to be provided within this version. Besides that, all connections between the user and other documents, that are stored within the user remain as shown in section \vref{sec:DatabaseLayout}.
 
 \paragraph{Division}
-The only changed made to the division object, is the member list. This element contains the id's of all members that are part of the division. Unfortunately the maintenance of this list is very expensive, since it needs to be update for every division change of a user. Nevertheless it's implication is a significant speedup of the message sending process. This is due to the fact that this member list is needed during each send request of a message and it's computation is rather expensive.
+The only change made to the division object, is the member list. This element contains the IDs of all members that are part of the division. Unfortunately the maintenance of this list is very expensive, since it needs to be update for every division change of a user. Nevertheless its implication is a significant speedup of the message sending process, due to the fact that this member list is needed during each send request of a message and its computation would be rather expensive.
 
 \paragraph{Message}
 
-Besides the initials thoughts of creating a self-destroying message stack, the decision was made to store all messages permanently. This is mainly due to the fact to later be able to support the access of one account on multiple devices. On top of that this would enable the possibility of storing meta-information about the delivery status of the message. Every receiver of a message is stored within the \enquote{Receiver} map, where the key is the user id string and the value is the delivery status. Therefore the retrieval of all non-delivered messages of a certain user is very fast and easy.
+Besides the initials thoughts of creating a self-destroying message stack, the decision was made to store all messages permanently. This is mainly due to the fact to later be able to support the access of one account on multiple devices. On top of that this would enable the possibility of storing meta-information about the delivery status of the message. Every receiver of a message is stored within the \enquote{Receiver} map, where the key is the user ID string and the value is the delivery status. Therefore the retrieval of all non-delivered messages of a certain user is very fast and easy.
 
 \paragraph{Event}
 
-The event document's properties were expanded, similar to the user's. Additional information like the precise coordinates of a location (stored in \enquote{Location Lat} and \enquote{Location Lng}) are now part of the object. Additionally the pattern of storing the message status together with the user id was adopted within the \enquote{Invited user} relationship, where the response is the value to the invited user's id.
+The event document's properties were expanded, similar to the user's. Additional information like the precise coordinates of a location (stored in \enquote{Location Lat} and \enquote{Location Lng}) are now part of the object. Additionally the pattern of storing the message status together with the user ID was adopted within the \enquote{Invited user} relationship, where the response is the value to the invited user's ID.
 
 \paragraph{Settings}
 
-As explained in section \vref{sec:Scalability} the system needs a central settings document. During the design phase this property was not considered and missing. Within the final design it is part of the database design. It has a relationship to exactly one division, which is the root division. This root division's name needs to be equal to the club name by design. 
+As explained in section \vref{sec:Scalability} the system needs a central settings document. During the design phase this property was not considered and missing. Within the final program it is part of the database design. It has a relationship to exactly one division, which is the root division. This root division's name needs to be equal to the club name by design. 
 
-\paragraph{Remember me token}
+\paragraph{Remember-me token}
 
 This document store wasn't considered during the initial design either. It is an independent document with no direct relation ship to any other document and used to keep a user logged, even if the session expires. A detailed explanation is given in section \vref{sec:ImplementationSec}. 
 
@@ -655,9 +663,9 @@ Due to limited time resources the feature of uploading and inspecting photos nee
 
 To access the data from the \emph{Java} program a developer has several options. He can either use the official \emph{MongoDB} driver library provided by \emph{MongoDB}, or a state of the art object-oriented mapping library like \emph{Hibernate}. Since the \emph{Spring WebMVC} framework was used within the project, another part of the \emph{Spring} framework was chosen to provide access to the database: \emph{Spring Data MongoDB}.
 
-This framework is build on top of \emph{Hibernate} and provides the same mapping capabilities from \emph{MongoDB} documents to objects within \emph{Java}, adding \emph{JavaEE} functionalities like annotations. Each document stored in the database should be represented by a class of the project. \emph{Spring Data} also has the possibility to return a map containing the entry, but this is a very in concise solution, which was not used within this project. Every document described in the previous chapter is therefore represented by a class located within the package \path{de.steilerdev.myVerein.server.model}. 
+This framework is build on top of \emph{Hibernate} and provides the same mapping capabilities from \emph{MongoDB} documents to objects within \emph{Java}, adding \emph{JavaEE} functionalities like annotations. Each document stored in the database should be represented by a class of the project. \emph{Spring Data} also has the possibility to return a map containing the entry, but this solution is not concise at all and was not used within this project. Every document described in the previous chapter is therefore represented by a class located within the package \path{de.steilerdev.myVerein.server.model}. 
 
-To enable the usage of an object within the context of \emph{Spring Data} it needs to inherit from the \texttt{BaseEntity} class. Afterwards every property of the object is mapped to the appropriate attribute of the document, unless it was annotated with \texttt{@Transient}, which is disabling the storage of the respective property in the database. 
+To enable the usage of an object within the context of \emph{Spring Data} it needs to inherit the \texttt{BaseEntity} class. Afterwards every property of the object is mapped to the appropriate attribute of the document, unless it was annotated with \texttt{@Transient}, which is disabling the storage of the respective property in the database. 
 
 Additionally validator annotations are available, ensuring that a specific property is \texttt{@NotEmpty}, \texttt{@NotNull} or an \texttt{@Email}. If these requirements are not met during the save process, an exception is thrown. 
 
@@ -665,7 +673,7 @@ Within \emph{MongoDB} the relation between two documents can be expressed by sto
 
 It is important to note that the references to other documents are automatically resolved, which simplifies the retrieval of nested documents. However this process is not done lazily, which resulted into a bad query performance for highly nested documents. \emph{Spring Data} therefore introduced the (optional) \texttt{lazy} property of the \texttt{@DBRef} annotation, indicating that this property is loaded upon access. Unfortunately this feature is not working in every context and could therefore not be used for every reference.
 
-The retrieval and storage of information within the database is done through repositories. One repository for each object class that should be stored within the database is created. These repositories are defined as interfaces and by analysing the function name or reading the provided annotation \emph{Spring Data} is able to create the appropriate function and query to retrieve the objects. The repositories also provide a \texttt{save()} function, storing a specified object, or a list of objects durably, if all validation requirements are met. 
+The retrieval and storage of information within the database is done through repositories. One repository for each object class that should be stored within the database is created. These repositories are defined as interfaces and by analysing the function name or reading the provided annotation \emph{Spring Data} is able to create the appropriate function and query to retrieve the objects. The repositories also provide a \texttt{save()} function durably storing a specified object or a list of objects if all validation requirements are met. 
 
 \subsection{Security}
 \label{sec:ImplementationSec}
@@ -680,7 +688,7 @@ Line 44 to 64 use the default behaviour of \emph{Spring Security} to enforce the
 
 Even though the behaviour presented in the last paragraph is very user friendly, it is not compatible with the \gls{REST} standard. A \gls{REST}ful \gls{API} needs to return appropriate status codes according to the availability of a resources, this includes a \texttt{401} status codes for an unauthenticated user. Therefore custom handler needed to be created and applied to the \gls{URI} that define the \gls{REST} interface. These overwriting handlers can be found within the \path{de.steilerdev.myVerein.server.security.rest} package. Their definition and usage within the configuration file can be found within lines 35 - 42, 15, 22 and 23. The remaining notable entries within the \gls{REST} block (lines 14 to 42) are the permission for every user to access the login, logout and initial setup \gls{URI} of the \gls{REST} \gls{API} and the distinction between the user's area (\texttt{/api/user}) and administrator's area (\texttt{/api/admin}). For security reasons every other resource within the \texttt{/api} \gls{URI} is matched by a rule restricting the access to administrators. Therefore new functionalities, that did not get an own policy yet are secured.
 
-As mentioned in section \vref{sec:DatabaseFinal} the back end supports a remember me functionality, keeping a user logged in, even if the session expires. Besides the regular session token, which gets deleted after the session ends, a second \enquote{remember-me} cookie is set, if the user wants to stay logged in. Within this cookie the user's username, a random token and a series number is handed to the user and stored within a database table. The user is later automatically logged in if he presents this cookie and the username, series and token match the currently stored database entry. Upon a successful authentication a new token is issued and overwrites the one currently present in the database. The series number stays the same. In case a \enquote{remember-me} cookie is presented, where the series and the username match an entry within the database, but the token is different a cookie theft is assumed and all cookies associated with the user are invalidated. Therefore a thief would only be able to use a stolen cookie until the user logs in the next time. Additionally the system is able to notify the user about the detection of a possible cookie theft. \cite{Jaspan:2006aa}
+As mentioned in section \vref{sec:DatabaseFinal} the back end supports a remember-me functionality, keeping a user logged in, even if the session expires. Besides the regular session token, which gets deleted after the session ends, a second \enquote{remember-me} cookie is set, if the user wants to stay logged in. Within this cookie the user's username, a random token and a series number is handed to the user and stored within a database table. The user is later automatically logged in if he presents this cookie and the username, series and token match the currently stored database entry. Upon a successful authentication a new token is issued and overwrites the one currently present in the database. The series number stays the same. In case a \enquote{remember-me} cookie is presented, where the series and the username match an entry within the database, but the token is different a cookie theft is assumed and all cookies associated with the user are invalidated. Therefore a thief would only be able to use a stolen cookie until the user logs in the next time. Additionally the system is able to notify the user about the detection of a possible cookie theft. \cite{Jaspan:2006aa}
 
 The configuration for this \enquote{remember-me} service can be found from line 66 to 80 within the configuration from appendix \vref{app:SpringSec}. The required data provider can be found within the class \path{de.steilerdev.myVerein.server.security.RememberMeTokenDataProvider}.
 
@@ -699,7 +707,7 @@ The next branch from line 530 to 542 covers the case, where the new list of divi
 
 The third branch is very similar to the last one and shown from line 543 to 555. In this case the user was not part of any division before this update and therefore only the new divisions and their events are going to be updated. The user is added to the divisions in line 546 and 547 and the events are updated in parallel within the lines 550 to 554. 
 
-The last branch is the most complex one. It covers the case where the user has been part of divisions before the change and will be part of divisions afterwards. In this case the first step is to perform set operations on the two list. By creating the intersect in line 559, the divisions that are in both sets are determined. These ones do not need to be changed at all, since the user was part of the division before and will be after. From line 564 to 578 this intersection is used while iterating over the list of new and old divisions to determine whether or not the user needs to be added or removed from the division. Each changed division is put into a list, specifying the division's events that needs to get updated within line 583 to 587. Since the collection is accessed from different threads at once, a synchronised list is needed, or otherwise an unexpected behaviour could occur.
+The last branch is the most complex one. It covers the case where the user has been part of divisions before the change and will be part of divisions afterwards. In this case the first step is to perform set operations on the two list. By creating the intersection in line 559, the divisions that are in both sets are determined. These ones do not need to be changed at all, since the user was part of the division before and will be after. From line 564 to 578 this intersection is used while iterating over the list of new and old divisions to determine whether or not the user needs to be added or removed from the division. Each changed division is put into a list, specifying the division's events that needs to get updated within line 583 to 587. Since the collection is accessed from different threads at once, a synchronised list is needed, or otherwise an unexpected behaviour could occur.
 
 After all divisions and events have changed, the altered user can be stored durably and no inconsistency should be present.
 
@@ -716,7 +724,7 @@ Initially this task was realised using a lot of back-end computing, iterating ov
 	\label{fig:EventPeriod}
 \end{figure}
 
-This change in behaviour could be realised, by updating \emph{Spring Data MongoDB} to the latest release, which included the support of comparing \emph{Java 8} \texttt{LocalDateTime} objects within a query. By shifting the workload from the application to the database the process is benefitting from internal query optimiser, a reduces result set and an overall improved responsiveness. 
+This change in behaviour could be realised, by updating \emph{Spring Data MongoDB} to the latest release, which included the support of comparing \emph{Java 8} \texttt{LocalDateTime} objects within a query. By shifting the workload from the application to the database the process is benefitting from internal query optimiser, a reduced result set and an overall improved responsiveness. 
 
 Figure \vref{fig:EventPeriod} is showing the four possibilities any event can occupy a part or the complete time period. Either it is within the period (event 1), starts before and ends within the period (event 2), starts within the period and ends after (event 3), or starts before and ends after the period (event 4). When analysing the problem, event 4 can actually be removed since it can be covered by a combination of event 2 and event 3 as shown below. This leads to a total of 3 relatively simple conditions that can easily implemented as a query for the \emph{MongoDB}.
 
@@ -778,7 +786,7 @@ private ArrayList<GrantedAuthority> getUserAuthorities(User user)
 
 Upon each authentication request, the user gets loaded by the \texttt{UserAuthenticationService} located in the \path{de.steilerdev.myVerein.server.security} package and gets his authorities assigned. As long as the user's session is active these authorities are cached within the system, to avoid reloading all the information. Listing \ref{lst:UserAuthentication} shows the function evaluating and returning the list of authorities. It was taken from the \texttt{UserAuthenticationService} class mentioned above. 
 
-Since this function is only called, if the user could be authenticated successfully, he is automatically becoming part of the \texttt{ROLE\_USER} group in line 10. Afterwards all divisions, administrated by the selected user, are retrieved, . If this list is not empty, which means that this user is administrating at least one division, he becomes part of the \texttt{ROLE\_ADMIN} authority. If one of the divisions within this list is the root division he get the role \texttt{ROLE\_SUPERADMIN} and can therefore manipulate all settings within the system. Since the root division does not have a parent, this field is set to \texttt{NULL}. Using this assumption the list is checked for containing the root division within line 15.
+Since this function is only called, if the user could be authenticated successfully, he is automatically becoming part of the \texttt{ROLE\_USER} group in line 10. Afterwards all divisions, administrated by the selected user, are retrieved. If this list is not empty, which means that this user is administrating at least one division, he becomes part of the \texttt{ROLE\_ADMIN} authority. If one of the divisions within this list is the root division he get the role \texttt{ROLE\_SUPERADMIN} and can therefore manipulate all settings within the system. Since the root division does not have a parent, this field is set to \texttt{NULL}. Using this assumption the list is checked for containing the root division within line 15.
 
 Finally the list of granted authorities is returned to \emph{Spring Security} which can proceed with the log in of the user. Additionally it is now able to evaluate if the user is allowed to access the specified resource.
 
@@ -795,7 +803,7 @@ Table \vref{tab:RESTAuthentication} shows the interface that needs to be used to
 	\RESTEntry{/api/login}
 		{POST}
 		{\texttt{username}, \texttt{password}, \texttt{rememberMe} (optional)}
-		{If the \texttt{username} and \texttt{password} match an entry within the database a success status code is returned. Additionally details about the system are present in the header of the response. These include the \texttt{System-ID}, the \texttt{System-Version} and the user's \texttt{User-ID}. If the \texttt{rememberMe} parameter is present, the user will receive a remember me token, which will not expire after 60 minutes like the session cooke. This behaviour was discussed in section \vref{sec:ImplementationSec}. If the authentication was not successful a \texttt{401} status code is returned}
+		{If the \texttt{username} and \texttt{password} match an entry within the database a success status code is returned. Additionally details about the system are present in the header of the response. These include the \texttt{System-ID}, the \texttt{System-Version} and the user's \texttt{User-ID}. If the \texttt{rememberMe} parameter is present, the user will receive a remember me token, which will not expire after 60 minutes like the session cookie. This behaviour was discussed in section \vref{sec:ImplementationSec}. If the authentication was not successful a \texttt{401} status code is returned}
 	\RESTEntry{/api/logout}
 		{POST}
 		{}
@@ -819,7 +827,7 @@ Table \vref{tab:RESTUserMember} will focus on all member facing functionalities 
 	\RESTEntry{/api/user/user}
 		{POST}
 		{\texttt{deviceToken}}
-		{This function updates the device token associated with the currently logged in user. This functionality is needed as soon as an notification service for the \emph{iOS} app is established. }
+		{This function updates the device token associated with the currently logged in user. This functionality is needed as soon as a notification service for the \emph{iOS} app is established. }
 \end{RESTTable}
 
 \paragraph{Administrator facing}
@@ -956,7 +964,7 @@ The messages \gls{API} does not have any administrator facing functionalities, t
 	\RESTEntry{/api/user/message}
 		{GET}
 		{\texttt{id}}
-		{Returns the complete message specified by \texttt{id}. If the message is delivered the first time, it's message status is going to be set to delivered}	
+		{Returns the complete message specified by \texttt{id}. If the message is delivered the first time, its message status is going to be set to delivered}	
 	\RESTEntry{/api/user/message}
 		{GET}
 		{\texttt{all} (optional)}
@@ -964,7 +972,7 @@ The messages \gls{API} does not have any administrator facing functionalities, t
 	\RESTEntry{/api/user/message}
 		{POST}
 		{\texttt{division}, \texttt{content}, \texttt{timestamp}}
-		{Sends a message with a specified \texttt{content} to the server. The receiving \texttt{division}, specified by its id, needs to exists and the user needs to be part of it. If the send was successful the response contains the send message, containing the message's system generated id as well as the timestamp assigned by the server}
+		{Sends a message with a specified \texttt{content} to the server. The receiving \texttt{division}, specified by its id, needs to exist and the user needs to be part of it. If the send was successful the response contains the send message, containing the message's system generated id as well as the timestamp assigned by the server}
 \end{RESTTable}
 
 \subsubsection{Initial setup}
@@ -1074,7 +1082,7 @@ The process of sending a request is depicted as a flow chart in appendix \vref{a
 
 Secondly the amount of running requests is tracked within a global counter. This value is made thread-safe, by installing a lock, protecting the critical region. This counter is increased, before the request is send, and decreased before the success or failure callbacks are executed.
 
-Finally the system is able to distinct between a general network error and an authentication problem. In case of a general error, the failure function defined during the request creation is executed and a warning is shown to the user, where in case of an authentication error another process is started: The current and all upcoming requests, until the user is logged in, are put onto a thread safe queue. Meanwhile the application tries to execute the login request using the stored user credentials. If this execution succeeds, the requests that were put on the queue earlier are getting resend. In case the authentication failed, the failure callback for each queued request is executed and the user is presented with an log in screen, since obviously his credentials are not valid anymore. 
+Finally the system is able to distinct between a general network error and an authentication problem. In case of a general error, the failure function defined during the request creation is executed and a warning is shown to the user, where in case of an authentication error another process is started: The current and all upcoming requests, until the user is logged in, are put onto a thread safe queue. Meanwhile the application tries to execute the login request using the stored user credentials. If this execution succeeds, the requests that were put on the queue earlier are getting resend. In case the authentication failed, the failure callback for each queued request is executed and the user is presented with a log in screen, since obviously his credentials are not valid anymore. 
 
 \subsubsection{Multi-Threading}
 
@@ -1111,13 +1119,13 @@ Up to this point none of the major design decisions were regretted, nevertheless
 
 The next steps will mainly include the implementation of the missing requirements specified in section \vref{sec:Requirements}. Additionally a restructuring of the back-end server is considered. Strictly separating the web application from the back-end logic would increase the maintainability and might even improve performance by decreasing the workload on the core service. Nevertheless this might imply some design changes within the administrator interface that need to be considered first.
 
-After completing the implementation of the requirements, the main objective needs to be stability. The complete platform needs to run smoothly and complication free, to prepare for a public testing phase, followed by an initial release. Together with this release, a streamlined process needs to be established to enable an automatic setup of instances. This might include the possibility to allocate resources on demand within a cloud environment.
+After completing the implementation of the requirements, the main objective is stability. It will be a top priority to get the platform run smoothly and free of complication, to prepare for a public testing phase, followed by an initial release. Together with this release, a streamlined process needs to be established to enable an automatic setup of instances. This might include the possibility to allocate resources on demand within a cloud environment.
 
 Based on the feedback during this time, the future of the platform is determined. In case of a positive reception, the monetarization of the software might be considered. This can be done, by providing a \gls{SaaS} concept, where the technical resources of the back-end as well as the required knowledge to setup and run the system is provided. By charging an appropriate monthly fee, either based on the size of the club and/or the traffic produced by the users, the costs of running the servers and allocating the workforce are getting compensated.
 
-Following these steps the continuous improvement of the system should not be ignored. As shown in section \vref{sec:Functionality}, there are many functionalities, that haven't been considered so far, since their implementation was not required for a satisfying user experience. By adding them to the platform, the introduction of \emph{myVerein} is getting more and more appealing.
+Following these steps the continuous improvement of the system must not be ignored. As shown in section \vref{sec:Functionality}, there are many functionalities, that haven't been considered so far, since their implementation was not any requirement so far but would give another push to ameliorate customer's satisfaction. By adding them to the platform, the introduction of \emph{myVerein} is surely going to be more and more appealing.
 
-Finally it is important to note, that the future work presented in this chapter is going to be very time consuming. Since the development of the system is currently done by a single person, this process might take years to finish and the system will be most certainly outdated before its initial release. From the beginning on the system's license was defined as open-source, enabling independent developers to contribute to this project. Therefore an important task of the near future will include the acquisition of skilled people sharing the vision of disrupting the management of clubs and increasing the size of the team working on \emph{myVerein}.
+Finally it is important to note, that the future work presented in this chapter is going to be very time consuming. Since the development of the system is currently done by a single person, this process might take years to finish and without additional support from other software engineers the system will be most certainly outdated before its initial release. From the early beginning the system's license was fully intended to be open-source to enable independent developers to contribute to this project. Therefore an important task of the near future will include the acquisition of skilled people sharing my vision of disrupting the management of clubs and increasing the size of the team working on \emph{myVerein}.
 
 
 
