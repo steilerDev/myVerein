@@ -155,11 +155,11 @@ extension LoginViewController {
     hostTextField.enabled = false
     loginButton.enabled = false
     
-    let (currentUsername, currentPassword, currentDomain) = MVSecurity.instance.currentKeychain()
+    let (username, password, domain) = MVSecurity.instance.currentKeychain()
     
-    if let username = currentUsername,
-      password = currentPassword,
-      domain = currentDomain {
+    if !username.isEmpty &&
+      !password.isEmpty &&
+      !domain.isEmpty {
         usernameTextField.text = username
         passwordTextField.text = password
         hostTextField.text = domain

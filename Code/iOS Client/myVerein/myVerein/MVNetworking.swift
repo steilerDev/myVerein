@@ -224,7 +224,7 @@ class MVNetworking {
   func performLogIn(showLoginScreenOnFailure: Bool = true, success: (() -> ())?, failure: ((NSError) -> ())?) {
     logger.verbose("Logging in using stored credentials")
     let (username, password, _) = MVSecurity.instance.currentKeychain()
-    if let username = username, password = password where !password.isEmpty && !username.isEmpty {
+    if !password.isEmpty && !username.isEmpty {
       let parameters = [
         NetworkingConstants.Login.Parameter.Username: username,
         NetworkingConstants.Login.Parameter.Password: password,

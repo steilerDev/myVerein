@@ -53,11 +53,12 @@ class MVNetworkingSessionFactory {
   /// This function returns the shared session manager used within the whole system. The object is lazily created
   class func createInstance() -> AFHTTPSessionManager? {
     logger.debug("Creating new session instance")
-    if let baseUrlString = MVSecurity.instance.currentKeychain().domain,
-      baseUrl = NSURL(string: baseUrlString),
+    
+    let baseUrlString = MVSecurity.instance.currentKeychain().domain
+    
+    if let baseUrl = NSURL(string: baseUrlString) ,
       certificatePath = NSBundle.mainBundle().pathForResource(NetworkingConstants.Certificate.Name, ofType: NetworkingConstants.Certificate.Type),
-      certificate = NSData(contentsOfFile: certificatePath)
-    {
+      certificate = NSData(contentsOfFile: certificatePath) {
       let sharedSessionManager = AFHTTPSessionManager(baseURL: baseUrl)
       sharedSessionManager?.securityPolicy = AFSecurityPolicy(pinningMode: .Certificate)
       
@@ -69,7 +70,7 @@ class MVNetworkingSessionFactory {
       logger.info("Successfully created new session instance")
       return sharedSessionManager
     } else {
-      logger.warning("Unable to create new session instance")
+      logger.error("Unable to create new session instance")
       return nil
     }
   }

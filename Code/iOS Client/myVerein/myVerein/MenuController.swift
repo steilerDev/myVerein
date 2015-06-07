@@ -52,9 +52,9 @@ class MenuController: UITabBarController {
     let (currentUsername, currentPassword, currentDomain) = MVSecurity.instance.currentKeychain()
     
     if !Defaults.hasKey(MVUserDefaultsConstants.UserID) ||
-      currentUsername == nil ||
-      currentPassword == nil ||
-      currentDomain == nil
+      currentUsername.isEmpty ||
+      currentPassword.isEmpty ||
+      currentDomain.isEmpty
     {
       logger.info("No credentials stored, asking the user to enter his")
       (UIApplication.sharedApplication().delegate as! AppDelegate).showLoginView()

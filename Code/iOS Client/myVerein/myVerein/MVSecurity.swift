@@ -83,8 +83,10 @@ class MVSecurity {
   }
   
   /// This function returns the current state of the keychain. If a property is not set nil is returned.
-  func currentKeychain() -> (username: String?, password: String?, domain: String?) {
+  func currentKeychain() -> (username: String, password: String, domain: String) {
     logger.debug("Returning current keychain credentials")
-    return (currentUsername, currentPassword, currentDomain)
+    return (currentUsername == nil ? "": currentUsername!,
+            currentPassword == nil ? "": currentPassword!,
+            currentDomain == nil ? "": currentDomain!)
   }
 }
