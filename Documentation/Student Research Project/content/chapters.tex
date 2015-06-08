@@ -727,8 +727,6 @@ Initially this task was realised using a lot of back-end computing, iterating ov
 
 This change in behaviour could be realised, by updating \emph{Spring Data MongoDB} to the latest release, which included the support of comparing \emph{Java 8} \texttt{LocalDateTime} objects within a query. By shifting the workload from the application to the database the process benefits from internal query optimiser, a reduced result set and an overall improved responsiveness. 
 
-Figure \vref{fig:EventPeriod} shows the four possibilities any event can occupy just a fraction or the complete given period. Either it is within (event 1), starts before and ends within (event 2), ends after and starts within (event 3), or starts before and ends after the period (event 4). When analysing the problem, event 4 can actually be removed since it can be covered by a combination of event 2 and event 3 as shown below. This leads to a total of 3 relatively simple conditions that can be easily implemented as a query for \emph{MongoDB}.
-
 \begin{lstlisting}[caption ={MongoDB query for getting events over a period}, label=lst:MongoEvent]
 {$or: [
 	{$and: [
@@ -748,7 +746,9 @@ Figure \vref{fig:EventPeriod} shows the four possibilities any event can occupy 
 ]}
 \end{lstlisting}
 
-Listing \ref{lst:MongoEvent} is showing the query used to gather all events spanning over a period defined by a start and end time. Within the query, the placeholder \texttt{?0} and \texttt{?1} are replaced by the start, respectively end of the period during runtime. The whole query is a \enquote{OR}-connection of three different statements. 
+Figure \vref{fig:EventPeriod} shows the four possibilities any event can occupy just a fraction or the complete given period. Either it is within (event 1), starts before and ends within (event 2), ends after and starts within (event 3), or starts before and ends after the period (event 4). When analysing the problem, event 4 can actually be removed since it can be covered by a combination of event 2 and event 3 as shown below. This leads to a total of 3 relatively simple conditions that can be easily implemented as a query for \emph{MongoDB}.
+
+Listing \vref{lst:MongoEvent} is showing the query used to gather all events spanning over a period defined by a start and end time. Within the query, the placeholder \texttt{?0} and \texttt{?1} are replaced by the start, respectively end of the period during runtime. The whole query is a \enquote{OR}-connection of three different statements. 
 
 The first statement from line 2 to 7 covers event 1 from figure \vref{fig:EventPeriod}. Line 3 and 4 check if the start of the event is between the start and end of the period, where line 5 and 6 assure the end of the event satisfies this condition as well.
 
@@ -759,6 +759,10 @@ This query is used within several functions in classes related to the event mana
 \subsubsection{User role assessment}
 
 During log-in it is important to evaluate the role of an authenticated user to be able to judge what policies apply to him. As noted in section \vref{sec:ImplementationSec} the security back-end uses the \emph{MongoDB} as a data provider for authentication. This is realised through the implementation of the \path{org.springframework.security.core.userdetails.UserDetails} interface within the user object. Besides authentication properties, like the password, username and information about the validity of the account, this interface expects the object to provide a list of granted authorities. These authorities match the user roles presented in section \vref{sec:ImplementationSec}. 
+
+Upon each authentication request, the user gets loaded by the \texttt{UserAuthenticationService} located in the \path{de.steilerdev.myVerein.server.security} package and gets his authorities assigned. As long as the user's session is active these authorities are cached within the system, to avoid reloading all the information. Listing \vref{lst:UserAuthentication} shows the function evaluating and returning the list of authorities. It was taken from the \texttt{UserAuthenticationService} class mentioned above. 
+
+After the authentication was successful this function is called, automatically assigning the user to the \texttt{ROLE\_USER} group in line 10. Afterwards all divisions, administrated by the selected user, are retrieved. If this list is not empty, which means that this user is administrating at least one division, he becomes part of the \texttt{ROLE\_ADMIN} authority. If one of the divisions within this list is the root division he get the role \texttt{ROLE\_SUPERADMIN} and can therefore manipulate all settings within the system. Since the root division does not have a parent, the associated member field is set to \texttt{NULL}. Using this assumption the list is checked for containing the root division within line 15.
 
 \begin{lstlisting}[caption ={User role assessment executed upon authentication (slightly modified for readability)}, label=lst:UserAuthentication, language=Java]
 /**
@@ -785,10 +789,6 @@ private ArrayList<GrantedAuthority> getUserAuthorities(User user)
 }
 \end{lstlisting}
 
-Upon each authentication request, the user gets loaded by the \texttt{UserAuthenticationService} located in the \path{de.steilerdev.myVerein.server.security} package and gets his authorities assigned. As long as the user's session is active these authorities are cached within the system, to avoid reloading all the information. Listing \ref{lst:UserAuthentication} shows the function evaluating and returning the list of authorities. It was taken from the \texttt{UserAuthenticationService} class mentioned above. 
-
-After the authentication was successful this function is called, automatically assigning the user to the \texttt{ROLE\_USER} group in line 10. Afterwards all divisions, administrated by the selected user, are retrieved. If this list is not empty, which means that this user is administrating at least one division, he becomes part of the \texttt{ROLE\_ADMIN} authority. If one of the divisions within this list is the root division he get the role \texttt{ROLE\_SUPERADMIN} and can therefore manipulate all settings within the system. Since the root division does not have a parent, the associated member field is set to \texttt{NULL}. Using this assumption the list is checked for containing the root division within line 15.
-
 Finally the list of granted authorities is returned to \emph{Spring Security} which can proceed with the log in of the user. Additionally it is now able to evaluate if the user is allowed to access the specified resource.
 
 \subsection{REST API}
@@ -804,7 +804,7 @@ Table \vref{tab:RESTAuthentication} shows the interface that needs to be used to
 	\RESTEntry{/api/login}
 		{POST}
 		{\texttt{username}, \texttt{password}, \texttt{rememberMe} (optional)}
-		{If the \texttt{username} and \texttt{password} match an entry within the database, a success status code is returned. Additionally details about the system are present in the header of the response. These include the \texttt{System-ID}, the \texttt{System-Version} and the user's \texttt{User-ID}. If the \texttt{rememberMe} parameter is present, the user will receive a remember-me token, which will not expire after 60 minutes like the session cookie. This behaviour was discussed in section \vref{sec:ImplementationSec}. If the authentication was not successful a \texttt{401} status code is returned}
+		{If the \texttt{username} and \texttt{password} match an entry within the database, a success status code is returned. Additionally details about the system are present in the header of the response. These include the \texttt{System-ID}, the \texttt{System-Version} and the user's \texttt{User-ID}. If the \texttt{rememberMe} parameter is present, the user will receive a remember-me token, discussed in section \vref{sec:ImplementationSec}. If the authentication was not successful a \texttt{401} status code is returned}
 	\RESTEntry{/api/logout}
 		{POST}
 		{}
@@ -837,21 +837,21 @@ Table \vref{tab:RESTUserAdmin} is showing all administrator related \gls{API}, w
 
 \begin{RESTTable}{Admin facing user API}{tab:RESTUserAdmin}
 	\RESTEntry{/api/admin/user}
+		{POST}
+		{\texttt{email}, \texttt{firstName}, \texttt{lastName}, \texttt{birthday}, \texttt{password}, \texttt{gender} (optional), \texttt{street}, \texttt{streetNumber}, \texttt{zip}, \texttt{city}, \texttt{country}, \texttt{activeMemberSince}, \texttt{passiveMemberSince}, \texttt{resignationDate}, \texttt{divisions}, \texttt{IBAN}, \texttt{BIC}, \texttt{userFlag}, \texttt{cuf\_*}} 
+		{Saves/creates a user. The \texttt{userFlag} needs to state the ID of the user who needs to be changed or \texttt{true} if a new user is created. The \texttt{password} field is only respected when creating a new user, concluding you can`t change the password of a user using this API. All other parameter specification can be found within the corresponding \emph{JavaDoc}}
+	\RESTEntry{/api/admin/user}
 		{GET}
 		{\texttt{term} (optional)} 
 		{Returns a list of all user. If the \texttt{term} parameter is present, the list is filtered and only users, where the first name, last name or email contains \texttt{term} are returned}
 	\RESTEntry{/api/admin/user}
-		{GET}
-		{\texttt{email}}
-		{Returns the user identified by \texttt{email}. If the user is not allowed to modify his profile, all private information are hidden and a parameter is set including a message telling the application that the selected user cannot be manipulated}
-	\RESTEntry{/api/admin/user}
-		{POST}
-		{\texttt{firstName}, \texttt{lastName}, \texttt{email}, \texttt{birthday}, \texttt{password}, \texttt{gender} (not required), \texttt{street}, \texttt{streetNumber}, \texttt{zip}, \texttt{city}, \texttt{country}, \texttt{activeMemberSince}, \texttt{passiveMemberSince}, \texttt{resignationDate}, \texttt{IBAN}, \texttt{BIC}, \texttt{divisions}, \texttt{userFlag}, \texttt{cuf\_*}} 
-		{Saves/creates a user. The \texttt{userFlag} needs to state the ID of the user who needs to be changed or \texttt{true} if a new user is created. The \texttt{password} field is only respected when creating a new user, concluding you can`t change the password of a user using this API. All other parameter specification can be found within the corresponding \emph{JavaDoc}}
-	\RESTEntry{/api/admin/user}
 		{DELETE}
 		{\texttt{email}}
 		{Deletes the user identified by his \texttt{email}}
+	\RESTEntry{/api/admin/user}
+		{GET}
+		{\texttt{email}}
+		{Returns the user identified by \texttt{email}. If the user is not allowed to modify his profile, all private information are hidden and a parameter is set including a message telling the application that the selected user cannot be manipulated}
 \end{RESTTable}
 
 \subsubsection{Division}
@@ -877,7 +877,7 @@ For modifying, creating and deleting divisions a user needs to be part of the \t
 \begin{RESTTable}{Admin facing division API}{tab:RESTDivAdmin}
 	\RESTEntry{/api/admin/division}
 		{POST}
-		{\texttt{name}, \texttt{ID}, \texttt{description}, \texttt{admin}}
+		{\texttt{name}, \texttt{description}, \texttt{admin}, \texttt{ID}}
 		{Saves the division defined by its \texttt{ID}, using the provided parameters. The division needs to exist}
 	\RESTEntry{/api/admin/division}
 		{POST} 
@@ -914,6 +914,10 @@ The member facing part of the event \gls{API} is shown in table \vref{tab:RESTEv
 
 \begin{RESTTable}{Member facing event API}{tab:RESTEventMember}
 	\RESTEntry{/api/user/event}
+		{POST}
+		{\texttt{ID}, \texttt{response}}
+		{Saves the user's response to the event specified by the \texttt{ID}. The \texttt{response} needs to be a string representation of a value from the enumeration defined in \path{de.steilerdev.myVerein.server.model.event.EventStatus}}
+	\RESTEntry{/api/user/event}
 		{GET}
 		{\texttt{lastChanged} (optional)}
 		{Returns the IDs of all events the user is invited to. If the \texttt{lastChanged} parameter is set, only events that changed after this date are returned. The \texttt{lastChanged} parameter needs to be formatted according to the pattern \texttt{YYYY-MM-DDTHH:mm:ss}}
@@ -921,10 +925,6 @@ The member facing part of the event \gls{API} is shown in table \vref{tab:RESTEv
 		{GET}
 		{\texttt{ID}}
 		{Returns the event specified by the \texttt{ID}, containing all available information}
-	\RESTEntry{/api/user/event}
-		{POST}
-		{\texttt{ID}, \texttt{response}}
-		{Saves the user's response to the event specified by the \texttt{ID}. The \texttt{response} needs to be a string representation of a value from the enumeration defined in \path{de.steilerdev.myVerein.server.model.event.EventStatus}}
 	\RESTEntry{/api/user/event}
 		{GET}
 		{\texttt{ID}, \texttt{response}}
@@ -948,18 +948,19 @@ The management of the events is done through the administrator facing \gls{API} 
 		{\texttt{ID}}
 		{Returns an event identified by its \texttt{ID}. If the user is not allowed to change the event, an administration-not-allowed parameter is present}
 	\RESTEntry{/api/admin/event}
-		{POST}
-		{\texttt{eventFlag}, \texttt{eventName}, \texttt{eventDescription}, \texttt{startDate}, \texttt{startTime}, \texttt{endDate}, \texttt{endTime}, \texttt{location}, \texttt{locationLat}, \texttt{locationLng}, \texttt{invitedDivisions}}
-		{This function updates the event identified by its ID within the \texttt{eventFlag} field, or creates a new event, if \texttt{eventFlag} is set to true. All other parameter specification can be found within the corresponding \emph{JavaDoc}. An event can only be modified, if the user either created it, or the user is the super admin. If the event was saved successfully a JSON map is returned containing a success message and the ID of the event}
-	\RESTEntry{/api/admin/event}
 		{DELETE}
 		{\texttt{ID}}
 		{Deletes the event specified by the \texttt{ID}. An event can only be deleted, if the user either created it, or the user is the super admin}	
+	\RESTEntry{/api/admin/event}
+		{POST}
+		{\texttt{eventFlag}, \texttt{eventName}, \texttt{eventDescription}, \texttt{startDate}, \texttt{startTime}, \texttt{endDate}, \texttt{endTime}, \texttt{location}, \texttt{locationLat}, \texttt{locationLng}, \texttt{invitedDivisions}}
+		{This function updates the event identified by its ID within the \texttt{eventFlag} field, or creates a new event, if \texttt{eventFlag} is set to true. All other parameter specification can be found within the corresponding \emph{JavaDoc}. An event can only be modified, if the user either created it, or the user is the super admin. If the event was saved successfully a JSON map is returned containing a success message and the ID of the event}
 \end{RESTTable}
 
 \subsubsection{Message}
 
-The messages \gls{API} does not have any administrator facing functionalities, therefore only member facing ones are available. Concluding to use the messaging service of the system, the authenticated user needs to be part of the \texttt{ROLE\_USER} authority. Table \vref{tab:RESTMsg} shows all provided functionalities. The implementation of the message handling can be found in the class \texttt{MessageController} within the package \paragraph{de.steilerdev.myVerein.controller.user}.
+The messages \gls{API} does not have any administrator facing functionalities, therefore only member facing ones are available. Concluding to use the messaging service of the system, the authenticated user needs to be part of the \texttt{ROLE\_USER} authority. Table \vref{tab:RESTMsg} shows all provided functionalities. The implementation of the message handling can be found in the class \texttt{MessageController} within the package \path{de.steilerdev.myVerein.controller.user}.
+
 
 \begin{RESTTable}{Message API}{tab:RESTMsg}
 	\RESTEntry{/api/user/message}
@@ -978,7 +979,9 @@ The messages \gls{API} does not have any administrator facing functionalities, t
 
 \subsubsection{Initial setup}
 
-Since there is no user specified during the initial setup, this resource is, in theory, accessible by every user, even if he is unauthorised. Nevertheless, the system will only accept requests using this \gls{API} if either the database is unavailable, or the initial setup flag is set. The functionality presented in table \vref{tab:RESTInit} is implemented by the \texttt{InitController} class, located within the \paragraph{de.steilerdev.myVerein.server.controller.init} package.
+Since there is no user specified during the initial setup, this resource is, in theory, accessible by every user, even if he is unauthorised. Nevertheless, the system will only accept requests using this \gls{API} if either the database is unavailable, or the initial setup flag is set. The functionality presented in table \vref{tab:RESTInit} is implemented by the \texttt{InitController} class, located within the \path{de.steilerdev.myVerein.server.controller.init} package.
+
+\newpage
 
 \begin{RESTTable}{Initial setup API}{tab:RESTInit}
 	\RESTEntry{/api/init}
@@ -991,19 +994,21 @@ Since there is no user specified during the initial setup, this resource is, in 
 
 This section is presenting the \gls{API} that can be used to alter the system settings. To use this interface shown in table \vref{tab:RESTSettings} the user needs to be authenticated as \texttt{ROLE\_ADMIN}. Unfortunately a regular admin only has a limited set of options to alter the settings, to use the full set he needs to be \texttt{ROLE\_SUPERADMIN}. The presented functionality is provided by the \texttt{SettingsController} class within the \path{de.steilerdev.myVerein.server.controller.admin} package.
 
+\newpage
+
 \begin{RESTTable}{Settings API}{tab:RESTSettings}
 	\RESTEntry{/api/admin/settings}
-		{GET}
-		{}
-		{This function returns all available settings, unless the user is not the super admin, then the response will only contain his email, name and ID together with an administration-not-allowed message.}
+		{POST}
+		{\texttt{currentAdmin}, \texttt{adminPasswordNew} (optional), \texttt{adminPasswordNewRe}, \texttt{clubName} (optional), \texttt{clubLogo} (optional), \texttt{cuf\_*} (optional), \texttt{currentPassword}}
+		{If the \texttt{currentPassword} is correct and the user is the super admin, all parameters from this request are saved. The \texttt{clubLogo} needs to be a multipart image file, either a \texttt{JPG} or \texttt{PNG}. The parameters prefixed with \texttt{cuf\_} are the custom user fields that are going to be available in all user profiles. The \texttt{currentAdmin} parameters defines the new super admin, unless the current user is only a second-level administrator. In this case the field needs to match the user's email. A regular administrator can only change his password through this \gls{API}.}
 	\RESTEntry{/api/admin/settings}
 		{DELETE}
 		{\texttt{password}}
 		{This functionality can only be used by the super admin. If the password is correct, this function will set the \texttt{initialSetup} flag within the settings and therefore enable a new initial setup, leading to the deletion of all information within the system}
 	\RESTEntry{/api/admin/settings}
-		{POST}
-		{\texttt{currentAdmin}, \texttt{adminPasswordNew} (optional), \texttt{adminPasswordNewRe}, \texttt{clubName} (optional), \texttt{clubLogo} (optional), \texttt{cuf\_*} (optional), \texttt{currentPassword}}
-		{If the \texttt{currentPassword} is correct and the user is the super admin, all parameters from this request are saved. The \texttt{clubLogo} needs to be a multipart image file, either a \texttt{JPG} or \texttt{PNG}. The parameters prefixed with \texttt{cuf\_} are the custom user fields that are going to be available in all user profiles. The \texttt{currentAdmin} parameters defines the new super admin, unless the current user is only a second-level administrator. In this case the field needs to match the user's email. A regular administrator can only change his password through this \gls{API}.}
+		{GET}
+		{}
+		{This function returns all available settings, unless the user is not the super admin, then the response will only contain his email, name and ID together with an administration-not-allowed message.}
 \end{RESTTable}
 
 \subsubsection{Content}
