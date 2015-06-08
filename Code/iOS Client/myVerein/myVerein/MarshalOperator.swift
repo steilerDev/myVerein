@@ -17,7 +17,7 @@
 
 //
 //  MarshalOperator.swift
-//  This file contains the definition of the Marshal operator, who is intended to simplify multi threading using GCD, by providing a thin abstraction layer, while still hiding the underlying C API.
+//  This file contains the definition of the Marshal operator, that is intended to simplify multi threading using GCD, by providing a thin abstraction layer, while still hiding the underlying C API.
 //
 //  The marshal operator (~>) is an in-, pre- and postfix operator used on closures. The operator was first suggested by Josh Smith, whose initial implementation is the foundation for this extension to the Swift programming language: http://ijoshsmith.com/2014/07/05/custom-threading-operator-in-swift/.
 //
